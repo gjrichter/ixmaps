@@ -1,0 +1,111 @@
+<?xml version="1.0" standalone="no"?>
+<!-- Creator: SVGGIS -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+   "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd"  >
+<svg xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xmap="http://www.medienobjekte.de"
+    xml:space="preserve"
+	  preserveAspectRatio="xMinYMin meet"
+    width="640px" height="480px" viewBox="0 0 12800 9600"  
+    onload="svggis_initLoadedScript(evt)">
+   
+  <script type="text/ecmascript"><![CDATA[
+    function svggis_initLoadedScript(evt){
+      if ( typeof(initAll) != "undefined" && typeof(initAll) == "function" )
+          initAll(evt);
+    }
+  ]]></script>
+
+  <script type="text/ecmascript" xlink:href="../../js/mapscript.js"/>
+   
+ <defs>
+  <g id="mapinclude" >
+    <g id="localstore" xlink:href="maplocal.svg">
+    </g>
+    <g id="menustore" xlink:href="mapmenu.svg">
+    </g>
+    <g id="symbolstore" xlink:href="mapsymbol.svg">
+    </g>
+    <g id="patternstore" xlink:href="mappattern.svg">
+    </g>
+    <g id="filterstore" xlink:href="mapfilter.svg">
+    </g>
+    <g id="widgetstore" xlink:href="mapwidget.svg">
+    </g>
+    <g id="imagestore" xlink:href="mapimages.svg">
+    </g>
+    <g id="scriptstore" xlink:href="mapscripts.svg">
+    </g>
+  </g>
+ </defs>
+ <defs>
+  <style id="mapstyles" type="text/css">
+   <![CDATA[
+.dontdraw{fill:none;stroke:none}
+.nodata{fill:#bbbbbb;stroke:black}
+.linetemplate{fill:none;}
+.World-countries-shp0s0{pointer-events:none;font-family:MS Shell Dlg 2;font-size:240px;font-weight:normal;font-style:normal;fill:#000000;stroke-width:0px;opacity:1.000000;text-anchor:middle;baseline-shift:-100;;pointer-events:none;display:inline;}
+.World-countries-shp0s1{fill:none;stroke:none;pointer-events:none;display:inline;}
+   ]]>
+  </style>
+ </defs>
+<defs>
+<g id="marker_symbols" >
+</g>
+</defs>
+<defs>
+</defs>
+<defs>
+</defs>
+<metadata>
+  <xmap:creation generator="SvgGis 1.1" version="1.1" build="4127" generation-time="Thu Nov 05 23:05:26 2015" />
+  <xmap:extension minboundx="-290.8191743804" maxboundx="189.1808256196" minboundy="-180.0000000000" maxboundy="180.0000000000" minx="-6400" maxx="6400" miny="-4800" maxy="4800" />
+  <xmap:coordsys projection="Mercator" datum="(null)" UTMZone="(null)" falseeasting="0.0000000000" falsenorthing="0.0000000000" correcteasting="0.0000000000" correctnorthing="0.0000000000" />
+  <xmap:scale mapscale="177165354" mapscalestr="1:177165354" mapunits="0" mapunitsstr="decimal_degrees" />
+  <xmap:features featurescaling="1.000000" borderscaling="1.000000" linescaling="1.000000" labelscaling="1.000000" objectscaling="1.000000" symbolscaling="1.000000"  />
+  <xmap:alignments map="" legend="" toolbar="" popupwindow=""  />
+  <xmap:scaledependencies >
+  </xmap:scaledependencies >
+  <xmap:themes >
+    <xmap:theme name="World_countries_shp" legendname="World_countries_shp" type="polygon" items="238" renderer="4" rendererfield="" label="" flag="" info="" selection="FeatureId" filter="ID" filtervalue="none" highlightstyle="" display="inline" displaylabel="inline" >
+      <xmap:category type="single" fill="#d6cd68" stroke="#000000" />
+    </xmap:theme>
+  </xmap:themes>
+</metadata>
+<g id="mapbackground">
+<rect id="mapbackground:largeeventrect" x="-12800" y="-9600" width="38400" height="28800" style="fill:white;stroke:none;opacity:0" />
+  <g id="mapbackground:logo" style="pointer-events:none">
+  </g>
+</g>
+<g id="mapoffset" transform='matrix(1 0 0 1 0 0)'>
+<g id="mapclipdef">
+  <clipPath id="mapclippath" style="pointer-events:all">
+    <rect id="mapcliprect" x="0" y="0" width="12800" height="9600" style="fill:none;stroke:none;" />
+  </clipPath>
+  <clipPath id="mapclippath2" style="pointer-events:all">
+    <rect id="mapcliprect2" x="-6400" y="-4800" width="12800" height="9600" style="fill:none;stroke:none;" />
+  </clipPath>
+</g>
+<g id="mapclip" clip-path="url(#mapclippath)">
+<g id="mapcanvas" style="display:none" transform='matrix(1 0 0 1 6400 4800) rotate(0)'>
+  <rect id="mapbackground:eventrect" x="-12800" y="-9600" width="38400" height="28800" style="fill:white;stroke:none;opacity:0" />
+<g id="mapzoomandpan" transform="matrix(1 0 0 1 0 0)">
+<g id="maplayer" clip-path="url(#mapclippath2)">
+<g id='World_countries_shp' class='World-countries-shp0s1' pointer-events='none' >
+<g id='World_countries_shp::bbox'  minboundx="300000.0000000000"  maxboundx="-300000.0000000000"  minboundy="300000.0000000000"  maxboundy="-300000.0000000000" ></g>
+</g>
+<g id='mapobjects_below_label'></g>
+<g id='World_countries_shp:label' class='World-countries-shp0s0'  >
+</g>
+</g>
+<g id='mapobjects'></g>
+</g>
+</g>
+</g>
+</g>
+<g id="extension" minboundx="-290.8191743804"  maxboundx="189.1808256196"  minboundy="-180.0000000000"  maxboundy="180.0000000000"  maxx="12800"  maxy="9600" ></g>
+<g id='objects'></g>
+<g id="widgets:antizoomandpan" style="">
+</g>
+</svg>
