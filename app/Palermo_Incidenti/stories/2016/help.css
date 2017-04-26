@@ -1,0 +1,33 @@
+﻿/*
+ * -----------------------------------
+ * iXMaps homepage main style sheet
+ * -----------------------------------
+ */
+
+body {
+  color: #eee;
+  background-color: #282828;
+}
+p,
+table,
+tr,
+td,
+ul,
+li,
+.maptypelist
+{
+    font-family: Raleway,Arial;
+    font-weight: 300;
+}
+
+.container{
+  color: #eee;
+  background-color: #282828;
+}
+.modal {
+	background-color: #282828;
+}
+.modal-content {
+	background-color: #282828;
+}
+

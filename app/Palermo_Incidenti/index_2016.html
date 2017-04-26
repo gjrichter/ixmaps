@@ -1,0 +1,81 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<meta charset="iso-8859-1">	
+	<title>ixmaps</title>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+
+	<link rel="shortcut icon" href="../../ui/images/ixmaps_logo.png">
+	<script type="text/javascript" src = "../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src = "../../ui/libs/getUrlParam/js/jquery.getUrlParam.js"></script>
+	<script type="text/javascript" src = "../../ui/js/htmlgui_api.js"></script>
+
+	<script>
+
+	__ui		= "../../ui/html/main_sync_story_frame.html?basemap=ll&maptype=CartoDB - Positron";
+	__ui       += "&minimal=1&options=1&tilemap=show&nolegend=1&themelegend=0&silent=0"; 
+	__map		= "";
+	__story		= "../../app/Palermo_Incidenti/stories/2016/index_full.html";
+	__bound		= "";
+	__attribute	= "Data: <a href='http://dati.comune.roma.it/cms/it/dettaglio_incidente_stradale.page?contentId=DTS4061' target='_blank'>Polizia Locale Roma Capitale - Open Data Roma Capitale - CC BY 4.0</a>"; 
+
+	__resize = function(){
+			$("#map-frame").attr("height",window.innerHeight-5+"px");
+			$("#map-frame").attr("width",window.innerWidth+"px");
+	}
+	$(document).ready(function() {
+
+			// is there a bookmark to execute at load ?
+			if ( $(document).getUrlParam('bookmark') ){
+				x = $(document).getUrlParam('bookmark');
+				__bound = decodeURIComponent(((typeof(x)!="string")?x.join(""):x));
+			}
+			if ( $(document).getUrlParam('maptype') ){
+				__maptype = $(document).getUrlParam('maptype');
+			}
+
+			__resize();
+
+			$("#map-frame").attr("src",__ui+
+					"&name=map-frame"+	
+					"&svggis="+__map+
+					"&story="+__story+
+					"&sidebar=32%&overlap=0&mapcontrol=true"+
+					"&bookmark="+encodeURIComponent(__bound)+
+					"&attribution="+encodeURIComponent(__attribute));
+
+			__szBookmark = null;
+	});
+	$(window).resize(function() {
+			__resize();
+	});
+
+	</script>
+</head>
+
+
+<body style="margin:0px;padding:0px;">
+
+	<!-- Container -->
+	<div id="container" style="margin:0px;padding:0px;margin-left:auto;margin-right:auto;overflow:hidden" >
+
+		<!-- Credits -->
+
+		<!-- Content -->
+		<div style="overflow:hidden;">
+			<iframe id="map-frame" width="100%" height="840px" style="border:0;overflow:hidden" src= ></iframe>
+		</div>
+		<!-- fine Content -->
+
+		<!-- Footer -->
+		<div id="footer" style="position:relative;">
+		</div>
+		<!-- fine Footer -->
+
+	</div>
+	<!-- fine Container -->
+
+</body>
+
+</html>
