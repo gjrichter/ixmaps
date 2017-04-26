@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>FullScreen Backgrounds - fullPage.js</title>
+	<meta name="author" content="Alvaro Trigo Lopez" />
+	<meta name="description" content="fullPage full-screen backgrounds." />
+	<meta name="keywords"  content="fullpage,jquery,demo,screen,fullscreen,backgrounds,full-screen" />
+	<meta name="Resource-type" content="Document" />
+
+
+	<link rel="stylesheet" type="text/css" href="../jquery.fullPage.css" />
+	<link rel="stylesheet" type="text/css" href="examples.css" />
+	<style>
+
+	/* Style for our header texts
+	* --------------------------------------- */
+	h1{
+		font-size: 5em;
+		font-family: arial,helvetica;
+		color: #fff;
+		margin:0;
+		padding:40px 0 0 0;
+	}
+	.intro p{
+		color: #fff;
+		padding:40px 0 0 0;
+	}
+
+	/* Centered texts in each section
+	* --------------------------------------- */
+	.section{
+		text-align:center;
+	}
+
+
+	/* Bottom menu
+	* --------------------------------------- */
+	#infoMenu li a {
+		color: #fff;
+	}
+	</style>
+
+	<!--[if IE]>
+		<script type="text/javascript">
+			 var console = { log: function() {} };
+		</script>
+	<![endif]-->
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+
+	<script type="text/javascript" src="../vendors/scrolloverflow.min.js"></script>
+
+	<script type="text/javascript" src="../jquery.fullPage.min.js"></script>
+	<script type="text/javascript" src="examples.js"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#fullpage').fullpage({
+				anchors: ['firstPage', 'secondPage', '3rdPage', '4thPage'],
+				sectionsColor: ['#4A6FB1', '#939FAA', '#323539'],
+				scrollOverflow: true
+			});
+		});
+	</script>
+
+</head>
+<body>
+<a href="https://github.com/alvarotrigo/fullPage.js" id="githubLink"><img style="position: fixed;z-index:99; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+
+<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://alvarotrigo.com/fullPage/" data-text="Great plugin to create fullscreen scrolling websites: http://alvarotrigo.com/fullPage/">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+<div id="fullpage">
+
+	<div class="section " id="section0">
+		<div class="intro">
+			<h1>Scrolling inside sections</h1>
+			<p>Easy and useful! Just make use of the option `scrollOverflow` for it and add the slimScroll plugin! <br></p>
+
+
+			<img src="https://raw.githubusercontent.com/alvarotrigo/fullPage.js/master/examples/imgs/iphone2.png" alt="iphone" id="iphone-two" />
+
+			<p>Eu nec ferri molestie consequat, vel at alia dolore putant. Labore philosophia ut vix. In vis nostrud interesset appellantur, vis et tation feugiat scripserit. Te nec noster suavitate persecuti. Diceret erroribus cu vix, alii omnes ei sit. Sea an corrumpit patrioque, virtute accumsan nominavi et usu, ex mei dolore vocibus incorrupte.
+
+	Duo ea saperet tacimates. Sed possim prodesset no, per novum putent doctus ea. Eu mea magna aliquip graecis, pri corpora officiis complectitur ei, lorem saepe consetetur his ad. Meis consulatu ei vis, an altera ocurreret interesset qui.
+
+	Eu ponderum comprehensam his, case antiopam pri te. Mel ne partem consequat instructior. Ad dicunt malorum sea, ex qui omnes invenire gubergren. Ius cu autem aliquando, pri vide ornatus perpetua an, no has epicuri verterem. Nam at animal pertinax efficiantur.
+
+	Per alienum torquatos eu. Sed saepe quodsi et, ullum choro definitionem sed et. Ullum elitr comprehensam sed at, sint illum propriae per eu. Eu enim laudem reformidans vel. Pro clita quando ad. Usu te virtute quaestio, ut eruditi tacimates volutpat per.
+
+	Affert accusamus duo ex, ea pri habeo graece, cu magna dolorum sea. Quas dictas assueverit ad qui, cu duo harum fabulas apeirian, ullum gubergren et sit. Ne cetero recusabo adipiscing quo, cu harum quaestio neglegentur cum. Has tation aliquip ad, virtute volumus definitionem mel ne. Nobis audiam civibus ius at.
+
+	Ei eum hinc mutat inciderint. Cu maluisset assentior per, graecis ponderum no mel. Eum eu vitae quando gloriatur, cum graece percipitur no, sed errem maiestatis te. Sed porro epicuri te, ad nam malorum verterem. Ea zril aliquip euismod sed.
+
+
+
+		  </p>
+
+		</div>
+
+
+
+	</div>
+	<div class="section" id="section1">
+	    <div class="slide" id="slide1">
+			<div class="intro">
+				<h1>Also in sections</h1>
+				<img src="https://raw.githubusercontent.com/alvarotrigo/fullPage.js/master/examples/imgs/iphone-two.png" alt="iphone" id="iphone-two" />
+				<p>
+					Eu nec ferri molestie consequat, vel at alia dolore putant. Labore philosophia ut vix. In vis nostrud interesset appellantur, vis et tation feugiat scripserit. Te nec noster suavitate persecuti. Diceret erroribus cu vix, alii omnes ei sit. Sea an corrumpit patrioque, virtute accumsan nominavi et usu, ex mei dolore vocibus incorrupte.
+
+					Duo ea saperet tacimates. Sed possim prodesset no, per novum putent doctus ea. Eu mea magna aliquip graecis, pri corpora officiis complectitur ei, lorem saepe consetetur his ad. Meis consulatu ei vis, an altera ocurreret interesset qui.
+
+					Eu ponderum comprehensam his, case antiopam pri te. Mel ne partem consequat instructior. Ad dicunt malorum sea, ex qui omnes invenire gubergren. Ius cu autem aliquando, pri vide ornatus perpetua an, no has epicuri verterem. Nam at animal pertinax efficiantur.
+					Eu ponderum comprehensam his, case antiopam pri te. Mel ne partem consequat instructior. Ad dicunt malorum sea, ex qui omnes invenire gubergren. Ius cu autem aliquando, pri vide ornatus perpetua an, no has epicuri verterem. Nam at animal pertinax efficiantur.
+					Eu ponderum comprehensam his, case antiopam pri te. Mel ne partem consequat instructior. Ad dicunt malorum sea, ex qui omnes invenire gubergren. Ius cu autem aliquando, pri vide ornatus perpetua an, no has epicuri verterem. Nam at animal pertinax efficiantur.
+
+					Per alienum torquatos eu.
+				</p>
+			</div>
+		</div>
+
+	    <div class="slide" id="slide2"><h1>Even inside slides</h1></div>
+		<div class="slide" id="slide3"><
+			<div class="intro">
+				<h1>Scrolling slide</h1>
+				<img src="https://raw.githubusercontent.com/alvarotrigo/fullPage.js/master/examples/imgs/iphone-red.png" alt="iphone" id="iphone-two" />
+				<p>
+					Eu nec ferri molestie consequat, vel at alia dolore putant. Labore philosophia ut vix. In vis nostrud interesset appellantur, vis et tation feugiat scripserit. Te nec noster suavitate persecuti. Diceret erroribus cu vix, alii omnes ei sit. Sea an corrumpit patrioque, virtute accumsan nominavi et usu, ex mei dolore vocibus incorrupte.
+
+					Duo ea saperet tacimates. Sed possim prodesset no, per novum putent doctus ea. Eu mea magna aliquip graecis, pri corpora officiis complectitur ei, lorem saepe consetetur his ad. Meis consulatu ei vis, an altera ocurreret interesset qui.
+
+					Eu ponderum comprehensam his, case antiopam pri te. Mel ne partem consequat instructior. Ad dicunt malorum sea, ex qui omnes invenire gubergren. Ius cu autem aliquando, pri vide ornatus perpetua an, no has epicuri verterem. Nam at animal pertinax efficiantur.
+					Eu ponderum comprehensam his, case antiopam pri te. Mel ne partem consequat instructior. Ad dicunt malorum sea, ex qui omnes invenire gubergren. Ius cu autem aliquando, pri vide ornatus perpetua an, no has epicuri verterem. Nam at animal pertinax efficiantur.
+					Eu ponderum comprehensam his, case antiopam pri te. Mel ne partem consequat instructior. Ad dicunt malorum sea, ex qui omnes invenire gubergren. Ius cu autem aliquando, pri vide ornatus perpetua an, no has epicuri verterem. Nam at animal pertinax efficiantur.
+
+					Per alienum torquatos eu.
+				</p>
+			</div>
+		</div>
+	</div>
+	<div class="section" id="section2">
+		<div class="intro">
+			<h1>No limitations!</h1>
+			<p>Content is a priority. Even if it is so large :)</p>
+		</div>
+	</div>
+</div>
+
+<div id="infoMenu">
+	
+
+<ul>
+	<li><a href="https://github.com/alvarotrigo/fullPage.js/archive/master.zip">Download</a></li>
+	<li>
+		<a href="#" id="showExamples">Examples</a>
+		<div id="examplesList">
+			<div class="column">
+				<h3>Navigation</h3>
+				<ul>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/scrollBar.html">Scroll Bar Enabled</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/normalScroll.html">Normal scrolling</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/continuous.html">Continuous vertical</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/noAnchor.html">Without anchor links (same URL)</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/navigationV.html">Vertical navigation dots</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/navigationH.html">Horizontal navigation dots</a></li>
+				</ul>
+			</div>
+			<div class="column">
+				<h3>Design</h3>
+				<ul>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/responsive.html">Responsive</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/backgrounds.html">Full backgrounds</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/videoBackground.html">Full background videos</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/autoHeight.html">Auto-height sections</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/gradientBackgrounds.html">Gradient backgrounds</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/scrolling.html">Scrolling inside sections and slides</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/fixedHeaders.html">Adding fixed header and footer</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/oneSection.html">One single section</a></li>
+				</ul>
+			</div>
+			 <div class="column">
+                <h3>Extensions</h3>
+                <ul>
+                    <li><a href="http://alvarotrigo.com/fullPage/extensions/continuousHorizontal.html">Continuous horizontal</a></li>
+                    <li><a href="http://alvarotrigo.com/fullPage/extensions/interlockedSlides.html">Interlocked Slides</a></li>
+                    <li><a href="http://alvarotrigo.com/fullPage/extensions/resetSliders.html">Reset Sliders</a></li>
+                    <li><a href="http://alvarotrigo.com/fullPage/extensions/responsiveSlides.html">Responsive Slides</a></li>
+                    <li><a href="http://alvarotrigo.com/fullPage/extensions/scrollHorizontally.html">Horizontal mouse wheel</a></li>
+                    <li><a href="http://alvarotrigo.com/fullPage/extensions/fadingEffect.html">Fading Effect</a></li>
+                    <li><a href="http://alvarotrigo.com/fullPage/extensions/offsetSections.html">Offset Sections</a></li>
+                    <li><a href="http://alvarotrigo.com/fullPage/extensions/dragAndMove.html">Drag And Move</a></li>
+                </ul>
+            </div>
+			<div class="column">
+				<h3>Other</h3>
+				<ul>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/apple.html">Animations on scrolling</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/callbacks.html">Callbacks</a></li>
+					<li><a href="http://alvarotrigo.com/fullPage/examples/methods.html">Functions and methods</a></li>
+                    <li><a href="http://alvarotrigo.com/fullPage/extensions/#navigation">Extra navigations</a></li>
+				</ul>
+			</div>
+		</div>
+
+	</li>
+	<li><a href="https://github.com/alvarotrigo/fullPage.js#fullpagejs">Documentation</a></li>
+	<li><a href="http://alvarotrigo.com/#contact-page">Contact</a></li>
+</ul>
+
+</div>
+
+</body>
+</html>

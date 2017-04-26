@@ -1,0 +1,139 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<html> <head> <title>ixmaps theme editor</title>
+<head>
+
+    <!-- Bootstrap core CSS -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="assets/css/main.css" rel="stylesheet">
+
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/css/icomoon.css" rel="stylesheet" >
+
+<!-- Styles ------------------------ -->
+
+  <style>
+	body {
+		font-family:arial;
+		font-size: 12px;
+		line-height: 0.7em;
+	}
+	textarea {
+		width:90%;
+	}
+	.actionLink{
+		vertical-align: 5px;;
+	}
+	/* Track */
+	::-webkit-scrollbar-track {
+		-webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.1); 
+		-webkit-border-radius: 0px;
+		border-radius: 0px;
+	}
+	/* Handle */
+	::-webkit-scrollbar-thumb {
+		-webkit-border-radius: 0px;
+		border-radius: 0px;
+		background: rgba(232,232,232,0.6); 
+		-webkit-box-shadow: inset 0 0 0px rgba(0,0,0,0.1); 
+	}
+	::-webkit-scrollbar-thumb:window-inactive {
+		background: rgba(222,222,222,0.4); 
+	}
+
+  </style>
+</head>
+
+<!-- End of Header ------------------------ -->
+
+<body  style="background:#f8f8f8">
+
+	<div class="well">
+		<div data-role="fieldcontain" data-inline="true">
+			<form>
+			  <fieldset>
+				<legend>create a new bookmark</legend>
+				<span class="help-block">the bookmark will contain the actual theme and map bounds</span>
+				<br>
+				<input id="bm-title" type="text" class="input" size="30" style="font-size:2em"></input>
+				<span class="help-block">please define a bookmark name</span>
+			  </fieldset>
+			</form>	
+	</div>
+		<div style="margin-top:1em;">
+			<a href='javascript:ixmaps.addNewBookmark();'>
+				<button type="button" class="btn btn-md">
+				add
+				</button>
+			</a>
+			<a href='javascript:ixmaps.cancelNewBookmark();'>
+				<button type="button" class="btn btn-md">
+				cancel
+				</button>
+			</a>
+		</div>
+	</div>
+
+    <!-- JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+    <script src="assets/js/jquery-1.11.2.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+
+	<script>
+
+		// ------------------------
+		// get api from opener 
+		// ------------------------
+
+		if ( window.opener ){
+			ixmaps = window.opener.ixmaps;
+		}else
+		if ( parent ){
+			ixmaps = parent.window.ixmaps;
+		}
+		else{
+			alert("error: missing parent window for themes !");
+		}
+
+		// ------------------------
+		// on ready
+		// ------------------------
+
+		$(document).ready(function() {
+			var d = new Date();
+			var date  = d.toLocaleDateString();
+			var hour  = d.toTimeString().split(" ")[0];
+			$("#bm-title").val(String(date + " " + hour)); 
+		});
+
+		// ------------------------------------------------
+		// define own functions as extenstion to parent api 
+		// ------------------------------------------------
+
+		ixmaps.doneNewBookmark = function(){
+			ixmaps.addBookmarkDone();
+			window.parent.$("#addbookmark-dialog").dialog("close");
+		};
+		ixmaps.addNewBookmark = function(){
+			var title = $("#bm-title").val();
+			ixmaps.bookmark.addActualTheme(title,ixmaps.doneNewBookmark);
+		};
+		ixmaps.cancelNewBookmark = function(){
+			window.parent.$("#addbookmark-dialog").dialog("close");
+		}
+
+	// ------------------------
+	// end of code 
+	// ------------------------
+
+	</script>
+
+</body>
+</html>

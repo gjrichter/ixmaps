@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"
+"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg width="500" height="500"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:visx="http://www.medienobjekte.de"
+>
+  <script type="text/ecmascript"><![CDATA[
+
+	szContainerTitle =	"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:18px;font-weight:normal;fill:#444444;pointer-events:none;";
+	szDescription =		"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:11px;fill:#555555;font-weight:bold;font-style:italic;pointer-events:none;";
+	szSummary =			"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:10px;fill:#666666;pointer-events:none;";
+	szNote =			"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:11px;fill:darkgrey;font-style:italic;stroke:none;pointer-events:none;";
+try{
+	map.setFeatures( 'featurescaling:dynamic;'
+					+'objectscaling:true;'
+					+'clipmap:true;'
+					+'clipmapdynamic:true;'
+
+					+'dynamiclabel:NOSIZE;'
+					+'labelspace:1.0;'
+					+'checklabeloverlap:NOSQUEEZE;'
+
+					+'dynamiclayer:true;'
+					+'dynamictiles:true;'
+					+'discardtiles:false;'
+					+'loadmultitiles:true;'
+					+'loadsilent:false;'
+					+'loadexternaldata:true;'
+
+					+'buttonsize:16;'
+
+					+'fastpan:false;'
+					+'panborder:0.5;'
+					+'northarrow:rotatable;'
+					+'realtimerotate:true'
+					+'sidebarbuttons:true;'
+					+'tooltipdelay:250;'
+					+'popupdelay:250;'
+					+'popupgridstyle:firstleft|firstitalic|firstbold|firstgray|firstsmall|background|alternate|full;'
+					+'popupalignment:BOTTOM|RIGHT;'
+					+'transparentbackground:true;'
+				 );
+
+
+}
+catch(e) {}
+  ]]>
+  </script>
+
+    <script type="text/ecmascript"><![CDATA[
+
+szDictionary = new Array();
+szDictionary["layer on/off"]			= "livello visibile/invisibile";
+szDictionary["activate theme"]			= "attivare livello";
+szDictionary["please wait ..."]			= "aggiornando ...";
+szDictionary["... loading ..."]			= "scaricando ...";
+szDictionary["loading"]					= "Caricamento Mappa";
+szDictionary["painting map"]			= "colorando ...";
+szDictionary["show full extent"]		= "massima estenzione";
+szDictionary["zoom in"]					= "ingrandire";
+szDictionary["zoom out"]				= "diminuire";
+szDictionary["zooming"]				    = "zoomare";
+szDictionary["panning"]				    = "trascinare";
+szDictionary["activate"]				= "attiva";
+szDictionary["measurement"]				= "misurare";
+szDictionary["polygon"]					= "poligono";
+szDictionary["polyline"]				= "poli linea";
+szDictionary["tool"]					= " ";
+szDictionary["activate information display"]		= "attiva mostrare informazione";
+szDictionary["change"]					= "cambia";
+szDictionary["classes"]					= "classi";
+szDictionary["method"]					= "metodo";
+szDictionary["member(s)"]				= "membri";
+szDictionary["value"]					= "valore";
+szDictionary["items"]					= "unità";
+szDictionary["Relative to"]				= "relativo a";
+szDictionary["of"]						= "del";
+szDictionary["equidistant"]				= "equidistante";
+szDictionary["fade in"]				    = "opaque";
+szDictionary["fade out"]				= "trasparente";
+szDictionary["smaller charts"]			= "simboli piu piccolo";
+szDictionary["bigger charts"]			= "simboli piu grande";
+szDictionary["mean"]					= "media";
+szDictionary["deviation from mean"]		= "deviazione dalla media";
+szDictionary["value of selection"]		= "valore della selezione";
+szDictionary["min value"]				= "minimo";
+szDictionary["max value"]				= "massimo";
+szDictionary["mean value"]				= "medio";
+szDictionary["selected items"]			= "entita selezionati";
+szDictionary["Selection"]				= "Selezione";
+szDictionary["Theme"]					= "Tema";
+szDictionary["* summary over selected area"]	= "* somma per l'area selezionata";
+
+		szChartTypeList = new Array(
+		"CHART|BAR"
+		;"CHART|BAR|3D"
+		;"CHART|BAR|3D|TRENDLINE"
+		;"CHART|BAR|3D|SORT"
+		;"CHART|BAR|HORZ|LEFT|UP"
+		;"CHART|BAR|HORZ|RIGHT|UP"
+		;"CHART|BAR|HORZ|LEFT|UP|COMPRESS"
+		;"CHART|BAR|HORZ|RIGHT|UP|COMPRESS"
+		;"CHART|BAR|HORZ|LEFT|UP|3D"
+		;"CHART|BAR|HORZ|RIGHT|UP|3D"
+		;"CHART|BAR|HORZ|RIGHT|3D"
+		;"CHART|BAR|HORZ|RIGHT|COMPRESS|3D"
+		;"CHART|BAR|HORZ|RIGHT|SORT|3D"
+		;"CHART|BAR|HORZ|RIGHT|SORT|COMPRESS|3D"
+		;"CHART|BAR|HORZ|RIGHT|SORT|UP|3D"
+		;"CHART|BAR|HORZ|LEFT|UP|COMPRESS|3D"
+		;"CHART|BAR|HORZ|RIGHT|UP|COMPRESS|3D"
+		;"CHART|BAR|HORZ|CENTER|UP"
+		;"CHART|BAR|STACKED"
+		;"CHART|BAR|STACKED|3D"
+		;"CHART|PIE"
+		;"CHART|PIE|SIZE"
+		;"CHART|PIE|3D"
+		;"CHART|PIE|3D|SIZE"
+		;"CHART|PIE|3D|HEIGHT"
+		;"CHART|PIE|DONUT"
+		;"CHART|PIE|DONUT|SIZE"
+		;"CHART|PIE|DONUT|3D"
+		;"CHART|PIE|DONUT|3D|SIZE"
+		;"CHART|PIE|DONUT|3D|HEIGHT"
+		;"CHART|PIE|DONUT|3D|VOLUME"
+		;"CHART|PIE|STARBURST"
+		;"CHART|PIE|STARBURST|SIZE"
+		;"CHART|PIE|STARBURST|3D"
+		;"CHART|PIE|STARBURST|3D|SIZE"
+		;"CHART|PIE|STARBURST|3D|HEIGHT"
+		;"CHART|PIE|DONUT|STARBURST"
+		;"CHART|PIE|DONUT|STARBURST|SIZE"
+		;"CHART|PIE|DONUT|STARBURST|3D"
+		;"CHART|PIE|DONUT|STARBURST|3D|SIZE"
+		;"CHART|PIE|DONUT|STARBURST|3D|HEIGHT"
+		;"CHART|PIE|DONUT|STARBURST|3D|HEIGHT"
+		;"CHART|SYMBOL|SEQUENCE|CENTER|SUM"
+		);
+
+
+
+
+
+  ]]></script>
+
+
+
+</svg>

@@ -1,0 +1,248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>SVGGIS Query Page</title>
+  <meta name="Generator" content="EditPlus">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+
+  <link href="../../ui/libs/jquery/ui/css/smoothness/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+  <link href="./assets/css/bootstrap.css" rel="stylesheet" type="text/css"/>
+
+  <script src = "../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+  <script src = "../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+  <!-- share api -->
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+
+<script type="text/javascript" src="../js/htmlgui_query.js" > </script>
+
+<script type="text/javascript">
+	$(function() {
+		$( "#tabs" ).tabs({
+		   select: function(event, ui) { changeTool(ui.panel.id); }
+		});
+		$( "#aquery_execute" ).button();
+		$( "#aquery_clear" ).button();
+		$( "#query_search" ).button();
+		$( "#chart_go" ).button();
+		$( "#get_Bookmark" ).button();
+		$( "#popout" ).button();
+
+		setTimeout('$( "#tabs" ).css("visibility","visible")',50);
+
+	});
+</script>
+
+<script type="text/javascript">
+
+		var ixmaps = null;
+		var szEmbedUrl = null;
+		var szAloneUrl = null;
+
+		var ixmaps = null;
+		if ( window.opener ){
+			ixmaps = window.opener.ixmaps;
+		}else
+		if ( parent ){
+			ixmaps = parent.window.ixmaps;
+		}
+		else{
+			alert("error: missing parent window for themes !");
+		}
+
+		/* ------------------------------------------------------------------ * 
+			Init functions
+		 * ------------------------------------------------------------------ */
+
+        function InitAll(){ 
+
+				var szAloneUrl = null;
+				var szEmbedUrl = null;
+				var szPopoutUrl = null;
+
+				// GR 30.04.2015 try to call explicit functions to get the share urls 
+				// ------------------------------------------------------------------
+				var szEditUrl   = ixmaps.getEditUrl  ?ixmaps.getEditUrl()  :null;
+				var szAloneUrl  = ixmaps.getLinkUrl  ?ixmaps.getLinkUrl()  :null;
+				var szEmbedUrl  = ixmaps.getEmbedUrl ?ixmaps.getEmbedUrl() :null;
+				var szPopoutUrl = ixmaps.getPopoutUrl?ixmaps.getPopoutUrl():null;
+				// ------------------------------------------------------------------
+
+				// GR 30.04.2015 get the last valid map name to query the bookmark from
+				// ------------------------------------------------------------------
+				szName = "map";
+				for ( i in ixmaps.embeddedApiA ){
+					szName = i;	
+				}
+
+				// GR 30.04.2015 go to the main window API, important for dispatch() 
+				// ------------------------------------------------------------------
+				while( ixmaps.embeddedApiA && ixmaps.embeddedApiA[szName] && (ixmaps.embeddedApiA[szName] != ixmaps) ){
+					ixmaps = ixmaps.embeddedApiA[szName];
+				}
+				
+				// GR 30.04.2015 dispatch() the url returned from the explicit function 
+				//				 szAloneUrl is already complete
+				// ------------------------------------------------------------------
+				szEmbedUrl  = szEmbedUrl ?ixmaps.dispatch(szEmbedUrl) :szEmbedUrl;
+				szPopoutUrl = szPopoutUrl?ixmaps.dispatch(szPopoutUrl):szPopoutUrl;
+
+				// make generic share urls from the internal map template 
+				// used only, if above defined explicit urls are null
+				// ------------------------------------------------------
+
+				// make url of the map template 
+				var szTemplateUrl = ixmaps.dispatch("ui/dispatch.htm?");
+				var szBasemap = ixmaps.getBaseMapParameter(ixmaps.szMapService);
+
+				var szTemplateEdit   = szTemplateUrl + "ui=edit"   + szBasemap;
+				var szTemplateEmbed  = szTemplateUrl + "ui=embed"  + szBasemap;
+				var szTemplateMain   = szTemplateUrl + "ui=embed"  + szBasemap;
+				var szTemplatePopout = szTemplateUrl + "ui=popout" + szBasemap;
+
+				window.document.body.topMargin = 0;
+				window.document.body.leftMargin = 0;
+
+				var szMapType  = ixmaps.htmlgui_getMapTypeId();
+				var szMapUrl   = ixmaps.htmlgui_getMapUrl();
+				var szStoryUrl = ixmaps.htmlgui_getStoryUrl();
+				var szBookmark = ixmaps.htmlgui_getBookmarkString(2);
+				var szAttrib   = ixmaps.htmlgui_getAttributionString();
+
+				szQuery  = "&maptype=" + szMapType;
+				szQuery += "&minimal=1&toolbutton=1&logo=1&child=1";
+				szQuery += "&svggis=" + encodeURI(szMapUrl);
+				szQuery += "&story="  + encodeURI(szStoryUrl||"");
+				szQuery += "&bookmark=" + encodeURIComponent(szBookmark);
+				szQuery += "&attribution=" + encodeURIComponent(szAttrib);
+
+				szEmbedUrl  = szEmbedUrl || (szTemplateEmbed + szQuery);
+				szAloneUrl  = szAloneUrl || (szTemplateMain + szQuery);
+				szEditUrl   = szEditUrl  || (szTemplateEdit + szQuery);
+				szPopoutUrl = szTemplatePopout + szQuery;
+
+				$("#longUrl").html(szAloneUrl);
+				$("#longUrl-test").html("<a href=\""+szAloneUrl+"\" target=\"blanc\">test it</a>");
+				$("#longUrl-edit").html("<a href=\""+szEditUrl+"\" target=\"blanc\">edit theme</a>");
+
+				$("#iframe").html("\<iframe width=\"425\" height=\"350\" frameborder=\"0\" scrolling=\"no\" marginheight=\"0\" marginwidth=\"0\" "+
+				"src=\""+szEmbedUrl+"\" \/\>");
+
+				var shortUrlService ="http://tinyurl.com/api-create.php?url=";
+				$("#shortUrl")[0].innerHTML = "<iframe src=\""+shortUrlService+szAloneUrl+"\" width=\"300px\" height=\"40px\" frameborder=\"0\" marginwidth=\"1px\" />";
+
+			}
+
+	function changeTool(){
+
+			var szPreview = "<iframe width=\"425\" height=\"350\" frameborder=\"0\" scrolling=\"no\" marginheight=\"0\" marginwidth=\"0\" "+
+			"src=\""+szEmbedUrl+"&pure=1"+"\" />";
+
+			$("#preview-map").html(szPreview);
+	}
+
+
+</script>
+<style type="text/css">
+  .midlink {
+	font-family:arial;
+	font-size:12;
+	font-weight:normal;
+	color: #ddd;
+	vertical-align:50%;
+	margin-left:-5px;
+	margin-right:-2px;
+	}
+   .testlink a{
+	font-family:arial;
+	font-size:12;
+	font-weight:normal;
+	color: #fff;
+	vertical-align:30%;
+	padding:0em 0.5em;
+	margin-left:0.2em;;
+	background:#ddd;
+	border-radius:2em;
+	text-decoration: none;
+	}
+ select.ifield {
+	width:150px;
+  }
+  p {
+	margin-top:10px;
+	margin-bottom:2px;
+  }
+
+.wrapword{
+	white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+	white-space: -pre-wrap;      /* Opera 4-6 */
+	white-space: -o-pre-wrap;    /* Opera 7 */
+	white-space: pre-wrap;       /* css-3 */
+	word-wrap: break-word;       /* Internet Explorer 5.5+ */
+	white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
+	word-break: break-all;
+	white-space: normal;
+}
+
+</style>
+
+</head>
+
+
+<body style="margin:0px;font-size:14px;overflow:hidden;" onload="InitAll()" >
+
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/it_IT/all.js#xfbml=1";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
+
+	<div id="tabs" style="visibility:hidden;">
+		<ul>
+			<li><a href="#normal">embed&amp;link</a></li>
+			<li><a href="#preview">preview</a></li>
+		</ul>
+		<div id="normal" >
+		  <!-- quick share -------------------------------------------------- -->
+			<p>long URL to the map <span id="longUrl-test" class="testlink"></span><span id="longUrl-edit" class="testlink"></span></p>
+			<div>
+				<textarea id="longUrl" rows="5" cols="40" class="area wrapword" style="font-size:0.85em">
+				...
+				</textarea>
+			</div>
+
+			<p>short URL to the map</p>
+			<div id="shortUrl" style="margin-left:2px;border: solid 1 #aaaaaa;width:259px;" >
+			</div>
+
+			<p>copy this to embed the map</p>
+			<div>
+				<textarea id="iframe" rows="5" cols="40" class="area wrapword" style="font-size:0.85em">
+				...
+				</textarea>
+			</div>
+
+			<br>
+
+		</div>
+		<div id="preview" >
+		  <!-- preview share ------------------------------------------------------ -->
+
+			<div id="preview-map" >
+			</div>
+
+		</div>
+
+	</div>
+
+</body>
+
+<!-- tooltips =============================================================== -->
+<script language="JavaScript" src="../js/tooltip.js" type="text/javascript" ></script>
+<!-- ========================================================================= -->
+</html>

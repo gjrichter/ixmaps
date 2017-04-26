@@ -1,0 +1,98 @@
+/*!
+ * CSS style for ixmaps onepage legends
+ * Code licensed under the Apache License v2.0.
+ * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+	table.legend-color-scheme {
+		border-collapse: separate;
+		border-spacing: 2px;
+	}
+	table.theme-legend {
+		spacing: 1;
+	}
+	.map-legend{
+		font-family: 'Open Sans','Helvetica Neue',Arial,sans-serif;
+		color: #565a5c;
+		font-size: 14px;
+		-webkit-text-size-adjust: 100%;
+		-ms-text-size-adjust: 100%;
+	}
+	.map-legend {
+		position:absolute;
+		top:15px;
+		right:50px;
+		opacity:0.95;
+		min-width:400px;
+		max-width:500px;
+	}
+	.map-legend-pane:before {
+		content: ' ';
+		display: block;
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 0;
+		background: white;
+		opacity: 0.9;
+		border: solid #dddddd 0.1px;
+		-webkit-box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+		box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+	}
+	.map-legend-pane .container {
+		width:100%;
+	}
+	#map-legend-content {
+		margin-right:1em;
+		margin-bottom:-0.5em;
+		width: 90%;
+	}
+	#map-legend-title {
+		font-size: 1.8em;	
+		font-weight: normal;
+		margin-top:0.2em;
+		margin-bottom:0.7em;
+		width: 90%;
+	}
+	#map-legend-snippet {
+		font-size: 1.1em;	
+		font-weight: normal;
+		margin-top:-1em;
+		margin-bottom:0.7em;
+	}
+	.theme-legend-item-selected {
+		background: #DBE6F4;
+	}
+	.theme-button {
+		padding:0 0 0 0;
+		color:#666666;
+	}
+	.theme-tool-button {
+		padding:0.3em;
+		color:#666666;
+	}
+	a.theme-tool-button, a.theme-tool-button:hover{
+		text-decoration:none;
+	}
+	a.legend-color-button, a.legend-color-button:hover{
+		text-decoration:none;
+		padding: 0px 0px 5px 0px;
+	}
+	.theme-legend-item-selected td.theme-legend {
+		font-size: 1.3em;
+		line-height: 1.1em;
+	}
+	.legend-range-text {
+		vertical-align:bottom;
+		font-size:0.9em;
+		line-height:2em;
+	}
+	.legend-filter-text {
+		margin-top:0em;
+		background:#ddd;
+	}
+	.fa:focus {
+	 outline: none;
+	}

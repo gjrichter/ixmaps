@@ -1,0 +1,54 @@
+<!DOCTYPE html> 
+<html>
+	<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>EasyNido map layer dialog</title> 
+
+</head> 
+<body> 
+
+	<ul id="layerlist" class="menu" style="min-width:200px;" >
+
+		<li class="menu" style="border:0;margin-bottom:20px;">
+			<a href="javascript:ixmaps.jsapi.setMapType('road');ixmaps.jsapi.setView('map');ixmaps.jsapi.reset();" >
+				<img style="float:right;padding:5px;background-color:white" src="resources/icons/01-refresh.png" height="24px;">
+			</a></li>
+
+		<a href="javascript:__dialog=true;ixmaps.htmlgui_setMapTypeId('roadmap');ixmaps.jsapi.layerDialog('hide');">
+			<li class="menu">
+			Road Map</li></a>      
+		<a href="javascript:__dialog=true;ixmaps.htmlgui_setMapTypeId('satellite');ixmaps.jsapi.layerDialog('hide');">
+			<li class="menu">
+			Satellite</li></a>       
+		<a href="javascript:__dialog=true;ixmaps.htmlgui_setMapTypeId('terrain');ixmaps.jsapi.layerDialog('hide');">
+			<li class="menu">
+			Terrain</li></a> 
+		<a href="javascript:__dialog=true;ixmaps.htmlgui_setMapTypeId('pale');ixmaps.jsapi.layerDialog('hide');">
+			<li class="menu">
+			Pale</li></a> 
+		<a href="javascript:__dialog=true;ixmaps.htmlgui_setMapTypeId('gray');ixmaps.jsapi.layerDialog('hide');">
+			<li class="menu">
+			Gray</li></a> 
+		<a href="javascript:__dialog=true;ixmaps.htmlgui_setMapTypeId('dark');ixmaps.jsapi.layerDialog('hide');">
+			<li class="menu">
+			Dark</li></a> 
+		<a href="javascript:__dialog=true;ixmaps.htmlgui_setMapTypeId('white');ixmaps.jsapi.layerDialog('hide');">
+			<li class="menu">
+			White</li></a> 
+		<a href="javascript:__dialog=true;ixmaps.htmlgui_setMapTypeId('BW');ixmaps.jsapi.layerDialog('hide');">
+			<li class="menu">
+			B&W</li></a> 
+
+		<li class="menu">&nbsp;</li>
+		<a href="javascript:__easynido_selectHelpDialog('show');ixmaps.jsapi.layerDialog('hide');" >
+			<li class="menu" >
+			guida</li></a>
+
+	</ul>
+						
+
+
+
+</body>
+</html>

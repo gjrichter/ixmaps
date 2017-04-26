@@ -1,0 +1,298 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8" >
+
+	<title>iXmps - Bookmarks - save to disk</title>
+
+<!-- Styles ------------------------ -->
+
+	<!-- Bootstrap core CSS -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="assets/css/main.css" rel="stylesheet">
+
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/css/icomoon.css" rel="stylesheet" >
+
+	<style>
+		body #importdiv{
+			background:#fff;
+			overflow:auto;
+			width:90%;
+			height:50%;
+			padding: 1em;
+			-moz-box-shadow: 0px 1px 8px /*{global-box-shadow-size}*/ 			rgba(0,0,0,.5) /*{global-box-shadow-color}*/ ;
+			-webkit-box-shadow: 0px 1px 8px /*{global-box-shadow-size}*/ 		rgba(0,0,0,.5) /*{global-box-shadow-color}*/ ;
+			box-shadow: 0px 1px 8px /*{global-box-shadow-size}*/ 				rgba(0,0,0,.5) /*{global-box-shadow-color}*/ ;
+		}
+		textarea {
+			width:90%;
+		}
+		/* Track */
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.1); 
+			-webkit-border-radius: 0px;
+			border-radius: 0px;
+		}
+		/* Handle */
+		::-webkit-scrollbar-thumb {
+			-webkit-border-radius: 0px;
+			border-radius: 0px;
+			background: rgba(232,232,232,0.6); 
+			-webkit-box-shadow: inset 0 0 0px rgba(0,0,0,0.1); 
+		}
+		::-webkit-scrollbar-thumb:window-inactive {
+			background: rgba(222,222,222,0.4); 
+		}
+
+	</style>
+
+</head>
+
+<!-- End of Header ------------------------ -->
+
+  <body id="ProjectSaver" >
+
+	<h1 id="done-message" style="background:white"></h1>
+
+	<a href='javascript:window.parent.$("#downloadbookmark-dialog").dialog("close");'>
+		<button type="button" class="btn btn-md">
+		close
+		</button>
+	</a>
+
+
+    <!-- JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+	<script src="assets/js/jquery-1.11.2.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+
+	<script>
+
+		// ------------------------
+		// get api from opener 
+		// ------------------------
+
+		if ( window.opener ){
+			ixmaps = window.opener.ixmaps;
+		}else
+		if ( parent ){
+			ixmaps = parent.window.ixmaps;
+		}
+		else{
+			alert("error: missing parent window for themes !");
+		}
+
+		// ------------------------
+		// on ready
+		// ------------------------
+
+		$(document).ready(function() {
+
+			if(isAPIAvailable()) {
+
+				$("#done-message").html("preparing for download ...");
+
+				var bookmarks = new Theme(ixmaps.bookmark.getList());
+				var szBookmarks = bookmarks.getPrettyString();
+				try	{
+					ixmaps.confirm("Please confirm download",
+						function () {
+							saveTextAsFile(szBookmarks);
+							$("#done-message").html("bookmarks saved !");
+						},
+						function () {
+							$("#done-message").html("bookmarks not saved !");
+						});
+				}
+				catch (e){
+					if ( confirm("Please confirm download") ){
+						saveTextAsFile(szBookmarks);
+					}
+					__killDialog();
+				}
+				
+			}
+		});
+
+		// ------------------------------------------------
+		// define own functions
+		// ------------------------------------------------
+
+		/**
+		 * isAPIAvailable  
+		 * checks the browser support for the HTML5 File API
+		 * displays a warning if the browser doesn't support it
+		 * @type boolean
+		 * @return true,false
+		 */
+		function isAPIAvailable() {
+			// Check for the various File API support.
+			if (window.File && window.FileReader && window.FileList && window.Blob) {
+				  // Great success! All the File APIs are supported.
+				  return true;
+			} else {
+				  alert("The browser you're using does not currently support\nthe HTML5 File API. As a result the file loading demo\nwon't work properly.");
+				  return false;
+			}
+		}
+		function saveTextAsFile(szText)
+		{
+			var textToWrite = szText;
+			var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
+			var fileNameToSaveAs = "bookmarks.json";
+
+			$("#done-message").html("saving ...");
+
+			var downloadLink = document.createElement("a");
+			downloadLink.download = fileNameToSaveAs;
+			downloadLink.innerHTML = "Download File";
+			if (window.webkitURL != null)
+			{
+				// Chrome allows the link to be clicked
+				// without actually adding it to the DOM.
+				downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+			}
+			else
+			{
+				// Firefox requires the link to be added to the DOM
+				// before it can be clicked.
+				downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+				downloadLink.onclick = destroyClickedElement;
+				downloadLink.style.display = "none";
+				document.body.appendChild(downloadLink);
+			}
+
+			downloadLink.click();
+		}
+
+		function destroyClickedElement(event)
+		{
+			document.body.removeChild(event.target);
+		}
+
+		/**************************************************************** 
+		 *
+		 * Theme - needed only for pretty print
+		 *
+		 ****************************************************************/
+
+		/**
+		 * This is the Theme class.  
+		 * It realizes an object to configure and realize a map theme 
+		 * @constructor
+		 * @throws 
+		 * @return A new Theme object
+		 */
+		function Theme(definition) {
+			this.obj = null;
+			this.szTheme = null;
+
+			if ( typeof(definition) == "string" ){
+				this.szTheme = definition;
+				this.parse(definition);
+			}else{
+				this.obj = definition;
+				//this.szTheme = JSON.stringify(definition);
+			}
+		}
+		Theme.prototype.parse = function(szThemeDef){
+			var szRaw = szThemeDef.replace(/\n\t+/g,'');
+			try	{
+				this.obj = JSON.parse(szRaw);
+			} catch (e){
+				ixmaps.parentApi.error("Code: "+e);
+			}
+		};
+		Theme.prototype.getString = function(){
+			if ( !this.szTheme ){
+				this.szTheme = JSON.stringify(this.obj);
+			}
+			return this.szTheme;
+		};
+		Theme.prototype.getObj = function(){
+			if ( !this.obj ){
+				this.parse(definition);
+			}
+			return this.obj;
+		};
+		Theme.prototype.getPrettyString = function(){
+			this.szPrettyString = "";
+			this.tab = 1;
+			this.recurs = 0;
+			this.formatObj(this.obj);
+			return this.szPrettyString;
+		};
+		Theme.prototype.isArray = function(obj) {
+			return Object.prototype.toString.call(obj) === '[object Array]';
+		};
+		Theme.prototype.formatObj = function(obj){
+
+			if ( ++this.recurs > 10 ){
+				return;
+			}
+			if ( this.isArray(obj) ){
+
+				this.szPrettyString += '[';
+				var n = 0;
+				for ( var a in obj ){
+					if ( typeof(obj[a]) == "object" ){
+						this.szPrettyString += (n?',':'');
+						this.tab++;
+						this.formatObj(obj[a]);
+						this.tab--;
+					}else{
+						this.szPrettyString += (n?',\n':'\n') + (this.getIndent()) + '"'+String(obj[a]).replace(/\"/,"\'")+'"';
+					}
+					n++;
+				}
+				this.szPrettyString += ']';
+
+			}
+			else{
+
+				var n = 0;
+				for ( var a in obj ){
+					if ( a == "parent" || a == "listItem" || a == "gOverlayObject" || a == "gOverlayObjectPartsA" || a == "setLine" || a == "setPolygon" || a == "setPosition"){
+						continue;
+					}
+					if ( obj[a] == null ){
+						continue;
+					}
+					if ( typeof(obj[a]) == "object" ){
+						this.szPrettyString += (n?',\n':'\n') + (this.getIndent()) + '"'+a+'": ' ;
+						this.tab++;
+						this.formatObj(obj[a]);
+						this.tab--;
+					}else{
+						this.szPrettyString += (n?',\n':'{\n') + (this.getIndent()) + '"'+a+'": "'+String(obj[a]).replace(/\"/,"\'")+'"';
+						n++;
+					}
+				}
+				this.szPrettyString += '\n'+(this.getIndent())+'}';
+			}
+
+			this.recurs--;
+		};
+		Theme.prototype.getIndent = function(){
+			var szTab = "";
+			for ( var i=0; i<this.tab; i++ ){
+				szTab += "\t";
+			}
+			return szTab;
+		};
+
+		// ------------------------
+		// end of code 
+		// ------------------------
+
+	</script>
+
+  </body>
+
+ </html> 

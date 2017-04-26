@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"> 
+        <meta charset="utf-8">
+        <title>iXMaps Themes API</title>
+        <title>undefined</title>
+        <meta name="generator" content="Bootply" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <link href="assets/css/bootstrap.css" rel="stylesheet">
+        <link href="assets/css/screen.css" rel="stylesheet">
+        <link href="assets/css/styles/googlecode.css" rel="stylesheet">
+       
+        <!--[if lt IE 9]>
+          <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link rel="shortcut icon" href="assets/img/favicon.png">
+        <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="assets/img/apple-touch-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="assets/img/apple-touch-icon-114x114.png">
+
+
+
+        <!-- CSS code from Bootply.com editor -->
+        
+        <style type="text/css">
+            /*
+A Bootstrap 3.1 affix sidebar template
+from http://bootply.com
+
+This CSS code should follow the 'bootstrap.css'
+in your HTML file.
+
+license: MIT
+author: bootply.com
+*/
+
+body {
+ padding-top:50px;
+}
+
+#masthead { 
+ min-height:250px;
+}
+
+#masthead h1 {
+ font-size: 30px;
+ line-height: 1;
+ padding-top:20px;
+}
+
+#masthead .well {
+ margin-top:8%;
+}
+
+@media screen and (min-width: 768px) {
+  #masthead h1 {
+    font-size: 50px;
+  }
+}
+
+.navbar-bright {
+ background-color:#111155;
+ color:#fff;
+}
+
+.affix-top,.affix{
+ position: static;
+}
+
+@media (min-width: 979px) {
+  #sidebar.affix-top {
+    position: static;
+    margin-top:20px;
+    width:228px;
+  }
+  
+  #sidebar.affix {
+    position: fixed;
+    top:70px;
+    width:228px;
+  }
+}
+
+#sidebar li.active {
+  border:0 #eee solid;
+  border-right-width:5px;
+}
+
+        </style>
+    </head>
+    
+    <!-- HTML code from Bootply.com editor -->
+    
+    <body  >
+        
+        <nav class="navbar navbar-fixed-top" role="banner">
+  <div class="container" style="padding:0px 40px 0px 40px;">
+      <ul class="nav ">
+        <li>
+          <a href="#sec">Get Started</a>
+        </li>
+        <li>
+          <a href="#sec">Make Maps</a>
+        </li>
+        <li>
+          <a href="#sec" class="active">Define Themes</a>
+        </li>
+        <li>
+          <a href="#sec" >Build Stories</a>
+        </li>
+      </ul>
+  </div>
+</nav>
+
+<div id="xmasthead">  
+  <div class="container">
+      <div class="row">
+        <div class="col-md-7">
+          <h1>iXMaps
+            <p class="lead">Theme API Documentation</p>
+          </h1>
+        </div>
+        <div class="col-md-12">
+            <div > 
+                    <img src="assets/img/iXmaps sample.png" class="img-responsive" style="width:100%">
+                    <em>hexbin population density on ESRI hillshade basemap</em>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div> 
+  </div><!--/container-->
+</div><!--/masthead-->
+
+<!--main-->
+<div class="container">
+    <div class="row">
+      <!--left-->
+      <div class="col-md-2" id="leftCol">
+        <ul class=" nav-stacked" id="sidebar">
+          <li><a href="#sec0">Overview</a></li>
+          <li><a href="#sec1">Quick Start</a></li>
+          <li><a href="#sec2">Defining themes</a></li>
+          <li><a href="#sec3">Theme 'type's</a></li>
+          <li><a href="#sec4">Colorscheme</a></li>
+          <li><a href="#sec5">'style' parameter</a></li>
+        </ul>
+      </div><!--/left-->
+      
+      <!--right-->
+      <div class="col-md-10">
+        <h1 id="sec0">Thematic maps</h1>
+		<br>
+        <p>
+          <strong>iXMaps</strong> is a vector graphic <b>mapping framework</b>, based on <b>SVG files 
+			</b> generated from shape files and QGIS projects, and a <b>Javascript library</b> to 
+			geographically handle these SVG files.</p>
+        
+        <h3 >Visualize data with iXMaps</h3>
+		<p>
+          The iXMaps <b>Javascript library </b>enables the map for <b>thematic mapping</b> either by changing 
+			properties of the map shapes (choroplethe themes), or creating new SVG graphical 
+			objects to visualize the data by various chart types which are positioned 
+			either on map items, or by geographical coordinates (latitude, 
+			longitude) defined by the data.</p>
+        
+        <h3 >Themes defined with grammar</h3>
+		<p>
+			iXMaps defines a high-level <b>visualization grammar</b> for thematic maps. It provides a concise <b>JSON syntax</b> for supporting rapid generation
+			of visualizations from raw data.</p>
+		<p>
+          At its core, <b>iXMaps theme specifications are JSON objects</b> that describe visualizations as mappings from data
+			to properties of geographical map objects (polygons or lines) or graphical marks (e.g., points, bars, etc ) bound 
+			to geographically defined positions or objects on the map.</p>
+        
+        <h3 >Customize and share client side</h3>
+		<p>
+          Because with iXMaps <b>themes are &#39;alive&#39; </b> and not images, every 
+			theme can be <b>customized</b> to adapt colors or chart types 
+			and sizes. Than if you like, you can share the customized map by 
+			generating a <b>new URL containing the customized map and theme 
+			parameter</b></p>
+		<p>
+          The theme definition object can be <b>serialized and joined as a parameter to an URL</b>. In consequence
+		    every thematic map can be represented by a URL which combines	the	HTML template, the Tile map service, the SVG map and the theme 
+			definition. </p>
+		<p>
+          iXMaps themes are always <b>created from raw data</b>, given by a data URL, so if 
+			the data changes, the theme follows. By defining a refresh interval, 
+			you can have almost real time data showed in the theme.&nbsp;&nbsp; </p>
+        
+        <h3 >Choroplethe and charts</h3>
+        <p>
+          iXMaps supports:
+		  <ol>
+		  <li>choroplethe themes, which change the color property of map items like shapes or lines</li>
+		  <li>chart themes, which create graphical objects (SVG) like bubbles, bars or pies to represent the theme values on the map</li>
+		  </ol></p>
+		<h4 class="title" style="margin-top:1em">
+		<a name="id969420"></a>Important!</h4>
+		<p>
+		  <b>Choroplethe themes require an 'id' of the map elements</b> to be used for the theme.</p>
+		<p>
+		  Chart themes can be positioned on the map either
+		  by the id of map elements or by geographical coordinates, if present in the data.</p>
+        
+        <hr>
+        
+        <h1 id="sec1">Quick start</h1>
+        <div class="section" lang="en">
+          <div class="section" lang="en">
+            <div class="titlepage">
+              <div>
+                <div>
+                  <h3 class="title">
+                  <a name="id969275"></a>Introduction</h3>
+                </div>
+              </div>
+            </div>
+            <p>Themes are defined by a JSON Object using the iXMaps high-level visualization grammar and realized by a 
+			<a href="#id969275">iXMaps API</a> function.</p>
+            <p>You may define the theme first and call it or define the theme inside the function call. You can also wrap it all together into a <a href="#wrap">HTML link</a> and place the theme function in the 
+			&#39;href&#39; attribute.</p>
+
+			<h3 class="title">
+			<a name="id969275"></a>Example</h3>
+
+            </div>
+
+<pre><code class="json">
+// define the theme
+
+var <b>theme1</b> = {   
+    "layer": "com2011_s",
+    "field": "Totale complessivo",
+    "style": {
+        "type": "CHOROPLETHE|EQUIDISTANT",
+        "colorscheme": [  "5","#FFFDD8","#B5284B","2colors","#FCBA6C" ],
+        "dbtable": "themeDataObj csv url(<em>http://mysite/mydata</em>/data.csv)",
+        "lookupfield": "comune"
+    }
+}
+
+// put the theme on the map
+
+ixmaps.<b>newTheme</b>("Totale complessivo",<b>theme1</b>,"clear");
+</code></pre>
+            <p>This is the minimal definition of a chloroplethe theme based on 
+			named shapes within the SVG map. The basic properties are:</p>
+
+
+<table data-id='theme'>
+	<tr>
+		<th class="minwidth">Property</th>
+		<th class="minwidth">Type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td><code><b>layer</b></code></td>
+		<td><a href="#istring"><code>string</code></a></td>
+		<td>Defines the layer of the map used by this theme. This layer must provide the topology for choroplethe 
+		themes or may define points to position charts on. In these cases, the 
+		entities of the layer must have IDs generated that correspond to the 
+		cell values of the data colums defined in the 'style' parameter "lookupfield".</td>
+	</tr>
+	<tr>
+		<td><code><b>field</b></code></td>
+		<td><a href="#istring"><code>string</code></a></td>
+		<td>Defines the field (column name) of your data, where to find the values of your theme</td>
+	</tr>
+	<tr>
+		<td><code><b>style</b></code></td>
+		<td><a href="#iobject"><code>object</code></a></td>
+		<td>Defines the type and the layout of the theme in Javascript object notation (JSON);</td>
+	</tr>
+</table>
+			<h3 class="title">
+			<a name="id969275"></a>The 'layer' object</h3>
+			<h4 class="title">
+			<a name="id969420"></a>Important!</h4>
+			<p>If you want to use a layer (in ixmaps layer items are SVG groups with unique ID attribute) for choroplethe themes, or as anchor for chart positioning, the layer must be created with appropriate ID's (which correspond to the data field, you define in the theme)</p>
+
+			<h3 class="title">
+			<a name="id969275"></a>The 'field' object</h3>
+			<p class="remark">
+			<i>
+			<span class="remark">Note: for chart themes it is possible to position the charts at geografic coodinates defined by latitude and longitude. For this case in the 'lookupfield' you define 2 fields, that will contain the lat/lon pair, separated by "|".</span>
+			</i>
+			Example:
+			<code class="literal">"lookupfield": "Lat|Lon"</code>
+			</p>
+
+			<h3 class="title">
+			<a name="id969275"></a>The 'style' object</h3>
+			<p>Defines the type and the layout of the theme in Javascript object notation (JSON)</p>
+
+<pre><code class="json">
+{ property1:value, property2:value,... }
+</code></pre>
+              <p>A list of all possible parameter you find here</p>
+              <p>Let's have a look on the definition from the above minimal example:</p>
+<pre><code class="json">
+"style": {
+    "type": "CHOROPLETHE|EQUIDISTANT",
+    "colorscheme": [  "5","#FFFDD8","#B5284B","2colors","#FCBA6C" ],
+    "dbtable": "themeDataObj csv url(<em>http://mysite/mydata</em>/data.csv)",
+    "lookupfield": "comune"
+}
+</code></pre>
+<table data-id='theme'>
+	<tr>
+		<th class="minwidth">Property</th>
+		<th class="minwidth">Type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td><code><b>type</b></code></td>
+		<td><a href="#istring"><code>string</code></a></td>
+		<td
+			<p>defines the type of the theme. This is the graphical representation, which can be a 
+				<span class="bold">
+				<strong>colorized shapes</strong>
+				</span>(CHOROPLETHE), or 
+				<span class="bold">
+				<strong>chart objects</strong>
+				</span> (bar charts, pies, donuts,...).</p>
+				<p>A type definition is a string with a combination of type variables, separated by &#39;|&#39;.</p>
+				<p>
+				<span class="emphasis">
+				<em>Sample:</em>
+				</span> &#39;type:CHOROPLETHE|EQUIDISTANT&#39;</p>
+		</td>
+	</tr>
+	<tr>
+		<td><code><b>colorscheme</b></code></td>
+		<td><a href="#iarray"><code>array</code></a></td>
+		<td>
+			<p>defines the colors to be used in the theme (default: momochrome blue)</p>
+		</td>
+	</tr>
+	<tr>
+		<td><code><b>dbtable</b></code></td>
+		<td><a href="#istring"><code>string</code></a></td>
+		<td> <p>associate an external (javascript) database table to this theme; value:name of the table (without suffix!) 
+                    <span class="emphasis">
+                      <em>sample:</em>
+                    </span> &#39;dbtable:layerdb&#39;</p></td>
+	</tr>
+	<tr>
+		<td><code><b>lookupfield</b></code></td>
+		<td><a href="#istring"><code>object</code></a></td>
+		<td><p>define a field of the above external table which values can be used to find the theme shapes; 
+                    <span class="emphasis">
+                      <em>sample:</em>
+                    </span> &#39;lookupfield:statename&#39;</td>
+	</tr>
+</table>
+                  <h3 class="title">
+                  <a name="id969275"></a>Realizing the theme</h3>
+
+            <p>The simples way to realize a theme is to define it as a JavaScript object and realize it with the appropriate iXmaps API call ixmaps.<strong>newTheme</strong>(<em>" ... title ..."</em>,<em>themeObj</em>,[<em>flag</em>]).</p>
+
+
+            <p>For the above example this would lead to:</p>
+            <div >
+              <a name="id969292"></a>
+
+<pre><code class="javascript">
+var <b>theme1</b> = {   
+    "layer": "com2011_s",
+    "field": "Totale complessivo",
+    "style": {
+        "type": "CHOROPLETHE|EQUIDISTANT",
+        "colorscheme": [  "5","#FFFDD8","#B5284B","2colors","#FCBA6C" ],
+        "dbtable": "themeDataObj csv url(<em>http://mysite/mydata</em>/data.csv)",
+        "lookupfield": "comune"
+    }
+}
+
+ixmaps.<b>newTheme</b>("Totale complessivo",<b>theme1</b>,"clear");
+</code></pre>
+            </div>
+
+			<p>You can also put it all together to a function call</p>
+
+            <div id="wrap" >
+
+              <a name="id969292"></a>
+
+<pre><code class="javascript">
+ixmaps.newTheme("Totale complessivo",{  
+        "layer": "com2011_s",
+        "field": "Totale complessivo",
+        "style": {
+            "type": "CHOROPLETHE|EQUIDISTANT",
+            "colorscheme": [  "5","#FFFDD8","#B5284B","2colors","#FCBA6C" ],
+            "dbtable": "themeDataObj csv url(<em>http://mysite/mydata</em>/data.csv)",
+            "lookupfield": "comune"
+        },"clear"
+    });
+</code></pre>
+            </div>
+
+            <p>or define it all in your HTML within an &lt;a&gt; tag</p>
+
+            <div >
+              <a name="id969292"></a>
+
+<pre><code class="javascript">
+&lt;a href='javascript:ixmaps.newTheme("Totale complessivo",{
+            "layer": "com2011_s",
+            "field": "Totale complessivo",
+                "style": {
+                "type": "CHOROPLETHE|EQUIDISTANT",
+                "colorscheme": [  "5","#FFFDD8","#B5284B","2colors","#FCBA6C" ],
+                "dbtable": "themeDataObj csv url(<em>http://mysite/mydata</em>/data.csv)",
+                "lookupfield": "comune"
+            }
+        },"clear"
+    );'&gt; Totale complessivo&lt;/a&gt;
+</code></pre>
+            </div>
+
+
+
+          </div>
+
+		<br><br>	
+        <h1 id="sec2">The iXMaps data visualization grammar</h1>
+		<h3 class="title">
+                  Basic structure </h3>
+
+		<br>
+            <p>Themes are defined by JSON objects, like in the example 
+			shown below, and realized with the appropriate iXmaps API call ixmaps.<strong>newTheme</strong>(<em>" ... title ..."</em>,<em>themeObj</em>,[<em>flag</em>]).</p>
+
+
+<pre><code class="json">
+var <b>theme1</b> = {   
+    "layer": "com2011_s",
+    "field": "Totale complessivo",
+    "style": {
+        "type": "CHOROPLETHE|EQUIDISTANT",
+        "colorscheme": [  "5","#FFFDD8","#B5284B","2colors","#FCBA6C" ],
+        "dbtable": "themeDataObj csv url(<em>http://mysite/mydata</em>/data.csv)",
+        "lookupfield": "comune"
+    }
+}
+ixmaps.<b>newTheme</b>("Totale complessivo",<b>theme1</b>,"clear");
+</code></pre>
+
+
+            <p>There are the following main arguments to define, to describe a 
+			theme:</p>
+		<table data-id='theme'>
+			<tr>
+				<td><code><b>layer</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>defines the layer of the map to be the reference for this theme. For choroplethe themes this layer will provide the topology to colorize, for charts it may define points to position charts on. In both cases,the entities of the layer must be identified and the ID's must correspond to the values in the data column defined by the 'style' parameter "lookupfield".</td>
+			</tr>
+			<tr>
+				<td><code><b>field</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>defines the field (colum name of table) of your data, where to find the values of your theme; 
+				this can be only one field, or a sequence of fields (column 
+				names) separated by &#39;|&#39;; example: &#39;col1|col2|col3&#39; </td>
+			</tr>
+			<tr>
+				<td><code><b>field100</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>defines the field of your data, where to find a 2nd values 
+				for percent, difference or other value operations</td>
+			</tr>
+			<tr>
+				<td><code><b>style</b></code></td>
+				<td><a href="#iobject"><code>object</code></a></td>
+				<td>defines the type and the layout of the theme in Javascript 
+				object notation (JSON)</td>
+			</tr>
+		</table>
+		<h3 class="title">
+                  Fundamental elements of the &#39;style&#39; object </h3>
+			<p>The last object defines the nearly everything of the theme. Lets have a look on the fundamental objects of the sample theme definition:</p>
+
+            <p>The <b>&#39;style&#39;</b> object must at least have 4 elements to define type, 
+			color scheme, data source and lookup field for the theme as you can 
+			see in the above example</p>
+
+
+		<table data-id='styles'>
+			<tr>
+				<th class="minwidth">Property</th>
+				<th class="minwidth">Type</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code><b>type</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>defines the type of the theme. This is the graphical representation, which can be a 
+						<span class="bold">
+						<strong>colorized shapes</strong>
+						</span>(CHOROPLETHE), or 
+						<span class="bold">
+						<strong>chart objects</strong>
+						</span> (bar charts, pies, donuts,...).<br>
+					<p>A type definition is a string with a combination of type variables, separated by &#39;|&#39;.</p>
+					<p>
+					<span class="emphasis">
+					<em>Example:</em>
+					</span><code class="javascript"> &#39;CHOROPLETHE|EQUIDISTANT&#39;</code></p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>colorscheme</b></code></td>
+				<td><a href="#iarray"><code>array</code></a></td>
+				<td>
+					<p>defines the colors to be used in the theme (default: momochrome blue)</p>
+					<p>
+					<span class="emphasis">
+					<em>Example:</em>
+					</span><code class="javascript">[  "red","blue","green" ]</code></p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>dbtable</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td> <p>defines the data to use by the theme. 
+					 the value is a sequence of parameter to define:
+					 <ol>
+					 <li>the name of the data table (arbitrary, but must be unique)</li>
+					 <li>the type of the data source</li>
+					 <li>the url of the data source</li>
+					 <li>[optional] a javascript function call to to prepare the data</li>
+					 </ol>
+					 </p>
+					 <p>
+					<span class="emphasis">
+					  <em>Example:</em>
+					</span><code class="javascript"> &#39;themeDataObj csv url(<em>http://mysite/mydata</em>/data.csv)&#39;</code></p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>lookupfield</b></code></td>
+				<td><a href="#istring"><code>object</code></a></td>
+				<td><p>define the name of the row of the above defined data table, where to find the values which can be used to identify the layer items (shapes or points) for the theme creation.</p> 
+				<p><em>Example:</em>
+				<code class="javascript">&#39;comune&#39;</code>
+				</td>
+			</tr>
+		</table>
+		<br>
+		<p>Lets have a look on the 4 objects</p>
+        <h1 id="sec6">Reference</h1>
+		<p></p>
+
+        <h2 id="sec3">type</h2>
+		<p>With the &#39;type&#39; keywords you define the nature of the theme by <b>basic types</b> and <b>modifyers</b></p>
+		<table data-id='styles'>
+			<tr><td colspan="3"><br>there are 2 different theme types</td></tr>
+			<tr>
+				<th class="minwidth">TYPE_ID</th>
+				<th class="minwidth">Type</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code><b>CHOROPLETHE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>defines a theme based on map shapes (polygons) that will be colored by 
+					value classes and a color scheme</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>CHART</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>defines a theme visualized by charts positioned on the map</p>
+				</td>
+			</tr>
+			<tr><td colspan="3"><br>
+				and the following basic CHART types </td></tr>
+			<tr>
+				<th class="minwidth">TYPE_ID</th>
+				<th class="minwidth">Type</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code><b>BUBBLE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>simple circle bubbles with size and color options and optional value display</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>SQUARE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>rectangulars with size and color options and optional value display </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>BAR</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>bars, barcharts with several bars and stacked bars</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>POINTER</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>bars with a pointing top, usefull if we have ranges from negative to positive values </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>PIE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>pie chart with one or more parts</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>DONUT</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>a donut chart with one or more parts</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>SYMBOLS</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>a theme visualized by symbols on the map</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>BUFFER</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>a special theme to create one or more buffers around map 
+					objects, which can be points, lines or shapes;<br>
+					the following example draws buffers of 500 meters around 
+					every school in the layer &#39;schools&#39; </p>
+
+
+<pre><code class="json">}
+"layer": "schools",
+"style": {
+  "type": "CHART|BUFFER|VALUE|NOINFO",
+  "colorscheme": [&quot;#ffffff&quot;],
+  "buffersize":&quot;500",
+  &quot;borderstyle&quot;:&quot;dashed&quot;,
+  &quot;align&quot;:&quot;center&quot;,	
+  }
+}</code></pre>
+					<p>&nbsp;</p>
+				</td>
+			</tr>
+
+			<tr><td colspan="3"><br>these basic types can be used in combination with the following modifier to define the final chart type
+				<br><br>
+			</td></tr>
+
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>I. methods to create the class ranges for color schemes:</td></tr>
+			<tr>
+				<th class="minwidth">TYPE_ID</th>
+				<th class="minwidth">Type</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code><b>EQUIDISTANT</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>equidistant value classes</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>LOG</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>logarithmical value classes</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>QUANTILE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>quantile value classes; same number of members in every class</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>EXACT</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>every value represents a color class</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>DOMINANT</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>with multiple fields, show the color of the field with 
+					the highest value&nbsp; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>PERCENTOFMEAN</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>with multiple fields, show the color of the field with 
+					the deviation from mean (in %)&nbsp; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>DEVIATION</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>with multiple fields, show the value with the highest deviation (in standard deviation)</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>OFFSETMEAN</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>with multiple fields and type CHART, show the deviation 
+					of all fields by +/- pointers:<br>
+					example:&nbsp; <code class="javascript"> &#39;type&#39;:&#39;CHART|BAR|POINTER|OFFSETMEAN&#39;</code></p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>RANGES</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>class ranges are defined explicitly by a &#39;ranges&#39; 
+					parameter; example: </p>
+
+
+<pre><code class="json">"style": {
+  "type": "CHOROPLETHE|RANGES",
+  "colorscheme": ["5","#FFFDD8","#B5284B","2colors","#FCBA6C"],
+  "ranges":"-100,-10,0,10,100"
+}</code></pre>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>II. defining the value algorithm 
+			</td></tr>
+			<tr>
+				<th class="minwidth">TYPE_ID</th>
+				<th class="minwidth">Type</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code><b>DIFFERENCE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>value = [field] - [field100]</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>FRACTION</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>value = [field]/[field100]</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>PERCENT</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>value = [field]/[field100]*100</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>PERMILLE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>value = [field]/[field100]*1000</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>RELATIVE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>value = [field]/[field100]*100 - 100</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>INVERT</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>value = 100 - [field]/[field100]*100</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>CALCVAL</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>value = Math.round([field]*[field100]/100)</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>CALC100</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>value = Math.round([field]*[field100]/100)</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>PRODUCT</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>value = [field]*[field100]</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>NEGATIVEISVALUE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>allow negative values</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>ZEROISVALUE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>allow zero values</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>SUM</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>define the aggregation mode; if values are absolute, you 
+					may define &#39;SUM&#39;;<br>
+					if values are in percent, you don&#39;t want SUM but MEAN, which 
+					is the default</p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>chart size methods
+			</td></tr>
+			<tr>
+				<th class="minwidth">TYPE_ID</th>
+				<th class="minwidth">Type</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code><b>LINEAR</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>the size of the chart graphics represents the value </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>VOLUME</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>for 3d charts; the volume of the chart graphic represents 
+					the value </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>SIZE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>for 2d charts; the surface of the chart graphic 
+					represents the value </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>SIZEP4</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>for wider value ranges, this uses power of 4 to flatten 
+					the chart sizes</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>SIZELOG</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>use the logarithm of the value to size the chart graphics</p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>dynamic opacity for choroplethe themes
+			</td></tr>
+			<tr>
+				<th class="minwidth">TYPE_ID</th>
+				<th class="minwidth">Type</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code><b>DOPACITY</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>dynamic opacity by the value; lower values get 
+					transparent</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>DOPACITYMIN</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>dynamic opacity to emphasize the minimum values; higher 
+					values get transparent </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>DOPACITYMAX</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>dynamic opacity to emphasize the maximum values; like 
+					DOPACITY but you can apply the style variables &#39;dopacitypow&#39; 
+					and &#39;dopacitypow&#39; to define custom opacity curves </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>DOPACITYMINMAX</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>emphasizes minimal and maximal values; the average values 
+					get more transparent</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>BIPOLAR</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>same as DOPACITYMINMAX</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>DOPACITYLOG</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>like DOPACITYMAX, but takes the logarithm of the values 
+					to scale the opacity</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>DOPACITYMEAN</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>like DOPACITY, to use with DOMINANT, PERCERTOFMEAN or 
+					DEVIANT</p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>chart type modifier
+			</td></tr>
+			<tr>
+				<th class="minwidth">TYPE_ID</th>
+				<th class="minwidth">Type</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code><b>SEQUENCE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>make a composite chart of n BUBBLE, SQUARE, BAR or SYMBOL; 
+					this means a chart composed of a sequence of graphics of the 
+					defined type, positioned in a defined way relative to the 
+					center of the chart; see <strong>chart positioning</strong> 
+					below.<br>
+					The <strong>number</strong> of sequenced charts is given by 
+					the<strong> number of fields</strong> defined; with SYMBOLS, 
+					the <strong>symbol types</strong> can be defined by the
+					<strong>&#39;symbols&#39; variable</strong>; default is &#39;circle&#39;. </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>STARBURST</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>PIE or DONUT modifier; make radius variable by value; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>3D</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>make BAR, PIE or DONUT tree dimensional</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>SIZE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>with PIE or DONUT, the radius represents the value </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>HEIGHT</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>with PIE or DONUT, the char height represents the value </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>WIDTH</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>with PIE or DONUT like SIZE; with POINTER, makes the 
+					pointer width more dynamic by value </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>VOLUME</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>with BAR or PIE; width and height represent the value; 
+					bars get cubes</p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br><strong>chart positioning</strong> and part <strong>sorting</strong>
+			</td></tr>
+			<tr>
+				<th class="minwidth">TYPE_ID</th>
+				<th class="minwidth">Type</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code><b>CENTER</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>the chart, or the single graphics of a composed chart are positioned on 
+					the center of the chart position.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>LEFT</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>the chart is aligned to the left of the chart position.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>RIGHT</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>the chart is aligned to the right of the chart position.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>TOP</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>the chart is aligned to the top of the chart position</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>BOTTOM</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>the chart is aligned to the bottom of the chart position</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>ABOVE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>like TOP</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>BELOW</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>like BOTTOM</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>HORZ</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>BARs and&nbsp; MULTIPLE or SEQUENCE charts are composed 
+					horizontally; default is vertically<br>
+					example: CHART|BAR|HORZ|UP|CENTER defines something like a 
+					pyramid, useful for demographics </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>STAR</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>the single graphics of a composed chart are positioned 
+					around the center of the chart position with the first 
+					graphic on the center and the following around the first 
+					with the radiuses touching each other.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>SORT</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>the graphics are sorted by their values; default is sort 
+					down; if not defined, the graphics are drawn in the order of 
+					the field definition </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>UP</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>sort up, the smallest value is on the top </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>DOWN</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>sort down, the biggest value is on the top</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>RANDOM</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>sort the graphics by random; every chart gets its own 
+					&#39;composition&#39;, this is useful with STAR charts, to avoid 
+					pattern forming&nbsp;&nbsp; </p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>miscellaneous
+			</td></tr>
+			<tr>
+				<th class="minwidth">TYPE_ID</th>
+				<th class="minwidth">Type</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code><b>AGGREGATE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>aggregate values of the same position before creating the 
+					charts; this is useful if you have a dataset with multiple 
+					records for the same position.<br>
+					used with the style parameter &#39;gridwidth&#39;, you can aggregate 
+					every theme to a virtual grid, the position of a chart is 
+					mapped to the nearest point of the defined grid; the 
+					value(s) is/are added to the point.&nbsp;&nbsp;&nbsp; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>DIFFUSE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>only with &#39;gridwidth&#39;: like AGGREGATE, but with a 
+					slightly different algorithm; every value is distributed to 
+					the nearest 4 points of the aggregation grid; every of the 4 
+					points gets a portion of the value relative to the distance 
+					to the original position of the value.&nbsp;&nbsp; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>MULTIPLE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>if you have a dataset with multiple records for the same 
+					position, this type modifier adds an offset to every 
+					repeated position, so you see every value displayed; 
+					normally the offset is added in Y-direction; you can change 
+					this by the modifier HORZ.</p>
+					<p>you can define rows by the style parameter &#39;gridx&#39;; 
+					example: &#39;gridx&#39;:&#39;3&#39; means that every 3 offsets a new row 
+					will be started. </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>VALUES</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>add a textual value display to CHOROPLETHE or CHART 
+					themes</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>VALUESBACKGROUND</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>create a colorized background for the textual value 
+					representation of CHART themes</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>BOX</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>create a background box around every chart; the box can 
+					be customized by the style parameter: &#39;boxopacity&#39;, &#39;boxborder&#39; 
+					and &#39;boxmargin&#39; described below. </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>MOVABLE</b></code></td>
+				<td><a href="#iarray"><code>string</code></a></td>
+				<td>
+					<p>makes charts movable; this means you can drag the charts 
+					on the map to any desired position. </p>
+				</td>
+			</tr>
+		</table>
+
+        <h2 id="sec4">Colorscheme</h2>
+		<table data-id='styles'>
+			<tr>
+				<th class="minwidth">Property</th>
+				<th class="minwidth">Type</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code><b>colorscheme</b></code></td>
+				<td><a href="#iarray"><code>array</code></a></td>
+				<td>
+					<p>a colorscheme is defined by an array of 1 - n values<p>
+					<p>the values may define directly 1 - n colors</p>
+					<p>
+					<em>Example:<em><code>[ "red", "green", "blue" ]</code></p>
+					<p>or a dynamic color scheme defined by:
+					<ol><li>the number of colors</li>
+					<li>n color scheme parameter</li></ol></>
+					<p>
+					<em>Example:<em><code>[ "7", "red", "green" ]</code></p>
+				</td>
+			</tr>
+		</table>
+	  <h3 class="title">
+	  <a name="id969275"></a>defining colorschemes</h3>
+
+		<p>The simplest colorscheme is one color definition, like shown below:</p>
+<pre><code class="javascript" style="margin-top:-0.7em">
+"colorscheme": [ "#FF0000" ]
+
+ or defined by RGB notation:
+
+"colorscheme": [ "RGB(255,0,0)" ]
+
+ or the color name:
+
+"colorscheme": [ "red" ]
+</code></pre>
+		<br>
+		<p>If you need more colors, you can define them directly:
+<pre><code class="javascript" style="margin-top:-0.7em">
+"colorscheme": [ "#FFFDD8","#FFEBB2","#FED992","#FCBA6C","#F99E5B","#E86144","#B5284B","#952D44" ]
+</code></pre>
+		or by a generated color scheme.
+<pre><code class="javascript" style="margin-top:-0.7em">
+"colorscheme": [ "8","#FFFDD8","#952D44" ]
+</code></pre>
+        <h1 id="sec7">&nbsp;</h1>
+		<h1>Grammar Reference</h1>
+        <h2 id="sec5">'style' Parameter</h2>
+		<table data-id='styles'>
+			<tr>
+				<th class="minwidth">Property</th>
+				<th class="minwidth">Type</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code><b>type</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>defines the nature of the theme, for details see 
+					description of &#39;type&#39; above</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>colorscheme</b></code></td>
+				<td><a href="#iarray"><code>array</code></a></td>
+				<td
+					<p>defines the colors to be used in the theme (default: momochrome blue)</p>
+					<p>
+					<span class="emphasis">
+					<em>Example:</em>
+					</span><code class="javascript">[  "red","blue","green" ]</code></p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>nodatacolor</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>define the color, that will be displayed if there is no 
+					value for the item</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>linecolor</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>define the line color of PIE or BAR charts</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>opacity</b></code></td>
+				<td><a href="#istring"><code>number</code></a></td>
+				<td>
+					<p>defines the overall opacity of a theme (CHLOROPLETHE and 
+					CHART)</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>autoopacity</b></code></td>
+				<td><a href="#istring"><code>boolean</code></a></td>
+				<td>
+					<p>if set to TRUE, the opacity of CHLOROPLETHE themes 
+					depends on the map actual zoom; zooming in the theme gets 
+					more and more transparent (to show details of the base map) </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>fillopacity</b></code></td>
+				<td><a href="#istring"><code>number</code></a></td>
+				<td>
+					<p>defines the opacity of surface filling in CHART themes</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>shadow</b></code></td>
+				<td><a href="#istring"><code>boolean</code></a></td>
+				<td>
+					<p>if set to TRUE, charts are displayed with a drop down 
+					shadow </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>aggregation</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>define the aggregation algorithm: may be &#39;sum&#39; or &#39;mean&#39; 
+					(default is &#39;mean&#39;)</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>evidence</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>defines how selected items (points, lines, polygons) 
+					shall be marked&nbsp;&nbsp; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>dfilter</b></code></td>
+				<td><a href="#istring"><code>number</code></a></td>
+				<td>
+					<p>define a filter for PERCENTOFMEAN</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>overviewchart</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>defines the &#39;type&#39; of the overview chart, which is the 
+					sum or class chart shown in the theme legend; default: NONE&nbsp;&nbsp; </p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>define data sources
+			</td></tr>
+			<tr>
+				<td><code><b>dbtable</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>defines the data source of the themes</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>dbtableType</b></code></td>
+				<td><a href="#istring"><code>resource</code></a></td>
+				<td>
+					<p>defines the type of the data source of the themes, (csv, 
+					json, FT)</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>dbtableUrl</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the URL to the data source</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>dbtableEXT</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>a Javascript function to call if data is loaded</p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>define data columns
+			</td></tr>
+			<tr>
+				<td><code><b>itemfield</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the field (column name) where to take the value from, 
+					alternative to the definition in &#39;fields&#39; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>lookupfield</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the&nbsp; <strong>column/s of the data</strong> which 
+					cells define the <strong>relationship to the map</strong>; 
+					these can be:<br>
+					a) an <strong>ID</strong> which corresponds to the IDs of 
+					map elements; in general the name of countries, towns, 
+					streets <br>
+					b) a <strong>geographical position</strong> given in<em>
+					</em><strong><em>Latitude</em></strong> and <em><strong>
+					Longitude</strong></em> in one or two data columns.</p>
+					<ul><li>in case of <strong>one column</strong> the contents of the cells must be two numbers: <strong>latitude,longitude</strong>separated by comma; example:&nbsp; &quot;lookupfield&quot;:&quot;Position&quot; and Position cell values like "44.234653,11.35647858"
+					</li><li>in case of <strong>two columns</strong> the first must define the latitude and the second the longitude; example:&nbsp;"lookupfield":"latcol|loncol" and latcol cells like&nbsp; "44.234653" and loncol cells like "44.234653"
+					</li></ul>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>lookuptoupper</b></code></td>
+				<td><a href="#istring"><code>boolean</code></a></td>
+				<td>
+					<p>if TRUE, lookup cell values are changed toUpper before 
+					matching the corresponding ID on the map<br>
+					example: the data may contain &#39;London&#39;, the map knows only 
+					&#39;LONDON&#39;</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>lookupsuffix</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>if TRUE, the define suffix will be appended to all lookup 
+					cell values before matching the corresponding ID on the map</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>exclude</b></code></td>
+				<td><a href="#istring"><code>array</code></a></td>
+				<td>
+					<p>you may define map item IDs to exclude from the theme 
+					display; example; &quot;exclude&quot; : &quot;Lichtenstein,Monaco&quot; </p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>theme calcolation
+			</td></tr>
+			<tr>
+				<td><code><b>ranges</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>define value ranges for themes with color classes defined 
+					by a colorscheme, you must define n+1 values for n colors</p>
+
+
+<pre><code class="json">"style": {
+  "type": "CHOROPLETHE|RANGES",
+  "colorscheme": [&quot;red&quot;,&quot;orange&quot;,&quot;yellow&quot;,&quot;green&quot;],
+  "ranges":"-100,-10,0,10,100"
+}</code></pre>
+					<p>in the above example there are 4 ranges with:
+<pre><code>"red"	 from  -100 to &lt;-10
+"orange" from   -10 to &lt;0
+"yellow" from     0 to 10
+"green"  from   &gt;10 to 100</code></pre>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>rangecentervalue</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>for EQUIDISTANT class distribution, you can here define 
+					the center of the classes; EQUIDISTANT automatic class 
+					definition takes the lowest and the highest value and 
+					divides the range into n equal parts. If you define a &#39;rangecentervalue&#39; 
+					the range will be symmetric to this value; this means either&nbsp; 
+					the min or the max value will be adjusted to fulfill this 
+					condition.</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>values</b></code></td>
+				<td><a href="#istring"><code>array</code></a></td>
+				<td>
+					<p>for EXACT theme types, you may want to define the allowed 
+					values or you can use this definition option to give an 
+					order to the possible EXACT values; <em><strong>note:</strong></em> 
+					EXACT values are strings.&nbsp; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>symbols</b></code></td>
+				<td><a href="#istring"><code>array</code></a></td>
+				<td>
+					<p>define the symbols for &#39;type&#39; SYMBOL; this can be IDs of 
+					loaded symbols defined in SVG or generic symbol shapes 
+					created &#39;on the fly&#39;. The generic symbols are: circle, 
+					square, diamond, triangle, label</p>
+					<p>The default symbol is &#39;circle&#39;</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>align</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>define the alignment for CHART themes; possible values 
+					are: center, top, bottom, left, right, above, below; you can 
+					combine align values; example: &quot;align&quot; : &quot;above|left&quot;&nbsp; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>sizefield</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the name off the data column to use to size the charts</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>buffersize</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the size of BUFFER charts to draw around points, lines or 
+					areas (in meter)</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>bufferstep</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the amount of buffer size changes (meters) </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>field100min</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>clips the charts drawn by defining a minimum value for 
+					the &#39;field100&#39; values; useful if you want to make a theme 
+					with percentages to exclude values based on few items&nbsp; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>fractionscale</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>defines a scaling factor for values created with the 
+					FRACTION &#39;type&#39; modifier</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>minvalue</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>minimal value, values below this are not shown </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>normalsizevalue</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>you can define the value that will produce a chart of a 
+					normal size, which is 30 pixel</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>scale</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>define a scaling factor (0 &gt;x&lt;100) to scale the chart 
+					size</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>weights</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the values from the theme data cells can be &#39;weighted&#39; by 
+					a floating-point factor; here you can define n factors for n 
+					fields (data columns); example: &quot;weights&quot; : &quot;1,1,0.5,1&quot;&nbsp; 
+					will scale the values of the 3. data column by 0.5</p>
+				</td>
+			</tr>
+
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>texts
+			</td></tr>
+
+			<tr>
+				<td><code><b>units</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>give a unit to the value display: example &quot;units&quot;:&quot;%&quot; 
+					leads to value display like &quot;56 %&quot;</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>units100</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>also the value100 (e.g. 100% value) can have a unit 
+					displayed </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>sizevalueunits</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>if you define a &#39;sizefield&#39;, you can give it a unit 
+					within the char info display; example &quot;sizevalueunits&quot; : 
+					&quot;residents&quot;&nbsp;&nbsp; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>legendunits</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>you may define value units, only used within the theme 
+					legend&nbsp; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>xaxis</b></code></td>
+				<td><a href="#istring"><code>array</code></a></td>
+				<td>
+					<p>for BAR charts with multiple bars, you can define a 
+					x-axis description; example you have 3 bars with values for 
+					2012, 2013 and 2014, then yuo can define the x-axis text 
+					with: &quot;xaxis&quot; : &quot;2012,2013,2014&quot;&nbsp; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>label</b></code></td>
+				<td><a href="#istring"><code>array</code></a></td>
+				<td>
+					<p>define legend label, the value label in the theme legend display are preset 
+					with the column names you defined to get the data; here you 
+					can overwrite them with more readable or sigificant text: "label":"label1,label2,vabel3"</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>title</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>define the title of the theme, to show in the theme 
+					legend</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>snippet</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>define a short description to use in the theme legend and 
+					in chart info bubbles</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>description</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>define a description to use in the theme legend and in 
+					chart info bubbles</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>infotitle</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>define a title for all chart info bubbles</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>titlefield</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the name off the data column to use as chart info title</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>snippetfield</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the name off the data column to use as short description 
+					in the chart info</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>labelfield</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the name off the data column to use as chart label</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>showdata</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>show the original data of the chart within the chart info 
+					bubble</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>textplacement</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>???</p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>textual value display
+			</td></tr>
+			<tr>
+				<td><code><b>valueupper</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>define an upper map scale value to suppress value display 
+					if you zoom out the map; e.g. &quot;valueupper&quot;:&quot;1:100000&quot; shows 
+					values only if the map scale is lower than 1:100000</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>valuescale</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>show bigger or smaller value texts </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>clipvaluesize</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>show values only if the dynamic text size (which depends 
+					on the chart size) is greater than the defined value (pixel)&nbsp; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>fadevaluepow</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>defines the power (x power n) of value display transparency depending on the value size; higher power leads to faster transparancy</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>fadenegative</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>defines the opacity of negative values ( 1 ... 0.1 )</p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>alpha channel (choroplethe themes)
+			</td></tr>
+			<tr>
+				<td><code><b>alphafield</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the name off the data column to use to create CHOROPLETHE 
+					themes with dynamic opacity</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>alphafield100</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the name off the data column to use with &#39;alphafield&#39; to 
+					calculate the value for dynamic opacity;<br>
+					special variable &#39;$density&#39; to define the density of the 
+					value in &#39;alphafield&#39; as source for the dynamic opacity</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>dopacityscale</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>defines a factor to apply to dynamic opacities calcolated by a dedicated value (see DOPACITY and alphafield)</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>dopacitypow</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>defines the power (x power n) for the dynamic alpha calculation; it is comparable to the contrast for images (see DOPACITY and alphafield)</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>dopacityramp</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>(deprecated) same as dopacitypow</p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>for theme with 'timeline' (CLIP)
+			</td></tr>
+			<tr>
+				<td><code><b>clipframes</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>the number of frames for CLIP themes</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>cliplegend</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>a text to display while CLIP themes are running</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>clipparts</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>clip the number of parts of a theme</p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>multiple values for the same position (MULTIPLE)
+			</td></tr>
+			<tr>
+				<td><code><b>gridx</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>a x-axis grid width for MULTIPLE themes</p>
+				</td>
+			</tr>
+			<tr><td colspan="3" style="background:#f8f8f8;">
+			<br>background box for charts ('BOX')
+			</td></tr>
+			<tr>
+				<td><code><b>boxopacity</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>with type modifier BOX: define the opacity of the chart 
+					background box</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>boxmargin</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>with type modifier BOX: define the margin (pixel) of the 
+					chart background box</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>bordercolor</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>with type modifier BOX: define the color of the border of 
+					the 
+					chart background box,<br>
+					color defined like: &#39;#123456&#39;, &#39;red&#39;, or RGB(128,234,255) </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>borderstyle</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>with type modifier BOX: define the border style of the 
+					chart background box;<br>
+					possible styles are :&#39;solid&#39;, &#39;dotted&#39; or &#39;dashed&#39; </p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>borderwidth</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>with type modifier BOX: define the width (pixel) of the 
+					border of the background box</p>
+				</td>
+			</tr>
+			<tr>
+				<td><code><b>borderradius</b></code></td>
+				<td><a href="#istring"><code>string</code></a></td>
+				<td>
+					<p>with type modifier BOX: define the corner radius (pixel) of the 
+					chart background box</p>
+				</td>
+			</tr>
+		</table>
+
+
+
+
+
+
+
+
+        </div><!--/right-->
+    </div><!--/row-->
+</div><!--/container-->
+        
+        <script type='text/javascript' src="assets/js/jquery-1.9.1.min.js"></script>
+        <script type='text/javascript' src="assets/google-code-prettify/run_prettify.js"></script>
+        <script type='text/javascript' src="assets/js/bootstrap.min.js"></script>
+		<script type='text/javascript' src="assets/js/highlight.pack.js"></script>
+        
+        <!-- JavaScript jQuery code from Bootply.com editor  -->
+        
+        <script type='text/javascript'>
+        
+        $(document).ready(function() {
+        
+            /* activate sidebar */
+			$('#sidebar').affix({
+			  offset: {
+				top: 235
+			  }
+			});
+
+			/* activate scrollspy menu */
+			var $body   = $(document.body);
+			var navHeight = $('.navbar').outerHeight(true) + 10;
+
+			$body.scrollspy({
+				target: '#leftCol',
+				offset: navHeight
+			});
+
+			/* smooth scrolling sections */
+			$('a[href*=#]:not([href=#])').click(function() {
+				if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+				  var target = $(this.hash);
+				  target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+				  if (target.length) {
+					$('html,body').animate({
+					  scrollTop: target.offset().top - 50
+					}, 1000);
+					return false;
+				  }
+				}
+			});
+
+			hljs.initHighlightingOnLoad();
+
+        });
+        
+        </script>
+        
+    </body>
+</html>

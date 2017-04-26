@@ -1,0 +1,231 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<html> <head> <title>ixmaps theme editor</title>
+<head>
+
+	<!-- Styles ------------------------ -->
+
+	<!-- Bootstrap core CSS -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="assets/css/main.css" rel="stylesheet">
+
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/css/icomoon.css" rel="stylesheet" >
+
+	<style>
+		body {
+			font-family: Raleway,Merriweather,Tahoma,Verdana,'Helvetica Neue',Aria;
+			font-size: 12px;
+			line-height: 0.7em;
+			font-weight: 300;
+		}
+		textarea {
+			width:90%;
+		}
+		.actionLink{
+			vertical-align: 5px;;
+		}
+		/* Track */
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.1); 
+			-webkit-border-radius: 0px;
+			border-radius: 0px;
+		}
+		/* Handle */
+		::-webkit-scrollbar-thumb {
+			-webkit-border-radius: 0px;
+			border-radius: 0px;
+			background: rgba(232,232,232,0.6); 
+			-webkit-box-shadow: inset 0 0 0px rgba(0,0,0,0.1); 
+		}
+		::-webkit-scrollbar-thumb:window-inactive {
+			background: rgba(222,222,222,0.4); 
+		}
+
+	</style>
+
+</head>
+
+<!-- End of Header ------------------------ -->
+
+<body style="padding:1em;">
+
+	<div id="workspace" style="margin-bottom:5em;overflow:auto;">
+
+	<div >
+		<div id="bookmark-list" style="max-height:50%;overflow:auto;margin-top:0.5em">
+		</div >
+	</div>
+
+	<div id="footer" >
+		<div >
+			<a href='javascript:ixmaps.addBookmark();'>
+				<button type="button" class="btn btn-md">
+				add
+				</button>
+			</a>
+			<a href='javascript:ixmaps.downloadBookmark();'>
+				<button type="button" class="btn btn-md">
+				save to disk
+				</button>
+			</a>
+			<a href="javascript:$('#info-add').toggle();">
+			<span class="icon icon-info tip" data-tip="più/<br>meno" style="font-size:14px;color:#aaaaaa;margin-left:0.2em;"></span></a>
+				<div id="info-add" style="margin-top:1em;margin-bottom:1em;line-height:1em;color:#dd8800;display:none">
+					<table>
+					<tr><td valign="top">add</td><td>add the actual theme to the bookmark list.</td></tr>
+					<tr><td>'save to disc'</td><td>get a JSON file of your bookmarks.</td></tr>
+					</table>
+				</div>
+		</div>
+
+
+		<div >
+			<br><br> or <br><br><br>
+			<a href="javascript:ixmaps.updatePageHistory(null,true);$('#info-url').toggle();">
+				<button type="button" class="btn btn-md btn-default" alt="test">
+				create bookmark URL 
+				</button>
+			</a>
+			<a href="javascript:$('#info-share').toggle();">
+			<span class="icon icon-info tip" data-tip="più/<br>meno" style="font-size:14px;color:#aaaaaa;margin-left:0.2em;"></span></a>
+			<p style="margin-top:1em;line-height:normal">
+			with the actual map parameter</p>
+			</p>
+				<div id="info-share" style="margin-top:1em;margin-bottom:1em;line-height:1em;color:#dd8800;display:none">
+					<p> Updates the URL in the browser bar with the actual theme and view.</p><p>
+					You can than use your favourite tool to bookmark the theme as you see it, with all your customizations.
+					</p>
+				</div>
+				<div id="info-url" style="margin-top:1em;margin-bottom:2em;line-height:1em;color:#444;display:none">
+					<p> The <b>URL</b> in the <b>browser</b> bar has been set with the actual map parameter.</p><p> You can now <b>use</b> any ordinary browser <b>bookmark tool</b> to rember the actual view and theme.</p>
+				</div>
+
+		</div>
+	</div>
+	</div>
+
+    <!-- JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+    <script src="assets/js/jquery-1.11.2.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src = "../js/tools/colorselect.js" > </script>
+
+	<script>
+
+		// ------------------------
+		// get api from opener 
+		// ------------------------
+
+		var ixmaps = null;
+		if ( window.opener ){
+			ixmaps = window.opener.ixmaps;
+		}else
+		if ( parent ){
+			ixmaps = parent.window.ixmaps;
+		}
+		else{
+			alert("error: missing parent window for themes !");
+		}
+		while( ixmaps.embeddedApi && (ixmaps.embeddedApi != ixmaps) ){
+			ixmaps = ixmaps.embeddedApi;
+		}
+
+
+		// ------------------------
+		// on ready
+		// ------------------------
+
+		$(document).ready(function() {
+			ixmaps.bookmark.load();
+			ixmaps.updateBookmarks();
+		});
+
+		// ------------------------------------------------
+		// define own functions as extenstion to parent api 
+		// ------------------------------------------------
+
+		ixmaps.showHistory = function(){
+			$("#history-switch").html("hide");
+			$("#history-switch").attr("onclick","javascript:ixmaps.hideHistory();");
+			$("#history").show();
+		};
+		ixmaps.hideHistory = function(){
+			$("#history-switch").html("show");
+			$("#history-switch").attr("onclick","javascript:ixmaps.showHistory();");
+			$("#history").hide();
+		};
+		ixmaps.updateBookmarks = function(){
+			var bookmarks = ixmaps.bookmark.getList();
+			var szTooltip = "";
+
+			if ( bookmarks.length ){
+
+				var szHtml = "<div class='choice_list' >";
+				szHtml += "<ul class='list-group' >";
+				for ( b in bookmarks ){
+
+					if ( bookmarks[b].time ){
+						var d = new Date(bookmarks[b].time);
+						var date  = d.toLocaleDateString();
+						var hour  = d.toTimeString().split(" ")[0];
+						szTooltip = "bookmark created: " + date + " " + hour; 
+					}else{
+						szTooltip = "bookmark"; 
+					}
+
+					if ( bookmarks[b].theme ){
+						szHtml += "<a href='javascript:ixmaps.bookmark.get("+b+");' class='list-group-item' title='"+szTooltip+"' >";
+
+						szHtml += "<h5 class='list-group-item-heading'>";
+						szHtml +=   "<span class='icon icon-bookmark' ></span> <span style='font-weight:bold;' >"+(bookmarks[b].name||(Number(b)+1)) +"</span>";
+						szHtml +=   "<span class='icon icon-remove pull-right list-group-item' style='color:#ddd;padding:0.5em' onclick='ixmaps.removeBookmark("+b+");event.stopPropagation();return false;'></span>";
+						szHtml += "</h5>";
+						szHtml += "<p class='list-group-item-text'>"+(bookmarks[b].theme.style.title)+"</p>";
+
+						szHtml += "</a>";
+					}
+				}
+				szHtml += "</ul>";
+				szHtml += "</div>";
+			}else{
+				szHtml = "<br><br><p><em> - no bookmarks defined - </em></p>";
+			}
+			$("#bookmark-list")[0].innerHTML = szHtml;
+			$("#bookmark-list").css("max-height",window.innerHeight-$("#footer").height()-80+"px");
+		};
+		ixmaps.addBookmark = function(){
+			ixmaps.addBookmarkDialog = ixmaps.openDialog(null,'addbookmark-dialog','./history_add.html','Bookmarks','10,103',500,350);
+		};
+		ixmaps.addBookmarkDone = function(){
+			ixmaps.updateBookmarks();
+		};
+		ixmaps.removeBookmark = function(b){
+			ixmaps.confirm("removere definitivamente il bookmark",
+				function () {
+					ixmaps.bookmark.remove(b,ixmaps.updateBookmarks);
+				},
+				function () {
+				});
+			return false;
+		};
+		ixmaps.downloadBookmark = function(){
+			ixmaps.downloadBookmarkDialog = ixmaps.openDialog(null,'downloadbookmark-dialog','./history_save.html','Bookmarks','10,103',500,250);
+		};
+
+	// ------------------------
+	// end of code 
+	// ------------------------
+
+	</script>
+
+</body>
+</html>

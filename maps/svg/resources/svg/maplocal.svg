@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"
+"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg width="500" height="500"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:visx="http://www.medienobjekte.de"
+>
+  <script type="text/ecmascript"><![CDATA[
+
+	szContainerTitle =	"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:18px;font-weight:normal;fill:#444444;pointer-events:none;";
+	szDescription =		"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:11px;fill:#555555;font-weight:bold;font-style:italic;pointer-events:none;";
+	szSummary =			"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:10px;fill:#666666;pointer-events:none;";
+	szNote =			"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:11px;fill:darkgrey;font-style:italic;stroke:none;pointer-events:none;";
+try{
+	map.setFeatures( 'featurescaling:true;'
+					+'objectscaling:true;'
+					+'clipmap:true;'
+					+'clipmapdynamic:true;'
+
+					+'dynamiclabel:NOSIZE;'
+					+'labelspace:1.0;'
+					+'checklabeloverlap:NOSQUEEZE;'
+
+					+'dynamiclayer:true;'
+					+'dynamictiles:true;'
+					+'discardtiles:false;'
+					+'loadmultitiles:true;'
+					+'loadsilent:false;'
+					+'loadexternaldata:true;'
+
+					+'buttonsize:15;'
+
+					+'fastpan:false;'
+					+'panborder:0;'
+					+'northarrow:false;'
+					+'sidebarbuttons:false;'
+					+'tooltipdelay:250;'
+					+'popupdelay:250;'
+					+'popupgridstyle:firstright|firstitalic|firstbold|firstgray|firstsmall|background|alternate|full;'
+					+'popupalignment:BOTTOM|LEFT;'
+					+'transparentbackground:true;'
+				 );
+
+	szChartTypeListSingleValue = new Array(
+		 "CHOROPLETHE"
+		,"CHART|BUBBLE"
+		,"CHART|SQUARE"
+		,"CHART|PIE|3D|SIZE"
+		,"CHART|PIE|3D|HEIGHT"
+		,"CHART|PIE|3D|SIZE|HEIGHT"
+ 		,"CHART|BAR|3D|VOLUME"
+		,"CHART|BAR"
+		,"CHART|BAR|3D"
+		,"CHART|BAR|3D|SIZE"
+		,"CHART|BAR|HORZ|RIGHT|UP"
+		,"CHART|BAR|HORZ|RIGHT|UP|3D"
+		,"CHART|BAR|POINTER"
+		,"CHART|BAR|POINTER|SIZE"
+		,"CHART|BAR|HORZ|RIGHT|UP|POINTER"
+		,"CHART|LABEL"
+		);
+
+	
+	szChartTypeList = new Array(
+		"CHART|BAR"
+		,"CHART|BAR|3D"
+		,"CHART|BAR|3D|TRENDLINE"
+		,"CHART|BAR|3D|SORT"
+		,"CHART|BAR|HORZ|LEFT|UP"
+		,"CHART|BAR|HORZ|RIGHT|UP"
+		,"CHART|BAR|HORZ|LEFT|UP|COMPRESS"
+		,"CHART|BAR|HORZ|RIGHT|UP|COMPRESS"
+		,"CHART|BAR|HORZ|LEFT|UP|3D"
+		,"CHART|BAR|HORZ|RIGHT|UP|3D"
+		,"CHART|BAR|HORZ|RIGHT|3D"
+		,"CHART|BAR|HORZ|RIGHT|COMPRESS|3D"
+		,"CHART|BAR|HORZ|RIGHT|SORT|3D"
+		,"CHART|BAR|HORZ|RIGHT|SORT|COMPRESS|3D"
+		,"CHART|BAR|HORZ|RIGHT|SORT|UP|3D"
+		,"CHART|BAR|HORZ|LEFT|UP|COMPRESS|3D"
+		,"CHART|BAR|HORZ|RIGHT|UP|COMPRESS|3D"
+		,"CHART|BAR|HORZ|CENTER|UP"
+		,"CHART|BAR|STACKED"
+		,"CHART|BAR|STACKED|3D"
+		,"CHART|BAR|STACKED|3D"
+		,"CHART|BAR|COLUMNS|STACKED|3D"
+		,"CHART|BAR|COLUMNS|STACKED|3D|SIZE"
+		,"CHART|BAR|COLUMNS|STACKED|3D|SORT|SIZE"
+		,"CHART|BAR|HORZ|STACKED|SIZE"
+		,"CHART|BAR|HORZ|3D|STACKED|SIZE"
+		,"CHART|BAR|HORZ|COLUMNS|STACKED|SIZE"
+		,"CHART|PIE"
+		,"CHART|PIE|SIZE"
+		,"CHART|PIE|3D"
+		,"CHART|PIE|3D|SIZE"
+		,"CHART|PIE|3D|HEIGHT"
+		,"CHART|PIE|3D|VOLUME|SORT|BIGTOTOP"
+		,"CHART|PIE|3D|VOLUME|SORT|BIGTOTOP|SIZE"
+		,"CHART|PIE|3D|VOLUME|SORT|BIGTOTOP|SIZE|HEIGHT"
+		,"CHART|PIE|DONUT"
+		,"CHART|PIE|DONUT|SIZE"
+		,"CHART|PIE|DONUT|3D"
+		,"CHART|PIE|DONUT|3D|SIZE"
+		,"CHART|PIE|DONUT|3D|HEIGHT"
+		,"CHART|PIE|DONUT|3D|SIZE|HEIGHT"
+		,"CHART|PIE|DONUT|3D|VOLUME|SORT|BIGTOTOP"
+		,"CHART|PIE|STARBURST"
+		,"CHART|PIE|STARBURST|RAYS"
+		,"CHART|PIE|STARBURST|SRAYS"
+		,"CHART|PIE|STARBURST|SIZE"
+		,"CHART|PIE|STARBURST|RAYS|SIZE"
+		,"CHART|PIE|STARBURST|SRAYS|SIZE"
+		,"CHART|PIE|STARBURST|3D"
+		,"CHART|PIE|STARBURST|3D|SIZE"
+		,"CHART|PIE|STARBURST|3D|HEIGHT"
+		,"CHART|PIE|DONUT|STARBURST"
+		,"CHART|PIE|DONUT|STARBURST|SIZE"
+		,"CHART|PIE|DONUT|STARBURST|3D"
+		,"CHART|PIE|DONUT|STARBURST|3D|SIZE"
+		,"CHART|PIE|DONUT|STARBURST|3D|HEIGHT"
+		,"CHART|PIE|DONUT|STARBURST|3D|VOLUME"
+		,"CHART|PIE|DONUT|STARBURST|3D|VOLUME|SORT|BIGTOTOP"
+		,"CHART|SYMBOL|SEQUENCE|CENTER"
+		,"CHART|SYMBOL|SEQUENCE|CENTER|SORT|UP"
+		,"CHART|SYMBOL|SEQUENCE|CENTER|SORT|DOWN"
+		,"CHART|SYMBOL|SEQUENCE|CENTER|RINGS"
+		,"CHART|SYMBOL|SEQUENCE|CENTER|SORT|UP|RINGS"
+		,"CHART|SYMBOL|SEQUENCE|CENTER|SORT|DOWN|RINGS"
+		,"CHART|SYMBOL|SEQUENCE|BOTTOM|SORT|DOWN"
+		,"CHART|SYMBOL|SEQUENCE|BOTTOM|SORT|UP|RINGS"
+		,"CHART|SYMBOL|SEQUENCE|TOP|SORT|UP|RINGS"
+		,"CHART|SYMBOL|SEQUENCE|BASE"
+		,"CHART|SYMBOL|SEQUENCE|BASE|SORT|DOWN"
+		,"CHART|SYMBOL|SEQUENCE|BASE|SORT|UP"
+		,"CHART|SYMBOL|SEQUENCE|STAR"
+		,"CHART|SYMBOL|SEQUENCE|STAR|SORT|UP|EXPAND"
+		,"CHART|SYMBOL|SEQUENCE|STAR|SORT|DOWN"
+		,"CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM"
+		,"CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM|DOPACITY"
+		);
+
+		szDictionary["... processing ..."]	= "...";
+		szDictionary["... actualize ..."]	= "...";
+	}
+catch(e) {}
+
+  ]]>
+  </script>
+
+
+</svg>

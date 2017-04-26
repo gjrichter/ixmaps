@@ -1,0 +1,379 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html> <head> <title>ixmaps theme editor</title>
+<head>
+
+    <!-- Bootstrap core CSS -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+	<link href="../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+	<link href="../../ui/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+	<link href="../../ui/css/site.min.css" rel="stylesheet" >
+	<link href="../../ui/css/font-awesome.min.css" rel="stylesheet"  >
+
+	<style type="text/css" media="screen">
+		body {
+			overflow: hidden;
+			}
+		#xcolor-label > span {
+			padding:0px 2px;
+		}
+	</style>
+
+</head>
+
+<body id="theme-editor" >
+
+	<div id="editor-div" >
+		<pre id="editor" style="height:100%;width:100%;border:#eee solid 1px;" >loading ...</pre>
+	</div>
+
+	<div id="editor-apply" style="margin-top:0.5em;margin-left:0.5em">
+		<a href='javascript:ixmaps.applyEditorTheme();'>
+			<button type="button" class="btn btn-default btn-md">
+			apply changes
+			</button>
+		</a>
+	</div>
+
+	<div id="editor-footer">
+		<span style="font-size:0.8em;color:#ddd">powered by ACE Code Editor, Copyright (c) 2010, Ajax.org B.V.</span>
+	<div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+	<script src = "../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+	<script src = "../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+    <script src = "assets/js/bootstrap.min.js"></script>
+
+	<script type = "text/javascript">
+
+	var ixmaps = null;
+	if ( window.opener ){
+		ixmaps = window.opener.ixmaps;
+	}else
+	if ( parent ){
+		ixmaps = parent.window.ixmaps;
+	}
+	else{
+		alert("error: missing parent window for themes !");
+	}
+    </script>
+
+  	<script src = "../js/tools/colorscheme.js"></script>
+    <script src = "../js/tools/colorselect.js"></script>
+
+	<script type = "text/javascript">
+
+   	/**************************************************************** 
+	 *
+	 * Theme 
+	 *
+	 ****************************************************************/
+
+	/**
+	 * This is the Theme class.  
+	 * It realizes an object to configure and realize a map theme 
+	 * @constructor
+	 * @throws 
+	 * @return A new Theme object
+	 */
+	function Theme(definition) {
+		this.obj = null;
+		this.szTheme = null;
+
+		if ( typeof(definition) == "string" ){
+			this.szTheme = definition;
+			this.parse(definition);
+		}else{
+			this.obj = definition;
+			//this.szTheme = JSON.stringify(definition);
+		}
+	}
+	Theme.prototype.parse = function(szThemeDef){
+		var szRaw = szThemeDef.replace(/\n\t+/g,'');
+		try	{
+			this.obj = JSON.parse(szRaw);
+		} catch (e){
+			ixmaps.parentApi.error("Code: "+e);
+		}
+	};
+	Theme.prototype.getString = function(){
+		if ( !this.szTheme ){
+			this.szTheme = JSON.stringify(this.obj);
+		}
+		return this.szTheme;
+	};
+	Theme.prototype.getObj = function(){
+		if ( !this.obj ){
+			this.parse(definition);
+		}
+		return this.obj;
+	};
+	Theme.prototype.getPrettyString = function(){
+		this.szPrettyString = "";
+		this.tab = 1;
+		this.recurs = 0;
+		this.formatObj(this.obj);
+		return this.szPrettyString;
+	};
+	Theme.prototype.isArray = function(obj) {
+		return Object.prototype.toString.call(obj) === '[object Array]';
+	};
+	Theme.prototype.formatObj = function(obj){
+
+		if ( ++this.recurs > 10 ){
+			return;
+		}
+		if ( this.isArray(obj) ){
+
+			this.szPrettyString += '[';
+			var n = 0;
+			for ( var a in obj ){
+				if ( obj[a] ){
+					if ( typeof(obj[a]) == "object" ){
+						this.szPrettyString += (n?',':'');
+						this.tab++;
+						this.formatObj(obj[a]);
+						this.tab--;
+					}else{
+						this.szPrettyString += (n?',\n':'\n') + (this.getIndent()) + '"'+String(obj[a]).replace(/\"/,"\'")+'"';
+					}
+					n++;
+				}
+			}
+			this.szPrettyString += ']';
+
+		}
+		else{
+
+			var n = 0;
+			for ( var a in obj ){
+				if ( a == "parent" || a == "listItem" || a == "gOverlayObject" || a == "gOverlayObjectPartsA" || a == "setLine" || a == "setPolygon" || a == "setPosition"){
+					continue;
+				}
+				if ( obj[a] == null ){
+					continue;
+				}
+				if ( typeof(obj[a]) == "object" ){
+					this.szPrettyString += (n?',\n':'\n') + (this.getIndent()) + '"'+a+'": ' ;
+					this.tab++;
+					this.formatObj(obj[a]);
+					this.tab--;
+				}else{
+					this.szPrettyString += (n?',\n':'{\n') + (this.getIndent()) + '"'+a+'": "'+String(obj[a]).replace(/\"/,"\'")+'"';
+					n++;
+				}
+			}
+			this.szPrettyString += '\n'+(this.getIndent())+'}';
+		}
+
+		this.recurs--;
+	};
+	Theme.prototype.getIndent = function(){
+		var szTab = "";
+		for ( var i=0; i<this.tab; i++ ){
+			szTab += "\t";
+		}
+		return szTab;
+	};
+
+   	/**************************************************************** 
+	 *
+	 * apply new theme definition
+	 *
+	 ****************************************************************/
+ 
+	ixmaps.applyEditorTheme = function(){
+		console.log("applyEditorTheme");
+
+		if ( !ixmaps.editor ){
+			ixmaps.parentApi.error("no theme defined!");
+			return;
+		}
+
+		var szThemeDef = ixmaps.editor.getValue();
+
+		var theme = new Theme(szThemeDef);
+		var themeDefObj = theme.obj;
+
+		// remove previous theme representation from map
+		console.log("applyEditorTheme - revove old:"+ixmaps.editorThemeId);
+		ixmaps.embeddedSVG.window.map.Api.removeTheme(ixmaps.editorThemeId);
+
+		console.log("applyEditorTheme - make new");
+		// make new theme representation
+		ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(theme.obj);
+		return;
+
+		/***
+		**
+		**	make function javascript call and execute by eval(...)
+		**
+		**/
+
+		var szLayer		= themeDefObj.layer;
+		var szField		= themeDefObj.field;
+		var szField100	= themeDefObj.field100 || "";
+
+		if ( szLayer.length == 0 || szField.length == 0 ){
+			ixmaps.parentApi.error("no layer/fields defined!");
+			return;
+		}
+
+		var szStyle = "";
+
+		for ( a in themeDefObj.style ){
+			// separated by '|' because of possible RGB(r,g,b) color definition  
+			if ( $.isArray(themeDefObj.style[a]) ){
+				s = "";
+				for ( x=0; x<themeDefObj.style[a].length; x++ ){
+					s += (x>0?"|":"") + themeDefObj.style[a][x];
+				}
+			}else{
+				s = String(themeDefObj.style[a]);	
+			}
+			szStyle += a +':'+ s + ";";
+		}
+
+		// remove previous theme representation from map
+		ixmaps.embeddedSVG.window.map.Api.removeTheme(ixmaps.editorThemeId);
+
+		// make edited theme
+		szCallTheme = "ixmaps.embeddedSVG.window.map.Api.newMapTheme('"+szLayer+"','"+szField+"','"+szField100+"','"+szStyle+"')";
+
+		eval(szCallTheme);
+	}
+
+	ixmaps.loadEditor = function(){
+
+		if (!ixmaps.getThemeObj() ){
+			return;
+		}
+		ixmaps.editorThemeId = ixmaps.getThemeObj().szId;
+		var themeObj =	ixmaps.getThemeDefinitionObj();
+
+		szHtml = "";
+        szHtml += "<div class='example' style='width:97%;margin-left:1%;'>";
+        szHtml += "<div class='row'>";
+        szHtml += "<div class='col-md-6'>";
+        szHtml += "<div class='jumbotron'>";
+        szHtml += "<div class='jumbotron-contents'>";
+		szHtml += "<p>"+ixmaps.editorThemeId+"</p>";
+		szHtml += "<p>"+themeObj.layer+"</p>";
+		szHtml += "<p>"+themeObj.field+"</p>";
+		szHtml += "<p>"+themeObj.field100+"</p>";
+		szHtml += "<p>"+themeObj.style.type+"</p>";
+
+		szHtml += "<p><span><a id='xcolor' href='javascript:ixmaps.popupSelectColorScheme();' ><label title='select color scheme'><span id='xcolor-label' style='font-size:11px;line-height:15px;background-color:white;padding:0px 5px'></span></label></a></span></p>";
+
+		szHtml += "</div>";
+		szHtml += "</div>";
+		szHtml += "</div>";
+		szHtml += "</div>";
+		szHtml += "</div>";
+		
+		$("#editor-div").html(szHtml);
+
+		setTimeout("ixmaps.setSelectColorScheme()",100);
+
+		return;
+
+		if (!ixmaps.getThemeObj() ){
+			return;
+		}
+
+		ixmaps.editorThemeId = ixmaps.getThemeObj().szId;
+		var themeObj =	ixmaps.getThemeDefinitionObj();
+
+		ixmaps.editor = ace.edit("editor");
+
+		// enable autocompletion and snippets
+		ixmaps.editor.setOptions({
+			enableBasicAutocompletion: true,
+			enableSnippets: true,
+			enableLiveAutocompletion: true
+		});
+
+		var ixmapsCompleter = {
+			getCompletions: function(editor, session, pos, prefix, callback) {
+				if (prefix.length === 0) { callback(null, []); return }
+				$.getJSON(
+					"./ixmaps.completer.js",
+					function(wordList) {
+						// wordList like [{"word":"flow","freq":24,"score":300,"flags":"bc","syllables":"1"}]
+						callback(null, wordList.map(function(ea) {
+							return {name: ea.word, value: ea.word, score: ea.score, meta: (ea.help||"ixmaps") }
+						}));
+					})
+			}
+		}
+
+		var langTools = ace.require("ace/ext/language_tools");
+		langTools.addCompleter(ixmapsCompleter);
+
+		ixmaps.editor.getSession().setMode("ace/mode/json");
+		ixmaps.editor.setTheme("ace/theme/dawn");
+		ixmaps.editor.setValue(new Theme(themeObj).getPrettyString());
+		ixmaps.editor.getSession().getSelection().selectionLead.setPosition(0,0);
+	};
+
+	ixmaps.setSelectColorScheme = function(){
+		var objTheme = ixmaps.getThemeObj();
+		var colorArgA = objTheme.origColorScheme.slice(0);
+
+		if ( isNaN(colorArgA[0]) ){
+			ixmaps.setColors(colorArgA.join('|'),"directly_defined_colors",7);
+		}else{
+			colorArgA.shift();	
+			ixmaps.setColors(colorArgA.join('|'),7);
+		}
+	};
+
+	ixmaps.popupSelectColorScheme = function(szHtml){
+	
+		var szElement = "colorList";	
+		api.openDialog(null,szElement,null,"color schemes",'280,60',80,300);
+		parentWindow.$("#"+szElement)[0].innerHTML = ixmaps.getColors();
+		api.onDialogClose = function(){ setTimeout("init_theme_line();",100) };
+
+	};
+
+   	/**************************************************************** 
+	 *
+	 * make theme definition string 
+	 *
+	 ****************************************************************/
+ 
+	ixmaps.editorThemeId = ixmaps.getThemeObj()?ixmaps.getThemeObj().szId:"";
+
+
+	var resize = function(){
+		var height = (window.parent.$("#editor").height() || ($(window.parent).height()+60) || ($(window).height()+60) );
+		$("#editor-div").css("height",(height-120)+"px");
+		if ( ixmaps && ixmaps.editor ){
+			ixmaps.editor.resize();
+		}
+	}; 
+	window.onresize=function(){
+		resize();
+	}; 
+
+	$("#editor-apply-button").button();
+	$("#editor-div").show();
+
+	$(document).ready(function() {
+		resize();
+		ixmaps.loadEditor();
+	});
+
+
+    </script>
+
+ </body> 
+ </html> 
+
+	

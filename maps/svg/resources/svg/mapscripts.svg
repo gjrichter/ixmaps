@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"
+"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg width="500" height="500"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:visx="http://www.medienobjekte.de"
+>
+	<script type="text/ecmascript" xlink:href="../../js/colorscheme.js" />
+	<script type="text/ecmascript" xlink:href="../../js/mapscript2.js" />
+	<script type="text/ecmascript" xlink:href="../../js/mapapi.js" />
+	<script type="text/ecmascript" xlink:href="../../js/mapquery.js" />
+	<script type="text/ecmascript" xlink:href="../../js/maptheme.js" />
+	<script type="text/ecmascript" xlink:href="../../js/mapselect.js" />
+	<script type="text/ecmascript" xlink:href="../../js/piechart.js" />
+	<script type="text/ecmascript" xlink:href="../../js/mapuser.js" />
+
+</svg>

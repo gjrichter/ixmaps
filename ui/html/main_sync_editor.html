@@ -1,0 +1,428 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+<meta name = "viewport" content = "initial-scale = 1.0, minimum-scale = 1.0, maximum-scale=1.0, width = device-width">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+<meta http-equiv="Content-Language" content="en-us" />
+<meta name="Generator" content="EditPlus"/>
+<meta name="copyright" content="Guenter Richter"/>
+<meta name="author" content="service@medienobjekte.de"/>
+<meta name="description" content="Interactive &amp; estensible maps in SVG and PDF"/>
+<meta name="revisit-after" content="30 days"/>
+<meta name="distribution" content="Global"/>
+<meta name="keywords" content="iXMaps,SVG,PDF,Flash,Google Earth,KMZ,KML,XML,GIS,map,maps,Karten,chart,charts,pie,bar,web,geo,Visualisierung,visualisation,visualizzazione,interaktiv,interactive,interattivo,SIT,Geo,georeference,georeferenziert,geomarketing,graphical,programming,example,location based services,web application,application,web2.0,HTTPXMLRequest,client side"/>
+<meta name="robots" content="index,follow"/>
+<meta name="page-topic" content="Homepage iXMaps, Guenter Richter, Medienobjekte"/>
+<meta name="audience" content="all, Alle"/>
+<meta name="language" content="UK, uk, english, englisch"/>
+<meta name="page-type" content="Homepage"/>
+<meta name="resource-type" content="document"/>
+<meta name="Classification" content="Homepage iXMaps.com medienobjekt.de Guenter Richter"/>
+
+<meta property="og:title" content="iXmaps, Open Data explore map" />
+<meta property="og:type" content="map" />
+<meta property="og:url" content="http://www.ixmaps.com/" />
+<meta property="og:image" content="http://www.decorourbano.org/images/DU_FB.jpg" />
+<meta property="og:description" content="Sample map application showing open data (population statistic) from Berlin" />
+<meta property="og:site_name" content="iXmaps" />
+
+<link rel="stylesheet" href="../css/page.css" type="text/css" />
+<link rel="stylesheet" href="../css/print.css" type="text/css" media="print" />
+
+<link href="../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+<link href="../css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+<link href="../css/ixmaps-ui.css" rel="stylesheet" type="text/css"/>
+<link id="story-css" href="#" rel="stylesheet" type="text/css"/>
+<link id="story-css-fonts" href="#" rel="stylesheet" type="text/css"/>
+
+<title>iXmaps - interactive map</title>
+
+<style type="text/css">
+.disclaimer{
+	margin-top:25px;
+	margin-left:15px;
+	font-size: 11px;
+	line-height: 14px;
+}
+.disclaimer a{
+	font-size: 11px;
+	line-height: 14px;
+}
+ul {
+	list-style: circle;
+}
+li {
+	padding: 0px 5px 5px 0px;
+	margin: 0px;
+}
+#title {
+	font-family:arial;
+	color:#444444;
+	font-size:2em;
+	line-height:1.5em;
+}
+#sidebar {
+	position:absolute;
+	top:4px;
+	right:10px;
+	width:226px;
+	color:#53637D
+}
+#sidebar-title{
+	margin-left:12px;
+	color:#aaa;
+	font-size:2em;
+}
+#sidebar-content{
+	margin-top:52px;
+}
+.sidebar-subtitle{
+	margin-top:18px;
+	margin-left:17px;
+	color:#aaa;
+}
+img {
+  max-width: 100%;
+  vertical-align: middle;
+  border: 0;
+  -ms-interpolation-mode: bicubic;
+}
+	
+</style>
+<style type="text/css">
+
+/* style the scrollbar */
+::-webkit-scrollbar {
+    width: 7px;
+}
+ 
+/* Track */
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.1); 
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+    background: rgba(232,232,232,0.6); 
+    -webkit-box-shadow: inset 0 0 0px rgba(0,0,0,0.1); 
+}
+::-webkit-scrollbar-thumb:window-inactive {
+	background: rgba(222,222,222,0.4); 
+}
+</style>
+
+<script type="text/javascript" src = "../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src = "../../ui/libs/getUrlParam/js/jquery.getUrlParam.js"></script>
+<script type="text/javascript" src = "../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+
+<script type="text/javascript" src = "../../ui/libs/colpick-jQuery-Color-Picker-master/js/colpick.js" ></script>
+<link   type="text/css"		   href= "../../ui/libs/colpick-jQuery-Color-Picker-master/css/colpick.css" rel="stylesheet" />
+
+
+<script type="text/javascript" src = "../../ui/js/htmlgui_api.js" > </script>
+<script type="text/javascript" src = "../../ui/js/htmlgui_story.js" > </script>
+<script type="text/javascript" src = "../../ui/js/htmlgui_query.js" > </script>
+
+<script type="text/javascript">
+
+
+	// -------------------------------------------------------------------
+	// initializition on document ready
+	//		- wait for the embeded map to load
+	//		- hide loading mesage
+	//		- display first theme
+	// -------------------------------------------------------------------
+
+	// delayed on document ready (see below)
+	// -------------------------------------------------------
+	ixmaps.onReady = function(){
+
+		ixmaps.iframe.waitForMap("embed-cross", function(){ 
+
+			$("#splash").hide("slow");
+			// $("#splash").css("visibility","hidden");
+
+			ixmaps.loadStory($(document).getUrlParam('story'));	
+		});
+	};
+
+	// wait for map and make first theme
+	// ---------------------------------
+	$(document).ready(function() {
+
+		// create the iframe with the embeddeb map 
+		// --------------------------------------------------------
+
+		var szBaseMap	= decodeURIComponent( $(document).getUrlParam('basemap')   ||
+											  $(document).getUrlParam('mapservice') );
+		var szUrl		= $(document).getUrlParam('svggis');
+
+		var szEmbedUI = "../../ui/dispatch.htm?ui=embed";
+		var szMapName = "map";
+
+		var src = szEmbedUI + "&basemap="	+ szBaseMap 
+							+ "&name="		+ szMapName 
+							+ "&svggis="	+ szUrl;
+
+		if ( $(document).getUrlParam('maptype') ){
+			src += "&maptype="+decodeURIComponent($(document).getUrlParam('maptype'));
+			}
+
+		if ( $(document).getUrlParam('allcontrols') ){
+			src += "&overlaycontrol=1";
+			src += "&mapcontrol=1";
+			src += "&options=1";
+			src += "&reset=1";
+		}else{
+			if ( $(document).getUrlParam('overlaycontrol') ){
+				src += "&overlaycontrol=1";
+			}
+			if ( $(document).getUrlParam('mapcontrol') ){
+				src += "&mapcontrol=1";
+			}
+			if ( $(document).getUrlParam('options') ){
+				src += "&options=1";
+			}
+			if ( $(document).getUrlParam('tools') ){
+				src += "&tools=1";
+			}
+			if ( $(document).getUrlParam('reset') ){
+				src += "&reset=1";
+			}
+			if ( $(document).getUrlParam('legendcontrol') ){
+				src += "&legendcontrol=1";
+			}
+			if ( $(document).getUrlParam('minimal') ){
+				src += "&minimal=1";
+				if ( $(document).getUrlParam('options') ){
+					src += "&toolbutton=1";
+				}
+			}
+		}
+		if ( $(document).getUrlParam('bookmark') ){
+			src += "&bookmark="+$(document).getUrlParam('bookmark');
+			}
+
+		$("#map").html("<iframe id='embed-cross' src=\"" + src + "\" " +
+					" width='0px' height='0px' style='border:0;margin:0px;' />");
+
+
+		// format the story board 
+		// --------------------------------------------------------
+
+		$("#embed-cross").css("width","65%");
+		$("#embed-cross").css("height",String(window.innerHeight-$("#embed-cross").offset().top)+"px");
+
+		// GR 30.06.2012 clip sidebar width
+		var sidebarWidth = ( $("#container").width() - $("#embed-cross").width() - 10);
+		sidebarWidth = Math.min(350,Math.max(250,sidebarWidth));
+		if ( $(document).getUrlParam('sidebar') ){
+			sidebarWidth = $(document).getUrlParam('sidebar');
+		}
+		$("#embed-cross").css("width",($("#container").width()-sidebarWidth)+"px");
+
+		ixmaps.mapTop   = $("#embed-cross").offset().top;
+		ixmaps.mapWidth = $("#embed-cross").width();
+		ixmaps.mapHeight = $("#embed-cross").height();
+		ixmaps.containerWidth = $("#container").width();
+		ixmaps.containerHeight = $("#container").height();
+
+		$("#sidebar").css("top",String(ixmaps.mapTop-0)+"px");
+		$("#sidebar").css("left",String(ixmaps.mapWidth+0)+"px");
+		$("#sidebar").css("width",String(ixmaps.containerWidth - ixmaps.mapWidth - 10)+"px");
+		$("#sidebar").css("height",String(ixmaps.mapHeight)+"px");
+
+		$("#collaps").css("right",String(ixmaps.containerWidth - ixmaps.mapWidth - 10)+"px");
+
+		// delay the map initializing (to give time to load iframe)
+		// --------------------------------------------------------
+		ixmaps.onReady();
+	});
+
+	// helper for buttons (string not settable in href="" )
+	// ----------------------------------------------------
+	ixmaps.popout = function() {
+		ixmaps.embeddedApi.embeddedApi.popOutMap('window');
+		// ixmaps.iframe.exec("embed-cross","ixmaps.embeddedApi.popOutMap('window')");
+	};
+	ixmaps.share = function() {
+		ixmaps.iframe.exec("embed-cross","ixmaps.embeddedApi.shareMap('dialog')" );
+	};
+	ixmaps.mail = function() {
+		ixmaps.iframe.exec("embed-cross","ixmaps.embeddedApi.mailMap('dialog')" );
+	};
+	ixmaps.execScript = function(szScript) {
+		ixmaps.iframe.exec("embed-cross","ixmaps.embeddedApi.execScript(\""+szScript+"\")" );
+	};
+	ixmaps.execBookmark = function(szScript) {
+		ixmaps.iframe.exec("embed-cross","ixmaps.embeddedApi.execBookmark(\""+szScript+"\")" );
+	};
+	ixmaps.clearAll = function() {
+		ixmaps.iframe.exec("embed-cross","ixmaps.embeddedApi.clearAll()" );
+	};
+	ixmaps.clearAllCharts = function() {
+		ixmaps.iframe.exec("embed-cross","ixmaps.embeddedApi.clearAllCharts()" );
+	};
+	ixmaps.clearAllChart = function() {
+		ixmaps.iframe.exec("embed-cross","ixmaps.embeddedApi.clearAllCharts()" );
+	};
+
+	ixmaps.mapWidthPx = null;
+	ixmaps.containerWidthPx = null;
+	ixmaps.fullScreen = function() {
+		if ( ixmaps.mapWidthPx ){
+			$("#container").css("width",ixmaps.containerWidthPx);
+			$("#embed-cross").css("width",ixmaps.mapWidthPx);
+			$("#sidebar").css("visibility","visible");
+			$("#expand").css("visibility","hidden");
+			$("#collaps").css("visibility","visible");
+			ixmaps.mapWidthPx = null;
+			ixmaps.containerWidthPx = null;
+		}else{
+			ixmaps.mapWidthPx = $("#embed-cross").css("width");
+			ixmaps.containerWidthPx = $("#container").css("width");
+			//$("#container").css("width","100%");
+			$("#embed-cross").css("width","100%");
+			$("#sidebar").css("visibility","hidden");
+			$("#expand").css("visibility","visible");
+			$("#collaps").css("visibility","hidden");
+		}
+	};
+	ixmaps.reset = function() {
+		$("a.action").css("background-color","white");
+		$("a.action").css("font-weight","normal");
+		ixmaps.iframe.exec("embed-cross","ixmaps.embeddedApi.resetMap()" );
+	};
+
+</script>
+
+
+
+</head>
+
+
+<body style="margin:0;padding:0;background:#ffffff" >
+
+	<!-- facebook -->
+<!--
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/it_IT/all.js#xfbml=1";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
+-->
+<!-- Container -->
+<div id="container" style="height:100%;width:100%" >
+
+	<!-- Content -->
+	<div id="toolbar" style="margin-left:5px;display:none" >
+
+		<!-- 2.0 share bar -->
+		<span id="sharebar">
+
+			<!--  sozial buttons -->
+
+			<span id="fb-like" style="float:left"></span>
+			<span id="google_plus_one" style="position:relative;top:0px;left:10px;float:left"></span>
+
+			<!--  link and embed buttons -->
+
+			<span id="share" style="position:relative;top:0px;left:0px;">
+				<!--  create popout map -->
+				<span style="position:relative;left:2px;">
+					<a href="javascript:ixmaps.popout();" >
+						<img src="../../ui/images/popout.png" height="18px" alt="popout map" title="popout map" />
+						<span style="font-size:0.8em;">duplicate</span>
+					</a>
+				</span>
+
+				<!--  share map -->
+				<span style="position:relative;left:3px;">
+					<a href="javascript:ixmaps.share();" >
+						<img src="../../ui/images/share.png" height="18px" alt="share map" title="share map" />
+						<span style="font-size:0.8em;">share&nbsp;</span>
+					</a>
+				</span>
+
+				<!--  mail map -->
+				<span style="position:relative;left:6px;">
+					<a href="javascript:ixmaps.mail();" >
+						<img src="../../ui/images/envelope_light.png" height="18px" alt="mail map" title="mail map" />
+						<span style="font-size:0.8em">mail</span>
+					</a>
+				</span>
+			</span>
+		
+		<!-- end sharebar  -->
+		</span>
+
+		<!-- page button -->
+		<span id="pagemode" style="position:relative;">
+			<span style="margin-left:15px;">
+				
+				<a href="javascript:ixmaps.reset();" style="position:relative;left:-3px;" >
+					<img src="../../ui/images/reset.png" height="18px" alt="reset map" title="reset map" />
+					<span style="font-size:0.8em;left:-5px;">reset</span>
+				</a>
+
+			</span>
+			<span id="collaps" style="position:relative;left:310px;margin-top:3px;">
+				<a href="javascript:ixmaps.fullScreen();" >
+					<img src="../../ui/images/collapsed.png" height="18px" alt="fullscreen map" title="fullscreen map" />
+					<span style="font-size:0.8em;color:#ddd;position:relative;left:-5px;">map</span>
+				</a>
+			</span>
+		</span>
+
+	</div>
+
+	<!-- panes -->
+
+	<div id="worksspace" style="margin:0px;" >
+	
+		<!-- embedded map -->
+
+		<div id="map" >
+		</div>
+
+		<!-- story -->
+
+		<div id="sidebar" style="position:absolute;overflow:hidden;margin-top:0px;visibility:hidde" >
+			
+			<div id="story-board" style="display:block;overflow:auto;margin-top:0px;">
+				<h2 style="background:#fafafa;color:white;margin-top:0px;"> story board ... </h2>
+			</div>
+		</div>
+
+		<div id="expand" style="position:absolute;right:2px;top:0px;visibility:hidden">
+			<a href="javascript:ixmaps.fullScreen();" >
+				<img src="../../ui/images/expanded.png" height="18px" alt="fullscreen map" title="fullscreen map" />
+				<span style="font-size:0.8em;color:#ddd;position:relative;left:-5px;">edit</span>
+			</a>
+		</div>
+
+	</div>
+
+	<!-- fine Content -->
+
+
+	<!-- Footer -->
+	<!-- fine Footer -->
+
+</div>
+<!-- fine Container -->
+
+</body>
+
+</html>

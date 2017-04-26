@@ -1,0 +1,118 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<html> <head> <title>ixmaps theme editor</title>
+<head>
+
+  <link href="../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+  <link href="../../ui/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+  <link href="../css/popuptools.css" rel="stylesheet" type="text/css" >
+  <link href="../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+  <link href="../../ui/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+  <link href="../css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+
+  <script src = "../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+  <script src = "../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+
+  <script type="text/javascript" src = "../js/tools/colorselect.js" > </script>
+  <script>
+
+	var ixmaps = null;
+	if ( window.opener ){
+		ixmaps = window.opener.ixmaps;
+	}else
+	if ( parent ){
+		ixmaps = parent.window.ixmaps;
+	}
+	else{
+		alert("error: missing parent window for themes !");
+	}
+
+	$(document).ready(function() {
+
+		// display last theme
+		var lastTheme = ixmaps.getStoredObject("actThemeDef");
+//		var html = PrettyPrintJsonObject(lastTheme, 0, false, false, false);
+//		$("#lastTheme").html("<PRE class='CodeContainer' >"+html+"</PRE>");
+
+		// display history
+		$("#history").hide();
+		ixmaps.history.makeItemList($("#history")[0]);
+
+		// display bookmarks
+		ixmaps.bookmark.load();
+		ixmaps.bookmark.makeItemList($("#bookmark")[0]);
+
+	});
+
+	ixmaps.showHistory = function(){
+		$("#history-switch").html("hide");
+		$("#history-switch").attr("onclick","javascript:ixmaps.hideHistory();");
+		$("#history").show();
+	};
+	ixmaps.hideHistory = function(){
+		$("#history-switch").html("show");
+		$("#history-switch").attr("onclick","javascript:ixmaps.showHistory();");
+		$("#history").hide();
+	};
+
+	// ------------------------
+	// end of code 
+	// ------------------------
+
+  </script>
+
+<!-- Styles ------------------------ -->
+
+  <style>
+	body {
+		font-family:arial;
+		font-size: 12px;
+		line-height: 0.7em;
+	}
+	textarea {
+		width:90%;
+	}
+	.actionLink{
+		vertical-align: 5px;;
+	}
+	/* Track */
+	::-webkit-scrollbar-track {
+		-webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.1); 
+		-webkit-border-radius: 0px;
+		border-radius: 0px;
+	}
+	/* Handle */
+	::-webkit-scrollbar-thumb {
+		-webkit-border-radius: 0px;
+		border-radius: 0px;
+		background: rgba(232,232,232,0.6); 
+		-webkit-box-shadow: inset 0 0 0px rgba(0,0,0,0.1); 
+	}
+	::-webkit-scrollbar-thumb:window-inactive {
+		background: rgba(222,222,222,0.4); 
+	}
+
+  </style>
+</head>
+
+<!-- End of Header ------------------------ -->
+
+<body  style="background:#f8f8f8">
+<div >
+  <div >
+    <p>last themes created&nbsp;
+		<button id="history-switch" onclick="javascript:ixmaps.showHistory();">show</button>
+	</p>
+	<hr>
+    <div id="history" style="margin-top:1em;">H I S T O R Y</div>
+  </div>
+  <div >
+    <p>bookmarks</p>
+	<hr>
+    <div id="bookmark" style="margin-top:1em;">(empty)</div>
+  </div>
+</body>
+</html>

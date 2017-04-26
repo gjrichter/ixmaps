@@ -1,0 +1,496 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>SVGGIS Query Page</title>
+  <meta name="Generator" content="EditPlus">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+
+<link rel="STYLESHEET" type="text/css" href="../css/popuptools.css">
+
+<script type="text/javascript" src="../js/htmlgui_query.js" > </script>
+
+<script type="text/javascript">
+
+		var api = null;
+
+		/* ------------------------------------------------------------------ * 
+			Init functions
+		 * ------------------------------------------------------------------ */
+
+        function InitAll(){
+
+				if ( parent ){
+					api = parent.window.ixmaps;
+					ixmaps.embeddedSVG = parent.window.htmlgui_getEmbeddedSVG();
+					alert(ixmaps.embeddedSVG);
+				}else
+				if ( window.opener ){
+					api = window.opener.ixmaps;
+					ixmaps.embeddedSVG = window.opener.htmlgui_getEmbeddedSVG();
+				}
+				else{
+					alert("error: missing parent window for map queries !");
+				}
+				window.document.body.topMargin = 0;
+				window.document.body.leftMargin = 0;
+
+				szSelectedTheme = ixmaps.doQueryActiveTheme();
+				ixmaps.InitNormalSearch();
+				ixmaps.InitAdvancedSearch(szSelectedTheme);
+				ixmaps.InitChart(szSelectedTheme);
+                var advancedDiv = window.document.getElementById("advancedsearch");
+                var normalDiv = window.document.getElementById("normalsearch");
+				if (0){
+					fSearchMode = 'advanced';
+					advancedDiv.style.display = "block";
+					normalDiv.style.display = "none";
+				}
+				else{
+					fSearchMode = 'normal';
+					advancedDiv.style.display = "none";
+					normalDiv.style.display = "block";
+	            }
+			}
+
+        function changeTool(szTool){
+
+                var advancedDiv = window.document.getElementById("advancedsearch");
+                var normalDiv = window.document.getElementById("normalsearch");
+                var chartDiv = window.document.getElementById("chart");
+                var bookmarkDiv = window.document.getElementById("bookmark");
+                var searchImg = window.document.getElementById("imagesearch");
+                var queryImg = window.document.getElementById("imagequery");
+                var chartImg = window.document.getElementById("imagechart");
+                var bookmarkImg = window.document.getElementById("imagebookmark");
+				switch (szTool){
+					case 'advancedsearch':
+						fSearchMode = 'advanced';
+						advancedDiv.style.display = "block";
+						normalDiv.style.display = "none";
+						chartDiv.style.display = "none";
+						bookmarkDiv.style.display = "none";
+						searchImg.src = "../images/search.png";
+						chartImg.src = "../images/chart.png";
+						bookmarkImg.src = "../images/chart.png";
+						queryImg.src = "../images/query_selected.png";
+						break;
+					case 'charts':
+						fSearchMode = 'charts';
+						chartDiv.style.display = "block";
+						advancedDiv.style.display = "none";
+						normalDiv.style.display = "none";
+						bookmarkDiv.style.display = "none";
+						searchImg.src = "../images/search.png";
+						queryImg.src = "../images/query.png";
+						bookmarkImg.src = "../images/chart.png";
+						chartImg.src = "../images/chart_selected.png";
+						break;
+					case 'bookmark':
+						fSearchMode = 'bookmark';
+						bookmarkDiv.style.display = "block";
+						chartDiv.style.display = "none";
+						advancedDiv.style.display = "none";
+						normalDiv.style.display = "none";
+						searchImg.src = "../images/search.png";
+						queryImg.src = "../images/query.png";
+						chartImg.src = "../images/chart.png";
+						bookmarkImg.src = "../images/chart_selected.png";
+						htmlgui_getBookmark();
+						break;
+					case 'normalsearch':
+					default:
+						fSearchMode = 'normal';
+						advancedDiv.style.display = "none";
+						chartDiv.style.display = "none";
+						normalDiv.style.display = "block";
+						queryImg.src = "../images/query.png";
+						chartImg.src = "../images/chart.png";
+						searchImg.src = "../images/search_selected.png";
+						break;
+	            }
+			window.document.getElementById("foundtotal").innerHTML = "";
+			window.document.getElementById("found").innerHTML = "";
+			window.document.getElementById("foundpaging").innerHTML = "";
+			}
+
+		function htmlgui_setActiveTheme(szTheme){
+				szSelectedTheme = szTheme;
+				InitAdvancedSearch(szSelectedTheme);
+				InitChart(szSelectedTheme);
+				}
+
+		function checkChartMethod(){
+			var selectObj = this.event.target;
+			var classesDiv = window.document.getElementById("chartThemeParam22");
+			classesDiv.style["visibility"] = (selectObj.value == 'EXACT')?"hidden":"visible";
+			classesDiv = window.document.getElementById("chartThemeParam22text");
+			classesDiv.style["visibility"] = (selectObj.value == 'EXACT')?"hidden":"visible";
+		}
+
+		function htmlgui_getBookmark(){
+
+			var szBookMarkJS = "";
+
+			var arrayPtLatLon = ixmaps.embeddedSVG.window.map.Api.getBoundsOfMapInGeoBounds();
+			arrayPtLatLon[0].x = Math.max(Math.min(arrayPtLatLon[0].x,180),-180);
+			arrayPtLatLon[0].y = Math.max(Math.min(arrayPtLatLon[0].y,80),-80);
+			arrayPtLatLon[1].x = Math.max(Math.min(arrayPtLatLon[1].x,180),-180);
+			arrayPtLatLon[1].y = Math.max(Math.min(arrayPtLatLon[1].y,80),-80);
+
+			var szEnvelope = String(arrayPtLatLon[0].y) +","+
+							 String(arrayPtLatLon[0].x) +","+
+							 String(arrayPtLatLon[1].y) +","+
+							 String(arrayPtLatLon[1].x);
+
+			// make executable SVG map API call
+			szBookMarkJS += "map.Api.doZoomMapToGeoBounds("+szEnvelope+");";
+
+			var szThemesA	  = ixmaps.embeddedSVG.window.map.Api.getMapThemeDefinitionStrings();
+			for ( var i=0; i<szThemesA.length; i++){
+				szBookMarkJS += szThemesA[i];
+			}
+		window.document.getElementById("bookmarkprint").innerHTML = szBookMarkJS;
+
+		api.htmlgui_prettyPrintXML("test",szBookMarkJS);
+		}
+
+
+</script>
+</head>
+
+<body onload="InitAll()" >
+  <table summary="SVG GIS Application" width="100%" height="100%" >
+    <tr>
+      <td valign="top" width="100%" height="100%">
+        <table summary="SVG GIS Application forms" width="100%" height="100%" cellpadding="0" cellspacing="0">
+          <tr>
+		    <td>
+			  <!-- tab bar ( switching search, query, chart ) -->	
+				<a
+				onclick="javascript:changeTool('normalsearch')"><img 
+				id="imagesearch" class="image" src="../images/search_selected.png" alt="Find Features" title="Find Features" ></a><a onclick="javascript:changeTool('advancedsearch')"><img
+				id="imagequery" class="image" src="../images/query.png" alt="Query Builder"	title="Query Builder" ></a><a onclick="javascript:changeTool('charts')"><img
+				id="imagechart" class="image" src="../images/chart.png" alt="Charts" title="Charts" ></a><a
+				onclick="javascript:changeTool('bookmark')"><img
+				id="imagebookmark" class="image" src="../images/chart.png" alt="Bookmark" title="Bookmark" ></a>
+			</td>
+          </tr>
+          <tr style=" background:#ffffff">
+            <td width="100%">
+            <table width="100%" cellspacing="0" cellpadding="0" summary="advanced search" ><tr height="1"><td></td></tr><tr><td>
+
+			  <!-- switchable divs for the different search forms -->
+			  
+			  <!-- normal search ------------------------------------------------------ -->
+			  <div id="normalsearch" style="position: relative; display:block;left:1px;border-top:thin double #d8d8d8;" ">
+                <form id="MapSearchForm" action="javascript:ixmaps.searchMap();" name="MapSearchForm">
+                  <table width="100%" cellspacing="1" cellpadding="1" height="150" summary="simple search" >
+					<tr>
+                      <td class="descrgrey" valign="bottom"><br>
+						select Field(s)
+                        <div id="themeOptions">
+                          <select class="ifield" id="themeList" name="themeList" size="5">
+                            <option value="all">
+                              (loading themes ...)&#160;&#160;
+                            </option>
+                          </select>
+						</div>
+                      </td>
+                      <td class="ifield" valign="bottom" width="100%">
+					    <input type="radio" name="searchmode" checked value="any">any&#160;part<br>
+						<input type="radio" name="searchmode" value="whole">whole&#160;field<br> 
+						<input type="radio" name="searchmode" value="begin">begins&#160;with
+					  </td>
+                    </tr>
+                    <tr>
+                      <td class="descrgrey" valign="bottom" colspan="3" >
+                        search Value<br>
+						<input class="ifield" id="query" type="text" size="40">
+						<input class="ifield" type="button" value=" find ..." onclick="javascript:ixmaps.searchMap();">
+					  </td>
+                    </tr>
+					<tr>
+                      <td class="descr_grey" width="50%" height="5" align="right" colspan="2">
+					  </td>
+                    </tr>
+                  </table>
+                </form>
+              </div>
+
+			  <!-- advanced search ------------------------------------------------------ -->	
+              <div id="advancedsearch" style="display:none;position: relative;left:1px;background:#ffffff;border-top:thin double #d8d8d8;">
+                <form id="MapAdvancedSearchForm" action="javascript:ixmaps.searchMap();" name="MapAdvancedSearchForm">
+                  <table cellspacing="1" cellpadding="1" summary="advanced search" >
+					<tr>
+                      <td class="descrgrey" valign="bottom"><br>
+					    select a layer
+                        <div id="advancedsearchThemeOptions">
+                          <select class="ifield" id="advancedsearchThemeList" name="advancedsearchThemeList" size="5" onchange="InitAdvancedSearchFields()" >
+                            <option value="all">
+                              (loading themes ...)&#160;&#160;
+                            </option>
+                          </select>
+						</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="descrgrey" valign="top" bgcolor="#eeeef8">
+                        select a field
+                        <div id="fieldOptions">
+                          <select class="ifield" id="fieldList" name="fieldList" size="6" onchange="advancedSearchAddField()">
+                            <option value="all">
+                              (no theme selected)&#160;&#160;
+                            </option>
+                          </select>
+                        </div>
+                      </td>
+
+					  <td>
+					  </td>
+
+					  <td valign="bottom" class="descrgrey" >
+						<table cellspacing="0" cellpadding="1" ><tr><td>
+						<input type="image" src="../images/lt.png" height="19" alt="less than"
+						title="less than" onclick="javascript:ixmaps.advancedSearchAddOperator('<');return false;"></td><td>
+						<input type="image" src="../images/equal.png" height="19" alt="equal"
+						title="equal" onclick="javascript:ixmaps.advancedSearchAddOperator('==');return false;"></td><td>
+						<input type="image" src="../images/gt.png" height="19" alt="greater than"
+						title="greater than" onclick="javascript:ixmaps.advancedSearchAddOperator('>');return false;"></td></tr><tr><td>
+						<input type="image" src="../images/le.png" height="19" alt="less equal"
+						title="less equal" onclick="javascript:ixmaps.advancedSearchAddOperator('<=');return false;"></td><td>
+						<input type="image" src="../images/notequal.png" height="19" alt="not equal"
+						title="not equal" onclick="javascript:ixmaps.advancedSearchAddOperator('<>');return false;"></td><td>
+						<input type="image" src="../images/ge.png" height="19" alt="greater equal"
+						title="greater equal" onclick="javascript:ixmaps.advancedSearchAddOperator('>=');return false;"></td></tr><tr><td>
+						<input type="image" src="../images/and.png" height="19" alt="and"
+						title="and" onclick="javascript:ixmaps.advancedSearchAddOperator('and');return false;"></td><td>
+						<input type="image" src="../images/or.png" height="19" alt="or"
+						title="or" onclick="javascript:ixmaps.advancedSearchAddOperator('or');return false;"></td><td>
+						<input type="image" src="../images/like.png" height="19" alt="like"
+						title="like" onclick="javascript:ixmaps.advancedSearchAddOperator('like');return false;">
+						</td></tr></table>
+						<center><a href="javascript:ixmaps.advancedSearchGetStatistics();" class="descr">statistics</a></center>
+					  </td>
+
+					  <td>
+					  </td>
+
+                      <td class="descrgrey" valign="top" align="left" >
+                        sample values
+                        <div id="valueOptions">
+                          <select class="ifield" id="valueList" name="valueList" size="6">
+                            <option value="all">
+                              (no field selected)&#160;&#160;
+                            </option>
+                          </select>
+						</div>  
+                      </td>
+                      <td class="descrgrey" valign="top" align="left" width="100%">
+                      </td>
+
+                    </tr>
+					<tr>
+					  <td colspan="10">
+						<input class="ifield" id="aquery" type="text" size="50">
+						<input class="ifield" type="button" value="execute" onclick="javascript:ixmaps.advancedSearchMap();">&nbsp;
+						<input class="ifield" type="button" value="clear" onclick="javascript:ixmaps.advancedSearchClearQuery();">
+					  </td>
+					</tr>
+
+					<tr height="10px"><td></td>
+					</tr>
+
+					<tr>
+                     <td class="descrgrey" valign="top" align="left" colspan="5">
+                        <div id="displayOptions">
+							all Fields
+							<input type='checkbox' name='allfields' onclick="ixmaps.advancedSearchChangeDisplay();" />
+								Field
+								<select class="ifield" id="displayList" name="displayList" size="1">
+									<option value="all">
+										(not loaded)
+									</option>
+								</select>
+							</input>
+						</div>  
+                      </td>
+					</tr>
+                  </table>
+                </form>
+              </div>
+
+			  <!-- charts ------------------------------------------------------ -->
+              <div id="chart" style="display:none;border-top:thin double #d8d8d8;">
+                <form id="MapChartForm" action="javascript:ixmaps.createChart();" name="MapChartForm">
+                  <table summary="advanced search" cellpadding="2" cellspacing="0" bgcolor="#ffffff">
+					<tr>
+                      <td class="descrgrey" width="50%" valign="bottom"><br>
+					    select a chart layer
+                        <div id="chartThemeOptions">
+                          <select class="ifield" id="chartThemeList" name="chartThemeList" size="5">
+                            <option value="all">
+                              (loading themes ...)&#160;&#160;
+                            </option>
+                          </select>
+						</div>
+                      </td>
+                    </tr>
+					<!-- chart value field --> 
+                    <tr>
+                      <td class="descrgrey" valign="top" bgcolor="#eeeef8">
+                        select a field
+                        <div id="chartFieldOptions">
+                          <select class="ifield" id="chartFieldList" name="chartFieldList" size="6" >
+                            <option value="all">
+                              (no theme selected ...)&#160;&#160;
+                            </option>
+                          </select>
+                        </div>
+                      </td>
+                      <td class="descrgrey" valign="top" align="left" >
+                        sample values
+                        <div id="chartValueOptions">
+                          <select class="ifield" id="chartValueList" name="chartValueList" size="6">
+                            <option value="all">
+                              (no field selected ...)&#160;&#160;
+                            </option>
+                          </select>
+						</div>  
+                      </td>
+                    </tr>
+					<tr height="5"><td></td></tr>
+					<!-- chart value 100% field --> 
+                    <tr>
+					  <td class="descrgrey" align="right" bgcolor="#eeeef8">field for % analysis</td> 	
+                      <td class="descrgrey" bgcolor="#eeeef8">
+                        <div id="chartField100Options">
+                          <select class="ifield" id="chartField100List" name="chartField100List" size="1" >
+                            <option value="none">
+                              none&#160;&#160;
+                            </option>
+                          </select>
+                        </div>
+                      </td>
+                    </tr>
+					<tr>
+					  <td class="descrgrey" align="right" bgcolor="#eeeef8">distribution type</td> 	
+                      <td class="descrgrey" width="50%" valign="bottom">
+                        <div id="chartMethodParam">
+                          <select class="ifield" id="chartMethod" name="chartMethod" onchange="checkChartMethod();">
+                            <option value="EQUIDISTANT">Equidistant</option>
+                            <option value="QUANTILE">Quantile</option>
+                            <option value="EXACT">Exact</option>
+                          </select>
+						</div>
+                      </td>
+					  <td class="descrgrey" align="right" bgcolor="#eeeef8"><span id="chartThemeParam22text">classes</span></td> 	
+                      <td class="descrgrey" width="50%" valign="bottom">
+                        <div id="chartThemeParam22">
+                          <select class="ifield" id="chartThemeNrClasses" name="chartThemeNrClasses" >
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option selected="true" value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                          </select>
+												</div>
+                      </td>
+						</td>
+					</tr>
+					<tr>
+					  <td class="descrgrey" align="right" bgcolor="#eeeef8">chart type</td> 	
+                      <td class="descrgrey" width="50%" valign="bottom">
+                        <div id="chartTypeParam">
+                          <select class="ifield" id="chartThemeType" name="chartThemeType" >
+                            <option value="CHLOROPLETHE">Colored Shapes</option>
+                            <option value="CHART|BUBBLE">Bubbles</option>
+                            <option value="CHART|BUBBLE|CENTER|EXACT">Bubbles (EXACT)</option>
+                            <option value="CHART|BUBBLE|VALUES">Bubbles + Values</option>
+                            <option value="CHART|BUBBLE|SURFACE">Bubbles </option>
+                            <option value="CHART|BUBBLE|SURFACE|VALUES">Bubbles + Values</option>
+                          </select>
+						</div>
+                      </td>
+					</tr>
+					<tr>
+					<tr>
+					  <td class="descrgrey" align="right" bgcolor="#eeeef8">color scheme</td> 	
+                      <td class="descrgrey" width="50%" valign="bottom">
+                        <div id="chartThemeParam2">
+                          <select class="ifield" id="chartThemeColors" name="chartThemeColors" >
+                            <option value="monoblue">monochrome blue</option>
+                            <option value="monored">monochrome red</option>
+                            <option value="monogreen">monochrome green</option>
+                            <option value="1">yellow</option>
+                            <option value="2">red/green</option>
+                            <option value="3">green/red</option>
+                            <option value="4">spectrum</option>
+                            <option value="5">office</option>
+                            <option value="6">mineral</option>
+                            <option value="7">harvest</option>
+                          </select>
+												</div>
+                      </td>
+						</td>
+					</tr>
+					<tr>
+					  <td class="descrgrey" align="right" bgcolor="#eeeef8">overwiew chart</td> 	
+                      <td class="descrgrey" width="50%" valign="bottom">
+                        <div id="chartThemeParam">
+                          <select class="ifield" id="chartThemeOverviewType" name="chartThemeOverviewType" >
+                            <option value="NONE">none</option>
+                            <option value="PIE">Pie</option>
+                            <option value="DONUT">Donut</option>
+                          </select>
+						</div>
+                      </td>
+					</tr>
+					<tr>
+					<tr>
+					  <td colspan="10">
+						<input class="ifield" type="button" value="execute" onclick="javascript:ixmaps.createChart();">
+					  </td>
+					</tr>
+                  </table>
+                </form>
+              </div>
+
+			  <!-- bookmark ------------------------------------------------------ -->
+              <div id="bookmark" style="display:none;border-top:thin double #d8d8d8;">
+				<div id="bookmarkprint" >
+				</div>
+              </div>
+
+			  <!-- end of switchable divs -->
+
+			</td></tr></table>
+
+			</td>
+          </tr>
+
+		  <!-- divs to show search/query results -->
+
+		  <tr height="100%"><td valign="top" align="center"><table bgcolor="#ffffff" cellpadding="0" width="98%" height="98" valign="top" >	
+			  <tr valign="top">
+				<td valign="top"><div id="foundtotal" ></div></td>
+			  </tr>
+			  <tr valign="top" width="100%">
+				<td valign="top"><div id="found" ></div></td>
+			  </tr>
+			  <tr valign="top">
+				<td valign="top"><div id="foundpaging" ></div></td>
+			  </tr>
+		  </table></td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  <!-- tooltips =============================================================== -->
+  <script language="JavaScript" src="../../js/tooltip.js" type="text/javascript" ></script>
+  <!-- ========================================================================= -->
+</body>
+</html>
