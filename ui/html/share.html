@@ -1,41 +1,44 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE HTML>
 <html>
+
 <head>
-  <title>SVGGIS Query Page</title>
-  <meta name="Generator" content="EditPlus">
-  <meta name="Author" content="">
-  <meta name="Keywords" content="">
-  <meta name="Description" content="">
-  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+	<meta charset="UTF-8">
+	<title>iXMaps Search Results</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
 
-  <link href="../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
-  <link href="../../ui/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
-  <link href="../css/popuptools.css" rel="stylesheet" type="text/css" >
+	<meta http-equiv="X-UA-Compatible" content="IE=9"/>
 
-  <script src = "../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
-  <script src = "../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
-  <!-- share api -->
-  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+	<link href="../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+	<link href="../../ui/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+	<link href="../css/popuptools.css" rel="stylesheet" type="text/css" >
 
-<script type="text/javascript" src="../js/htmlgui_query.js" > </script>
+	<script src = "../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+	<script src = "../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+	<!-- share api -->
+	<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
 
-<script type="text/javascript">
-	$(function() {
-		$( "#tabs" ).tabs({
-		   select: function(event, ui) { changeTool(ui.panel.id); }
+	<script type="text/javascript" src="../js/htmlgui_query.js" > </script>
+
+	<script type="text/javascript">
+		$(function() {
+			$( "#tabs" ).tabs({
+			   select: function(event, ui) { changeTool(ui.panel.id); }
+			});
+			$( "#aquery_execute" ).button();
+			$( "#aquery_clear" ).button();
+			$( "#query_search" ).button();
+			$( "#chart_go" ).button();
+			$( "#get_Bookmark" ).button();
+			$( "#popout" ).button();
+
+			setTimeout('$( "#tabs" ).css("visibility","visible")',50);
+
 		});
-		$( "#aquery_execute" ).button();
-		$( "#aquery_clear" ).button();
-		$( "#query_search" ).button();
-		$( "#chart_go" ).button();
-		$( "#get_Bookmark" ).button();
-		$( "#popout" ).button();
+	</script>
 
-		setTimeout('$( "#tabs" ).css("visibility","visible")',50);
-
-	});
-</script>
-<script type="text/javascript">
+	<script type="text/javascript">
 
 		var ixmaps = null;
 		var szEmbedUrl = null;
@@ -121,39 +124,40 @@
 			$("#preview-map").html(szPreview);
 	}
 
+	</script>
 
-</script>
-<style type="text/css">
-  .midlink {
-	font-family:arial;
-	font-size:12;
-	font-weight:normal;
-	color: #ddd;
-	vertical-align:50%;
-	margin-left:-5px;
-	margin-right:-2px;
-	}
-   .testlink a{
-	font-family:arial;
-	font-size:12;
-	font-weight:normal;
-	color: #fff;
-	vertical-align:30%;
-	padding:0em 0.5em;
-	margin-left:0.2em;;
-	background:#ddd;
-	border-radius:2em;
-	text-decoration: none;
-	}
- select.ifield {
-	width:150px;
-  }
-  p {
-	margin-top:10px;
-	margin-bottom:2px;
-  }
+	<style type="text/css">
 
-</style>
+	  .midlink {
+		font-family:arial;
+		font-size:12;
+		font-weight:normal;
+		color: #ddd;
+		vertical-align:50%;
+		margin-left:-5px;
+		margin-right:-2px;
+		}
+	   .testlink a{
+		font-family:arial;
+		font-size:12;
+		font-weight:normal;
+		color: #fff;
+		vertical-align:30%;
+		padding:0em 0.5em;
+		margin-left:0.2em;;
+		background:#ddd;
+		border-radius:2em;
+		text-decoration: none;
+		}
+	 select.ifield {
+		width:150px;
+	  }
+	  p {
+		margin-top:10px;
+		margin-bottom:2px;
+	  }
+
+	</style>
 
 </head>
 

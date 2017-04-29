@@ -1,12 +1,13 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE html>
+
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>iXmaps UI</title>
-  <meta name="Generator" content="EditPlus">
-  <meta name="Author" content="">
-  <meta name="Keywords" content="">
-  <meta name="Description" content="">
-  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
 
   <link rel="shortcut icon" href="./html/resources/images/ixmaps_logo.png" >
 
@@ -202,6 +203,9 @@
 			window.location.href = uiurl + szMap + szParams;
 		}
 
+		var maxHeight = window.innerHeight;
+		var maxWidth = window.innerWidth;
+
 		// embed the template via iframe and pass the parameter
 		if ( navigator.userAgent.match(/iPad/i) ){
 			// on iPad height = 100% causes strange behaviour, i.e. continous grow of page height
@@ -211,12 +215,17 @@
 		}else{
 			// embed the template via iframe and pass the parameter
 			$("body").html("<iframe id='"+szName+"' src=\"" + uiurl + szMap + szParams + "\" " +
-						" style='width:100%;height:100%;padding:0;margin:0;border:0;overflow:hidden' />");
+						" style='width:"+maxWidth+"px;height:"+maxHeight+"px;padding:0;margin:0;border:0;overflow:hidden' />");
 		}
 		
 		if ( ui == "edit" ){
 			document.title = "iXMaps editor";
 		}
+
+		$(window).resize(function() {
+			$("#"+szName).css("width",window.innerWidth+"px");
+			$("#"+szName).css("height",window.innerHeight+"px");
+		});
 
 	});
 

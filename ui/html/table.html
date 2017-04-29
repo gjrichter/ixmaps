@@ -27,8 +27,8 @@
 	<style type="text/css" title="currentStyle">
 		@import "../../ui/libs/DataTables-1.9.4/media/css/demo_table.css";
 	</style>
-    <link href="../../ui/html/css/bootstrap.css" rel="stylesheet">
-    <link href="../../ui/html/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="../../ui/css/bootstrap.css" rel="stylesheet">
+    <link href="../../ui/css/bootstrap-responsive.css" rel="stylesheet">
 
 	<script type="text/javascript" language="javascript" src="../../ui/libs/DataTables-1.9.4/media/js/jquery.dataTables.js"></script>
 
@@ -37,6 +37,9 @@
 	<style type="text/css">
 		table {
 			width: 100%;
+			border-collapse: collapse;
+			border-spacing: 0px;
+			cellspacing: 
 		}
 		table.dataTable thead th{
 			border: #dddddd solid 1px;
@@ -55,6 +58,10 @@
 		}
 		tfoot input.search_init {
 			font-size: 0.9em;
+		}
+		th, td {
+			padding: 5px;
+			text-align: left;
 		}
 		th {
 			text-align: left;
@@ -208,10 +215,6 @@
 			}
 		} );
 
-		var szSourceURL  = szTable.split(/url\(/)[1].split(/\)/)[0];
-		var szSourceTYPE = szTable.match(/ FT /)?" (Fusion Tables&trade;Id)":"";
-
-		document.getElementById('ft-data-name').innerHTML += '<div class="datasource" >'+szSourceURL+szSourceTYPE+'</div>';
 
 
 	};

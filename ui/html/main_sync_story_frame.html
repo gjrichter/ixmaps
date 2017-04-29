@@ -2,70 +2,71 @@
 <html>
 
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+	<meta charset="UTF-8">
+	<title>iXmaps embed</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
 
-<meta http-equiv="Content-Language" content="en-us" />
-<meta name="copyright" content="Guenter Richter"/>
-<meta name="author" content="service@medienobjekte.de"/>
-<meta name="description" content="Interactive &amp; estensible maps in HTML5"/>
-<meta name="revisit-after" content="30 days"/>
-<meta name="distribution" content="Global"/>
-<meta name="keywords" content="iXMaps,SVG,GIS,map,maps,Karten,chart,charts,pie,bar,web,geo,Visualisierung,visualisation,visualizzazione,interaktiv,interactive,interattivo,SIT,Geo,georeference,georeferenziert,geomarketing,graphical,programming,example,web application,application,web2.0"/>
-<meta name="robots" content="index,follow"/>
-<meta name="page-topic" content="iXMaps presentation wrapper, Guenter Richter, Medienobjekte"/>
-<meta name="audience" content="all, Alle"/>
-<meta name="language" content="UK, uk, english, englisch"/>
-<meta name="page-type" content="wrapper"/>
-<meta name="resource-type" content="document"/>
-<meta name="Classification" content="presentation wrapper iXMaps.com medienobjekt.de Guenter Richter"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=9"/>
 
-<link href="../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
-<link href="../css/jquery-ui.css" rel="stylesheet" type="text/css"/>
-
-<link rel="stylesheet" type="text/css" href="../../ui/css/messagebox.css" />
+	<meta name="description" content="Interactive &amp; estensible maps in HTML5"/>
+	<meta name="keywords" content="iXMaps,SVG,GIS,map,maps,Karten,chart,charts,pie,bar,web,geo,Visualisierung,visualisation,visualizzazione,interaktiv,interactive,interattivo,SIT,Geo,georeference,georeferenziert,geomarketing,graphical,programming,example,web application,application,web2.0"/>
+	<meta name="robots" content="index,follow"/>
+	<meta name="page-topic" content="iXMaps presentation wrapper"/>
+	<meta name="audience" content="all, Alle"/>
+	<meta name="language" content="UK, uk, english, englisch"/>
+	<meta name="page-type" content="wrapper"/>
+	<meta name="resource-type" content="document"/>
+	<meta name="Classification" content="presentation wrapper iXMaps.com"/>
 
 
-<title>iXmaps - interactive map</title>
+	<link href="../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+	<link href="../css/jquery-ui.css" rel="stylesheet" type="text/css"/>
 
-<style type="text/css">
-.disclaimer{
-	margin-top:25px;
-	margin-left:15px;
-	font-size: 11px;
-	line-height: 14px;
-}
-.disclaimer a{
-	font-size: 11px;
-	line-height: 14px;
-}
-ul {
-	list-style: circle;
-}
-li {
-	padding: 0px 5px 5px 0px;
-	margin: 0px;
-}
-#sidebar {
-	position:absolute;
-	top:4px;
-	right:10px;
-	width:226px;
-	color:#53637D
-}
-#sidebar-title{
-	margin-left:12px;
-	color:#aaa;
-	font-size:2em;
-}
-#sidebar-content{
-	margin-top:52px;
-}
-.sidebar-subtitle{
-	margin-top:18px;
-	margin-left:17px;
-	color:#aaa;
-}
+	<link rel="stylesheet" type="text/css" href="../../ui/css/messagebox.css" />
+
+
+	<title>iXmaps - interactive map</title>
+
+	<style type="text/css">
+	.disclaimer{
+		margin-top:25px;
+		margin-left:15px;
+		font-size: 11px;
+		line-height: 14px;
+	}
+	.disclaimer a{
+		font-size: 11px;
+		line-height: 14px;
+	}
+	ul {
+		list-style: circle;
+	}
+	li {
+		padding: 0px 5px 5px 0px;
+		margin: 0px;
+	}
+	#sidebar {
+		position:absolute;
+		top:4px;
+		right:10px;
+		width:226px;
+		color:#53637D
+	}
+	#sidebar-title{
+		margin-left:12px;
+		color:#aaa;
+		font-size:2em;
+	}
+	#sidebar-content{
+		margin-top:52px;
+	}
+	.sidebar-subtitle{
+		margin-top:18px;
+		margin-left:17px;
+		color:#aaa;
+	}
 .sidebar-background{
 	background-image: -webkit-linear-gradient(left, rgba(255,255,255,0.0001) 0%, rgba(255,255,255,1) 30%, rgba(255,255,255,1) 50%);
 	background-image: -o-linear-gradient(left, rgba(255,255,255,0.0001) 0%, rgba(255,255,255,1) 30%, rgba(255,255,255,1) 50%);

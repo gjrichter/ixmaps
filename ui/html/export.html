@@ -1,15 +1,15 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML>
+<html>
 
-
-
-<!-- DOM Viewer  -->
-<!-- Copyright 2000, 2001 by Mike Hall  --> 
-<!-- Please see http://www.brainjar.com for terms of use. --> 
-
-
-
-<html> <head> <title>DOM Viewer</title>
 <head>
+  <meta charset="UTF-8">
+  <title>iXmaps export</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="Description" content="">
+  <meta name="author" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+
+  <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 
   <link href="../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
   <link href="../../ui/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
@@ -21,156 +21,149 @@
   <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
 
 
-<style type="text/css">
-* {
-	font-family: arial, verdana, sans-serif
+  <style type="text/css">
+	* {
+		font-family: arial, verdana, sans-serif
+		}
+	span.object {
+	  color: #0000ff;
+	  text-decoration: underline;
+	  cursor: pointer;
 	}
-span.object {
-  color: #0000ff;
-  text-decoration: underline;
-  cursor: pointer;
-}
-body {
-	background-color: #efefe9;
+	body {
+		background-color: #efefe9;
+		}
+	h1 {
+		font-size: 8pt;
+		margin-bottom:2px;
+		}
+	h2 {
+		font-size: 8pt;
+		margin-bottom:2px;
+		}
+	h3 {
+		font-size: 8pt;
+		font-weight: 500;
+		text-indent: 12px;
+		margin-bottom:2px;
+		}
+	li {
+	  white-space: nowrap;
+	  padding: 0px;
 	}
-h1 {
-	font-size: 8pt;
-	margin-bottom:2px;
+	ul {
+	  list-style-type: square;
+	  margin-left: 0px;
+	  padding-left: 1.5em;
 	}
-h2 {
-	font-size: 8pt;
-	margin-bottom:2px;
+	li li {
+	  list-style-type: disc;
+	  margin-left: 0px;
+	  padding-left: 1.5em;
 	}
-h3 {
-	font-size: 8pt;
-	font-weight: 500;
-	text-indent: 12px;
-	margin-bottom:2px;
+	li li li{
+	  list-style-type: circle;
+	  margin-left: 0px;
+	  padding-left: 1.5em;
 	}
-li {
-  white-space: nowrap;
-  padding: 0px;
-}
 
+	li li li li li {
+	  list-style-type: square;
+	  margin-left: 0px;
+	  padding-left: 1.5em;
+	}
+	textarea {
+		overflow:auto;
+	}
 
+	.popup_messagebox {
+		background:#ffffff;
+		padding:10px;
+		-moz-box-shadow: 0px 0px 18px /*{global-box-shadow-size}*/ 			rgba(0,0,0,.6) /*{global-box-shadow-color}*/ ;
+		-webkit-box-shadow: 0px 0px 18px /*{global-box-shadow-size}*/ 		rgba(0,0,0,.6) /*{global-box-shadow-color}*/ ;
+		box-shadow: 0px 0px 18px /*{global-box-shadow-size}*/ 				rgba(0,0,0,.6) /*{global-box-shadow-color}*/ ;
+	}
+	.messagebox_container
+	{
+		width:100%;
+		height:100%;
+		overflow:auto;
+		background-color:white;
+		text-shadow: 0 0 0 #ddd;
+		padding-bottom:10px;
+		text-align:center;
+	}
+	 
+	.messagebox_header
+	{
+		font-size:24px;   
+		color:#ddd;
+		margin:10px 0px 10px 0px;
+		padding:0px 0px 0px 15px;
+		text-align:left;    
+	}
+	 
+	.messagebox_caption
+	{
+		color:White;
+		font-size:14px;
+		text-align:left;
+		margin:10px 0px 10px 15px;
+	}
+	 
+	.messagebox_content
+	{
+		color:#444;
+		min-height:10px;
+		text-align:left;
+		padding:0px 10px 10px 15px;    
+	}
+	.messagebox_error_content
+	{
+		color:#c66;
+		min-height:10px;
+		text-align:left;
+		padding:0px 10px 10px 15px;    
+	}
+	 
+	.ui-simpledialog-container
+	{
+		border:solid 2px white !important;
+		border-radius:.3em !important;
+		-webkit-border-radius:.3em !important;
+		background-color:#eee !important;        
+		
+	}
+	.popup_messagebox
+	{
+		position:fixed;
+		background-color:#eee !important;
+		padding:0 !important;
+		border:solid 2px white;
+		border-radius: .3em !important;
+		min-width:280px !important;
+		vertical-align:middle; 
+		z-index:100000000000;   
+	}
+	 
+	.cover_background
+	{
+		position:fixed;
+		top:0px;
+		left:0px;
+		width:10000px;
+		height:10000px;
+		opacity:0.5;
+		z-index:10000;
+		background-color:#888888;    
+	}
+  </style> 
 
-ul {
-  list-style-type: square;
-  margin-left: 0px;
-  padding-left: 1.5em;
-}
-li li {
-  list-style-type: disc;
-  margin-left: 0px;
-  padding-left: 1.5em;
-}
-li li li{
-  list-style-type: circle;
-  margin-left: 0px;
-  padding-left: 1.5em;
-}
-
-li li li li li {
-  list-style-type: square;
-  margin-left: 0px;
-  padding-left: 1.5em;
-}
-textarea {
-    overflow:auto;
-}
-
-
-.popup_messagebox {
-	background:#ffffff;
-	padding:10px;
-	-moz-box-shadow: 0px 0px 18px /*{global-box-shadow-size}*/ 			rgba(0,0,0,.6) /*{global-box-shadow-color}*/ ;
-	-webkit-box-shadow: 0px 0px 18px /*{global-box-shadow-size}*/ 		rgba(0,0,0,.6) /*{global-box-shadow-color}*/ ;
-	box-shadow: 0px 0px 18px /*{global-box-shadow-size}*/ 				rgba(0,0,0,.6) /*{global-box-shadow-color}*/ ;
-}
-.messagebox_container
-{
-    width:100%;
-    height:100%;
-    overflow:auto;
-    background-color:white;
-    text-shadow: 0 0 0 #ddd;
-    padding-bottom:10px;
-    text-align:center;
-}
- 
-.messagebox_header
-{
-    font-size:24px;   
-    color:#ddd;
-    margin:10px 0px 10px 0px;
-    padding:0px 0px 0px 15px;
-    text-align:left;    
-}
- 
-.messagebox_caption
-{
-    color:White;
-    font-size:14px;
-    text-align:left;
-    margin:10px 0px 10px 15px;
-}
- 
-.messagebox_content
-{
-    color:#444;
-    min-height:10px;
-    text-align:left;
-    padding:0px 10px 10px 15px;    
-}
-.messagebox_error_content
-{
-    color:#c66;
-    min-height:10px;
-    text-align:left;
-    padding:0px 10px 10px 15px;    
-}
- 
-.ui-simpledialog-container
-{
-    border:solid 2px white !important;
-    border-radius:.3em !important;
-    -webkit-border-radius:.3em !important;
-    background-color:#eee !important;        
-    
-}
-.popup_messagebox
-{
-    position:fixed;
-    background-color:#eee !important;
-    padding:0 !important;
-    border:solid 2px white;
-    border-radius: .3em !important;
-    min-width:280px !important;
-    vertical-align:middle; 
-    z-index:100000000000;   
-}
- 
-.cover_background
-{
-    position:fixed;
-    top:0px;
-    left:0px;
-    width:10000px;
-    height:10000px;
-    opacity:0.5;
-    z-index:10000;
-    background-color:#888888;    
-}
-
-
-
-</style> <script type="text/JavaScript"> 
+<script type="text/JavaScript"> 
 var isNS6 = (navigator.userAgent.indexOf("Gecko") > 0) ? 1 : 0;
 var isIE5 = (navigator.appVersion.indexOf("MSIE 5") > 0) ? 1 : 0;
 var OPERA = (navigator.userAgent.indexOf("Opera") > 0) ? true : false;
 // Array for tracking objects to expand or collapse.
-
-
 
 var objectList = new Array();
 var depth = 0;

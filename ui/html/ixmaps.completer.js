@@ -48,6 +48,8 @@
 	{"word":"RELATIVE","freq":24,"score":300,"flags":"bc","syllables":"2","help":"theme type modifier"},
 	{"word":"NOLINES","freq":24,"score":300,"flags":"bc","syllables":"2","help":"theme style modifier"},
 	{"word":"BOX","freq":24,"score":300,"flags":"bc","syllables":"1","help":"make chart background"},
+	{"word":"RECT","freq":24,"score":300,"flags":"bc","syllables":"1","help":"rectangular grid"},
+	{"word":"RELOCATE","freq":24,"score":300,"flags":"bc","syllables":"1","help":"position from grid point to barycenter of values"},
 
 	{"word":"overviewchart","freq":24,"score":300,"flags":"bc","syllables":"1","help":"theme base layer"},
 	{"word":"evidence","freq":24,"score":300,"flags":"bc","syllables":"1","help":"[isolate|highlight]"},
@@ -90,6 +92,8 @@
 	{"word":"scale","freq":24,"score":300,"flags":"bc","syllables":"1","help":"chart size scaling"},
 
 	{"word":"labelfield","freq":24,"score":300,"flags":"bc","syllables":"1","help":"data column for labels"},
+	{"word":"labelupper","freq":24,"score":300,"flags":"bc","syllables":"1","help":"scale depentant label [e.s. 1:10000]"},
+
 	{"word":"sizefield","freq":24,"score":300,"flags":"bc","syllables":"1","help":"data column to size charts"},
 	{"word":"alphafield","freq":24,"score":300,"flags":"bc","syllables":"1","help":"data column for dyn.opacity"},
 	{"word":"alphafield100","freq":24,"score":300,"flags":"bc","syllables":"1","help":"data column for dyn.opacity"},
@@ -112,6 +116,7 @@
 	{"word":"borderradius","freq":24,"score":300,"flags":"bc","syllables":"1","help":"chart BOX styler"},
 	{"word":"boxopacity","freq":24,"score":300,"flags":"bc","syllables":"1","help":"chart BOX styler"},
 	{"word":"boxmargin","freq":24,"score":300,"flags":"bc","syllables":"1","help":"chart BOX styler"},
+	{"word":"boxupper","freq":24,"score":300,"flags":"bc","syllables":"1","help":"scale depentant BOX [e.s. 1:10000]"},
 
 	{"word":"textplacement","freq":24,"score":300,"flags":"bc","syllables":"1","help":"[dynamic]"},
 	{"word":"infotitle","freq":24,"score":300,"flags":"bc","syllables":"1","help":"define title for item infos"},

@@ -1752,7 +1752,7 @@ $Log: htmlgui.js,v $
 	};
 
 	ixmaps.viewTable = function(target,position){
-		this.openDialog(null,'table-dialog',"table.html",'data table',position||'auto',800,500);
+		this.openDialog(null,'table-dialog',"table.html",'data table',position||'auto',800,600);
 	};
 
 	ixmaps.popupBookmarks = function(position){
@@ -2875,7 +2875,7 @@ $Log: htmlgui.js,v $
 
 		for ( i=1; i<data.length;i++ ){
 			var row = [];
-			for ( a in data[i] ){
+			for ( a in data[0] ){
 				row.push(data[i][a]);
 			}
 			dataA.push(row);
