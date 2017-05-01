@@ -1,21 +1,21 @@
 /**********************************************************************
  preprocess.js
 
-$Comment: provides JavaScript to preprocess data for 'Rome incidents'
+$Comment: provides JavaScript to preprocess data for 'Palermo incidents'
 $Source : preprocess.js,v $
 
 $InitialAuthor: guenter richter $
 $InitialDate: $
 $Author: guenter richter $
-$Id: preprocess.js 8 2014-04-06 00:00:00Z Guenter Richter $
+$Id: preprocess.js 8 2017-04-06 00:00:00Z Guenter Richter $
 
 Copyright (c) Guenter Richter
 $Log: preprocess.js,v $
 **********************************************************************/
 
 /** 
- * @fileoverview This file provides preprocessing functions for datasets of 'Rome incidents'
- * @author Guenter Richter guenter.richter@medienobjekte.de
+ * @fileoverview This file provides preprocessing functions for datasets of 'Palermo incidents'
+ * @author Guenter Richter guenter.richter@gmail.com
  * @version 1.0 
  */
 
