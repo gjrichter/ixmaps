@@ -5,11 +5,11 @@
 
 	var num_totale =  
 	{
-	"layer": "World_countries_shp",
+	"layer": "generic",
 	"field": "Incidenti",
 	"field100": "",
 	"style": {
-		"type": "CHART|BUBBLE|EXACT|ZEROISVALUE|NEGATIVEISVALUE",
+		"type": "CHART|BUBBLE|EXACT",
 		"colorscheme": [
 			"RGB(77,184,73)",
 			"RGB(255,92,92)",
@@ -40,11 +40,11 @@
 	};
 	var num_totale_glow =  
 	{
-	"layer": "World_countries_shp",
+	"layer": "generic",
 	"field": "Incidenti",
 	"field100": "",
 	"style": {
-		"type": "CHART|BUBBLE|GLOW|EXACT|ZEROISVALUE|NEGATIVEISVALUE",
+		"type": "CHART|BUBBLE|GLOW|EXACT",
 		"colorscheme": [
 			"RGB(77,184,73)",
 			"RGB(255,92,92)",
@@ -75,11 +75,11 @@
 	};
 	var num_totale_pie_centervalue =  
 	{
-	"layer": "World_countries_shp",
+	"layer": "generic",
 	"field": "Incidenti",
 	"field100": "",
 	"style": {
-		"type": "CHART|PIE|CENTERVALUE|EXACT|ZEROISVALUE|NEGATIVEISVALUE|AGGREGATE|RECT|RELOCATE|SIZE|SUM",
+		"type": "CHART|PIE|CENTERVALUE|EXACT|AGGREGATE|RECT|RELOCATE|SIZE|SUM",
 		"colorscheme": [
 			"RGB(77,184,73)",
 			"RGB(255,92,92)",
@@ -113,11 +113,11 @@
 	};
 	var num_totale_multibubble =  
 	{
-	"layer": "World_countries_shp",
+	"layer": "generic",
 	"field": "Incidenti",
 	"field100": "",
 	"style": {
-		"type": "CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM|VALUES|ZEROISVALUE|NEGATIVEISVALUE|AGGREGATE|RELOCATE|EXACT|SUM|SUM",
+		"type": "CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM|VALUES|AGGREGATE|RELOCATE|EXACT|SUM",
 		"colorscheme": [
 			"RGB(77,184,73)",
 			"RGB(255,92,92)",
@@ -155,11 +155,11 @@
 	};
 	var num_totale_multibubble_glow =  
 	{
-	"layer": "World_countries_shp",
+	"layer": "generic",
 	"field": "Incidenti",
 	"field100": "",
 	"style": {
-		"type": "CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM|VALUES|GLOW|ZEROISVALUE|NEGATIVEISVALUE|AGGREGATE|RELOCATE|EXACT|SUM|SUM",
+		"type": "CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM|VALUES|GLOW|AGGREGATE|RELOCATE|EXACT|SUM",
 		"colorscheme": [
 			"RGB(77,184,73)",
 			"RGB(255,92,92)",
@@ -196,11 +196,11 @@
 
 	var num_totale_multibubble_center_glow =  
 	{
-	"layer": "World_countries_shp",
+	"layer": "generic",
 	"field": "Incidenti",
 	"field100": "",
 	"style": {
-		"type": "GLOW|RECT|CHART|SYMBOL|EXACT|SEQUENCE|CENTER|SORT|UP|RINGS|AGGREGATE|SUM|SIZE|FORCE",
+		"type": "CHART|SYMBOL|EXACT|SEQUENCE|CENTER|SORT|UP|RINGS|GLOW|AGGREGATE|RECT|SUM|SIZE",
 		"colorscheme": [
 			"RGB(77,184,73)",
 			"RGB(255,92,92)",
@@ -239,11 +239,11 @@
 
 	var num_totale_multibubble_center_linear_glow =  
 	{
-	"layer": "World_countries_shp",
+	"layer": "generic",
 	"field": "Incidenti",
 	"field100": "",
 	"style": {
-		"type": "GLOW|RECT|CHART|SYMBOL|EXACT|SEQUENCE|CENTER|SORT|UP|LINEAR|RINGS|AGGREGATE|RELOCATE|SUM|SIZE|FORCE",
+		"type": "CHART|SYMBOL|GLOW|EXACT|SEQUENCE|CENTER|SORT|UP|LINEAR|RINGS|AGGREGATE|RECT|RELOCATE|SUM|SIZE",
 		"colorscheme": [
 			"RGB(77,184,73)",
 			"RGB(255,92,92)",
@@ -494,7 +494,7 @@
 	"field": "I0-3|F0-3|R0-3|M0-3|I3-6|F3-6|R3-6|M3-6|I6-9|F6-9|R6-9|M6-9|I9-12|F9-12|R9-12|M9-12|I12-15|F12-15|R12-15|M12-15|I15-18|F15-18|R15-18|M15-18|I18-21|F18-21|R18-21|M18-21|I21-24|F21-24|R21-24|M21-24",
 	"field100": "",
 	"style": {
-		"type": "AGGREGATE|RECT|AUTOSIZE|CHART|SYMBOL|SEQUENCE|PLOT|RAW|LINES|NOSORT|BOX|GRID|FIXSIZE|TITLE|SUM|CLEAR|ZEROISVALUE|FORCE",
+		"type": "CHART|SYMBOL|SEQUENCE|PLOT|RAW|LINES|NOSORT|BOX|GRID|FIXSIZE|TITLE|AGGREGATE|RECT|AUTOSIZE|SUM|CLEAR|ZEROISVALUE|FORCE",
 		"colorscheme": [
 			"RGB(77,184,73)",
 			"RGB(255,92,92)",
@@ -561,7 +561,7 @@
 		"dbtable": "totale_incidenti_georef",
 		"dbtableUrl": "../../data/Palermo/_20032017144826.csv",
 		"dbtableType": "csv",
-		"dbtableExt": "preprocess.js",
+		"dbtableExt": "../../app/Palermo_Incidenti/stories/2016/preprocess.js",
 		"datacache": "true",
 		"itemfield": "lat|lon",
 		"lookupfield": "lat|lon",
@@ -590,7 +590,7 @@
 	}
 	var test_pie =  
 	{
-	"layer": "World_countries_shp",
+	"layer": "generic",
 	"field": "Incidenti",
 	"field100": "",
 	"style": {
@@ -604,7 +604,7 @@
 		"dbtable": "totale_incidenti_georef",
 		"dbtableUrl": "../../data/Palermo/_20032017144826.csv",
 		"dbtableType": "csv",
-		"dbtableExt": "preprocess.js",
+		"dbtableExt": "../../app/Palermo_Incidenti/stories/2016/preprocess.js",
 		"datacache": "true",
 		"itemfield": "lat|lon",
 		"lookupfield": "lat|lon",
@@ -643,7 +643,7 @@
 		"dbtable": "totale_incidenti_georef",
 		"dbtableUrl": "../../data/Palermo/_20032017144826.csv",
 		"dbtableType": "csv",
-		"dbtableExt": "preprocess.js",
+		"dbtableExt": "../../app/Palermo_Incidenti/stories/2016/preprocess.js",
 		"datacache": "true",
 		"itemfield": "lat|lon",
 		"lookupfield": "lat|lon",
@@ -683,7 +683,7 @@
 		"dbtable": "totale_incidenti_georef",
 		"dbtableUrl": "../../data/Palermo/_20032017144826.csv",
 		"dbtableType": "csv",
-		"dbtableExt": "preprocess.js",
+		"dbtableExt": "../../app/Palermo_Incidenti/stories/2016/preprocess.js",
 		"datacache": "true",
 		"itemfield": "lat|lon",
 		"lookupfield": "lat|lon",
@@ -704,7 +704,7 @@
 	"field": "Feriti",
 	"field100": "$item$",
 	"style": {
-		"type": "DOPACITY|GRIDSIZE|CHART|SYMBOL|QUANTILE|ZEROISVALUE|NEGATIVEISVALUE|SUM|AGGREGATE|GAP|NORMALIZE|VALUES|DTEXT|VALUEBACKGROUND",
+		"type": "CHART|SYMBOL|QUANTILE|ZEROISVALUE|NEGATIVEISVALUE|SUM|AGGREGATE|GAP|DOPACITY|GRIDSIZE|NORMALIZE|VALUES|DTEXT|VALUEBACKGROUND",
 		"colorscheme": [
 			"1",
 			"#ffeeee",
@@ -716,7 +716,7 @@
 		"dbtable": "totale_incidenti_georef",
 		"dbtableUrl": "../../data/Palermo/_20032017144826.csv",
 		"dbtableType": "csv",
-		"dbtableExt": "preprocess.js",
+		"dbtableExt": "../../app/Palermo_Incidenti/stories/2016/preprocess.js",
 		"datacache": "true",
 		"itemfield": "lat|lon",
 		"lookupfield": "lat|lon",
@@ -744,7 +744,7 @@
 	"field": "Feriti",
 	"field100": "",
 	"style": {
-		"type": "DOPACITY|GRIDSIZE|CHART|SYMBOL|QUANTILE|ZEROISVALUE|NEGATIVEISVALUE|SUM|AGGREGATE|GAP|NORMALIZE|VALUES|DTEXT|VALUEBACKGROUND",
+		"type": "CHART|SYMBOL|QUANTILE|ZEROISVALUE|NEGATIVEISVALUE|SUM|AGGREGATE|GAP|DOPACITY|GRIDSIZE|NORMALIZE|VALUES|DTEXT|VALUEBACKGROUND",
 		"colorscheme": [
 			"1",
 			"#ffeeee",
@@ -756,7 +756,7 @@
 		"dbtable": "totale_incidenti_georef",
 		"dbtableUrl": "../../data/Palermo/_20032017144826.csv",
 		"dbtableType": "csv",
-		"dbtableExt": "preprocess.js",
+		"dbtableExt": "../../app/Palermo_Incidenti/stories/2016/preprocess.js",
 		"datacache": "true",
 		"itemfield": "lat|lon",
 		"lookupfield": "lat|lon",
@@ -784,7 +784,7 @@
 	"field": "$item$",
 	"field100": "",
 	"style": {
-		"type": "DOPACITY|GRIDSIZE|CHART|SYMBOL|QUANTILE|ZEROISVALUE|NEGATIVEISVALUE|SUM|AGGREGATE|GAP|NORMALIZE|VALUES|DTEXT|VALUEBACKGROUND",
+		"type": "CHART|SYMBOL|QUANTILE|ZEROISVALUE|NEGATIVEISVALUE|SUM|AGGREGATE|GAP|DOPACITY|GRIDSIZE|NORMALIZE|VALUES|DTEXT|VALUEBACKGROUND",
 		"colorscheme": [
 			"1",
 			"#ffeeee",
@@ -796,7 +796,7 @@
 		"dbtable": "totale_incidenti_georef",
 		"dbtableUrl": "../../data/Palermo/_20032017144826.csv",
 		"dbtableType": "csv",
-		"dbtableExt": "preprocess.js",
+		"dbtableExt": "../../app/Palermo_Incidenti/stories/2016/preprocess.js",
 		"datacache": "true",
 		"itemfield": "lat|lon",
 		"lookupfield": "lat|lon",
@@ -825,7 +825,7 @@
 	"field": "Feriti",
 	"field100": "$item$",
 	"style": {
-		"type": "GLOW|CHART|SYMBOL|ZEROISVALUE|QUANTILE|NEGATIVEISVALUE|AGGREGATE|RELOCATE|FRACTION|NORMALIZE|VALUES|DTEXT|VALUEBACKGROUND",
+		"type": "CHART|SYMBOL|GLOW|ZEROISVALUE|QUANTILE|NEGATIVEISVALUE|AGGREGATE|RELOCATE|FRACTION|NORMALIZE|VALUES|DTEXT|VALUEBACKGROUND",
 		"colorscheme": [
 			"10",
 			"green",
@@ -836,7 +836,7 @@
 		"dbtable": "totale_incidenti_georef",
 		"dbtableUrl": "../../data/Palermo/_20032017144826.csv",
 		"dbtableType": "csv",
-		"dbtableExt": "preprocess.js",
+		"dbtableExt": "../../app/Palermo_Incidenti/stories/2016/preprocess.js",
 		"datacache": "true",
 		"itemfield": "lat|lon",
 		"lookupfield": "lat|lon",
@@ -883,7 +883,7 @@
 		"dbtable": "totale_incidenti_georef",
 		"dbtableUrl": "../../data/Palermo/_20032017144826.csv",
 		"dbtableType": "csv",
-		"dbtableExt": "preprocess.js",
+		"dbtableExt": "../../app/Palermo_Incidenti/stories/2016/preprocess.js",
 		"datacache": "true",
 		"itemfield": "lat|lon",
 		"lookupfield": "lat|lon",
