@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Corruptiuon Perceptiuon Index - ixmaps story</title>
+	<meta name="author" content="ixmaps" />
+	<meta name="description" content="ixmaps story" />
+	<meta name="keywords"  content="ixmaps,corruption,map" />
+	<meta name="Resource-type" content="Document" />
+
+
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/css/jquery.fullPage.css" />
+	<link rel="stylesheet" type="text/css" href="index.css" />
+	<link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/css/icomoon.css" rel="stylesheet" />    
+	<style>
+
+	body{
+		background-color: rgba(255,255,255,0.85);
+	}
+	.fp-controlArrow.fp-prev{
+		border-color: transparent #444 transparent transparent;
+	}
+	.fp-controlArrow.fp-next{
+		border-color: transparent transparent transparent #444;
+	}
+	.shareBtns a {
+		color: #aaa;
+	}
+	 a {
+		color: #88f;
+	}
+	 button {
+		border-width:0.5px;
+		border-color: #444;
+	}
+	
+	.inline-legend .icon, .inline-legend .glyphicon {
+		font-size:17px;
+		color:#444444;
+		background:#ffffff;
+		padding:0.4em;
+		display: inline;
+	}
+	p.comment {
+		font-size: 11px;
+		margin: 1em 0em 0em 10px;
+	}
+
+	td {
+		font-weight: 400;
+		font-size: 1.1em;
+		padding: 0.5em 0.3em;
+		vertical-align: top;
+	}
+
+	.navbar-pad-original {
+		-moz-box-shadow: 0px 2px 10px /*{global-box-shadow-size}*/ 			rgba(0,0,0,.2) /*{global-box-shadow-color}*/ ;
+		-webkit-box-shadow: 0px 2px 10px /*{global-box-shadow-size}*/ 		rgba(0,0,0,.2) /*{global-box-shadow-color}*/ ;
+		box-shadow: 0px 2px 10px /*{global-box-shadow-size}*/ 				rgba(0,0,0,.2) /*{global-box-shadow-color}*/ ;
+		xxborder-bottom: solid #ddd 1px;
+	}
+
+	</style>
+	<style type="text/css">
+		#result-div {
+			padding: 1em;
+			background: white;
+			-moz-box-shadow: 0px 2px 4px /*{global-box-shadow-size}*/ 			rgba(0,0,0,.5) /*{global-box-shadow-color}*/ ;
+			-webkit-box-shadow: 0px 2px 4px /*{global-box-shadow-size}*/ 		rgba(0,0,0,.5) /*{global-box-shadow-color}*/ ;
+			box-shadow: 0px 2px 4px /*{global-box-shadow-size}*/ 				rgba(0,0,0,.5) /*{global-box-shadow-color}*/ ;
+		}
+		#result-button {
+			text-decoration: none;
+			font-family: "Arial";
+			color: #666666;
+		}
+	</style>
+
+</head>
+<body>
+
+	<div id="fullpage" >
+
+
+		<div class="section" id="section1">
+			<div class="slide" id="section1slide1">
+				<div class="intro down">
+					<h1 ></h1>
+					<h2 id="legend_title">Map Layer</h2>
+				</div>
+			</div>
+
+			<div id="legendDiv" style="margin-top:2em">
+			</div>
+ 			<div id="legendDiv2" style="margin-top:2em">
+			</div>
+
+		</div>
+
+
+
+		<div class="section" id="section7">
+			<div class="slide" >
+			<div class="intro up" style="background-color:#f8f8f8">
+				<h4 style="margin-left:10px">Attribuzioni</h4>
+
+				<p class="comment">
+					Visualizzazione:<br>
+					creato da <a href="http://ixmaps.com">iXmaps</a> - CC BY<br>
+					<span class="icon icon-envelop"></span> <a href="#"> info@ixmaps.com</a> <br/>
+					<span class="icon icon-twitter"></span> <a href="#"> @grichter </a> <br/>
+					</p>
+				<p class="comment">
+					Crediti:<br>
+					<a href="http://icomoon.io">icomoon.io</a> - for the nice icons
+				</p>
+
+			</div>
+			</div>
+		</div>
+
+	</div>
+
+
+	<div id="header" class="navbar-fixed-top" style="position: fixed;top:0;left:5px;width:100%;margin-bottom:1em;padding-right:2em;background-color:rgba(255,255,255,0.9)" >
+		<div class="container" style="margin-top:11px" >
+			<div class="row">
+				<div class="col-lg-8 col-lg-offset-2">
+					<div class="header" aria-hidden="true">
+						<div class="linkSocialContainer" style="float:left">
+							<span class="linkContainer"></span>
+							<span class="shareBtns" style="font-size:24px">
+								<a href="javascript:ixmaps.popupShare()">
+								<i class="shareIcon blackHover share_facebook icon-facebook-squared" title="Share on Facebook" tabindex="-1"></i></a>
+								<a href="javascript:ixmaps.popupBookmarks()">
+								<i class="icon shareIcon blackHover share_twitter icon-bookmark" title="Open bookmarks dialog" tabindex="-1"></i></a>
+								<a href="javascript:ixmaps.popupShare()">
+								<span class="fa fa-share fa-fw" ></span></a>
+								<a href="javascript:ixmaps.loadStoryTool('./filter.html',{frame:true})" >
+								<i class="icon shareIcon blackHover share_bitly icon-filter" title="Filter" tabindex="-1" style="margin-left:0.2em" ></i></a>
+								<a href="javascript:ixmaps.loadStoryTool('./layer.html')" >
+								<i class="icon shareIcon blackHover share_bitly icon-map" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i></a>
+								<a href="javascript:ixmaps.loadStoryTool('./about.html')" >
+								<i class="icon shareIcon blackHover share_bitly icon-info" title="About" tabindex="-1" style="margin-left:0.2em" ></i></a>
+								<a href="javascript:ixmaps.loadStoryTool('./menu.html')" >
+								<i class="icon shareIcon blackHover share_bitly icon-list2" title="Menu" tabindex="-1" style="margin-left:0.1em" ></i></a>
+							</span>
+						</div>
+						<div class="linkSocialContainer" style="float:right;margin-right:-1.5em;margin-top:0.2em;">
+							<span class="linkContainer"></span>
+							<span class="shareBtns" style="font-size:18px">
+									<a href="javascript:ixmaps.fullScreen()">
+								<i class="shareIcon blackHover share_bitly icon-close" title="Info" tabindex="-1" style="margin-left:0.2em" ></i></a>
+							</span>
+						</div>
+						<div class="logoContainer" style="float:right;margin-right:-10px;display:none">
+							<table>
+								<tr>
+									<td class="logoWrapper">
+										<a class="logoLink" target="_blank" tabindex="-1">
+											<img class="logoImg" src="" height="60px" style="opacity:0.8"/>
+										</a>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+
+ 		</div>
+	</div>	
+
+	<!-- ==== MODAL DIALOG ==== -->
+	<div id="modal-dialog-1" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="z-index:9999">
+	  <div class="modal-dialog modal-lg">
+		  <div class="modal-content">
+			...
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		  </div>
+	  </div>
+	</div>
+	<div id="modal-dialog-2" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="z-index:9999">
+	  <div class="modal-dialog modal-lg">
+		  <div class="modal-content">
+			...
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		  </div>
+	  </div>
+	</div>
+	<div id="modal-dialog-3" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="white;z-index:9999">
+	  <div class="modal-dialog modal-lg">
+		  <div class="modal-content">
+			...
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		  </div>
+	  </div>
+	</div>
+
+	<!--[if IE]>
+		<script type="text/javascript">
+			 var console = { log: function() {} };
+		</script>
+	<![endif]-->
+
+ 	<script type="text/javascript" src="assets/plugins/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="assets/js/main.js"></script>
+	<script type="text/javascript" src="assets/js/masonry.pkgd.min.js"></script>
+	<script type="text/javascript" src="assets/js/imagesloaded.js"></script>
+    <script type="text/javascript" src="assets/js/classie.js"></script>
+	<script type="text/javascript" src="assets/js/AnimOnScroll.js"></script>
+
+	<script type="text/javascript" src="assets/plugins/scrolloverflow.min.js"></script>
+	<script type="text/javascript" src="assets/plugins/jquery.fullPage.min.js"></script>
+
+	<!-- ixmaps iframe connect JavaScript
+    ================================================== -->
+	<script type="text/javascript">
+		var ixmaps = null;
+		if ( window.opener ){
+			ixmaps = window.opener.ixmaps;
+		}else
+		if ( parent ){
+			ixmaps = parent.window.ixmaps;
+		}
+		else{
+			alert("error: missing parent window for themes !");
+		}
+
+		$("#legend_title").html(unescape(ixmaps.title||"Map Layer"));
+
+ 		// --------------------------------
+		// p a g e 
+		// --------------------------------
+
+        <!-- CUSTOM SCROLL SCRIPT FUNCTION FOR NAVBAR  -->
+        $(function () {
+            $('.scrollclass a').bind('click', function (event) { //just pass scrollclass in design and start scrolling
+                var $anchor = $(this);
+                $('html, body').stop().animate({
+                    scrollTop: $($anchor.attr('href')).offset().top
+                }, 1000, 'easeInOutQuad');
+                event.preventDefault();
+            });
+        });
+       //ADD REMOVE PADDING CLASS ON SCROLL
+        $(window).scroll(function () {
+            if ($(document).scrollTop() > 40) {
+                $(".navbar-fixed-top").addClass("navbar-pad-original");
+            } else {
+                $(".navbar-fixed-top").removeClass("navbar-pad-original");
+            }
+        });
+
+		//load layer legend css first, then print <link> to header, and execute callback
+		//just set var href above this..
+		$("<link/>", {
+		   rel: "stylesheet",
+		   type: "text/css",
+		   href: "./layer_legend.css"
+		}).appendTo("head");
+		
+		// load layer legend script
+		$.getScript("./layer_legend.js",function(){
+
+			// ============================================
+			//
+			// start it all on map ready
+			//
+			// ============================================
+
+			ixmaps.waitForMap("map",function(map){
+
+				map.setOptions({
+					"autoSwitchInfo":true
+				});
+				map.setLocal("... processing ...","");
+				map.setLocal("loading map elements","");
+
+				ixmaps.makeLayerLegend();
+
+			});
+
+		});
+
+		
+		// ============================================
+		//
+		// refresh legend on zoom and pan
+		//
+		// ============================================
+
+		ixmaps.htmlgui_onZoomAndPan = function(nZoom){
+			var layerA = ixmaps.getLayer();
+			var depA = ixmaps.getLayerDependency();
+			console.log("--> htmlgui_onZoomAndPan("+(1/nZoom)+")");
+			//ixmaps.makeLayerLegend();
+		};
+
+		ixmaps.htmlgui_setScaleSelect = function(scale){
+			console.log("--> htmlgui_setScaleSelect(1:"+(scale)+")");
+		}
+
+		ixmaps.htmlgui_onItemClick = function(szId){ 
+			if ( szId.match(/theme/) ){
+				ixmaps.hideStoryTool();
+				return;
+			}
+			if ( szId.match(/mapbackground/) ){
+				ixmaps.hideStoryTool();
+				return;
+			}
+			ixmaps.szMapItemId = szId;
+			ixmaps.loadStoryTool('./item.html');
+			console.log("click");
+			ixmaps.embeddedSVG.window.map.Api.highlightItem(szId);
+			return true;
+		};
+	</script>
+
+</body>
+</html>

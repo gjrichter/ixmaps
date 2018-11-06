@@ -63,7 +63,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		var szThemeStyle = ixmaps.getThemeStyleString(szThemeId);
 
-		if ( szThemeStyle.match(/CHOROPLETHE/) ){
+		if ( szThemeStyle.match(/CHOROPLETH/) ){
 			switch (szParameter) {
 				case "amplify":
 					ixmaps.changeThemeStyle(szThemeId,'dopacitypow:'+String(1/Number(szFactor)),'factor');
@@ -121,13 +121,13 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 	ixmaps.legend.makeColorLegendHTML = function(szId,szLegendId,szMode){
 
 		fLegendCompact = (szMode && szMode == "compact")?true:false;
-		fLegendCompact = true;
+		//fLegendCompact = true;
 
 		szLegendId = szLegendId || "generic";
 
 		var themeObj = ixmaps.getThemeObj(szId);
 
-		if ( (themeObj.partsA.length == 1) && themeObj.szFlag.match(/DOPACITY/) ){
+		if ( ((themeObj.partsA.length == 1) || !themeObj.szAlphaField ) && themeObj.szFlag.match(/DOPACITY/) ){
 			return ixmaps.legend.makeColorLegendHTMLCompact(szId,szLegendId);
 		}
 
@@ -141,7 +141,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		var szUnit = themeObj.szLegendUnits || themeObj.szUnits || "";
 		szUnit = szUnit.replace(/ /g,'&nbsp;');
 
-		if ( !labelA || ( !themeObj.szFlag.match(/EXACT/) && !themeObj.szFlag.match(/SEQUENCE/) ) ){
+		if ( !labelA ){
 			labelA = new Array();
 			var len = Math.min(colorA.length,themeObj.partsA.length);
 			for ( var i=0; i<len; i++){
@@ -154,7 +154,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		// theme filter
 		if (themeObj.szFilter){
-			szHtml += "<p class='legend-filter' style='margin-top:0em;color:#fff;background:#ddd'><span class='icon icon-filter' style='float:left;padding:0.2em 0.5em;'></span>"+themeObj.szFilter+"<a href='javascript:ixmaps.changeThemeStyle(null,\"filter\",\"remove\");' title=\"remove\" ><span class='icon icon-cancel-circle' style='float:right;padding:0.2em 0.5em;'></span></a></p>";
+			szHtml += "<p class='legend-filter' style='margin-top:0em;color:#fff;background:#ddd'><span class='icon icon-filter' style='float:left;padding:0.2em 0.5em;'></span><span class='legend-filter-text'>"+themeObj.szFilter+"</span><a href='javascript:ixmaps.changeThemeStyle(null,null,\"filter\",\"remove\");' title=\"remove\" ><span class='icon icon-cancel-circle' style='float:right;padding:0.2em 0.5em;'></span></a></p>";
 		}
 
 		// color legend = table
@@ -206,18 +206,21 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			( ( themeObj.partsA.length > 2)		||
 				themeObj.szLabelA				||
 				themeObj.szFlag.match(/EXACT/)	||
-				themeObj.szRangesA.length ) ){
+				themeObj.szRangesA ) ){
 
 			// get exact count from themeObj
 			var count = "";
 			for ( var i=0; i<max; i++){
+
+				var ix = sortA[i].index;
 
 				if ( (fCountBars || themeObj.szFlag.match(/FILTER/) )&& !sortA[i].count ){
 					continue;
 				}
 
 				var fSelected = false;
-				if ( (typeof(themeObj.markedClass) != "undefined") && (themeObj.markedClass == sortA[i].index) ){
+				if ( ((typeof(themeObj.markedClass)   != "undefined") && (themeObj.markedClass == ix)) ||
+					 ((typeof(themeObj.markedClasses) != "undefined") && (themeObj.markedClasses[ix]))	) {
 					fSelected = true;
 				}else
 				if ( themeObj.szShowParts ){
@@ -246,12 +249,12 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 				}else{
 					if ( themeObj.szFlag.match(/DOPACITY/) ){
 						szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-						szHtml += "</span><span onclick='javascript:ixmaps.switchThemeClass(\""+szId+"\","+sortA[i].color+");event.stopPropagation();return false;' style='background:"+colorA[sortA[i].color]+";opacity:0.75;'>"; 
+						szHtml += "</span><span onclick='javascript:ixmaps.markThemeClass(\""+szId+"\","+sortA[i].color+");event.stopPropagation();return false;' style='background:"+colorA[sortA[i].color]+";opacity:0.75;'>"; 
 						szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-						szHtml += "</span><span onclick='javascript:ixmaps.switchThemeClass(\""+szId+"\","+sortA[i].color+");event.stopPropagation();return false;' style='background:"+colorA[sortA[i].color]+";opacity:0.5;'>"; 
+						szHtml += "</span><span onclick='javascript:ixmaps.markThemeClass(\""+szId+"\","+sortA[i].color+");event.stopPropagation();return false;' style='background:"+colorA[sortA[i].color]+";opacity:0.5;'>"; 
 						szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 					}else{
-						szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+						szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 					}
 
 				}
@@ -259,7 +262,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 				var szLabel = labelA[sortA[i].index];
 				var szCount = sortA[i].count?("<td class='theme-legend-count' style='text-align:right;padding-left:1em;'>"+count+" "+szUnit.replace(/ /g,'&nbsp;')+"</td>"):"";
 
-				szHtml += "</span></td><td class='theme-legend' style='max-width:"+(szCount.length?"200px":"300px")+"'><a class='theme-button' href='#' title='click to see'><span title='"+szLabel+"'><span onclick='javascript:ixmaps.switchThemeClass(\""+szId+"\","+sortA[i].index+");event.stopPropagation();return false;' >"+szLabel+"</span></span></a></td>"+szCount+"</tr>";
+				szHtml += "</span></td><td class='theme-legend' ><a class='theme-button' href='#' title='click to see'><span title='"+szLabel+"'><span onclick='javascript:ixmaps.markThemeClass(\""+szId+"\","+sortA[i].index+");event.stopPropagation();return false;' >"+szLabel+"</span></span></a></td>"+szCount+"</tr>";
 			}
 
 		}else if (0){
@@ -294,12 +297,12 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		var szUnit = themeObj.szLegendUnits || themeObj.szUnits || "";
 		szUnit = szUnit.replace(/ /g,'&nbsp;');
 
-		var nLegendWidth = 300;
+		var nLegendWidth = (ixmaps.legend.maxwidth*0.95)||300;
 		var szHtml = "";
 
 		// theme filter
 		if (themeObj.szFilter){
-			szHtml += "<p class='legend-filter' style='margin-top:0em;color:#fff;background:#ddd'><span class='icon icon-filter' style='float:left;padding:0.2em 0.5em;'></span>"+themeObj.szFilter+"<a href='javascript:ixmaps.changeThemeStyle(null,\"filter\",\"remove\");' title=\"remove\" ><span class='icon icon-cancel-circle' style='float:right;padding:0.2em 0.5em;'></span></a></p>";
+			szHtml += "<p class='legend-filter' style='margin-top:0em;color:#fff;background:#ddd'><span class='icon icon-filter' style='float:left;padding:0.2em 0.5em;'></span><span class='legend-filter-text'>"+themeObj.szFilter+"</span><a href='javascript:ixmaps.changeThemeStyle(null,\"filter\",\"remove\");' title=\"remove\" ><span class='icon icon-cancel-circle' style='float:right;padding:0.2em 0.5em;'></span></a></p>";
 		}
 
 		if ( (themeObj.partsA.length == 1) && themeObj.szFlag.match(/DOPACITY/) ){
@@ -313,8 +316,6 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			for ( var i=0; i<nColors; i++){
 				var szMinMax = "";
 				if ( themeObj.partsA[ix] && themeObj.partsA[ix].min && themeObj.partsA[ix].max ){
-					var szUnit = themeObj.szUnit || "";
-					szUnit = szUnit.replace(/ /g,'&nbsp;');
 					szMinMax = parseFloat(themeObj.partsA[ix].min).toFixed(0)+szUnit+" ... "+parseFloat(themeObj.partsA[ix].max).toFixed(0)+szUnit;
 				}
 
@@ -325,7 +326,41 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 				szHtml += "<a class='legend-color-button' href='#' title='"+szMinMax+" click to see'>";
 				szHtml += "<span onclick='javascript:ixmaps.markThemeClass(\""+szId+"\","+ix+");event.stopPropagation();return false;' style='background:"+colorA[0]+";opacity:"+(1/(nColors-i))+"'>";
 
-				if ( (typeof(themeObj.markedClass) != "undefined") && (themeObj.markedClass == ix) ){
+				if ( ((typeof(themeObj.markedClass)   != "undefined") && (themeObj.markedClass == ix)) ||
+					 ((typeof(themeObj.markedClasses) != "undefined") && (themeObj.markedClasses[ix]))	) {
+					szHtml += "<span style='font-size:2em;line-height:0;vertical-align:-0.35em'>*</span>";
+				}
+				szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+
+				szHtml += "</div></td></a>";
+			}
+			szHtml += "</tr>";
+
+		}else
+		if ( ((themeObj.partsA.length == 2) && !themeObj.szAlphaField ) && themeObj.szFlag.match(/DOPACITY/) ){
+
+			// 2 color and DOPACITY, make 8 step opacity down and up
+			nColors = 8;
+			nOpacityA = [1,0.7,0.3,0.1,0.1,0.3,0.7,1];
+			
+			szHtml += "<table id='legend-classes"+szLegendId+"' >";
+
+			szHtml += "<tr valign='top' >";
+			for ( var i=0; i<nColors; i++){
+				var szMinMax = "";
+				if ( themeObj.partsA[ix] && themeObj.partsA[ix].min && themeObj.partsA[ix].max ){
+					szMinMax = parseFloat(themeObj.partsA[ix].min).toFixed(0)+szUnit+" ... "+parseFloat(themeObj.partsA[ix].max).toFixed(0)+szUnit;
+				}
+
+				var nCount = nLegendWidth/nColors;
+				var nGap = nCount/10;
+
+				szHtml += "<td><div style='width:"+(nCount-nGap)+"px;margin-right:"+nGap+"px;overflow:hidden;'>";
+				szHtml += "<a class='legend-color-button' href='#' title='"+szMinMax+" click to see'>";
+				szHtml += "<span onclick='javascript:ixmaps.markThemeClass(\""+szId+"\","+ix+");event.stopPropagation();return false;' style='background:"+colorA[Math.floor(i/4)]+";opacity:"+nOpacityA[i]+"'>";
+
+				if ( ((typeof(themeObj.markedClass)   != "undefined") && (themeObj.markedClass == ix)) ||
+					 ((typeof(themeObj.markedClasses) != "undefined") && (themeObj.markedClasses[ix]))	) {
 					szHtml += "<span style='font-size:2em;line-height:0;vertical-align:-0.35em'>*</span>";
 				}
 				szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -346,8 +381,6 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 					var szMinMax = "";
 					var ix = themeObj.szFlag.match(/XXX/)?(nColors-i-1):i;
 					if ( themeObj.partsA[ix] && themeObj.partsA[ix].min && themeObj.partsA[ix].max ){
-						var szUnit = themeObj.szUnit || "";
-						szUnit = szUnit.replace(/ /g,'&nbsp;');
 						szMinMax = parseFloat(themeObj.partsA[ix].min).toFixed(0)+szUnit+" ... "+parseFloat(themeObj.partsA[ix].max).toFixed(0)+szUnit;
 					}
 
@@ -358,24 +391,35 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 					szHtml += "<a class='legend-color-button' href='#' title='"+szMinMax+" click to see'>";
 					szHtml += "<span onclick='javascript:ixmaps.markThemeClass(\""+szId+"\","+ix+");event.stopPropagation();return false;' style='background:"+colorA[ix]+";opacity:"+(1/(row+1))+"'>";
 
-					if ( (typeof(themeObj.markedClass) != "undefined") && (themeObj.markedClass == ix) ){
+					if ( ((typeof(themeObj.markedClass)   != "undefined") && (themeObj.markedClass == ix)) ||
+						 ((typeof(themeObj.markedClasses) != "undefined") && (themeObj.markedClasses[ix]))	) {
 						szHtml += "<span style='font-size:2em;line-height:0;vertical-align:-0.35em'>*</span>";
 					}
 					szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 
 					szHtml += "</div></td></a>";
 				}
+				if ( themeObj.szFlag.match(/DOPACITY/) && themeObj.nMaxAlpha ){
+					if ( row == 0 ){
+						szHtml += "<td><span style='padding-left:0.5em'>"+ixmaps.__bestFormatValue(themeObj.nMaxAlpha)+"</span></td>";
+					}else
+					if ( row == 1 ){
+						szHtml += "<td><span style='padding-left:0.5em'>&#8595; "+(themeObj.szAlphaValueUnits||(themeObj.szFlag.match(/DENSITY/)?"density":""))+"</span></td>";
+					}else{
+						szHtml += "<td><span style='padding-left:0.5em'>"+ixmaps.__bestFormatValue(themeObj.nMinAlpha)+"</span></td>";
+					}
+				}
 				szHtml += "</tr>";
 			}
 		}
 
-		// if szUnits == . don't inser leading blank
-		var szUnits = ((themeObj.szUnits.substr(0,1) == '.')?"":" ") + themeObj.szUnits;
+		// if szUnits == . don't insert leading blank
+		var szUnits = ((szUnit.substr(0,1) == '.')?"":" ") + szUnit;
 		var span = Math.floor(nColors*0.5);
 
 		szHtml += "<tr class='legend-range-text' >";
 		szHtml += "<td colspan='"+(span)+"' >"+ixmaps.__formatValue(themeObj.nMin,2,"BLANK")+szUnits+"</td>";
-		szHtml += "<td colspan='"+(nColors - span)+"' align='right'>"+ixmaps.__formatValue(themeObj.nMax,2,"BLANK")+szUnits+"</td>";
+		szHtml += "<td colspan='"+(nColors - span)+"' align='right'>"+ixmaps.__formatValue(themeObj.nMax,2,"BLANK")+szUnits+"&nbsp;&nbsp;&nbsp;</td>";
 		szHtml += "</tr>";
 
 		szHtml += "</table>";
@@ -727,12 +771,27 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		}
 	};
 
+	/**
+	 * convert a number into a formatted string; if the number > 1000 it will be formatted like 1 023 234 
+	 * @param nValue the number to format
+	 */
+	ixmaps.__bestFormatValue = function(nValue){
+		if ( nValue >= 10 )	{
+			return ixmaps.__formatValue(nValue,0,"BLANK");
+		}else
+		if ( nValue >= 1 )	{
+			return ixmaps.__formatValue(nValue,1,"BLANK");
+		}else{
+			return ixmaps.__formatValue(nValue,2,"BLANK");
+		}
+	};
+
 	// ---------------------------------------------------
 	// format number display 
 	// ---------------------------------------------------
 
 	/**
-	 * convert a number into a formatted string; if the number > 1000 it will be formatted like 1.023.234 
+	 * convert a number into a formatted string; if the number > 1000 it will be formatted like 1 023 234 
 	 * @param nValue the number to format
 	 * @param nPrecision the wanted decimal points 
 	 * @param szFlag "CEIL" or "FLOOR" (round either up or down)

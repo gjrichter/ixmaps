@@ -1,0 +1,600 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>iXMaps Search Results</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+
+	<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+
+	<link href="../../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+	<link href="../../../ui/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+	<link href="../assets/css/icomoon.css" rel="stylesheet" />    
+ 
+	<style type="text/css">
+	  a {
+		color: #3641E2;
+		text-decoration:none;
+	  }
+	  a:hover {
+		color: blue;
+		text-decoration:underline;
+	  }
+	  input:focus	{ 
+		background-color:white;
+		outline-width: 0;
+	  }
+	  a.midlink {
+		margin-left: 2px;
+		margin-right: 2px;
+		vertical-align: middle;
+	  }
+	  #toolbar a {
+		color: #444;
+	  }
+	  img {
+		vertical-align: middle;
+	  }
+	  .blackHover {
+		color: #888;
+		font-size: 1.3em;
+		padding:0 0.3em;
+	  }
+	</style>
+</head>
+
+<body style="margin:0px;padding:0px;font-size:14px;overflow:hidden;" onload="InitAll()">
+
+	<div id="toolbar" data-role="fieldcontain" data-inline="true" style="display:none;">
+
+		<div style="float:left;" height="22px">
+			<button id="selectline" title="next toolbar" style="width:4em">Theme</button>
+			<button id="selectline-icon" style="width:1.5em">Icon</button>
+		</div>
+
+		<div id="Theme" class="tool-line" style="float:left;vertical-align:middle;margin-left:5px;">
+
+			<div id="Theme-opacity" style="float:left;margin-left:5px;margin-top:3px" >
+				<a href="javascript:api.changeThemeStyle(null,'opacity:0.66;','factor');" >
+					<img src="../../resources/images/circle_minus_transparent.png" alt="opacity -" title="opacity -" height="18" /></a>
+				<a class="midlink" href="javascript:api.toggleSVGMapOpacity();" title="switch theme display">opacity</a>
+				<a href="javascript:api.changeThemeStyle(null,'opacity:1.5;','factor');" >
+					<img src="../../resources/images/circle_plus_transparent.png" alt="opacity +" title="opacity +" height="18" /></a>
+			</div>
+
+			<div id="dopacity-group" style="float:left;margin-left:5px;">
+				<span style="margin-right:0px;" > 
+					<button id="dopacity" title="dynamic opacity" 
+							onclick="javascript:toggle_dopacity();" style="height:23px;" >...</button>
+				</span>
+				<span id="dopacitybuttons" style="" >
+					<a href="javascript:api.changeThemeStyle(null,'d_dopacityscale:0.66;',0);" >
+						<img src="../../resources/images/circle_minus_transparent.png" alt="dyn.opacity -" title="dyn.opacity -" height="18" /></a>
+					<a href="javascript:api.changeThemeStyle(null,'d_dopacityscale:1.5;',1);" >
+						<img src="../../resources/images/circle_plus_transparent.png" alt="dyn.opacity +" title="dyn.opacity +" height="18" /></a>
+				</span>
+			</div>
+
+			<div id="chartsize-group" style="float:left;margin-left:15px;margin-top:3px">
+				<a href="javascript:api.changeObjectScaling(0.75);" >
+					<img src="../../resources/images/circle_minus_transparent.png" alt="chartsize -" title="chartsize -" height="18" /></a>
+				<a href="javascript:api.changeObjectScaling(0);" title="set default chart size">size</a>
+				<a href="javascript:api.changeObjectScaling(1/0.75);" >
+					<img src="../../resources/images/circle_plus_transparent.png" alt="chartsize +" title="chartsize +" height="18" /></a>
+			</div>
+
+			<div style="float:left;margin-left:10px;margin-right:8px;margin-top:4px" > 
+						<a id="valuebutton" href="javascript:toggle_values();" title="toggle theme value display">
+							<span  style="font-family:times;font-weight:bold;font-size:1em;color:#444;">&nbsp;T</span>
+							<span style="color:#76A8B8;font-weight:bold;margin-left:-3px;">&nbsp;&#177;</span></label></a>
+			</div> 
+
+			<div id="color-group" style="float:left;">
+				<span > 
+					<a id="xcolor" href="javascript:ixmaps.popupSelectColorScheme();" >
+						<label title="select color scheme">
+							<span id="xcolor-label" style="font-size:11px;line-height:15px;background-color:white;"></span></label>
+					</a>
+				</span> 
+			</div>
+			<div id="advanced-group" style="float:left;margin-left:8px;padding:0.1em">
+				<a href="javascript:ixmaps.popupThemeEditor();">
+					<i class="icon shareIcon blackHover share_bitly icon-pencil" title="open theme code editor" tabindex="-1"></i></a>
+
+				<a href="javascript:ixmaps.popupExtendedTools();">
+					<i class="icon shareIcon blackHover share_bitly icon-wrench" title="open extended tools dialog" tabindex="-1"></i></a>
+
+				<a href="javascript:ixmaps.popupShare()">
+					<i class="icon shareIcon blackHover share_bitly icon-redo2" title="Share a short link" tabindex="-1"></i></a>
+
+				<a href="javascript:ixmaps.popupThemeInfo();">
+					<i class="icon shareIcon blackHover share_bitly icon-info" title="show info of actual theme" tabindex="-1"></i></a>
+
+				<a href="javascript:api.makeChartMenueHTML();">
+					<i class="icon shareIcon blackHover share_bitly icon-pie" title="chart type menu" tabindex="-1"></i></a>
+
+				<a href="javascript:ixmaps.popupThemeTable();">
+					<i class="icon shareIcon blackHover share_bitly icon-table2" title="theme data table" tabindex="-1"></i></a>
+
+			</div>
+
+		</div>
+
+		<div id="Theme2" class="tool-line" style="float:left;vertical-align:middle;margin-left:5px;margin-top:3px;">
+
+			<div id="Theme-blur" style="float:left;margin-left:5px;" >
+				<a href="javascript:api.changeThemeStyle(null,'blur:-0.25;','add');" >
+					<img src="../../resources/images/circle_minus_transparent.png" alt="opacity -" title="opacity -" height="18" /></a>
+				<a class="midlink" href="javascript:api.changeThemeStyle(null,'blur:toggle');" title="switch theme blur">blur</a>
+				<a href="javascript:api.changeThemeStyle(null,'blur:0.25;','add');" >
+					<img src="../../resources/images/circle_plus_transparent.png" alt="opacity +" title="opacity +" height="18" /></a>
+			</div>
+
+			<div id="Theme-grid" style="float:left;margin-left:15px;" >
+				<a href="javascript:api.changeThemeStyle(null,'gridwidth:1.5','factor');" >
+					<img src="../../resources/images/circle_minus_transparent.png" alt="opacity -" title="opacity -" height="18" /></a>
+				<a class="midlink" href="javascript:api.changeThemeStyle(null,'type:AGGREGATE','toggle');api.changeThemeStyle(null,'gridwidth:auto');" title="switch aggregation grid">grid</a>
+				<a href="javascript:api.changeThemeStyle(null,'gridwidth:0.66','factor');" >
+					<img src="../../resources/images/circle_plus_transparent.png" alt="opacity +" title="opacity +" height="18" /></a>
+			</div>
+
+			<div id="Theme-size" style="float:left;margin-left:15px;" >
+				<a class="midlink" href="javascript:api.changeThemeStyle(null,'type:SIZE','toggle');" title="switch dynamic size">size</a>
+			</div>
+
+			<div id="Theme-shadow" style="float:left;margin-left:15px;" >
+				<a class="midlink" href="javascript:api.changeThemeStyle(null,'shadow:toggle');" title="switch chart shadow">shadow</a>
+			</div>
+
+			<div id="Theme-shadow" style="float:left;margin-left:15px;" >
+				<a class="midlink" href="javascript:api.changeThemeStyle(null,'type:SORT','toggle');" title="switch sorting parts">sort</a>
+			</div>
+
+			<div id="Theme-clip-parts" class="midlink" style="float:left;margin-left:15px;" ><span style="color:#aaa" title="limit chart parts shown">chart parts:
+					<a href='javascript:api.changeThemeStyle(null,"clipparts:1");' title="only first part" >1</a>
+					<a href='javascript:api.changeThemeStyle(null,"clipparts:2");' title="2 parts" >2</a>
+					<a href='javascript:api.changeThemeStyle(null,"clipparts:3");' title="3 parts" >3</a>
+					<a href='javascript:api.changeThemeStyle(null,"clipparts:4");' title="4 parts" >4</a>
+					<a href='javascript:api.changeThemeStyle(null,"clipparts:5");' title="5 parts" >5</a>
+					<a href='javascript:api.changeThemeStyle(null,"clipparts:0");' title="all parts" >all</a>
+			</div>
+
+		</div>
+
+		<div id="Map" class="tool-line" style="float:left;margin-left:5px;">
+			<div style="float:left;margin-top:2px">
+				<span style="margin-right:5px;margin-left:5px;" > 
+					<a href="javascript:api.setSVGMapOpacity(-0.1,'relative');" >
+						<img src="../../resources/images/circle_minus_transparent.png" alt="opacity -" title="opacity -" height="18" /></a>
+					<a class="midlink" href="javascript:api.toggleSVGMapOpacity();" title="switch theme display">opacity</a>
+					<a href="javascript:api.setSVGMapOpacity(0.1,'relative');" >
+						<img src="../../resources/images/circle_plus_transparent.png" alt="opacity +" title="opacity +" height="18" /></a>
+				</span> 
+
+				<span style="margin-right:5px;margin-left:5px;" > 
+					<a href="javascript:api.changeLineScaling(0.75);" >
+						<img src="../../resources/images/circle_minus_transparent.png" alt="feature size -" title="feature size -" height="18" /></a>
+					<a class="midlink" href="javascript:api.changeLineScaling(0);" title="set default chart size">border</a>
+					<a href="javascript:api.changeLineScaling(1/0.75);" >
+						<img src="../../resources/images/circle_plus_transparent.png" alt="feature size +" title="feature size +" height="18" /></a>
+				</span> 
+
+				<span style="margin-right:5px;margin-left:5px;" > 
+					<a href="javascript:api.changeLabelScaling(0.75);" >
+						<img src="../../resources/images/circle_minus_transparent.png" alt="label size -" title="label size -" height="18" /></a>
+					<a class="midlink" href="javascript:api.changeLabelScaling(0);" title="set default label size">label</a>
+					<a href="javascript:api.changeLabelScaling(1/0.75);" >
+						<img src="../../resources/images/circle_plus_transparent.png" alt="label size +" title="label size +" height="18" /></a>
+				</span> 
+			</div>
+
+			<div style="float:left;margin-top:4px"">
+				<span style="margin-right:5px;margin-left:5px;" > 
+					<a href="javascript:api.toggleThemeLegends();" title="show/hide legend">
+						<span  style="font-family:times;font-weight:bold;font-size:1em;color:#444;">&#177; legend </span></a>
+				</span> 
+			</div>
+
+			<div style="float:left;">
+				<span id="advanced-group" style="margin-left:2px;">
+					<a href="javascript:ixmaps.popupThemeEditor();" >
+						<i class="icon shareIcon blackHover share_bitly icon-pencil" title="Share a short link" tabindex="-1"></i></a>
+
+					<a href="javascript:ixmaps.popupExtendedTools();" >
+						<i class="icon shareIcon blackHover share_bitly icon-wrench" title="Share a short link" tabindex="-1"></i></a>
+
+					<a href="javascript:ixmaps.popupShare();" >
+						<i class="icon shareIcon blackHover share_bitly icon-redo2" title="Share a short link" tabindex="-1"></i></a>
+
+					<a href="javascript:ixmaps.popupExport();" style="margin-left:0.5em;vertical-align:6px;opacity:0.8">
+						<img src="../../resources/images/svg-bw-arrow.jpg" alt="create SVG code" title="create SVG code" height="22" /></a>
+				</span>
+			</div>
+
+		</div>
+
+		<div id="Layer" class="tool-line" style="float:left;margin-left:5px;vertical-align:middle;">
+
+			<div style="float:left;margin-top:2px">
+				<span style="margin-right:5px;margin-left:5px;" > 
+					<a href="javascript:api.setSVGMapOpacity(-0.1,'relative');" >
+						<img src="../../resources/images/circle_minus_transparent.png" alt="opacity -" title="opacity -" height="18" /></a>
+					<a class="midlink" href="javascript:api.toggleSVGMapOpacity();" title="switch overlay display">overlay</a>
+					<a href="javascript:api.setSVGMapOpacity(0.1,'relative');" >
+						<img src="../../resources/images/circle_plus_transparent.png" alt="opacity +" title="opacity +" height="18" /></a>
+				</span>
+
+				<span style="margin-right:5px;margin-left:5px;" > 
+					<a href="javascript:api.setHTMLMapOpacity(-0.1,'relative');" >
+						<img src="../../resources/images/circle_minus_transparent.png" alt="opacity -" title="opacity -" height="18" /></a>
+					<a class="midlink" href="javascript:api.HTML_toggleMap();" title="switch basemap display">basemap</a>
+					<a href="javascript:api.setHTMLMapOpacity(0.1,'relative');" >
+						<img src="../../resources/images/circle_plus_transparent.png" alt="opacity +" title="opacity +" height="18" /></a>
+				</span>
+			</div>
+
+			<div style="float:left;margin-top:2px">
+				<span id="layerinfo-group" style="margin-left:5px;margin-top:5px">
+					<a href="javascript:ixmaps.popupThemeInfo();">
+						<i class="icon shareIcon blackHover share_bitly icon-info" title="Share a short link" tabindex="-1"></i></a>
+				</span>
+			</div>
+
+		</div>
+		<div id="Measure" class="tool-line" style="float:left;">
+			&nbsp;
+			<span id="measure-group" style="vertical-align:middle">
+
+				<button type="button" id="measure-coordinate" 
+				style="height:22px;background-image:url(../../resources/images/coord.png);background-size:22px 22px;background-repeat:no-repeat;background-position:50% 0px;"
+				onclick="javascript:api.mapTool('coord');"
+				title="show lat/lon">&nbsp;</button>&nbsp;
+
+				<button type="button" id="measure-measurement" 
+				style="height:22px;background-image:url(../../resources/images/measure.png);background-size:22px 22px;background-repeat:no-repeat;background-position:50% 0px;"
+				onclick="javascript:api.mapTool('measurement');"
+				title="measure length with buffer">&nbsp;</button>&nbsp;
+
+				<button type="button" id="measure-polyline" 
+				style="height:22px;background-image:url(../../resources/images/polyline.png);background-size:22px 22px;background-repeat:no-repeat;background-position:50% 0px;" 
+				onclick="javascript:api.mapTool('polyline');"
+				title="measure complex distance">&nbsp;</button>&nbsp;
+
+				<button type="button" id="measure-polygon" 
+				style="height:22px;background-image:url(../../resources/images/polygon.png);background-size:22px 22px;background-repeat:no-repeat;background-position:50% 0px;" 
+				onclick="javascript:api.mapTool('polygon');"
+				title="measure area">&nbsp;</button>&nbsp;
+				
+			</span>
+
+			<span style="font-family:arial;color:#aaaaaa;vertical-align:middle">&nbsp;&nbsp;(activate various distance/area measurement tools)</span>
+		</div>
+		<div id="Select" class="tool-line" style="float:left;vertical-align:middle">
+			&nbsp;
+			<span id="select-group" >
+
+				<button type="button" id="select-rect" 
+				style="height:22px;background-image:url(../../resources/images/selectrect.png);background-size:16px 16px;background-repeat:no-repeat;background-position:50% 3px;"
+				onclick="javascript:api.mapTool('selectrect');"
+				title="select with rectangle">&nbsp;&nbsp;&nbsp;</button>
+				<button type="button" id="select-rect" 
+				style="height:22px;background-image:url(../../resources/images/selectbuffer.png);background-size:16px 16px;background-repeat:no-repeat;background-position:50% 3px;"
+				onclick="javascript:api.mapTool('selectbuffer');"
+				title="select with circle buffer">&nbsp;&nbsp;&nbsp;</button>
+				<!--
+				<button type="button" id="select-grid" 
+				style="height:22px;background-image:url(../../resources/images/selectbuffer.png);background-size:16px 16px;background-repeat:no-repeat;background-position:50% 3px;"
+				onclick="javascript:api.mapTool('grid');"
+				title="select with circle buffer">&nbsp;&nbsp;&nbsp;</button>
+				-->
+			<span style="font-family:arial;color:#aaaaaa;vertical-align:middle">&nbsp;&nbsp;(activate theme item selection by rectagular or circle buffer)</span>
+			</span>
+		</div>
+	</div>
+  <script src = "../../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+  <script src = "../../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+
+  <script src = "../../js/tools/colorscheme.js"></script>
+  <script src = "../../js/tools/colorselect.js"></script>
+
+<script type="text/javascript">
+
+window.ixmaps = window.ixmaps || {};
+
+ixmaps.carousellA = new Array(0);
+
+jQuery.fn.extend({
+/**
+* extend jquery for one line toolbar
+*/ 
+	collect: function(){
+		return this.each(function() {
+			ixmaps.carousellA.push($(this).attr("id"));
+		});
+	}
+});
+</script>
+
+<script type="text/javascript">
+	$(function() {
+
+		$( "#selectline" )
+		  .button()
+		  .click(function() {
+			  carousell();
+			  return false;
+		  })
+		  .next()
+			.button({
+			  text: false,
+			  icons: {
+				primary: "ui-icon-triangle-1-s"
+			  }
+			})
+			.click(function() {
+			  carousell();
+			  return false;
+			})
+			.parent()
+			  .buttonset()
+
+
+		$( ".tool-line" )
+			.collect()
+			.hide();
+
+		$( "#Theme" )
+			.show();
+
+		$( "#dopacity" )
+			.button({
+			  icons: {
+				secondary: "ui-icon-triangle-1-s"
+			  }
+			})
+		  .click(function() {
+			  dopacity();
+			  return false;
+		  });
+
+		$( "#dopacitybuttons")
+			.hide();
+
+		$( "#xcolor" )
+			.button();
+
+
+		$( "#measure-coordinate" ).button();
+		$( "#measure-measurement" ).button();
+		$( "#measure-polyline" ).button();
+		$( "#measure-polygon" ).button();
+		$( "#measure-group" ).buttonset();
+
+		$( "#select-rect" ).button();
+		$( "#select-buffer" ).button();
+		$( "#select-grid" ).button();
+		$( "#select-group" ).buttonset();
+
+		$( "#toolbar" ).show();
+
+	});
+</script>
+<script type="text/javascript">
+
+	var api = null;
+	var parentWindow = null;
+
+	/* ------------------------------------------------------------------ * 
+		Init functions
+	 * ------------------------------------------------------------------ */
+
+	function InitAll(){
+
+		try
+		{
+			if ( parent ){
+				parentWindow = parent.window;
+				api = parent.window.ixmaps;
+				ixmaps.embeddedSVG = parent.window.htmlgui_getEmbeddedSVG();
+			}else
+			if ( window.opener ){
+				parentWindow = window.opener;
+				api = window.opener.ixmaps;
+				ixmaps.embeddedSVG = window.opener.htmlgui_getEmbeddedSVG();
+			}
+			else{
+				alert("error: missing parent window for map queries !");
+			}
+		}
+		catch (e)
+		{
+		}
+		window.document.body.topMargin = 0;
+		window.document.body.leftMargin = 0;
+
+		if ( api.getThemeObj() ){
+			init_theme_line();
+		}else{
+			carousell();
+		}
+
+		// give the parent my init function
+		api.initThemeTools = init_theme_line;
+
+
+	}
+
+	function carousell(){
+		$( "#"+ixmaps.carousellA[0] ).hide();
+		ixmaps.carousellA.push(ixmaps.carousellA.shift());
+		if ( (ixmaps.carousellA[0] == "Theme") && !api.getThemeObj()){
+			ixmaps.carousellA.push(ixmaps.carousellA.shift());
+		}
+		$( "#"+ixmaps.carousellA[0] ).show();
+		$( "#selectline span" ).text(ixmaps.carousellA[0]);
+	}
+
+	function init_theme_line(){
+		if ( api && api.getThemeStyleString ){
+			var szThemeStyle = api.getThemeStyleString();
+			if ( szThemeStyle && szThemeStyle.match(/DOPACITYLOG/) ){
+				$( "#dopacitybuttons").show();
+				$( "#dopacity" ).button({label:"log"});
+			}else
+			if ( szThemeStyle && szThemeStyle.match(/DOPACITYMEAN/) ){
+				$( "#dopacitybuttons").show();
+				$( "#dopacity" ).button({label:"mean"});
+			}else
+			if ( szThemeStyle && szThemeStyle.match(/DOPACITYMAX/) ){
+				$( "#dopacitybuttons").show();
+				$( "#dopacity" ).button({label:"max"});
+			}else
+			if ( szThemeStyle && szThemeStyle.match(/DOPACITY/) ){
+				$( "#dopacitybuttons").show();
+				$( "#dopacity" ).button({label:"dyn"});
+			}else{
+				$( "#dopacitybuttons").hide();
+				$( "#dopacity" ).button({label:"linear"});
+			}
+			if ( szThemeStyle && szThemeStyle.match(/CHART/) ){
+				$( "#chartsize-group").show();
+				$( "#dopacity-group").hide();
+			}else{
+				$( "#chartsize-group").hide();
+				$( "#dopacity-group").show();
+			}
+		}
+
+		var objTheme = api.getThemeObj();
+		var colorArgA = objTheme.origColorScheme.slice(0);
+
+		if ( isNaN(colorArgA[0]) ){
+			ixmaps.setColors(colorArgA.join('|'),"directly_defined_colors",7);
+		}else{
+			colorArgA.shift();	
+			ixmaps.setColors(colorArgA.join('|'),7);
+		}
+	}
+
+	ixmaps.popupSelectColorScheme = function(szHtml){
+	
+		var szElement = "colorList";	
+		api.openDialog(null,szElement,null,"color schemes",'280,60',80,300);
+		parentWindow.$("#"+szElement)[0].innerHTML = ixmaps.getColors();
+		api.onDialogClose = function(){ setTimeout("init_theme_line();",100) };
+
+	};
+	ixmaps.popupThemeEditorxxx = function(szHtml){
+	
+		var szElement = "editor";	
+		api.openDialog(null,szElement,null,"theme",'10,103',400,300);
+
+		var szThemesA =	api.getThemeDefinitionString();
+		var szTheme = 	api.getBookmarkString();
+
+		for ( var i=0; i<szThemesA.length; i++){
+			szTheme += szThemesA[i] + "\n";
+		}
+		szTheme = szTheme.replace(/;/g,";\n").replace(/,\"/g,",\n\"").replace(/,\'/g,",\n\'").replace(/\(/g,"\(\n");
+		parentWindow.$("#"+szElement)[0].innerHTML = "<textarea id=\"code\" name=\"code\" style=\"font-family:Consolas,monospace;font-size:0.6em;width:98%;height:90%;\" >"+szTheme+"</textarea>";
+		api.onDialogClose = function(){ setTimeout("init_theme_line();",100) };
+
+	};
+	ixmaps.popupThemeEditor = function(){
+		var szElement = "editor";	
+		window.idialog = api.openDialog(null,szElement,'./tools/theme_editor.html','Theme Editor','10,103',380,600);
+	};
+
+	ixmaps.popupThemeInfo = function(szHtml){
+		var szElement = "info";	
+		window.idialog = api.openDialog(null,szElement,'./tools/theme_info.html','Theme Info','10,103',380,600);
+	};
+	
+	ixmaps.popupLayerInfo = function(szHtml){
+
+		// layer == themes
+		var layerA = ixmaps.embeddedSVG.window.map.Query.getThemes();
+	
+		var szElement = "editor";	
+		api.openDialog(null,szElement,null,"layer",'10,103',400,300);
+
+		var szInfo = 	"";
+
+		for ( var i=0;i<layerA.length; i++ ){
+			szInfo += "<table cellpadding='0' style='margin-top:5px;' > ";	
+			szInfo += "<tr><td>"+(i+1)+": </td><td>"+layerA[i]+"</td></tr>";	
+			}
+
+		szInfo += "</table> ";	
+
+		parentWindow.$("#"+szElement)[0].innerHTML = "<div id=\"code\" name=\"code\" style=\"font-family:Consolas,monospace;font-size:0.6em;width:98%;height:90%;\" >"+szInfo+"</div>";
+		api.onDialogClose = function(){ setTimeout("init_theme_line();",100) };
+
+	};
+
+	ixmaps.popupMapEditor = function(szHtml){
+	
+		var szElement = "editor";	
+		api.openDialog(null,szElement,null,"Map",'10,103',400,300);
+
+		var szTheme = 	api.getBookmarkString();
+		szTheme = szTheme.replace(/;/g,";\n").replace(/,\"/g,",\n\"").replace(/,\'/g,",\n\'").replace(/\(/g,"\(\n");
+		parentWindow.$("#"+szElement)[0].innerHTML = "<textarea id=\"code\" name=\"code\" style=\"font-family:Consolas,monospace;font-size:0.6em;width:98%;height:90%;\" >"+szTheme+"</textarea>";
+		api.onDialogClose = function(){ setTimeout("init_theme_line();",100) };
+
+	};
+	ixmaps.popupExtendedTools = function(){
+		var szElement = "editor";	
+		api.openDialog(null,'szElement','./tools/popuptools_jquery.html','','10,103',380,500);
+	};
+
+	ixmaps.popupShare = function() {
+		api.shareMap('dialog','10,103');
+	};
+	ixmaps.popupExport = function() {
+		api.exportMap('dialog','10,103');
+	};
+	ixmaps.popupThemeTable = function() {
+		api.viewTable('dialog','10,103');
+	};
+	ixmaps.initThemeTools = function() {
+		init_theme_line();
+	};
+
+	function toggle_dopacity(){
+		var szThemeStyle = api.getThemeStyleString();
+		if ( szThemeStyle && szThemeStyle.match(/DOPACITYLOG/) ){
+			api.changeThemeStyle(null,'type:DOPACITYLOG;','remove');
+			api.changeThemeStyle(null,'type:DOPACITYMAX;dopacityscale:5;','toggle');
+		}else
+		if ( szThemeStyle && szThemeStyle.match(/DOPACITYMAX/) ){
+			api.changeThemeStyle(null,'type:DOPACITYMAX;','remove');
+		}else
+		if ( szThemeStyle && szThemeStyle.match(/DOPACITY/) ){
+			api.changeThemeStyle(null,'type:DOPACITY;','remove');
+			api.changeThemeStyle(null,'type:DOPACITYLOG;dopacityscale:5;','toggle');
+		}else{
+			api.changeThemeStyle(null,'type:DOPACITY;dopacityscale:5;','toggle');
+		}
+		setTimeout("init_theme_line()",100);
+	}
+	function toggle_values(){
+		var szThemeStyle = api.getThemeStyleString();
+		if ( szThemeStyle && szThemeStyle.match(/VALUES/) ){
+			api.changeThemeStyle(null,'type:VALUES;','remove');
+		}else{
+			api.changeThemeStyle(null,'type:VALUES;','add');
+		}
+	}
+
+</script>
+
+</body>
+
+<!-- tooltips =============================================================== -->
+<script language="JavaScript" src="../../js/tooltip.js" type="text/javascript" ></script>
+<!-- ========================================================================= -->
+</html>

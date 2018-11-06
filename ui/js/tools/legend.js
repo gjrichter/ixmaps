@@ -62,7 +62,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		var szThemeStyle = ixmaps.getThemeStyleString(szThemeId);
 
-		if ( szThemeStyle.match(/CHOROPLETHE/) ){
+		if ( szThemeStyle.match(/CHOROPLETH/) ){
 			switch (szParameter) {
 				case "amplify":
 					ixmaps.changeThemeStyle(szThemeId,'dopacitypow:'+String(1/Number(szFactor)),'factor');
@@ -118,28 +118,6 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 					break;
 			}
 		}
-	};
-
-
-	ixmaps.showClass = [];
-	ixmaps.switchThemeClass = function(szThemeId,nClass){
-
-		ixmaps.markThemeClass(szThemeId,nClass);
-		return;
-
-		if ( ixmaps.showClass[nClass] ){
-			ixmaps.showClass[nClass] = false;
-		}else{
-			ixmaps.changeThemeStyle(szThemeId,"showparts:"+String(nClass),"set");
-			ixmaps.showClass[nClass] = true;
-		}
-		szShow = "";
-		for (i in ixmaps.showClass ){
-			if( ixmaps.showClass[i] ){
-				szShow += (szShow.length?',':'')+String(i);
-			}
-		}
-		ixmaps.changeThemeStyle(szThemeId,"showparts:"+szShow,szShow.length?"set":"remove");
 	};
 
 	// ---------------------------------------------------
@@ -286,60 +264,79 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 	// color scheme table 
 	// ------------------
 
-	ixmaps.legend.makeColorLegendHTML = function(szId,szLegendId,szMode){
-
-		fLegendCompact = (szMode && szMode == "compact")?true:false;
+	ixmaps.legend.makeColorLegendHTML = function(szId,szLegendId,szMode){ 
 
 		szLegendId = szLegendId || "generic";
 
+		var fLegendCompact = (szMode && szMode == "compact")?true:false;
 		var themeObj = ixmaps.getThemeObj(szId);
 
-		if ( (themeObj.partsA.length == 1) && themeObj.szFlag.match(/DOPACITY/) ){
+		// check whether to make compact (one line) legend 
+		// -----------------------------------------------
+		if ( ((themeObj.partsA.length == 1) || !themeObj.szAlphaField ) && themeObj.szFlag.match(/DOPACITY/) && !themeObj.szFlag.match(/EXACT/)){
 			return ixmaps.legend.makeColorLegendHTMLCompact(szId,szLegendId);
 		}
-
 		if ( fLegendCompact && !themeObj.szFlag.match(/EXACT/) && themeObj.partsA.length >= 5 && !( !(themeObj.szFlag.match(/SEQUENCE/) && !themeObj.szFlag.match(/SYMBOL/)) && themeObj.szLabelA && themeObj.szLabelA.length ) ){
 			return ixmaps.legend.makeColorLegendHTMLCompact(szId,szLegendId);
 		}
 
+		// ok make long (multiple line) version
+		// =====================================
+
 		var colorA  = themeObj.colorScheme;
 		var labelA  = themeObj.szLabelA;
 
-		var szUnit = themeObj.szLegendUnits || themeObj.szUnits || "";
+		// if color field defined, we collect the colors and make legend label here
+		// -----------------------------------------------------------------------
+		if ( themeObj.colorFieldA ){
+			labelA = [];
+			for ( a in themeObj.colorFieldA ){
+				labelA.push(a);
+			}
+			// create list of colors (classes) used 
+			themeObj.colorClassUsedA = [];
+			for ( i in themeObj.indexA ){
+				themeObj.colorClassUsedA[themeObj.itemA[themeObj.indexA[i]].nClass] = true;
+			}
+		}
+
+		// compose the units suffix
+		// ---------------------------
+		var szUnit = themeObj.szLegendUnits || themeObj.szUnits || "     ";
 		szUnit = szUnit.replace(/ /g,'&nbsp;');
 
+		// if no labels or colors are defined, make value range texts as label
+		// -----------------------------------------------------------------------
 		if ( !labelA ){
 			labelA = new Array();
 			var len = Math.min(colorA.length,themeObj.partsA.length);
 			for ( var i=0; i<len; i++){
-				var szPart = " ... "+parseFloat(themeObj.partsA[i].max).toFixed(2)+"&nbsp;"+szUnit;
+				var szPart = parseFloat(themeObj.partsA[i].min).toFixed(2)+"&nbsp;"+" ... "+parseFloat(themeObj.partsA[i].max).toFixed(2)+"&nbsp;"+szUnit;
 				labelA.push(szPart);
 			}
 		}
 
-		var szHtml = "";
+		// how many rows 
+		// ---------------------------
+		var nRows = Math.min(colorA.length,labelA.length);
 
-		// theme filter
-		if (themeObj.szFilter){
-			szHtml += "<p class='legend-filter-text'>&nbsp;"+themeObj.szFilter+"</p>";
-		}
-
-		// color legend = table
-		szHtml += "<table id='legend-classes"+szLegendId+"' class='legend-color-scheme'>";
-
-		var max = Math.min(colorA.length,labelA.length);
-
-		// get exact count from themeObj
-		var count = "";
-
-		sortA = [];
-		for ( var i=0; i<max; i++){
+		// sort (or don't sort) the legend rows
+		// -------------------------------------
+		var sortA = [];
+		for ( var i=0; i<nRows; i++){
 			if(  themeObj.szFlag.match(/SUM/) || 
 				(themeObj.szFlag.match(/EXACT/) && !themeObj.szFlag.match(/SIZE/)) ){
 				if ( typeof(themeObj.partsA[i].nSum) != "undefined" ){
-					sortA.push({index:i,color:(themeObj.szFlag.match(/INVERT/)?(max-i-1):i),count:(themeObj.partsA[i].nSum)});
+					if ( themeObj.szFlag.match(/SUM/) ){
+						sortA.push({index:i,color:(themeObj.szFlag.match(/INVERT/)?(nRows-i-1):i),count:(themeObj.partsA[i].nSum)});
+					}else
+					if ( themeObj.szFlag.match(/COUNT/) ){
+						sortA.push({index:i,color:(themeObj.szFlag.match(/INVERT/)?(nRows-i-1):i),count:(themeObj.partsA[i].nCount)});
+					}else{
+						sortA.push({index:i,color:(themeObj.szFlag.match(/INVERT/)?(nRows-i-1):i),count:(themeObj.partsA[i].nSum/themeObj.partsA[i].nCount)});
+					}
 				}else{
-					sortA.push({index:i,color:(themeObj.szFlag.match(/INVERT/)?(max-i-1):i),count:(themeObj.exactSizeA[i]||themeObj.exactCountA[i]||themeObj.nMeanA[i]||((themeObj.szFieldsA.length > 1)?themeObj.nOrigSumA[i]:null))});
+					sortA.push({index:i,color:(themeObj.szFlag.match(/INVERT/)?(nRows-i-1):i),count:(themeObj.exactSizeA[i]||themeObj.exactCountA[i]||themeObj.nMeanA[i]||((themeObj.szFieldsA.length > 1)?themeObj.nOrigSumA[i]:null))});
 				}
 			}else{
 				sortA.push({index:i,color:(i),count:(themeObj.exactSizeA[i]/themeObj.exactCountA[i])});
@@ -352,15 +349,29 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			sortA.sort(this.sortUp);
 		}
 
-		max = Math.min(500,Math.min(colorA.length,labelA.length));
+		// clip legend rows !!
+		nRows = Math.min(500,Math.min(colorA.length,labelA.length));
 
 		// colorscheme
 		//
+		// start making the HTML
+		// -----------------------------
+		var szHtml = "";
+
+		// show theme filter, if defined
+		if (0 && themeObj.szFilter){
+			szHtml += "<p class='legend-filter' style='margin-top:0em;color:#fff;background:#ddd'><span class='icon icon-filter' style='float:left;padding:0.2em 0.5em;'></span><span class='legend-filter-text'>"+themeObj.szFilter+"</span><a href='javascript:ixmaps.changeThemeStyle(null,null,\"filter\",\"remove\");' title=\"remove\" ><span class='icon icon-cancel-circle' style='float:right;padding:0.2em 0.5em;'></span></a></p>";
+		}
+
+		// color legend = table
+		// ---------------------
+		szHtml += "<div id='legend-classes"+szLegendId+"' style='border-spacing:2px;line-height:1.25em;' >";
+
 		var fColorScheme = false; 
 		var fCountBars = false;
 		var nMaxCount = 0;
 
-		for ( var i=0; i<max; i++){
+		for ( var i=0; i<nRows; i++){
 			if ( colorA[0] !=  colorA[i] ){
 				fColorScheme = true; 
 			}
@@ -373,67 +384,102 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			( ( themeObj.partsA.length > 2)		||
 				themeObj.szLabelA				||
 				themeObj.szFlag.match(/EXACT/)	||
-				(themeObj.szRangesA && themeObj.szRangesA.length) ) ){
+				themeObj.szRangesA ) ){
 
 			// get exact count from themeObj
 			var count = "";
-			for ( var i=0; i<max; i++){
+			for ( var i=0; i<nRows; i++){
+
+				if ( themeObj.colorFieldA ){
+					if ( !themeObj.colorClassUsedA[sortA[i].index] ){
+						continue;
+					}
+				}else
+				if ( !themeObj.partsA[sortA[i].index].nSum ){
+					continue;
+				}
 
 				if ( (fCountBars || themeObj.szFlag.match(/FILTER/) )&& !sortA[i].count ){
 					continue;
 				}
 
 				var fSelected = false;
-				if ( (typeof(themeObj.markedClass) != "undefined") && (themeObj.markedClass == sortA[i].index) ){
+				if ( ((typeof(themeObj.markedClass)   != "undefined") && (themeObj.markedClass == sortA[i].index)) ||
+					 ((typeof(themeObj.markedClasses) != "undefined") && (themeObj.markedClasses[sortA[i].index]))	) {
 					fSelected = true;
 				}else
 				if ( themeObj.szShowParts ){
 					for ( p in themeObj.szShowPartsA ){
-						if ( themeObj.szShowPartsA[p] == sortA[i].index ){
+						if ( themeObj.szShowPartsA[p] == i ){
 							fSelected = true;
 						}
 					}
-					if ( !fSelected ){
-						continue; 
-					}
-					fSelected = false;
 				}
 
 				count = ixmaps.__formatValue(sortA[i].count,2,"BLANK"); //sortA[i].count?""+sortA[i].count+"":"";
+
 				if ( fSelected ){
-					szHtml += "<tr valign='center' class='theme-legend-item-selected'>";
+					szHtml += "<div valign='center' class='theme-legend-item-selected' onclick='javascript:ixmaps.markThemeClass(\""+szId+"\","+sortA[i].index+");event.stopPropagation();return false;'>";
 				}else{
-					szHtml += "<tr valign='center' class='theme-legend-item'>";
+					szHtml += "<div valign='center' class='theme-legend-item' onclick='javascript:ixmaps.markThemeClass(\""+szId+"\","+sortA[i].index+");event.stopPropagation();return false;'>";
 				}
 
-				szHtml += "<td><a class='legend-color-button' href='#' title='click to see'><span onclick='javascript:ixmaps.switchThemeClass(\""+szId+"\","+sortA[i].color+");event.stopPropagation();return false;' style='background:"+colorA[sortA[i].color]+"'>";
+				szHtml += "<div style='margin-top:-0.3em;margin-bottom:-0.3em'>";				
+				
+				var szLabel = labelA[sortA[i].index];
+				szHtml += "<span class='theme-legend' >";
+				szHtml += "<a class='theme-button' href='#' title='click to see'>";
+				szHtml += "<span title='"+szLabel+"' >";
+				szHtml += "<span>";
+				szHtml += szLabel;
+				szHtml += "</span>";
+				szHtml += "</span>";
+				szHtml += "</a>";
+				szHtml += "</span>";
+
+				szHtml += "</div>";
+
+				if ( fSelected ){
+					szHtml += "<div style='margin-top:-2px;margin-bottom:8px;padding-bottom:5px;border-bottom:#888888 solid 0px;'>";
+				}else{
+					szHtml += "<div style='margin-top:-2px;margin-bottom:8px;padding-bottom:5px;border-bottom:#888888 solid 0px;'>";
+				}
+
+				szHtml += "<span style='line-height:5px'>";
+				szHtml += "<a class='legend-color-button' href='#' title='click to see'>";
+
+				if ( colorA[sortA[i].color] == "none" )	{
+					szHtml += "<span style='background:"+colorA[sortA[i].color]+";border:solid "+themeObj.szLineColor+" 1px;opacity:0.7;font-size:0.5em'>";
+				}else{
+					szHtml += "<span style='background:"+colorA[sortA[i].color]+";opacity:1;font-size:0.5em'>";
+				}
 
 				if ( fCountBars ){
-					//for ( var w=0; w<Math.ceil(Math.pow(sortA[i].count,0.5)/10); w++ ){
-					for ( var w=0; w<Math.ceil(Math.pow(sortA[i].count,0.5)*(20/Math.pow(nMaxCount,0.5))); w++ ){
-						szHtml += "&nbsp;";
-					}
+					var nMaxBar = 200;
+					var nBar = Math.ceil(Math.pow(sortA[i].count,1)*(nMaxBar/Math.pow(nMaxCount,1)));
+					szHtml += "<span style='display:inline-block;width:"+nBar+"px;font-size:0.5em'>&nbsp;</span>";
 				}else{
 					if ( themeObj.szFlag.match(/DOPACITY/) ){
 						szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-						szHtml += "</span><span onclick='javascript:ixmaps.switchThemeClass(\""+szId+"\","+sortA[i].color+");event.stopPropagation();return false;' style='background:"+colorA[sortA[i].color]+";opacity:0.75;'>"; 
+						szHtml += "</span><span onclick='javascript:ixmaps.markThemeClass(\""+szId+"\","+sortA[i].color+");event.stopPropagation();return false;' style='background:"+colorA[sortA[i].color]+";opacity:0.75;'>"; 
 						szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-						szHtml += "</span><span onclick='javascript:ixmaps.switchThemeClass(\""+szId+"\","+sortA[i].color+");event.stopPropagation();return false;' style='background:"+colorA[sortA[i].color]+";opacity:0.5;'>"; 
+						szHtml += "</span><span onclick='javascript:ixmaps.markThemeClass(\""+szId+"\","+sortA[i].color+");event.stopPropagation();return false;' style='background:"+colorA[sortA[i].color]+";opacity:0.5;'>"; 
 						szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 					}else{
-						szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+						szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 					}
-
 				}
 
-				var szLabel = labelA[sortA[i].index];
-				var szCount = sortA[i].count?("<td class='theme-legend-count' style='text-align:right;padding-left:1em;'>"+count+" "+szUnit.replace(/ /g,'&nbsp;')+"</td>"):"";
+				szHtml += "</span>";
+				szHtml += "</a>";
+				szHtml += "</span>";
 
-				szHtml += "</span></td><td class='theme-legend' style='max-width:"+(szCount.length?"200px":"300px")+"'><a class='theme-button' href='#' title='click to see'><span title='"+szLabel+"' style='color:#888888'><span onclick='javascript:ixmaps.switchThemeClass(\""+szId+"\","+sortA[i].index+");event.stopPropagation();return false;' >"+szLabel+"</span></span></a></td>"+szCount+"</tr>";
+				szHtml += sortA[i].count?("<span class='theme-legend-count' style='color:#888888;float:right'> "+count+" "+szUnit+"</span>"):"";
+
+				szHtml += "</div>";
+				szHtml += "</div>";
+
 			}
-
-		}else if (0){
-			szHtml += "<tr valign='top'><td><span onclick='javascript:ixmaps.hideThemeClass(\""+szId+"\","+0+")'  style='background:"+colorA[0]+";font-size:0.7em;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td><span style='padding-left:5px'>"+labelA[0]+"</span></td><td> &nbsp;&nbsp;|</td><td><span style='padding-left:5px'>"+labelA[labelA.length-1]+"</span></td></tr>";
 		}else{
 			if ( ((themeObj.nMinValue||themeObj.nMin) != 1) || ((themeObj.nMaxValue||themeObj.nMax) != 1) ){
 				szHtml += "<tr valign='top'><td><span onclick='javascript:ixmaps.hideThemeClass(\""+szId+"\","+0+")'  style='background:"+colorA[0]+";font-size:0.7em;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td><span style='padding-left:5px'>"+ ixmaps.__formatValue((themeObj.nMinValue||themeObj.nMin),2,"BLANK")+" "+szUnit+"</span></td><td> &nbsp;...</td><td><span style='padding-left:5px'>"+ ixmaps.__formatValue((themeObj.nMaxValue||themeObj.nMax),2,"BLANK")+" "+szUnit+"</span></td></tr>";
@@ -463,11 +509,10 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		var szUnit = themeObj.szLegendUnits || themeObj.szUnits || "";
 		szUnit = szUnit.replace(/ /g,'&nbsp;');
-
 		var szHtml = "";
 
 		// theme filter
-		if (themeObj.szFilter){
+		if (0 && themeObj.szFilter){
 			szHtml += "<p class='legend-filter-text' >Filter: "+themeObj.szFilter+"</p>";
 		}
 
@@ -498,29 +543,33 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		}else{
 
 			// color legend 
-			szHtml += "<table id='legend-classes"+szLegendId+"' cellspacing='0' cellpadding='0' >";
+			szHtml += "<table id='legend-classes"+szLegendId+"' cellspacing='2' cellpadding='0' >";
 
-			var nRows = themeObj.szFlag.match(/DOPACITY/)?3:1;
+			var nRows = (themeObj.szFlag.match(/DOPACITY/) && themeObj.nMaxAlpha)?3:1;
 			for ( var row=0; row<nRows; row++){
 				szHtml += "<tr valign='top' >";
 				for ( var i=0; i<nColors; i++){
 					var szMinMax = "";
-					var ix = themeObj.szFlag.match(/XXX/)?(nColors-i-1):i;
+					var ix = themeObj.szFlag.match(/INVERT/)?(nColors-i-1):i;
 					if ( themeObj.partsA[ix] && themeObj.partsA[ix].min && themeObj.partsA[ix].max ){
-						var szUnit = themeObj.szUnit || "";
-						szUnit = szUnit.replace(/ /g,'&nbsp;');
 						szMinMax = parseFloat(themeObj.partsA[ix].min).toFixed(0)+szUnit+" ... "+parseFloat(themeObj.partsA[ix].max).toFixed(0)+szUnit;
 					}
 					var nCount = Math.min(100/nColors,8);
-					szHtml += "<td><a "+((nCount<=1)?"style='margin-right:-0.5px'":"")+" class='legend-color-button' href='#' title='"+szMinMax+" click to see'><span onclick='javascript:ixmaps.switchThemeClass(\""+szId+"\","+ix+");event.stopPropagation();return false;' style='background:"+colorA[ix]+";opacity:"+(1/(row+1))+"'>";
-					if ( (typeof(themeObj.markedClass) != "undefined") && (themeObj.markedClass == ix) ){
-						nCount -= 2;
+					var nOpacity = (1/(row+1));
+					if (themeObj.szFlag.match(/DOPACITY/)){
+						nOpacity = (i+(nColors/10))/nColors;
+					}
+					szHtml += "<td><a "+((nCount<=1)?"style='margin-right:-0.5px'":"")+" class='legend-color-button' href='#' title='"+szMinMax+" click to see'><span onclick='javascript:ixmaps.markThemeClass(\""+szId+"\","+ix+");event.stopPropagation();return false;' style='background:"+colorA[ix]+";opacity:"+nOpacity+"'>";
+					if ( ((typeof(themeObj.markedClass)   != "undefined") && (themeObj.markedClass == ix)) ||
+						 ((typeof(themeObj.markedClasses) != "undefined") && (themeObj.markedClasses[ix]))	) {
+						nCount -= 4;
 					}
 					for ( ii=0; ii<nCount; ii++){
 						szHtml += "&nbsp;";
 					}
-					if ( (typeof(themeObj.markedClass) != "undefined") && (themeObj.markedClass == ix) ){
-						szHtml += "<span style='font-size:2em;line-height:0;vertical-align:-0.35em'>*</span>";
+					if ( ((typeof(themeObj.markedClass)   != "undefined") && (themeObj.markedClass == ix)) ||
+						 ((typeof(themeObj.markedClasses) != "undefined") && (themeObj.markedClasses[ix]))	) {
+						szHtml += "<span style='font-size:2em;line-height:0;vertical-align:-0.35em;color:#444'>*</span>";
 					}
 					szHtml += "</td></a>";
 				}
@@ -539,8 +588,8 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		}
 		var span = Math.floor(nColors*0.5);
 		szHtml += "<tr class='legend-range-text' >";
-		szHtml += "<td colspan='"+(span)+"' >"+ixmaps.__formatValue(themeObj.nMin,2,"BLANK")+" "+themeObj.szUnits+"</td>";
-		szHtml += "<td colspan='"+(nColors - span)+"' align='right'>"+ixmaps.__formatValue(themeObj.nMax,2,"BLANK")+" "+themeObj.szUnits+"</td>";
+		szHtml += "<td colspan='"+(span)+"' >"+ixmaps.__formatValue(themeObj.nMin,2,"BLANK")+" "+szUnit+"</td>";
+		szHtml += "<td colspan='"+(nColors - span)+"' align='right'>"+ixmaps.__formatValue(themeObj.nMax,2,"BLANK")+" "+szUnit+"</td>";
 		szHtml += "</tr>";
 
 		szHtml += "</table>";
@@ -561,12 +610,19 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		var szHtml = "";
 
+		// show theme filter, if defined
+		if (themeObj.szFilter){
+			szHtml += "<p class='legend-filter' style='margin-top:0em;color:#fff;background:#ddd;width:85%'><span class='icon icon-filter' style='float:left;padding:0.2em 0.5em;'></span><span class='legend-filter-text'>"+themeObj.szFilter+"</span><a href='javascript:ixmaps.changeThemeStyle(null,null,\"filter\",\"remove\");' title=\"remove\" ><span class='icon icon-cancel-circle' style='float:right;padding:0.2em 0.5em;'></span></a></p>";
+		}
 		if ( 0 && (themeObj.partsA.length > 2) ){
-			szHtml += "<p style='color:#444444;margin-top:-10px'><i class='icon-arrow-up' title='arrow up' ></i> clicca sui colori per evidenziare</p>";
+			szHtml += "<p style='color:#444444;><i class='icon-arrow-up' title='arrow up' ></i> clicca sui colori per evidenziare</p>";
 		}
 		if ( themeDef.style.type.match(/AGGREGATE/) && themeDef.style.gridwidthpx ){
-			szHtml += "<p style='color:#444444;margin-top:-10px'> aggregato per griglia di "+ themeDef.style.gridwidthpx +" pixel</p>";
+			szHtml += "<p style='color:#444444'> aggregato per griglia di "+ themeDef.style.gridwidthpx +" pixel</p>";
 			szHtml += "<p>";
+			szHtml += "<button type='button' class='btn btn-default' onclick='javascript:ixmaps.changeThemeStyle(null,\"gridwidthpx:1\",\"set\");'>1</button>";
+			szHtml += "<button type='button' class='btn btn-default' onclick='javascript:ixmaps.changeThemeStyle(null,\"gridwidthpx:2\",\"set\");'>2</button>";
+			szHtml += "<button type='button' class='btn btn-default' onclick='javascript:ixmaps.changeThemeStyle(null,\"gridwidthpx:5\",\"set\");'>5</button>";
 			szHtml += "<button type='button' class='btn btn-default' onclick='javascript:ixmaps.changeThemeStyle(null,\"gridwidthpx:10\",\"set\");'>10</button>";
 			szHtml += "<button type='button' class='btn btn-default' onclick='javascript:ixmaps.changeThemeStyle(null,\"gridwidthpx:20\",\"set\");'>20</button>";
 			szHtml += "<button type='button' class='btn btn-default' onclick='javascript:ixmaps.changeThemeStyle(null,\"gridwidthpx:50\",\"set\");'>50</button>";
@@ -608,7 +664,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		var id = szId.replace(/\./g,'');
 
-		szHtml += 		"<div style='margin-left:-5px;margin-top:0.2em;margin-bottom:1em;' >";
+		szHtml += 		"<div style='margin-left:-5px;margin-top:0.2em;margin-bottom:1em;line-height:2em; >";
 		szHtml += 		"<span id='legend-buttons"+szId+"'>";
 			
 		szHtml += 		"<a id='highbutton"+id+"' class='theme-tool-button' href='javascript:ixmaps.changeThemeDynamic(\""+szId+"\",\"amplify\",\"0.66\");' title='smooth chart' >";
@@ -625,7 +681,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		szHtml += 		"<a id='plusbutton"+id+"' class='theme-tool-button' href='javascript:ixmaps.changeThemeDynamic(\""+szId+"\",\"scale\",\"1.5\");' title='bigger charts'>";
 		szHtml += 			"<span class='icon icon-plus theme-tool-button' ></span>";
-		szHtml += 			"</a>&nbsp;";
+		szHtml += 			"</a> ";
 
 		szHtml += 		"<a id='valuebutton"+id+"' class='theme-tool-button' href='javascript:ixmaps.toggleValueDisplay(\""+szId+"\");' title='add/remove textual values'>";
 		szHtml += 			"<span class='icon icon-spell-check theme-tool-button' ></span>";
@@ -636,11 +692,11 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		szHtml += 			"</a>&nbsp;";
 
 		szHtml += 		"<a id='opplusbutton"+id+"' class='theme-tool-button' href='javascript:ixmaps.changeThemeDynamic(\""+szId+"\",\"opacity\",\"1.5\");' title='less transparency'>";
-		szHtml += 			"<span class='icon icon-checkbox-partial theme-tool-button' ></span>";
+		szHtml += 			"<span class='icon icon-stop2 theme-tool-button' ></span>";
 		szHtml += 			"</a>&nbsp;";
 
 		szHtml += 		"<a id='deletebutton"+id+"' class='theme-tool-button'  href='javascript:ixmaps.makeChartMenueHTML(\""+szId+"\");' title='chart menu'>";
-		szHtml += 			"<span class='icon icon-pie theme-tool-button' ></span>";
+		szHtml += 			"<span class='icon icon-pie-chart theme-tool-button' ></span>";
 		szHtml += 			"</a>&nbsp;";
 		
 		szHtml += 		"<a id='lockbutton"+id+"' class='theme-tool-button'  href='javascript:ixmaps.changeThemeStyle(\""+szId+"\",\"type:LOCKED\",\"toggle\");' title='chart menu'>";
@@ -653,7 +709,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		}
 
 		szHtml += 		"<a id='deletebutton"+id+"' class='theme-tool-button'  href='javascript:ixmaps.removeTheme(\""+szId+"\");' title='remove theme'>";
-		szHtml += 			"<span class='icon icon-remove theme-tool-button' ></span>";
+		szHtml += 			"<span class='icon icon-bin2 theme-tool-button' ></span>";
 		szHtml += 			"</a>&nbsp;";
 
 
@@ -675,76 +731,13 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 	};
 
 
-	// ----------------------
-	// make chart type menu 
-	// ----------------------
-
-	var szChartMenuId = null;
-	var fChartMenuDialog = false;
-	var fChartMenuVisible = true;
-
-	ixmaps.makeChartMenueHTML = function(szId){
-
-		// make <div> + <svg> to receive the chart menu (in svg)
-		var szHtml = "";
-		szHtml += "<div style='font-size:0.6em;margin-bottom:0.5em'>select chart type:</div>";
-		szHtml += "<div id='menuDiv' style='height:300px;width:260px;overflow:auto'><div><svg width='240' height='2000' viewBox='0 0 4800 40000'><g id='getchartmenutarget'></g></svg></div></div>";
-
-		// create dialog
-		__showChartDialog(szHtml,ixmaps.themeObj.szTitle);
-
-		// call theme method to draw the charts
-		var szTypelistA = ixmaps.themeObj.getChartTypeMenu($("#getchartmenutarget")[0],null,240);
-
-		// create click map to select the chart for the theme
-		szHtml = "<div style='position:relative;top:-2010px;'>";
-		for ( i in szTypelistA ){
-			if ( i%4 == 0 ){
-				szHtml += "<div style='clear:both'>";
-			}
-			szHtml += "<a href=\"javascript:ixmaps.changeThemeStyle(null,'type:"+szTypelistA[i]+"','set');\"><div style='float:left;height:60px;width:60px;'></div></a>";
-		}
-		szHtml += "</div>";
-
-		$("#menuDiv").append(szHtml);
-	};
-
-	__showChartDialog = function(szHtml,szTitle){
-
-		ixmaps.szChartHtml  = szHtml  || ixmaps.szChartHtml  || "";
-		ixmaps.szChartTitle = szTitle || ixmaps.szChartTitle || "";
-
-		if ( !fChartMenuVisible ){
-			return;
-		}
-	
-		// create dialog (oversized) to host the ChartMenu
-		//
-		if ( !fChartMenuDialog ){
-			ixmaps.openDialog(null,'chartmenue','',ixmaps.szChartTitle,'auto',800,500);
-			fChartMenuDialog = true;
-		}
-
-		// set content and resize
-		//
-		$("#chartmenue").html(ixmaps.szChartHtml);
-
-		$("#chartmenue").parent().css("width","300px");
-		$("#chartmenue").parent().css("height","300px");
-
-		$("#chartmenue").dialog({
-		  close: function( event, ui ) {
-				fChartMenuDialog = false;
-				$("#chartmenue").remove();
-			}
-		});
-	};
-
-
-
 	// ============================================
 	// event handler
 	// ============================================
+
+	ixmaps.htmlgui_onNewTheme = function(szId){
+		$("#map-legend").html("<h3 id='map-legend-title' class='loading-text' style='margin-top:1px;padding:0.2em 1em;border:solid #444 0.5px;border-radius:5px'>loading ...</h3>");
+	}
 
 
 	// --------------------------------------------------
@@ -758,7 +751,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			return;
 		}
 
-		if ( themeObj.szFlag.match(/SUBTHEME/) ){
+		if ( themeObj.szFlag.match(/SUBTHEME/) || themeObj.szFlag.match(/NOLEGEND/) ){
 			return;
 		}
 
@@ -766,11 +759,17 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		szId = szId || themeObj.szId;	
 
 		var	szHtml = "";
-		szHtml += "<h3 id='map-legend-title'>"+themeObj.szTitle||"Color Legend"+"</h3>";
+		szHtml += "<h3 id='map-legend-title'>"+themeObj.szTitle||"Color Legend";
+		// theme filter
+		if (themeObj.szFilter){
+			//szHtml += "<p class='legend-filter-text' style='font-size:11px'>&nbsp;"+themeObj.szFilter+"</p>";
+		}
+		szHtml += "</h3>";
+
 		szHtml += "<h4 id='map-legend-snippet'>"+(themeObj.szSnippet||"")+"</h4>";
 
 		szHtml += "<div id='map-legend-body'>";
-		szHtml += "<div style='max-height:300px;overflow:auto;margin-right:1em;margin-bottom:1em'>";
+		szHtml += "<div style='max-height:300px;overflow:auto;margin-right:2em;'>";
 		szHtml += ixmaps.legend.makeColorLegendHTML(szId,"generic","compact");
 		szHtml += "</div>";
 		//szHtml += "<br>";
@@ -778,19 +777,19 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		//szHtml += ixmaps.legend.makeLegendButtons(szId,"generic");
 		//szHtml += "<br>";
 
-		if( themeObj.szDescription ){
-			szHtml += "<p>"+(themeObj.szDescription||"")+"</p>";
-			}
 	
 		szHtml += "</div>";
+		if( themeObj.szDescription ){
+			szHtml += "<p id='map-legend-description'>"+(themeObj.szDescription||"")+"</p>";
+			}
 		szHtml += "<div id='map-legend-footer'>";
 
 		szHtml += ixmaps.htmlgui_onLegendFooter ? ixmaps.htmlgui_onLegendFooter(szId,themeObj,ixmaps.getThemeDefinitionObj(szId)) : "";
 			
 		szLegendPane = "<div id='map-legend-pane' class='map-legend-pane'>"+
 						 "<a href='javascript:__toggleLegendPane()'>"+
-						 "<div style='position:absolute;top:0em;right:0px;float:right;z-index:1;font-size:1em;padding:0.3em 0.5em;border:solid #ddd 1px'>"+
-						   "<i id='map-legend-pane-switch' class='fa fa-chevron-up' title='close' style='color:#888' tabindex='-1'></i>"+
+						 "<div id='legend-type-switch'>"+
+						   "..."+
 						 "</div>"+
 						 "</a>"+ 
 						 "<div class='container'>"+
@@ -801,9 +800,13 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 						  "</div>"+
 						"</div>";
 
-		$("#map-legend").html(szLegendPane);
+		szLegendPane += "<a href='javascript:__toggleLegendPane(0);'>"+
+						 "<div style='position:absolute;bottom:1em;right:1em;float:right;z-index:1;font-size:1em;padding:0.3em 0.5em;border:solid #ddd 1px'>"+
+						   "<i id='map-legend-pane-switch' class='icon shareIcon blackHover icon-arrow-down2' title='close' style='color:#888;pointer-events:none;' tabindex='-1'></i>"+
+						 "</div>"+
+						 "</a>";
 
-		$("#map-legend").slideDown();
+		$("#map-legend").html(szLegendPane);
 
 		__actualThemeId = szId;
 
@@ -830,42 +833,68 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 	 * display/hide the legend parts
 	 * @type void
 	 */
-	var __themeLegendState = 2;
 
-	__switchLegendPanes = function(){
-		if ( __themeLegendState == 2 ){
+	// define initial/actual legend state (0=title only, 1=colorlegend, 2=footer/tools)
+	ixmaps.legendState = 0;
+
+	__actualThemeId = null;
+
+	__switchLegendPanes = function(state){
+
+		ixmaps.legendState = (typeof(state)!='undefined')?state:ixmaps.legendState;
+
+		$("#map-legend-pane-switch").removeClass("icon-arrow-down2");
+		$("#map-legend-pane-switch").addClass("icon-arrow-up2");
+
+		if ( ixmaps.legendState == 2 ){
 			$("#map-legend-body").show();
 			$("#map-legend-snippet").show();
 			$("#map-legend-footer").show();
-			$("#map-legend-pane-switch").removeClass("fa-chevron-down");
-			$("#map-legend-pane-switch").addClass("fa-chevron-up");
+			$("#map-legend-pane-switch").parent().show();
 		}else
-		if ( __themeLegendState == 1 ){
+		if ( ixmaps.legendState == 1 ){
 			$("#map-legend-body").show();
 			$("#map-legend-snippet").show();
 			$("#map-legend-footer").hide();
-			$("#map-legend-pane-switch").removeClass("fa-chevron-up");
-			$("#map-legend-pane-switch").addClass("fa-chevron-down");
+			$("#map-legend-pane-switch").show();
 		}else{
 			$("#map-legend-body").hide();
 			$("#map-legend-snippet").hide();
 			$("#map-legend-footer").hide();
-			$("#map-legend-pane-switch").removeClass("fa-chevron-up");
-			$("#map-legend-pane-switch").addClass("fa-chevron-down");
+			$("#map-legend-pane-switch").parent().hide();
 		}
-
+		$("#map-legend").slideDown();
 	}
 
 	/**
 	 * open/close the legend parts
 	 * @type void
 	 */
-	__toggleLegendPane = function(){
-		__themeLegendState = ++__themeLegendState%3;
+	__toggleLegendPane = function(i){
 
-		ixmaps.htmlgui_onDrawTheme(__actualThemeId);
+		if ( i == 0 ){
+			__switchLegendPanes(-1);
+		}else
+		if ( ixmaps.legendState == 2 ){
+			ixmaps.makeLayerLegend();
+		}else
+		// switch back to theme legend
+		if ( (i == -1) && __actualThemeId){
+			ixmaps.htmlgui_onDrawTheme(__actualThemeId);
+		}else{
+			i = 0;
+		}
 
-		//__switchLegendPanes();
+		ixmaps.legendState += i||0;
+
+		if ( $("#map-legend-footer").height() ){
+			ixmaps.legendState = ++ixmaps.legendState%3;
+		}else{
+			ixmaps.legendState = ++ixmaps.legendState%2;
+		}
+
+
+		__switchLegendPanes();
 
 	};
 
@@ -882,12 +911,18 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		}
 		cssMainContainer.append(className + " {" + classValue + "}\n");
 	}
-	ixmaps.htmlgui_setMapTypeBG = function(szId){
+	var old_setMapTypeBG = ixmaps.htmlgui_setMapTypeBG;
+	ixmaps.htmlgui_setMapTypeBG = function(szId){ 
+
+		if (old_setMapTypeBG){
+			old_setMapTypeBG(szId);
+		}
 
 		$("#css-modifier-container").remove();
 
 		if ( szId.match(/dark/i) || szId.match(/black/i) ){
-			changeCss(".map-legend-pane:before", "background:#333" );
+
+			changeCss(".map-legend-pane:before", "background:#111" );
 			changeCss(".map-legend-pane", "color:#888" );
 			changeCss(".map-legend-count", "color:#888" );
 			changeCss(".map-legend-switch", "color:#888" );
@@ -914,8 +949,8 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			changeCss(".btn-default:focus","outline:none");
 
 			changeCss("tr.theme-legend-item-selected", "background:#444" );
-
-
+	
+			changeCss(".loading-text","background-color:rgba(0,0,0,0.5)");
 		}
 	};
 

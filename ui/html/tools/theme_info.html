@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+    <title>iXmaps Theme Information</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+
+	<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../assets/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../assets/css/icomoon.css" rel="stylesheet" >
+
+	<link href="../../css/site.min.css" rel="stylesheet" >
+
+	<style type="text/css" media="screen">
+		body {
+			overflow: auto;
+			}
+		#xcolor-label > span {
+			padding:6px 12px;
+		}
+		option, optgroup{ 
+			color: #666666;
+			font-size: 1.2em;
+		}
+		optgroup { 
+			color: #dddddd;
+		}
+		input::placeholder {
+		  color: #dddddd;
+		}
+		.form-control::placeholder {
+		  color: #dddddd;
+		}
+		td {
+			padding-right:0.5em;
+		}
+	</style>
+</head>
+
+<body >
+
+	<div class="container" >
+
+		<div class="row">
+			<div id="info-content" ></div>
+		</div>
+
+	</div>	
+	
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+	<script src = "../../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+	<script src = "../../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+    <script src = "../assets/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript">
+
+		var api = null;
+		if ( window.opener ){
+			api = window.opener.ixmaps;
+		}else
+		if ( parent ){
+			api = parent.window.ixmaps;
+		}
+		else{
+			alert("error: missing parent window for themes !");
+		}
+
+		var themeObj =	api.getThemeObj();
+
+		var szInfo = 	"";
+
+		szInfo += "<table cellpadding='0' style='margin-top:5px;' > ";	
+		szInfo += "<tr><td><b>title: </b></td><td>"+themeObj.szTitle+"</td></tr>";	
+		szInfo += "<tr><td><b>data: </b></td><td>"+themeObj.coTable+"</td></tr>";	
+		szInfo += "<tr><td><b>items: </b></td><td>"+themeObj.nCount+"</td></tr>";
+		if ( themeObj.szField100 && themeObj.szField100.length ){
+			szInfo += "<tr><td>field100: </td><td>"+themeObj.szField100+"</td></tr>";
+			if ( themeObj.nField100Min ){
+				szInfo += "<tr><td>filter: </td><td>> "+themeObj.nField100Min+"</td></tr>";	
+			}
+			szInfo += "<tr><td><b>min: </b></td><td>"+themeObj.nMin100+"</td></tr>";	
+			szInfo += "<tr><td><b>max: </b></td><td>"+themeObj.nMax100+"</td></tr>";
+		}
+		szInfo += "<tr><td><b>load: </b></td><td>"+themeObj.timeLoading+" ms</td></tr>";
+		if ( themeObj.timeAggregating ){
+			szInfo += "<tr><td><b>aggregate: </b></td><td>"+themeObj.timeAggregating+" ms</td></tr>";
+		}
+		if ( themeObj.timeRealizing ){
+			szInfo += "<tr><td><b>realize: </b></td><td>"+themeObj.timeRealizing+" ms</td></tr>";
+		}
+
+		szInfo += "</table> ";	
+
+		var count = themeObj.szFieldsA.length;
+
+		for ( var i=0;i<count; i++ ){
+			szInfo += "<hr> ";	
+			szInfo += "<table cellpadding='0' style='margin-top:5px;' > ";	
+			szInfo += "<tr><td>field: </td><td>"+themeObj.szFieldsA[i]+"</td></tr>";	
+			szInfo += "<tr><td><b>min: </b></td><td>"+themeObj.nMinA[i]+"</td></tr>";	
+			szInfo += "<tr><td><b>max: </b></td><td>"+themeObj.nMaxA[i]+"</td></tr>";	
+			szInfo += "<tr><td><b>mean: </b></td><td>"+themeObj.nMeanA[i]+"</td></tr>";	
+			szInfo += "<tr><td><b>median: </b></td><td>"+themeObj.nMedianA[i]+"</td></tr>";	
+			szInfo += "<tr><td><b>deviataion: </b></td><td>"+themeObj.nDeviationA[i]+"</td></tr>";	
+			szInfo += "</table> ";	
+		}
+
+		if ( themeObj.missedA ){
+
+			var __nNotFound = 0;
+			var szNotFound = "";
+
+			szInfo += "<hr> ";	
+			szInfo += "<table cellpadding='0' style='margin-top:5px;vertical-align:top' > ";	
+
+			for ( a in themeObj.missedA ){
+				szNotFound += "<tr><td></td><td>"+a +""+"</td></tr>";	
+				__nNotFound++;
+			}
+			var nTotal = themeObj.nCount;
+			if (themeObj.nMissingLookupCount){
+				szInfo += "<tr style='vertical-align:top'><td><b>missing lookups: </b></td><td>"+themeObj.nMissingLookupCount+" / "+nTotal+" records</td></tr>";
+			}
+			if (themeObj.nMissingPositionCount){
+				szInfo += "<tr style='vertical-align:top'><td><b>missing positions: </b></td><td>"+themeObj.nMissingPositionCount+"</td></tr>";
+			}
+			szInfo += szNotFound;
+
+			szInfo += "</table> ";	
+
+		}
+
+		if ( themeObj.nTopicsSkipedByZeroExclusion ){
+
+			szInfo += "<hr> ";	
+			szInfo += "<table cellpadding='0' > ";	
+
+			szInfo += "<tr><td><b>Aggregation notes: "+themeObj.nTopicsSkipedByZeroExclusion+"</b></td></tr>";
+			szInfo += "<tr><td>topics excluded from aggregation because of one or more zero values, and ZEROISVALUE not set in chart type</td></tr>";
+
+			szInfo += "</table> ";	
+
+		}
+
+		if ( themeObj.nWrongRecordLengthCount ){
+
+			szInfo += "<hr> ";	
+			szInfo += "<table cellpadding='0' > ";	
+
+			szInfo += "<tr><td><b>Data Error: "+themeObj.nWrongRecordLengthCount+"</b></td></tr>";
+			szInfo += "<tr><td>items excluded by wrong record length</td></tr>";
+
+			szInfo += "</table> ";	
+
+		}
+
+		szInfo += "<hr> ";	
+		szInfo += "<br><br><br><br><br><br>";	
+
+		$("#info-content").html(szInfo);
+
+	</script>
+
+</body>
+
+</html>

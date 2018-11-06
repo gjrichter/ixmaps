@@ -188,7 +188,8 @@ Map.User.prototype.onClick = function(evt,szId){
 	try{
 		HTMLWindow.ixmaps.htmlgui_onItemClick(szId);
 	}
-	catch (e){}
+	catch (e){
+	}
 	return false;
 };
 /**
@@ -198,5 +199,10 @@ Map.User.prototype.onClick = function(evt,szId){
  * @return true, to suppress the info display
  */
 Map.User.prototype.onInfoDisplay = function(evt,szId){
+	try{
+		return HTMLWindow.ixmaps.htmlgui_onInfoDisplay(szId);
+	}
+	catch (e){
+	}
 	return false;
 };

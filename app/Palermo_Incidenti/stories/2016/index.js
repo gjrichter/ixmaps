@@ -3,6 +3,24 @@
 		init sidebar	
 	**/
 
+		// --------------------------------------------------------------
+		// define click extension to
+		// check/highlight the theme button 
+		// --------------------------------------------------------------
+
+		// array to store the clicked objects for onRemoveTheme callback
+		var clickA = new Array(0);
+
+		// store the last clicked object for onNewTheme callback
+		var lastClicked = null;
+		var actualClicked = null;
+		$("a").click(function () {
+			if ( String($(this).attr("href")).match(/ixmaps.newTheme/i) || 
+				 String($(this).attr("href")).match(/ixmaps.changeThemeStyle/i) ){
+				lastClicked = actualClicked = $(this);
+			}
+		});
+
 	// change 'button' style to show presence of theme
 	__setThemeButtonStyle = function(buttonObj,fFlag){
 		if ( buttonObj.children().last().css("display") == "none" ){
@@ -38,6 +56,11 @@
 	// intercept theme creation, to mark active themes
 	ixmaps.htmlgui_onNewTheme = function(szId){
 
+		if ( !actualClicked ){
+			return;
+		}
+		actualClicked = null;
+
 		//ixmaps.showLoading(". . .",true);
 		setTimeout("ixmaps.hideLoading()",1);
 
@@ -49,7 +72,7 @@
 			if ( themeObj.szSnippet && typeof(themeObj.szSnippet)!="undefined"){
 				szHtml += "<br><span style=\"font-size:0.8em;\"><em>"+themeObj.szSnippet+"</em></span>";
 			}
-			szHtml += "<div><img src='resources/images/bg-spinner.gif' style='display:block;margin:1em auto;height:32px'></div>";
+			szHtml += "<div><img src='resources/images/loading_blue.gif' style='display:block;margin:1em auto;height:64px'></div>";
 			$(li).append("<div id='themeLegendDiv"+szId.replace(/\./g,'')+"' class='inline-legend' style='min-height:2em'>"+szHtml+"</div>");
 		}
 		clickA[szId] = lastClicked;
@@ -225,7 +248,7 @@
 
 		var szThemeStyle = ixmaps.getThemeStyleString();
 
-		if ( szThemeStyle.match(/CHOROPLETHE/) ){
+		if ( szThemeStyle.match(/CHOROPLETH/) ){
 			switch (szParameter) {
 				case "amplify":
 					ixmaps.changeThemeStyle(szThemeId,'dopacitypow:'+String(1/Number(szFactor)),'factor');

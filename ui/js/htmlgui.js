@@ -19,15 +19,46 @@ $Log: htmlgui.js,v $
  * @version 1.1 
  */
 
-/**
- * define namespace ixmaps
+/** 
+ * @namespace ixmaps
  */
 
-(function( ixmaps, $, undefined ) {
+(function (window, document, undefined) {
+
+	var ixmaps = {
+		version: "1.0"
+	};
+
+	function expose() {
+		var oldIxmaps = window.ixmaps;
+
+		ixmaps.noConflict = function () {
+			window.ixmaps = oldIxmaps;
+			return this;
+		};
+
+		window.ixmaps = ixmaps;
+	}
+
+	// define Data for Node module pattern loaders, including Browserify
+	if (typeof module === 'object' && typeof module.exports === 'object') {
+		module.exports = ixmaps;
+
+	// define Data as an AMD module
+	} else if (typeof define === 'function' && define.amd) {
+		define(ixmaps);
+	}
+
+	// define Data as a global variable, saving the original Data to restore later if needed
+	if (typeof window !== 'undefined') {
+		expose();
+	}
 
 	/* ------------------------------------------------------------------ * 
 		global variables
 	 * ------------------------------------------------------------------ */
+
+	ixmaps.szDefaultMap				= "../../maps/svg/maps/generic/mercator.svgz";
 
 	ixmaps.szUrlSVG					= null;
 	ixmaps.helpWindow				= null;
@@ -37,13 +68,17 @@ $Log: htmlgui.js,v $
 
 	ixmaps.location					= null;
 
-	ixmaps.fMapLegendStyle			= "visible";
+	ixmaps.fMapLegendStyle			= "hidden";
 	ixmaps.fMapControlStyle			= "large";
 	ixmaps.fMapSizeMode				= "fullscreen";
 	ixmaps.blockLoadingMessage		= false;
 	ixmaps.fSilent					= false;
 
 	ixmaps.szCorsProxy 				= "";
+
+	ixmaps.SVGmapWidth				= 0;			
+	ixmaps.SVGmapHeight				= 0;
+
 
 	/* ------------------------------------------------------------------ * 
 		local variables
@@ -56,8 +91,6 @@ $Log: htmlgui.js,v $
 	var __SVGmapPosY				= 0;			
 	var __SVGmapOffX				= 0;			
 	var __SVGmapOffY				= 0;
-	var __SVGmapWidth				= 0;			
-	var __SVGmapHeight				= 0;
 
 	var __mapTop					= 0;
 	var __mapLeft					= 0;
@@ -100,17 +133,24 @@ $Log: htmlgui.js,v $
 	//
 	var _log_start_time = new Date();
 	_LOG = function(szLog) {
-		var x = new Date();
-		var time = x.getMinutes()+":"+String(x.getSeconds())+"."+String(x.getMilliseconds());
-		console.log("_LOG: time["+time+"] "+szLog);
-
-		// //var time = String(x.getSeconds()+(x.getMilliseconds()/1000));
-		//var time = ((new Date()) - _log_start_time)/1000;
-		//console.log("_LOG: time[sec.ms] "+time+" "+szLog);
+		var time = ((new Date()) - _log_start_time)/1000;
+		console.log("_LOG: time[sec.ms] "+time+" "+szLog);
 	};
 
+	var __addEvent = function(elem, type, eventHandle) {
+		if (elem == null || elem == undefined){
+			return;
+		}
+		if ( elem.addEventListener ) {
+			elem.addEventListener( type, eventHandle, false );
+		} else if ( elem.attachEvent ) {
+			elem.attachEvent( "on" + type, eventHandle );
+		}
+	};
+
+
 	/* ================================================================== * 
-		Init functions
+		create the map application
 	 * ================================================================== */
 
 	/**
@@ -120,7 +160,9 @@ $Log: htmlgui.js,v $
 	 * @type object
 	 * @return the new ixmaps object
 	 */
-	ixmaps.map = function(szMapDiv,options){
+	ixmaps.map = function(szMapDiv,options,callback){
+
+		console.log("*** htmlgui version: "+ixmaps.version);
 
 		if ( !ixmaps.hasSVG() ){
 			alert("sorry ! your browser has no native SVG support;\n\nPlease try:   Chrome, Firefox, Safari, Opera or IE9" );
@@ -168,6 +210,8 @@ $Log: htmlgui.js,v $
 			ixmaps.fMapSizeMode	= "fix";
 			__SVGEmbedWidth = mapDiv.clientWidth;
 			__SVGEmbedHeight = mapDiv.clientHeight;
+			__SVGmapPosX = mapDiv.offsetLeft;
+			__SVGmapPosY = mapDiv.offsetTop;
 			__mapTop  = 0;
 			__mapLeft = 0;
 		}
@@ -189,8 +233,18 @@ $Log: htmlgui.js,v $
 				ixmaps.fMapType = options.maptype;
 			}
 		}
+		if (options.mapType){
+			if (options.mapType != "null"){
+				ixmaps.fMapType = options.mapType;
+			}
+		}
+		if (options.wheelzoom){
+			ixmaps.scrollWheelZoom = true;
+		}
 
-		this.options = options;
+		ixmaps.options = options;
+
+		ixmaps.callback = callback;
 
 		/** 
 		*  load the maps
@@ -217,8 +271,8 @@ $Log: htmlgui.js,v $
 			szError = "Error: missing map target (SVG div)!";
 		}
 		if ( szError ){
-			this.HTML_showLoading();
-			$("#loading-text").append(szError);
+			this.showLoading();
+			$("#loading-text").append(szError+"x");
 			$("#loading-image").css("visibility","hidden");
 
 			// call user defined method on map ready
@@ -240,7 +294,8 @@ $Log: htmlgui.js,v $
 		// store this for later use, needed in browser with more windows 
 		this.location = window.location;
 
-		this.szUrlSVG = szUrl;
+		this.szName     = this.szName || "map";
+		this.szUrlSVG	= "";
 		this.szGmapDiv  = szGmapDiv;
 		this.szSvgDiv   = szSvgDiv;
 		this.gmapDiv	= $('#'+szGmapDiv)[0];
@@ -257,7 +312,7 @@ $Log: htmlgui.js,v $
 		var mapWidth  = fullWidth  - __mapLeft - __SVGmapPosX;			
 		var mapHeight = fullHeight - __mapTop  - __SVGmapPosY;			
 
-		this.HTML_hideLoading();
+		this.hideLoading();
 
 		// -----------------------------------
 		// prepare hosting div for google maps
@@ -270,11 +325,13 @@ $Log: htmlgui.js,v $
 			this.gmapDiv.setAttribute("onmouseover","javascript:ixmaps.do_mapmouseover(event);");
 			this.gmapDiv.setAttribute("onmousemove","javascript:ixmaps.do_mapmousemove(event);");
 			this.gmapDiv.setAttribute("onclick","javascript:ixmaps.do_mapclick(event);");
+			this.gmapDiv.setAttribute("ondblclick","javascript:ixmaps.do_mapclick(event);");
 			this.gmapDiv.setAttribute("onKeyDown","javascript:ixmaps.do_keydown(event);");
 			this.gmapDiv.setAttribute("onKeyUp","javascript:ixmaps.do_keyup(event);");
 			
 			$(this.gmapDiv).css({'pointer-events':'all'	,
 								 'position':'absolute'	,
+								 'z-index':'1',
 								 'top':__SVGmapPosY+'px',
 								 'left':__SVGmapPosX+'px',
 								 'height':mapHeight+'px',
@@ -297,11 +354,13 @@ $Log: htmlgui.js,v $
 			this.svgDiv.setAttribute("onKeyDown","javascript:ixmaps.do_keydown(event);");
 			this.svgDiv.setAttribute("onKeyUp","javascript:ixmaps.do_keyup(event);");
 
-			this.svgDiv.setAttribute("style","pointer-events:none;position:absolute;z-index:2;visibility:hidden;"+
-				"top:"+__SVGmapPosY+"px;"+
-				"left:"+__SVGmapPosX+"px;"+
-				"width:100%;"+
-				"height:100%;");
+			$(this.svgDiv).css({'pointer-events':'none',
+								'position':'absolute',
+								'z-index':'99',
+								'top':+__SVGmapPosY+'px',
+								'left':+__SVGmapPosX+'px' });
+
+			$(this.svgDiv).css({'visibility':'hidden'});
 
 			// GR 09.01.2014 create without data="... attribute !
 			//				 data= will be defined by ixmaps.HTML_loadSVGMap(...); see below
@@ -317,116 +376,47 @@ $Log: htmlgui.js,v $
 			// load basic SVG file
 			// --------------------
 
-			if (this.szUrlSVG || $(this.szUrlSVG).assertStr()){
+			// GR 07.04.2018 default map
+			szUrl = szUrl || ixmaps.szDefaultMap;
 
-				this.HTML_loadSVGMap(this.szUrlSVG);
+			if ( szUrl || $( szUrl).assertStr()){
+
+				this.HTML_loadSVGMap(szUrl);
+				this.szUrlSVG = szUrl;
 
 			}else{
 				// if no map is given
 				// we are ready here ----> fire onMapReady event !
 				// -----------------------------------------------
-				this.HTML_showLoading();
+				this.showLoading();
 				$("#loading-text").append("no map");
 				$("#loading-image").css("visibility","hidden");
-				try{
-					this.onMapReady(this.szName);
-				}
-				catch (e){
-				}
-				// bubble it up !
-				try{
-					this.parentApi.onMapReady(this.szName);
-				}
-				catch (e){
+
+				if ( this.callback ) {
+					this.callback(this);
+				}else{
+					try{
+						this.onMapReady(this.szName);
+					}
+					catch (e){
+					}
+					// bubble it up !
+					try{
+						this.parentApi.onMapReady(this.szName);
+					}
+					catch (e){
+					}
 				}
 			}
 		}
 
 		// register window resize event to adapt the map always to the window size
 		// -----------------------------------------------------------------------
-		__addEvent(window, "resize", function() { ixmaps.onWindowResize(null,false); } );
+		__addEvent(window, "resize", function() { ixmaps.resizeMap(null,false); } );
 
-		setTimeout("ixmaps.onWindowResize(null,false)",100);
+		setTimeout("ixmaps.resizeMap(null,false)",100);
 
 		return ixmaps;
-	};
-
-	/**
-	 * on resize handler   
-	 * @param mapBox an optinal boundigbox in screen coordinates
-	 * @param fZoomTo parameter to pass to htmlgui_resizeMap()
-	 * @param fCenter parameter to pass to htmlgui_resizeMap()
-	 * @type void
-	 */
-	ixmaps.onWindowResize = function(mapBox,fZoomTo,fCenter){
-
-		if (mapBox){
-			__SVGmapOffX = mapBox.x;			
-			__SVGmapOffY = mapBox.y;	
-			__SVGmapWidth  = mapBox.width;			
-			__SVGmapHeight = mapBox.height;			
-		}else{
-			if ( ixmaps.fMapSizeMode == "fix" ){
-				return;
-			}
-			if ( $("#banner-right").position() ){
-				__SVGmapPosY = $("#banner-right").position().top - parseInt($("#banner-right").parent().css("padding-top"));
-				$("#banner").css("height","40px");
-			}
-			__SVGmapWidth  = window.innerWidth  - __mapLeft - __SVGmapPosX - __SVGmapOffX;			
-			__SVGmapHeight = window.innerHeight - __mapTop  - __SVGmapPosY - __SVGmapOffY;			
-		}
-		
-		if ($(this.gmapDiv)){
-			$(this.gmapDiv).css({
-				"top"	:(__SVGmapPosY+__SVGmapOffY)+"px",
-				"left"	:(__SVGmapPosX+__SVGmapOffX)+"px",
-				"width"	:(__SVGmapWidth)+"px",
-				"height":(__SVGmapHeight)+"px",
-				"overflow":"hidden"
-				});
-		}
-		if ($(this.svgDiv)){
-			$(this.svgDiv).css({
-				"top"	:(__SVGmapPosY)+"px",
-				"left"	:(__SVGmapPosX)+"px",
-				"width"	:(__SVGmapOffX+__SVGmapWidth)+"px",
-				"height":(__SVGmapOffY+__SVGmapHeight)+"px",
-				"overflow":"hidden"
-				});
-		}
-		if ($("#SVGMap")){
-			$("#SVGMap").css({
-				"width"	:(__SVGmapOffX+__SVGmapWidth)+"px",
-				"height":(__SVGmapOffY+__SVGmapHeight)+"px",
-				"overflow":"hidden"
-				});
-		}
-		if ($("#ixmap")){
-			$("#ixmap").css({
-				"width"	:(__SVGmapOffX+__SVGmapWidth)+"px",
-				"height":(__SVGmapOffY+__SVGmapHeight)+"px",
-				"overflow":"hidden"
-				});
-		}
-		if ($("#dummy-split-container")){
-			$("#dummy-split-container").css({
-				"top"	:(__SVGmapPosY+__SVGmapOffY)+"px",
-				"left"	:(__SVGmapPosX+__SVGmapOffX)+"px",
-				"width"	:(__SVGmapWidth)+"px",
-				"height":(__SVGmapHeight)+"px",
-				"overflow":"hidden"
-				});
-		}
-
-		htmlMap_setSize(__SVGmapWidth,__SVGmapHeight);
-
-		this.htmlgui_resizeMap(fZoomTo,__SVGmapOffX+__SVGmapWidth,__SVGmapOffY+__SVGmapHeight,fCenter);
-
-		try{
-			this.htmlgui_onWindowResize();
-		}
-		catch (e){}
 	};
 
 	/**
@@ -437,14 +427,22 @@ $Log: htmlgui.js,v $
 	 */
 	ixmaps.HTML_loadSVGMap = function(szUrl,szName){
 
-		this.HTML_showLoading();
+		this.showLoading();
 		if (ixmaps.embeddedSVG){
 			this.mapTool("");
 		}
-		remove_popupTools();
-		remove_popupHelp();
 
-		$(this.svgDiv).css("visibility","visible");
+		if ( this.szUrlSVG == szUrl ){
+
+			// call user defined method on map ready
+			// --------------------------------------------------------
+			if ( this.callback ) {
+				this.callback(this);
+			}else{
+				this.onMapReady(this.szName);
+			}
+			return;
+		}
 
 		this.szUrlSVG = szUrl;
 		this.szUrlSVGRoot = "";
@@ -471,13 +469,10 @@ $Log: htmlgui.js,v $
 
 		this.embeddedSVG = null;
 		do_enableSVG();
-
-		$("#loading-text").empty();
-		$("#loading-text").append(szName?szName:" ... loading ...");
-
 	};
+
 	ixmaps.loadMapError = function(){
-		alert("alert");
+		alert("SVG load error!");
 	};
 
 	/**
@@ -502,6 +497,95 @@ $Log: htmlgui.js,v $
 		$("#dialog").dialog( "close" );
 	};
 
+	/**
+	 * wrapper to load an SVG map
+	 * @param szUrl the relative or absolute URL of the SVG file
+	 * @type void
+	 */
+	ixmaps.loadMap = function(szUrl,callback) {
+		this.callback = callback;
+		ixmaps.HTML_loadSVGMap(szUrl);
+	};
+
+	/**
+	 * on resize handler   
+	 * @param mapBox an optinal boundigbox in screen coordinates
+	 * @param fZoomTo parameter to pass to htmlgui_resizeMap()
+	 * @param fCenter parameter to pass to htmlgui_resizeMap()
+	 * @type void
+	 */
+	ixmaps.resizeMap = function(mapBox,fZoomTo,fCenter){
+
+		if (mapBox){
+			__SVGmapOffX = mapBox.x;			
+			__SVGmapOffY = mapBox.y;	
+			ixmaps.SVGmapWidth  = mapBox.width;			
+			ixmaps.SVGmapHeight = mapBox.height;			
+		}else{
+			if ( ixmaps.fMapSizeMode == "fix" ){
+				return;
+			}
+			if ( $("#banner-right").position() ){
+				__SVGmapPosY = $("#banner-right").position().top - parseInt($("#banner-right").parent().css("padding-top"));
+				$("#banner").css("height","40px");
+			}
+			ixmaps.SVGmapWidth  = window.innerWidth  - __mapLeft - __SVGmapPosX - __SVGmapOffX;			
+			ixmaps.SVGmapHeight = window.innerHeight - __mapTop  - __SVGmapPosY - __SVGmapOffY;			
+		}
+		
+		if ($(this.gmapDiv)){
+			$(this.gmapDiv).css({
+				"top"	:(__SVGmapPosY+__SVGmapOffY)+"px",
+				"left"	:(__SVGmapPosX+__SVGmapOffX)+"px",
+				"width"	:(ixmaps.SVGmapWidth)+"px",
+				"height":(ixmaps.SVGmapHeight)+"px",
+				"overflow":"hidden"
+				});
+		}
+		if ($(this.svgDiv)){
+			$(this.svgDiv).css({
+				"top"	:(__SVGmapPosY)+"px",
+				"left"	:(__SVGmapPosX)+"px",
+				"width"	:(__SVGmapOffX+ixmaps.SVGmapWidth)+"px",
+				"height":(__SVGmapOffY+ixmaps.SVGmapHeight)+"px",
+				"overflow":"hidden"
+				});
+		}
+		if ($("#SVGMap")){
+			$("#SVGMap").css({
+				"width"	:(__SVGmapOffX+ixmaps.SVGmapWidth)+"px",
+				"height":(__SVGmapOffY+ixmaps.SVGmapHeight)+"px",
+				"overflow":"hidden"
+				});
+		}
+		if ($("#ixmap")){
+			$("#ixmap").css({
+				"width"	:(__SVGmapOffX+ixmaps.SVGmapWidth)+"px",
+				"height":(__SVGmapOffY+ixmaps.SVGmapHeight)+"px",
+				"overflow":"hidden"
+				});
+		}
+		if ($("#dummy-split-container")){
+			$("#dummy-split-container").css({
+				"top"	:(__SVGmapPosY+__SVGmapOffY)+"px",
+				"left"	:(__SVGmapPosX+__SVGmapOffX)+"px",
+				"width"	:(ixmaps.SVGmapWidth)+"px",
+				"height":(ixmaps.SVGmapHeight)+"px",
+				"overflow":"hidden"
+				});
+		}
+
+		htmlMap_setSize(ixmaps.SVGmapWidth,ixmaps.SVGmapHeight);
+
+		this.htmlgui_resizeMap(fZoomTo,__SVGmapOffX+ixmaps.SVGmapWidth,__SVGmapOffY+ixmaps.SVGmapHeight,fCenter);
+
+		try{
+			this.htmlgui_onWindowResize();
+		}
+		catch (e){}
+	};
+
+
 	// -----------------------------------
 	// loading message 
 	// -----------------------------------
@@ -511,7 +595,7 @@ $Log: htmlgui.js,v $
 	 * @param szMessage the message text
 	 * @type void
 	 */
-	ixmaps.HTML_showLoading = function(szMessage,fForce){
+	ixmaps.showLoading = function(szMessage,fForce){
 
 		// GR 09.12.2016 ixmaps parameter defined to not show loading messages
 		if ( ixmaps.embeddedSVG && ixmaps.embeddedSVG.window.fExecuteSilent && !fForce ){
@@ -530,6 +614,60 @@ $Log: htmlgui.js,v $
 			szMessage = "..."+szMessage.slice(-25);
 		}
 
+		/**
+		if ( !$("#divloading")[0] )	{
+			$(this.gmapDiv).append(
+			'<div id="divloading" style="pointer-events:none;z-index:9999">'+
+				'<div id="loading-text-div" style="position:absolute;top:47%;width:100%;opacity:1;z-index:99">'+
+					'<div id="loading-text" style="font-family:arial;font-size:48px;opacity:1;'+
+										'color: #cccccc;'+
+										'background-color: #ffffff;'+
+										'text-align:center;'+
+										'">'+
+					'</div>'+
+					'<div id="loading-gif" style="margin-top:-1em"><img src="../../ui/resources/images/loading_blue.gif" style="display:block;position:absolute;top:3em;left:45%;margin:1em auto;height:64px"/></div>'+
+					'</div>'+
+				'</div>'+
+			'</div>'
+			);
+		}
+		**/
+		if ( !$("#divloading")[0] )	{
+			$(this.gmapDiv).append(
+			'<div id="divloading" style="pointer-events:none;z-index:9999">'+
+				'<div id="loading-text-div" class="loading-text-div">'+
+					'<span id="loading-text" class="loading-text">IXMAPS</span>'+
+				'</div>'+
+			'</div>'
+			);
+			$("#loading-text-div").css({
+				"position": "absolute",
+				"top": "47%",
+				"width": "100%",
+				"opacity": "1",	
+				"z-index": "99",
+				"text-align": "center"
+			});
+			$("#loading-text").css({
+				"font-family": "arial",
+				"font-size": "42px",
+				"opacity": "1",
+				"color": "#aaa",
+				"padding": "0em 1em",
+				"border": "solid #666 0.5px",
+				"border-radius": "0.2em",
+				"background": "rgb(255, 255, 255, 0.5)" 
+			});
+			$("#loading-gif").css({
+				"margin-top": "-1em"
+			});
+			$("#loading-gif-img").css({
+				"display": "block",
+				"margin": "1em auto",
+				"height": "64px" 
+			});
+		}
+
 		try{
 			var top  = (window.innerHeight*0.4);
 			var left = (window.innerWidth*0.47);
@@ -544,6 +682,7 @@ $Log: htmlgui.js,v $
 				"left"		:String(left+"px")
 				});
 			$("#loading-image").css("visibility","visible");
+			$("#loading-text-div").show();
 			if ( szMessage ){
 				$("#loading-text").empty();
 				$("#loading-text").append(szMessage);
@@ -551,60 +690,73 @@ $Log: htmlgui.js,v $
 
 			ixmaps.blockLoadingMessage = true;
 
+			clearTimeout(ixmaps.hideLoadingTimeout);
 		}
 		catch (e){
 		}
 	};
-	ixmaps.HTML_hideLoading = function(){
+
+	/**
+	 * hide the loading message
+	 * @type void
+	 */
+	ixmaps.hideLoading = function(){
 		try{
 			$("#loading-image").css("visibility","hidden");
+			ixmaps.hideLoadingTimeout = setTimeout('$("#loading-text-div").fadeOut(100)',500);
 			ixmaps.blockLoadingMessage = false;
 		}
 		catch (e){
 		}
 	};
 
+	// -----------------------------------
+	// alternating loading message 
+	// -----------------------------------
+
 	var __showLoadingArray = [];
 	var __showLoadingArrayIndex = 0;
 	var __showLoadingArrayTimeout = null;
 	var __showLoadingArrayActive = false;
 
-	ixmaps.HTML_showLoadingArray = function(szMessageA){
+	/**
+	 * start displaying alternating loading messages
+	 * @param szMessageA an array of alternative message texts
+	 * @type void
+	 */
+	ixmaps.showLoadingArray = function(szMessageA){
 		__showLoadingArray = szMessageA;
 		__showLoadingArrayActive = true;
 		__showLoadingArrayIndex = 0;
-		ixmaps.HTML_showLoadingArrayNext();
+		ixmaps.showLoadingArrayNext();
 	};
-	ixmaps.HTML_showLoadingArrayNext = function(){
+	/**
+	 * show the next message from the array 
+	 * @type void
+	 */
+	ixmaps.showLoadingArrayNext = function(){
 		if ( !__showLoadingArrayActive ){
 			return;
 		}
-		ixmaps.HTML_showLoading(__showLoadingArray[__showLoadingArrayIndex++]);
+		ixmaps.showLoading(__showLoadingArray[__showLoadingArrayIndex++]);
+		$("#loading-gif").show();
+
 		__showLoadingArrayIndex = __showLoadingArrayIndex%(__showLoadingArray.length);
-		__showLoadingArrayTimeout = setTimeout("ixmaps.HTML_showLoadingArrayNext()",1000);
+		__showLoadingArrayTimeout = setTimeout("ixmaps.showLoadingArrayNext()",1000);
 	};
-	ixmaps.HTML_showLoadingArrayStop = function(){
+	/**
+	 * stot the alternating message display
+	 * @type void
+	 */
+	ixmaps.showLoadingArrayStop = function(){
 		__showLoadingArrayActive = false;
 		clearTimeout(__showLoadingArrayTimeout);
+		$("#loading-gif").hide();
 	};
 
-	// show/hide HTML User Interface
-	// -----------------------------
-	ixmaps.HTML_hideUi = function(){
-		try{
-			ixmaps.switchUi(false);
-		}
-		catch (e){}
-	};
-	ixmaps.HTML_showUi = function(){
-		try{
-			ixmaps.switchUi(true);
-		}
-		catch (e){}
-	};
-
+	// -----------------------------------
 	// show/hide HTML map
-	// ------------------
+	// -----------------------------------
 
 	ixmaps.HTML_showMap = function(){
 		if ( this.fSVGInitializing ){
@@ -613,13 +765,25 @@ $Log: htmlgui.js,v $
 		if ( this.gmapDiv && !this.gmap ){
 			this.gmap = this.loadGMap(this.szMapService);
 			this.htmlMap = true;
+
+			// --------------------------------------------------------
+			// event error work around
+			// --------------------------------------------------------
+			// GR 09.04.2018 some broser don't get events through overlay SVG even if there pointer-events == none
+			// we create a transparent pane on top to enable zoom and pan of the HTML basemap 
+			aDiv = document.createElement("div");
+			aDiv.setAttribute("id","androideventpane");
+			aDiv.setAttribute("class", "androideventpane");
+			aDiv.setAttribute("style", "position:absolute;width:100%;height:100%;z-index:100");
+			$('#'+this.szGmapDiv)[0].appendChild(aDiv);
+
 		}
 		$(this.gmapDiv).css("visibility","visible");
 		this.hideNorthArrow();
 	};
 
 	ixmaps.HTML_hideMap = function(){
-		$(this.gmapDiv).css("visibility","hidden");
+		//$(this.gmapDiv).css("visibility","hidden");
 		this.showNorthArrow();
 	};
 	
@@ -634,386 +798,152 @@ $Log: htmlgui.js,v $
 		}
 	};
 
-	// show/hide SVG map
-	// ------------------
-	ixmaps.HTML_toggleSVG = function(){
-		if ( $(this.svgDiv).css("width") == (__SVGmapOffX+"px") ){
-			$(this.svgDiv).css("width",(__SVGmapOffX+__SVGmapWidth)+"px");
-		}else{
-			$(this.svgDiv).css("width",(__SVGmapOffX)+"px");
-		}
-	};
-
 	/** query HTML map visibility
 	 */
 	ixmaps.htmlgui_isHTMLMapVisible = function(){
 		return ($(this.gmapDiv).css("visibility") == "visible");
 	};
 
+	// -----------------------------------
+	// show/hide SVG map
+	// -----------------------------------
+
+	ixmaps.HTML_toggleSVG = function(){
+		if ( $(this.svgDiv).css("width") == (__SVGmapOffX+"px") ){
+			$(this.svgDiv).css("width",(__SVGmapOffX+ixmaps.SVGmapWidth)+"px");
+		}else{
+			$(this.svgDiv).css("width",(__SVGmapOffX)+"px");
+		}
+	};
+
+	// -----------------------------------
+	//	map opacity
+	// -----------------------------------
+
+	ixmaps.setSVGMapOpacity = function(nValue,szMode){
+		try { ixmaps.embeddedSVG.window.map.setOpacity(nValue,szMode);
+		} catch (e){}
+	};
+	ixmaps.toggleSVGMapOpacity = function(){
+		try { ixmaps.embeddedSVG.window.map.toggleOpacity();
+		} catch (e){}
+	};
+	ixmaps.setHTMLMapOpacity = function(nValue,szMode){
+		var nOpacity = Number($(this.gmapDiv).css("opacity") || 1);
+		nOpacity += nValue;
+		$(this.gmapDiv).css("opacity",String(nOpacity));
+	};
 
 
 	/* ------------------------------------------------------------------ * 
 		helper
 	 * ------------------------------------------------------------------ */
 
-	var __addEvent = function(elem, type, eventHandle) {
-		if (elem == null || elem == undefined){
-			return;
-		}
-		if ( elem.addEventListener ) {
-			elem.addEventListener( type, eventHandle, false );
-		} else if ( elem.attachEvent ) {
-			elem.attachEvent( "on" + type, eventHandle );
-		}
+	/**
+	 * set map features
+	 * @param {String} szFeatures a style string like "item1:value1;item2:value2;" 
+	 * @return void
+	 * @example	ixmaps.setMapFeatures("popupdelay:250;toolmargintop:60;flushPaintShape:5000;flushChartDraw:5000;featurescaling:true;objectscaling:dynamic;labelscaling:dynamic;dynamiclabel:NOSIZE;labelspace:2.0;checklabeloverlap:NOSQUEEZE;loadsilent:true;");
+	 * @deprecated please use {@link ixmaps.setOptions} 
+	 */
+	ixmaps.setMapFeatures = function(szFeatures){
+		ixmaps.embeddedSVG.window.map.Api.setMapFeatures(szFeatures);
+		ixmaps.embeddedSVG.window.map.Viewport.reformat();
+		return ixmaps;
 	};
-	ixmaps.onDialogClose = null;
-	ixmaps.beforeDialogTool = "";
-	ixmaps.openDialog = function(event,szElement,szUrl,szTitle,szPosition,nMaxWidth,nMaxHeight,nOpacity){
 
-		if ( typeof($("#"+szElement)[0]) != "undefined" ){
-			if ( $("#"+szElement)[0].innerHTML.length > 10 ){
-				$("#"+szElement)[0].innerHTML = "";
-				$("#"+szElement).dialog( "destroy" );
-				ixmaps.mapTool(ixmaps.beforeDialogTool);
+	/**
+	 * set map options
+	 * @param {Object} opt option object  like {item1:value1,item2:value2} 
+	 * @return void
+	 */
+	ixmaps.setOptions = function(opt){
+		var szFeatures = "";
+		for ( i in opt ){
+			if ( (typeof(i) == "string") && (i.match(/autoSwitchInfo/i)) ){
+				this.setAutoSwitchInfo(true);
+			}else
+			if ( (typeof(i) == "string") && (i.match(/panHidden/i)) ){
+				this.panHidden = (typeof(opt[i]) == "string") ? (opt[i]=="true") : opt[i];
+			}else
+			if ( (typeof(i) == "string") && (i.match(/normalSizeScale/i)) ){
+				this.setScaleParam({"normalSizeScale":opt[i]});
+			}else{
+				szFeatures += String(i+":"+opt[i]+";");
+			}
+		}
+		ixmaps.embeddedSVG.window.map.Api.setMapFeatures(szFeatures);
+		return ixmaps;
+	};
+
+	/**
+	 * set map scale parameter
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szParam a style string like "item1:value1;item2:value2;" 
+	 * @return void
+	 * @example	ixmaps.setScaleParam("normalSizeScale:50000;labelScaling:1.5");
+	 */
+	ixmaps.setScaleParam = function(szParam){
+		if ( typeof(szParam) == 'string' ){
+			try	{
+				eval('szParam = {'+szParam.replace(/;/g,',')+'}');
+			} catch (e) {
+				alert("invalid scale param: \""+szParam+"\"");
 				return;
 			}
 		}
-		// GR 05.06.2014 restore input mode after dialog closed
-		ixmaps.beforeDialogTool = ixmaps.getMapTool();
-
-		var offsetLeft = null;
-		var offsetTop  = null;
-		if ( event && (typeof(event) != "undefined") ){
-			if ( $(event.currentTarget) ){
-				offsetLeft = $(event.currentTarget).offset().left + $(event.currentTarget).innerWidth();
-				offsetTop  = $(event.currentTarget).offset().top  + $(event.currentTarget).innerHeight();
-			}
-		}
-
-		var dialogWidth  = nMaxWidth?nMaxWidth:450;
-		var dialogHeight = Math.min(__SVGmapHeight-30,nMaxHeight?nMaxHeight:__SVGmapHeight-30);
-
-		var nPosition = [450,50];
-
-		if ( !szPosition ){
-			szPosition = "center";
-		}
-
-		if ( szPosition ){
-			if ( szPosition == "left" ){
-				nPosition = [0,50];
-			}
-			else
-			if ( szPosition == "centerleft" ){
-				nPosition = [50,50];
-			}
-			else
-			if ( szPosition == "right" ){
-				nPosition = [window.innerWidth-dialogWidth-50,50];
-			}
-			else
-			if ( szPosition == "center" ){
-				nPosition = [window.innerWidth/2-dialogWidth/2,50];
-			}
-			else
-			if ( szPosition == "auto" && offsetLeft && offsetTop ){
-				nPosition = [Math.max(10,offsetLeft-dialogWidth-5),offsetTop+10];
-			}
-			else
-			if ( szPosition.match(/,/) ){
-				var szValueA = szPosition.split(",");
-				nPosition = [Number(szValueA[0]),Number(szValueA[1])];
-			}
-			else{
-				nPosition = [window.innerWidth/2-dialogWidth/2,50];
-			}
-		}
-		// GR 18.02.2014 limit width again
-		if ( dialogWidth > window.innerWidth-nPosition[0] ){
-			dialogWidth = Math.min(window.innerWidth-20,dialogWidth);
-			// for 1 line dialogs add a line to avoid scrollbars
-			dialogHeight += 26;
-		}
-		// if no spez. host element given, create randomone
-		if ( typeof($("#"+szElement)[0]) == "undefined" ){
-			if ( !szElement ){
-				szElement = "dialog-"+String(Math.random()).substr(2,10);
-			}
-			var dialogDiv = document.createElement("div");
-			dialogDiv.setAttribute("id",szElement);
-			$("#dialog")[0].parentNode.appendChild(dialogDiv);
-		}
-
-		$("#"+szElement).css("visibility","visible");
-	    $("#"+szElement).dialog({	draggable: true,
-									resizable: true,
-									    width: dialogWidth,
-									   height: dialogHeight,
-									    title: szTitle,
-			                         position: nPosition,
-								        close: function(event, ui) {
-				$("#"+szElement)[0].innerHTML = "";
-				$("#"+szElement).dialog("destroy");
-				ixmaps.mapTool(ixmaps.beforeDialogTool);
-				if (ixmaps.onDialogClose){
-					ixmaps.onDialogClose();
-				}
-			}
-			});
-		// GR 18.02.2014 set correct height
-		$("#"+szElement).parent().css("height",String(dialogHeight-60)+"px");
-		// GR 13.10.2011 set opacity
-		if (nOpacity){
-			$("#"+szElement).parent().css("opacity",String(nOpacity));
-		}
-		// load content
-		if ( typeof(szUrl) == "string" && szUrl.length ){
-			$("#"+szElement)[0].innerHTML = 
-				"<div overflow=\"auto\">"+
-				"<iframe style=\"width:100%;height:"+(dialogHeight-60)+"px;\" id=\"dialogframe\" src=\""+szUrl+"\" frameborder=\"0\" marginwidth=\"0px\" />"+
-				"</div>";
-			}
-		return 	$("#"+szElement)[0];
+		ixmaps.embeddedSVG.window.map.Api.setScaleParam(szParam);
+		return ixmaps;
 	};
-	ixmaps.openSidebar = function(event,szElement,szUrl,szTitle,szPosition,nMinWidth,nMinHeight){
-		if ( typeof($("#"+szElement)[0]) == "undefined" ){
-			szElement = "dialog";
-		}
-		if ( ixmaps.sidebar ){
-			$(ixmaps.sidebar).css("visibility","hidden");
-			ixmaps.sidebar.innerHTML = "";
-			ixmaps.sidebar = null;
+
+
+	// -----------------------------
+	// map themes handling
+	// -----------------------------
+
+	ixmaps.newTheme = function(szThemeName,theme,fClear){ 
+
+		if ( !theme ){
+			alert("no theme defined");
 			return;
 		}
-		$("#"+szElement).css({
-			"visibility":"visible",	
-			"position"	:"absolute",
-			"top"		:"30px;",
-			"left"		:"10px;",
-			"z-index"	:"1000",
-			"width"		:"370px",
-			"height"	:(__SVGmapHeight-30) +"px",
-			"background-color":"#fff",
-			"border-right":"solid 1px #ddd",
-			"border-bottom":"solid 1px #ddd"
-		});
-		if ( typeof(szUrl) == "string" && szUrl.length ){
-			$("#"+szElement)[0].innerHTML = 
-				"<div id=\"sidebarclosebutton\" style=\position:absolute;top:1px;left:370px;background-color:#fff;border-right:solid;border-bottom:solid;border-color:#ddd;border-width:1;\">" + 
-				"<a style=\"font-family:verdana;font-size:16px;color:#888\" href=\"javascript:ixmaps.closeSidebar();\">&nbsp;x&nbsp;</a></div>" +
-				//"<button type=\"button\" id=\"closetools\" style=\"position:absolute;top:6px;left:368px;background-color:#fff;height:23px;\"><label for=\"popuptools\"></label></button>" +
-				"<iframe src=\""+szUrl+"\" width=\"100%\" height=\"100%\" frameborder=\"0\" marginwidth=\"0px\" />";
+		// clone opt to not destroy the original
+		// method found on stackoverflow.org
+		ixmaps.theme = JSON.parse(JSON.stringify(theme));
 
-		}
-		$( "#closetools" ).button({ icons:{primary:'ui-icon-close'}}).click(function(e){
-							ixmaps.openSidebar(e,'dialog','','','auto',350,800);
-							});
-		ixmaps.sidebar = $("#"+szElement)[0];
-	};
-	ixmaps.closeSidebar = function(){
-		if ( ixmaps.sidebar ){
-			$(ixmaps.sidebar).css("visibility","hidden");
-			ixmaps.sidebar.innerHTML = "";
-			ixmaps.sidebar = null;
-			return;
-		}
-	};
-	ixmaps.openMegaBox = function(event,szElement,szUrl,szTitle){
-		if ( typeof($("#"+szElement)[0]) == "undefined" ){
-			return;
-		}
-
-		var dialogWidth   = Math.min(800,window.innerWidth*0.75);
-		var dialogHeight  = Math.min(800,window.innerHeight*0.85);
-		var nPosition = [window.innerWidth/2-dialogWidth/2,50];
-
-		$("#velo").css({
-			"visibility":"visible",
-			"width":(__SVGmapOffX+__SVGmapWidth)+"px",
-			"height":(__SVGmapHeight)-"px"
-		});
-		$("#"+szElement).css("visibility","visible");
-	    $("#"+szElement).dialog({ width: dialogWidth, height: dialogHeight, title: szTitle, position:  nPosition, close: function(event, ui) {
-			$("#velo").css("visibility","hidden");
+		// to clear, call clearAll() and give time by setTimeout 
+		if ( fClear ){
+			if ( fClear == "force" ){
+				theme.style.type += "|FORCE";
 			}
-			});
-		if ( typeof(szUrl) == "string" && szUrl.length ){
-			$("#"+szElement)[0].innerHTML = 
-				"<iframe src=\""+szUrl+"\" width=\"100%\" height=\"100%\" frameborder=\"0\" marginwidth=\"0px\" />";
-			}	
-	};
-
-	/* ------------------------------------------------------------------ * 
-		splitter - whipe SVG content over the HTML basemap
-	 * ------------------------------------------------------------------ */
-
-	var ___splitterMode = "div";
-	var ___splitter = false;
-	var ___splitterVisible = false;
-	var ___splitterWidth = 0;
-	ixmaps.toggleSplitter = function(){
-		if ( !___splitter ){
-			initSplitter();
-			___splitter = true;
-		}else{
-			if ( ___splitterVisible ){
-				$('#dummy-split-container').css("visibility","hidden");
-				if ( ___splitterMode == "div" && this.svgDiv){
-					$(this.svgDiv).css("width",(__SVGmapOffX+__SVGmapWidth)+"px");
-				}else{
-					ixmaps.clipLayer(null,(__SVGmapWidth));
-				}
+			if ( fClear == "clearcharts" ){
+				this.clearAllCharts();
 			}else{
-				$('#dummy-split-container').css("visibility","visible");
-				if ( ___splitterMode == "div" && this.svgDiv){
-					$(this.svgDiv).css("width",(__SVGmapPosX+__SVGmapOffX+___splitterWidth)+"px");
-				}else{
-					ixmaps.clipLayer(null,(___splitterWidth));
-				}
+				this.clearAll();
 			}
 		}
-		___splitterVisible = ___splitterVisible?false:true;
-	};
-	ixmaps.removeSplitter = function(){
-		if ( !___splitter ){
-			return;
-		}else{
-			if ( ___splitterVisible ){
-				$('#dummy-split-container').css("visibility","hidden");
-				if ( ___splitterMode == "div" && this.svgDiv ){
-					$(this.svgDiv).css("width",(__SVGmapOffX+__SVGmapWidth)+"px");
-				}else{
-					ixmaps.clipLayer(null,(__SVGmapWidth));
-				}
-			}
-		}
-		___splitterVisible = false;
-	};
-	function initSplitter(){
-		var splitterDiv = document.createElement("div");
-		splitterDiv.setAttribute("id","dummy-split-container");
-		splitterDiv.setAttribute("style","position:absolute");
-		splitterDiv.innerHTML  = "<div><img alt=\"before\" src=\"\" style=\"visibility:hidden\" width=\""+(__SVGmapWidth)+"px"+"\" height=\""+(__SVGmapHeight)+"px"+"\" /></div>";
-		splitterDiv.innerHTML += "<div><img alt=\"after\" src=\"\" style=\"visibility:hidden\" /></div>";
 
-		ixmaps.svgDiv.parentNode.insertBefore(splitterDiv,ixmaps.svgDiv.nextSibling);
-
-		var splitterDiv = window.document.getElementById("dummy-split-container");
-		if ($("#dummy-split-container")){
-			$("#dummy-split-container").css({
-				"top"	:(__SVGmapPosY+__SVGmapOffY)+"px",
-				"left"	:(__SVGmapPosX+__SVGmapOffX)+"px",
-				"width"	:(__SVGmapWidth)+"px",
-				"height":(__SVGmapHeight)+"px"
-			});
+		// set theme title to theme name if not defined in theme object
+		if ( !theme.style.title && szThemeName ){
+			theme.style.title = szThemeName;
 		}
 
-		$('#dummy-split-container').beforeAfter({showFullLinks:false,
-												 onReady:setSplitter,
-												 onMove:setSplitter,
-												 imagePath : '../../ui/libs/beforeafter/js/'});
-	}
-	function setSplitter(nWidth){
-		___splitterWidth = nWidth;
-		if ( ___splitterMode == "div" && ixmaps.svgDiv){
-			$(ixmaps.svgDiv).css("width",(__SVGmapPosX+__SVGmapOffX+___splitterWidth)+"px");
-		}else{
-			ixmaps.clipLayer(null,(___splitterWidth));
+		try {
+			ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(theme);
 		}
-		/**
-			var gmapDiv = window.document.getElementById("gmap");
-			if (0 && gmapDiv){
-				gmapDiv.style["width"] = (nWidth)+"px";
-			}
-		**/
-	}
-
-	// -----------------------------
-	// html button handler
-	// -----------------------------
-
-	ixmaps.panMap = function(nDeltaX,nDeltaY,szMode){
-		try{
-			ixmaps.embeddedSVG.window.map.Api.doPanMap(nDeltaX,nDeltaY,szMode);
-		}
-		catch (e){
-			alert('map api error!');
-		}
+		catch (e){}
 	};
-	ixmaps.zoomMap = function(nIndex,szMode,newZoom){
-		try{
-			var zoomSelect  = window.document.getElementById("zoomList");
-			var newScale = ixmaps.embeddedSVG.window.map.Api.doZoomMap(nIndex,szMode,newZoom);
-			if ( szMode == null ){
-				zoomSelect.options[zoomSelect.options.length-1].text = "1:"+newScale;
-				zoomSelect.selectedIndex = zoomSelect.options.length-1;
-			}
+	ixmaps.refreshTheme = function(szThemeId){
+		try {
+			ixmaps.embeddedSVG.window.map.Api.refreshTheme(szThemeId);
 		}
-		catch (e){
-			alert('map api error!');
-		}
+		catch (e){}
 	};
-	ixmaps.clipLayer = function(szLayerName,nWidth){
-		try{
-			ixmaps.embeddedSVG.window.map.Api.setLayerClip(szLayerName,nWidth);
+	ixmaps.removeTheme = function(szThemeId){
+		try {
+			ixmaps.embeddedSVG.window.map.Api.removeTheme(szThemeId);
 		}
-		catch (e){
-			alert('map api error!');
-		}
-	};
-	ixmaps.clipMap = function(nWidth){
-		try{
-			ixmaps.embeddedSVG.window.map.Api.setMapClip(nWidth);
-		}
-		catch (e){
-			alert('map api error!');
-		}
-	};
-	ixmaps.backwardsMap = function(){
-		try{
-			ixmaps.embeddedSVG.window.map.Api.backwards();
-		}
-		catch (e){
-			alert('map api error!');
-		}
-	};
-	ixmaps.forwardsMap = function(){
-		try{
-			ixmaps.embeddedSVG.window.map.Api.forwards();
-		}
-		catch (e){
-			alert('map api error!');
-		}
-	};
-	ixmaps.mapTool = function(szMode){
-		if ( szMode == "pan"){
-			try{
-				ixmaps.embeddedSVG.window.map.Api.clearAllOverlays();
-			}
-			catch (e){
-				alert('map api error!');
-			}
-		}
-		try{
-			ixmaps.embeddedSVG.window.map.Api.setMapTool(szMode);
-		}
-		catch (e){
-			alert('map api error!');
-		}
-	};
-	ixmaps.getMapTool = function(){
-		try{
-			return ixmaps.embeddedSVG.window.map.Api.getMapTool();
-		}
-		catch (e){
-			alert('map api error!');
-		}
-	};
-
-	ixmaps.newTheme = function(theme){alert("embed hi");
-		try{
-			ixmaps.embeddedSVG.window.map.Api.newMapTheme(theme.layer,theme.fields,theme.field100,theme.style,theme.title,theme.label);
-		}catch (e){}
+		catch (e){}
 	};
 	ixmaps.clearAll = function(){
 		try{
@@ -1025,9 +955,9 @@ $Log: htmlgui.js,v $
 			ixmaps.embeddedSVG.window.map.Api.clearAllCharts();
 		}catch (e){}
 	};
-	ixmaps.clearAllChoroplethe = function(){
+	ixmaps.clearAllChoropleth = function(){
 		try{
-			ixmaps.embeddedSVG.window.map.Api.clearAllChoroplethe();
+			ixmaps.embeddedSVG.window.map.Api.clearAllChoropleth();
 		}catch (e){}
 	};
 	ixmaps.clearAllOverlays = function(){
@@ -1038,6 +968,11 @@ $Log: htmlgui.js,v $
 	ixmaps.changeObjectScaling = function(nDelta){
 		try{
 			ixmaps.embeddedSVG.window.map.Api.changeObjectScaling(nDelta);
+		}catch (e){}
+	};
+	ixmaps.changeFeatureScaling = function(nDelta){
+		try{
+			ixmaps.embeddedSVG.window.map.Api.changeFeatureScaling(nDelta);
 		}catch (e){}
 	};
 	ixmaps.changeLabelScaling = function(nDelta){
@@ -1131,6 +1066,26 @@ $Log: htmlgui.js,v $
 			}catch (e){}	
 	};
 
+	ixmaps.changeThemeStyle = function(szThemeName,szStyle,szFlag){
+		try {
+			ixmaps.embeddedSVG.window.map.Api.changeThemeStyle(szThemeName,szStyle,szFlag);
+		}
+		catch (e){}
+	};
+
+	ixmaps.zoomToTheme = function(szThemeName){
+		try {
+			ixmaps.embeddedSVG.window.map.Api.zoomToTheme(szThemeName);
+		}
+		catch (e){}
+	};
+
+	ixmaps.getThemes = function(){
+		try {
+			return ixmaps.embeddedSVG.window.map.Api.getAllThemes();
+		}catch (e){return null;}	
+	};
+
 	ixmaps.getThemeObj = function(szThemeName){
 		try {
 			return ixmaps.embeddedSVG.window.map.Api.getTheme(szThemeName);
@@ -1143,49 +1098,177 @@ $Log: htmlgui.js,v $
 		}catch (e){return null;}	
 	};
 
-	// ----------------------------------------------------------------------
-	// touch to mouse !!!
-	// ----------------------------------------------------------------------
-
-	ixmaps.simulateMouseDown = function(pos){
-		var evt = ixmaps.embeddedSVG.window.document.createEvent("MouseEvents");
-		var cb = ixmaps.embeddedSVG.window.document.getElementById("mapbackground:eventrect");
-
-		evt.initMouseEvent("mousedown", true, false, this, 1, pos.x, pos.y, pos.x, pos.y, false,
-                         false, false, false, 0, cb);
-		cb.dispatchEvent(evt);
-		evt.target = cb;
-		ixmaps.embeddedSVG.window.map.Event.defaultMouseDown(evt);
+	ixmaps.getThemeStyleString = function(szThemeName){
+		try {
+			return ixmaps.embeddedSVG.window.map.Api.getMapThemeStyleString(szThemeName);
+		}catch (e){return null;}
 	};
-	ixmaps.simulateMouseMove = function(pos){
-		var evt = ixmaps.embeddedSVG.window.document.createEvent("MouseEvents");
-		var cb = ixmaps.embeddedSVG.window.document.getElementById("mapbackground:eventrect");
 
-		evt.initMouseEvent("mousemove", true, false, this, 1, pos.x, pos.y, pos.x, pos.y, false,
-                         false, false, false, 0, cb);
-		cb.dispatchEvent(evt);
-		evt.target = cb;
-		ixmaps.embeddedSVG.window.map.Event.defaultMouseMove(evt);
+	/**
+	 * get the data of a theme object or map item
+	 * @param {String} szItem the id of the theme item or map item
+	 * @return {Object} the data as JSON object
+	 */
+	ixmaps.getData = function(szItem){
+		try {
+			var theme = szItem.split(":")[0];
+			if ( theme.match("theme") ){
+				szItem = szItem.split(theme+":")[1];
+				szItem = szItem.split(":chartgroup")[0];
+				var dataA = ixmaps.embeddedSVG.window.map.Api.getMapThemeDataRow(null,szItem);
+				var result = [];
+				var data = {};
+				var nItems = dataA.length/2;
+				for ( i=0; i<nItems;i++ ) {
+					if ( data[dataA[i]] ){
+						result.push(data);
+						data = {};
+					}
+					data[dataA[i]] = dataA[i+nItems];
+				}
+				result.push(data);
+				return result;
+			}
+		}catch (e){return null;}	
 	};
-	ixmaps.simulateMouseUp = function(pos){
-		var evt = ixmaps.embeddedSVG.window.document.createEvent("MouseEvents");
 
-		evt.initMouseEvent("mouseup", true, false, window, 1, 0, 0, 0, 0, false,
-                         false, false, false, 0, null);
-		var cb = ixmaps.embeddedSVG.window.document.getElementById("mapbackground:eventrect");
-		cb.dispatchEvent(evt);
-		evt.target = cb;
-		ixmaps.embeddedSVG.window.map.Event.defaultMouseUp(evt);
+	/**
+	 * get the position of a theme object or map item
+	 * @param {String} szItem the id of the theme item or map item
+	 * @return {Object} the position as JSON object
+	 */
+	ixmaps.getPosition = function(szItem){
+		try {
+			var theme = szItem.split(":")[0];
+			if ( theme.match("theme") ){
+				szItem = szItem.split(theme+":")[1];
+				szItem = szItem.split(":chartgroup")[0];
+				return ixmaps.embeddedSVG.window.map.Api.getMapThemeItemPosition(null,szItem);
+			}
+		}catch (e){return null;}	
 	};
-	ixmaps.simulateClick = function(pos){
-		var evt = ixmaps.embeddedSVG.window.document.createEvent("MouseEvents");
+	/**
+	 * mark theme class
+	 * @param szThemeId the id of the theme received on create
+	 * @return void
+	 */
+	ixmaps.markThemeClass = function(szThemeId,nIndex){
+		try {
+			ixmaps.embeddedSVG.window.map.Api.markThemeClass(szThemeId,nIndex);
+		}catch (e){
+			return null;
+		}	
+	};
+	/**
+	 * unmark theme class
+	 * @param szThemeId the id of the theme received on create
+	 * @return void
+	 */
+	ixmaps.unmarkThemeClass = function(szThemeId,nIndex){
+		try {
+			ixmaps.embeddedSVG.window.map.Api.unmarkThemeClass(szThemeId,nIndex);
+		}catch (e){
+			return null;
+		}	
+	};
 
-		evt.initMouseEvent("mouseover", true, false, window, 1, pos.x, pos.y, pos.x, pos.y, false,
-                         false, false, false, 0, null);
-		var cb = ixmaps.embeddedSVG.window.document.getElementById("mapobjects");
-		cb.dispatchEvent(evt);
-		evt.target = cb;
-		ixmaps.embeddedSVG.window.map.Event.defaultMouseClick(evt);
+	/**
+	 * filter theme items 
+	 * @param szThemeId the id of the theme received on create
+	 * @param szFilter the filter string
+	 * @param mode an additional flag
+	 * @return void
+	 */
+	ixmaps.filterThemeItems = function(szThemeId,szFilter,mode){
+		console.log("exec");
+		console.log(arguments);
+		try {
+			ixmaps.embeddedSVG.window.map.Api.filterThemeItems(szThemeId,szFilter,mode);
+		}catch (e){
+			return null;
+		}	
+	};
+
+	// -----------------------------
+	// html button handler
+	// -----------------------------
+
+	ixmaps.panMap = function(nDeltaX,nDeltaY,szMode){
+		try{
+			ixmaps.embeddedSVG.window.map.Api.doPanMap(nDeltaX,nDeltaY,szMode);
+		}
+		catch (e){
+			alert('map api error!');
+		}
+	};
+	ixmaps.zoomMap = function(nIndex,szMode,newZoom){
+		try{
+			var zoomSelect  = window.document.getElementById("zoomList");
+			var newScale = ixmaps.embeddedSVG.window.map.Api.doZoomMap(nIndex,szMode,newZoom);
+			if ( szMode == null ){
+				zoomSelect.options[zoomSelect.options.length-1].text = "1:"+newScale;
+				zoomSelect.selectedIndex = zoomSelect.options.length-1;
+			}
+		}
+		catch (e){
+			alert('map api error!');
+		}
+	};
+	ixmaps.clipLayer = function(szLayerName,nWidth){
+		try{
+			ixmaps.embeddedSVG.window.map.Api.setLayerClip(szLayerName,nWidth);
+		}
+		catch (e){
+			alert('map api error!');
+		}
+	};
+	ixmaps.clipMap = function(nWidth){
+		try{
+			ixmaps.embeddedSVG.window.map.Api.setMapClip(nWidth);
+		}
+		catch (e){
+			alert('map api error!');
+		}
+	};
+	ixmaps.backwardsMap = function(){
+		try{
+			ixmaps.embeddedSVG.window.map.Api.backwards();
+		}
+		catch (e){
+			alert('map api error!');
+		}
+	};
+	ixmaps.forwardsMap = function(){
+		try{
+			ixmaps.embeddedSVG.window.map.Api.forwards();
+		}
+		catch (e){
+			alert('map api error!');
+		}
+	};
+	ixmaps.mapTool = function(szMode){
+		if ( (szMode == "pan") ){
+			try{
+				ixmaps.embeddedSVG.window.map.Api.clearAllOverlays();
+			}
+			catch (e){
+				alert('map api error!');
+			}
+		}
+		try{
+			ixmaps.embeddedSVG.window.map.Api.setMapTool(szMode);
+		}
+		catch (e){
+			alert('map api error!');
+		}
+	};
+	ixmaps.getMapTool = function(){
+		try{
+			return ixmaps.embeddedSVG.window.map.Api.getMapTool();
+		}
+		catch (e){
+			alert('map api error!');
+		}
 	};
 
 	// ----------------------------------------------------------------------
@@ -1206,9 +1289,6 @@ $Log: htmlgui.js,v $
 		this.fSVGInitializing = true;
 
 		this.embeddedSVG = new Object({window:mapwindow});
-
-		$("#loading-text").empty();
-		$("#loading-text").append(this.embeddedSVG.window.map.Dictionary.getLocalText("... initializing ..."));
 
 		if ( this.fMapLegendStyle.match(/hidden/) ){
 			this.extendMap();
@@ -1236,11 +1316,13 @@ $Log: htmlgui.js,v $
 		catch (e){
 		}
 
-		//this.htmlgui_displayInfo("exit");
-
 		// call user defined method on map ready
 		// --------------------------------------------------------
-		this.onMapReady(this.szName);
+		if ( this.callback ) {
+			this.callback(this);
+		}else{
+			this.onMapReady(this.szName);
+		}
 	};
 
 	/**
@@ -1259,20 +1341,16 @@ $Log: htmlgui.js,v $
 	 * @param mapwindow the window handle of the SVG map 
 	 * @return ---
 	 */
-	ixmaps.htmlgui_onMapReady = function(mapwindow){
+	ixmaps.htmlgui_onMapReady = function(mapwindow){ 
 
 		_LOG("ready");
-
 		this.fSVGInitializing = false;
-
-		$("#loading-text").empty();
-		$("#loading-text").append(this.embeddedSVG.window.map.Dictionary.getLocalText("... initializing ..."));
 
 		ixmaps.blockLoadingMessage = false;
 
 		if ( this.htmlMap && this.gmapDiv ){
 			ixmaps.HTML_showMap();
-			setTimeout("$('#loading-text').empty()",1000);
+			// setTimeout("$('#loading-text').empty()",250);
 		}
 		else{
 			var div = window.document.getElementById("svgmapdiv");
@@ -1280,9 +1358,10 @@ $Log: htmlgui.js,v $
 				try	{		div.style.setProperty("visibility","visible",null); }
 				catch (e) { div.style["visibility"] = "visible";         	   }
 			}
-			setTimeout("ixmaps.HTML_hideLoading()",1000);
+			setTimeout("ixmaps.hideLoading()",250);
 			this.mapTool("pan");
 		}
+
 		// enable access to the SVG map
 		// ----------------------------
 		this.embeddedSVG = new Object({window:mapwindow});
@@ -1295,28 +1374,23 @@ $Log: htmlgui.js,v $
 			this.parentApi.setEmbeddedSVG(this.embeddedSVG);
 		}
 
-		// hide loding image 
-		// --------------------------
-		/**
-		try{
-			$("#divloading").css("visibility","hidden");
-			$("#ixmap").css("background","#fff");
-		}
-		catch (e){
-		}
-		**/
 		// call user defined method on map ready
 		// --------------------------------------------------------
-		try{
-			this.onMapReady(this.szName);
-		}
-		catch (e){
-		}
-		// bubble it up !
-		try{
-			this.parentApi.onMapReady(this.szName);
-		}
-		catch (e){
+
+		if ( this.callback ) {
+			this.callback(this);
+		}else{
+			try{
+				this.onMapReady(this.szName);
+			}
+			catch (e){
+			}
+			// bubble it up !
+			try{
+				this.parentApi.onMapReady(this.szName);
+			}
+			catch (e){
+			}
 		}
 		if ( this.fSilent ){
 			this.embeddedSVG.window.map.Api.setMapFeatures('worksilent:true');
@@ -1326,22 +1400,8 @@ $Log: htmlgui.js,v $
 		// in case we have no user defined view in the initializing process, we must program a sync via timeout !
 		setTimeout("ixmaps.htmlgui_checkSync()",1000);
 
-	};
+		$("#loading-gif").hide();
 
-	/**
-	 * called if SVG map has been resized (e.g. legend switched off)
-	 * @return ---
-	 */
-	ixmaps.htmlgui_doMapResize = function(){
-
-		// adapt the HTML map to the canvas offsets of the SVG map
-		// --------------------------------------------------------
-		try{
-			var mapBox = this.embeddedSVG.window.map.Api.getMapBox();
-			this.onWindowResize(mapBox,true);
-		}
-		catch (e){
-		}
 	};
 
 	/**
@@ -1354,7 +1414,7 @@ $Log: htmlgui.js,v $
 		// --------------------------------------------------------
 		try{
 			var mapBox = this.embeddedSVG.window.map.Api.getMapBox();
-			this.onWindowResize(mapBox,false);
+			this.resizeMap(mapBox,false);
 		}
 		catch (e){
 		}
@@ -1375,7 +1435,9 @@ $Log: htmlgui.js,v $
 			catch (e){
 			}
 		}
-		ixmaps.parentApi.htmlgui_setScaleSelect(newScale);
+		if ( ixmaps.parentApi != ixmaps ) {
+			ixmaps.parentApi.htmlgui_setScaleSelect(newScale);
+		}
 	};
 
 	/**
@@ -1420,10 +1482,10 @@ $Log: htmlgui.js,v $
 	 */
 	ixmaps.htmlgui_resizeMap = function(fZoomTo,nWidth,nHeight,fCenter){
 
-	var szMethod = fCenter?"center":"extendmax";
-	// GR 15.10.2015 test
-	szMethod = "center";	
-	if ( ixmaps.embeddedSVG ){
+		var szMethod = fCenter?"center":"extendmax";
+		// GR 15.10.2015 test
+		szMethod = "center";	
+		if ( ixmaps.embeddedSVG ){
 			if ( nWidth && nHeight ){
 				ixmaps.embeddedSVG.window.map.Api.resizeCanvas(0,0,nWidth,nHeight,szMethod);
 			}else{
@@ -1512,14 +1574,14 @@ $Log: htmlgui.js,v $
 	/**
 	 * Is called by the svg map script to display messages in a HTML window
 	 */
-	ixmaps.htmlgui_doDisplayInfo = function(szMessage){
+	ixmaps.htmlgui_doDisplayInfo = function(szMessage){ //return;
 
 		if ( szMessage && (szMessage.length > 25) ){
 			szMessage = szMessage.slice(0,25)+" ...";
 		}
 		$("#loading-text").empty();
 		$("#loading-text").append(szMessage);
-		ixmaps.HTML_showLoading();
+		ixmaps.showLoading();
 		return; 
 	};
 	/**
@@ -1530,8 +1592,8 @@ $Log: htmlgui.js,v $
 			return;
 		}
 		clearTimeout(tDisplayInfo); 
-		$("#loading-text").empty();
-		setTimeout("ixmaps.HTML_hideLoading()",1000);
+		//$("#loading-text").empty();
+		setTimeout("ixmaps.hideLoading()",250);
 		return; 
 	};
 	/**
@@ -1547,340 +1609,96 @@ $Log: htmlgui.js,v $
 	ixmaps.htmlgui_errorLog = function(szMessage){
 
 		$("#loading-text").empty();
-		$("#loading-text").append(szMessage);
+		$("#loading-text").append(szMessage+"e");
 
 		alert(szMessage);
-		return; 
-		/**
-		if (infoWindow){
-			try{
-				infoWindow.focus();
-			}
-			catch (e){
-				infoWindow = null;
-			}
-		}
-		if (!infoWindow){
-			try{
-				infoWindow = window.open("info.html","Info","dependent=yes,alwaysRaised=yes,'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=300,height=50,left=200,top=200");
-			}
-			catch (e){
-			}
-		}
-		if (infoWindow){
-			var dField = infoWindow.document.getElementById("infofield");
-			dField.innerHTML = szMessage;
-		}
-		**/
-
 	};
-	/**
-	 * foreward these events to an hosting window, if present
-	 */
+
+	// ---------------------------------------------------------
+	// foreward these events to an hosting window, if present
+	// ---------------------------------------------------------
 
 	ixmaps.htmlgui_onItemClick = function(szId){
-		return ixmaps.parentApi.htmlgui_onItemClick(szId);
+		if ( ixmaps.parentApi != ixmaps ){
+			return ixmaps.parentApi.htmlgui_onItemClick(szId);
+		}
 	};
 
 	ixmaps.htmlgui_onInfoDisplay = function(szId){
-		return ixmaps.parentApi.htmlgui_onInfoDisplay(szId);
-	};
-
-	ixmaps.htmlgui_onInfoDisplayExtend = function(svgDoc,szId){
-		return ixmaps.parentApi.htmlgui_onInfoDisplayExtend(svgDoc,szId);
+		if ( ixmaps.parentApi != ixmaps ){
+			return ixmaps.parentApi.htmlgui_onInfoDisplay(szId);
+		}
 	};
 
 	ixmaps.htmlgui_onNewTheme = function(szId){
-		ixmaps.parentApi.htmlgui_onNewTheme(szId);
+		if ( ixmaps.parentApi != ixmaps ){
+			ixmaps.parentApi.htmlgui_onNewTheme(szId);
+		}
 	};
 
 	ixmaps.htmlgui_onDrawTheme = function(szId){
-		ixmaps.updatePageHistory();
-		ixmaps.parentApi.htmlgui_onDrawTheme(szId);
+		try{
+			ixmaps.updatePageHistory();
+		}
+		catch (e){}
+		if ( ixmaps.parentApi != ixmaps ){
+			ixmaps.parentApi.htmlgui_onDrawTheme(szId);
+		}
 	};
 
 	ixmaps.htmlgui_onRemoveTheme = function(szId){
-		ixmaps.parentApi.htmlgui_onRemoveTheme(szId);
+		if ( ixmaps.parentApi != ixmaps ){
+			ixmaps.parentApi.htmlgui_onRemoveTheme(szId);
+		}
 	};
 
 	ixmaps.htmlgui_onErrorTheme = function(szId){
-		ixmaps.parentApi.htmlgui_onErrorTheme(szId);
+		if ( ixmaps.parentApi != ixmaps ){
+			ixmaps.parentApi.htmlgui_onErrorTheme(szId);
+		}
 	};
 
 	ixmaps.htmlgui_drawChart = function(SVGDoc,args){
-		return ixmaps.parentApi.htmlgui_drawChart(SVGDoc,args);
+		return ( ixmaps.parentApi != ixmaps ) ? ixmaps.parentApi.htmlgui_drawChart(SVGDoc,args) : null;
 	};
 
 	ixmaps.htmlgui_drawChartAfter = function(SVGDoc,args){
-		return ixmaps.parentApi.htmlgui_drawChartAfter(SVGDoc,args);
+		return ( ixmaps.parentApi != ixmaps ) ? ixmaps.parentApi.htmlgui_drawChartAfter(SVGDoc,args) :null;
 	};
 
 	ixmaps.htmlgui_onTooltipDisplay = function(szText){
-		return ixmaps.parentApi.htmlgui_onTooltipDisplay(szText);
+		return ( ixmaps.parentApi != ixmaps ) ? ixmaps.parentApi.htmlgui_onTooltipDisplay(szText) : szText;
 	};
 
 	ixmaps.htmlgui_onInfoTitle = function(szText,item){
-		return ixmaps.parentApi.htmlgui_onInfoTitle(szText,item);
+		return ( ixmaps.parentApi != ixmaps ) ? ixmaps.parentApi.htmlgui_onInfoTitle(szText,item) : szText;
+	};
+
+	ixmaps.htmlgui_onInfoDisplayExtend = function(svgDoc,szId){
+		return ( ixmaps.parentApi != ixmaps ) ? ixmaps.parentApi.htmlgui_onInfoDisplayExtend(svgDoc,szId) : null;
 	};
 
 	ixmaps.htmlgui_colorScheme = function(theme){
-		return ixmaps.parentApi.htmlgui_colorScheme(theme);
+		if ( ixmaps.parentApi != ixmaps ){
+			ixmaps.parentApi.htmlgui_colorScheme(theme);
+		}
 	};
 
-	ixmaps.htmlgui_onZoomAndPan = function(nZoom){ 
+	ixmaps.htmlgui_onZoomAndPan = function(nZoom){
 		ixmaps.updatePageHistory(nZoom);
-		try	{
-			ixmaps.parentApi.onMapZoom(nZoom);
-		}catch (e){}
-		try	{
-			ixmaps.parentApi.htmlgui_onZoomAndPan(nZoom);
-		}catch (e){}
+		if ( ixmaps.parentApi != ixmaps ){
+			try	{
+				ixmaps.parentApi.onMapZoom(nZoom);
+			}catch (e){}
+			try	{
+				ixmaps.parentApi.htmlgui_onZoomAndPan(nZoom);
+			}catch (e){}
+		}
 	};
 
 	ixmaps.htmlgui_onWindowResize = function(){
-		ixmaps.parentApi.htmlgui_onWindowResize();
-	};
-
-	// --------------------------------------------------
-	// create bookmark by changing url in browser window
-	// --------------------------------------------------
-
-	ixmaps.fDynamicPageHistory = false;
-
-	ixmaps.setDynamicPageHistory = function(fFlag){
-		ixmaps.fDynamicPageHistory = fFlag;
-	};
-
-	ixmaps.updatePageHistory = function(nZoom,fFlag){ 
-
-		if ( ixmaps.fDynamicPageHistory || fFlag ){
-
-			// -----------------------------
-			// change url in browser window
-			// -----------------------------
-
-			var szBookmark = ixmaps.htmlgui_getBookmarkString(nZoom);
-
-			// dispatch to cross domain parent frames
-			// --------------------------------------------------------
-			try{
-				this.onUrlChange(this.szName,szBookmark);
-			}
-			catch (e){
-			}
-			// bubble it up !
-			try{
-				this.parentApi.onUrlChange(this.szName,szBookmark);
-			}
-			catch (e){
-			}
-
-			// try to set URL for non cross domain frames
-			w = window;
-			while ( w && w.parent && (w != w.parent) ){
-				w = w.parent;
-			}
-
-			var szUrl =  String(w.location.href);
-			x = szUrl.match(/\?/);
-
-			var szMapUrl    = this.htmlgui_getMapUrl();
-			    szUrl =  w.location.href.split("bookmark")[0]+(x?"":"?");
-				szUrl += "bookmark="+encodeURIComponent(szBookmark);
-				szUrl += "&maptype="+ixmaps.htmlgui_getMapTypeId();
-				szUrl += "&svggis="+encodeURI(szMapUrl);
-				szUrl += "&center="+encodeURI(JSON.stringify(ixmaps.htmlgui_getCenter()));
-				szUrl += "&zoom="+encodeURI(ixmaps.htmlgui_getZoom());
-
-			w.history.replaceState({"foo":"bar"}, "page 2", szUrl);
-
-			this.embeddedSVG.window.map.Api.displayMessage("Bookmark saved !",1000,"notify");
-
-		}
-	};
-
-	// -----------------------------
-	// html bookmark handler
-	// -----------------------------
-
-	ixmaps.dispatch = function(szUrl){
-
-		// case a) localhost
-		if ( 0 && String(ixmaps.location).match(/localhost/) ){
-			return "../../" + szUrl;
-		}
-
-		// case b) 'real' URL
-		// look for 'ui' in path and set the part before as root
-		var szRoot = String(ixmaps.location);
-		var szRootUrlA = szRoot.split('/');
-		while ( szRootUrlA.length ){
-			if ( szRootUrlA.pop() == "ui" ){
-				break;
-			}
-		}
-		szRoot = szRootUrlA.join('/');
-		return szRoot+ "/" + szUrl;
-
-		/** GR 01.02.2014 commented
-		var szHost = "http://"+$(location).attr('host');
-		return szHost+ "/" + szUrl;
-		**/
-	};
-
-	ixmaps.getBaseMapParameter = function(szMapService){
-		if ( szMapService == "leaflet" ){
-			return "&basemap=ll";
-		}else
-		if ( szMapService == "openlayers" ){
-			return "&basemap=ol";
-		}else
-		if ( szMapService == "microsoft" ){
-			return "&basemap=bg";
-		}else{
-			return "&basemap=go";
-		}
-	};
-	ixmaps.shareMap = function(target,position){
-		this.openDialog(null,'share-dialog',"share.html",'share map',position||'auto',500,550);
-	};
-
-	ixmaps.exportMap = function(target,position){
-		window.szMapTypeId = ixmaps.htmlgui_getMapTypeId();
-		window.DOMViewerObj = ixmaps.embeddedSVG.window.document;
-		this.openDialog(null,'export-dialog',"export.html",'export map',position||'auto',500,150);
-	};
-
-	ixmaps.viewTable = function(target,position){
-		this.openDialog(null,'table-dialog',"table.html",'data table',position||'auto',800,600);
-	};
-
-	ixmaps.popupBookmarks = function(position){
-		this.openDialog(null,'bookmarks','./history.html','Bookmarks',position||'10,103',250,450);
-	};
-
-	ixmaps.popupThemeEditor = function(position){
-		window.idialog = this.openDialog(null,'themeeditor','./theme_editor.html','Theme Editor',position||'10,103',380,600);
-	};
-
-	ixmaps.fullScreenMap = function(szTemplateUrl){
-
-		var szMapService = this.szMapService;
-		var szMapUrl    = this.htmlgui_getMapUrl();
-		var szMapType   = this.htmlgui_getMapTypeId();
-		var szStoryUrl  = this.htmlgui_getStoryUrl();
-
-		// get envelope 
-		var szEnvelope = this.htmlgui_getEnvelopeString(1);
-		// get all themes
-		var szThemesJS = this.htmlgui_getThemesString();
-		// compose bookmark
-		var szBookmark = "map.Api.doZoomMapToGeoBounds("+szEnvelope+");" + "map.Api.clearAll();" + szThemesJS;
-
-		// make url of the map template 
-		if ( !szTemplateUrl ){
-			szTemplateUrl = ixmaps.dispatch("ui/dispatch.htm?ui=popout&minimal=1&toolbutton=1&logo=1");
-		}
-		szTemplateUrl += ixmaps.getBaseMapParameter(szMapService);
-		// create complete url with query string 
-		var szUrl = szTemplateUrl;
-		szUrl += szMapUrl?  ("&svggis="		+ encodeURI(szMapUrl))		:"";
-		szUrl += szMapType? ("&maptype="	+ szMapType)				:"";
-		szUrl += szStoryUrl?("&story="		+ szStoryUrl)					:"";
-		szUrl += szBookmark?("&bookmark="	+ encodeURI(szBookmark))	:"";
-
-		window.open(szUrl,'map fullscreen'+Math.random());
-	};
-
-	ixmaps.popOutMap = function(fFlag,szTemplateUrl){
-
-		var szMapService = this.szMapService;
-		var szMapType    = this.htmlgui_getMapTypeId();
-		var szMapUrl     = this.htmlgui_getMapUrl();
-
-		// get envelope with zoom factor 3 because the popout window is smaller than the map window
-		var szEnvelope = this.htmlgui_getEnvelopeString(3);
-		// get all themes
-		var szThemesJS = this.htmlgui_getThemesString();
-		// compose bookmark
-		var szBookmark = "map.Api.doZoomMapToGeoBounds("+szEnvelope+");" + "map.Api.clearAll();" + szThemesJS;
-		
-		// make url of the map template 
-		if ( !szTemplateUrl ){
-			szTemplateUrl = ixmaps.dispatch("ui/dispatch.htm?ui=popout&minimal=1&toolbutton=1&logo=1");
-		}
-		szTemplateUrl += ixmaps.getBaseMapParameter(szMapService);
-
-		// create complete url with query string 
-		var szUrl = szTemplateUrl;
-		szUrl += "&svggis=" + encodeURI(szMapUrl);
-		szUrl += "&maptype=" + szMapType;
-		szUrl += "&bookmark=" + encodeURI(szBookmark);
-
-		// alternative store map parameter for child window access
-		ixmaps.popoutURL		= szTemplateUrl;
-		ixmaps.popoutSVGGIS		= szMapUrl;
-		ixmaps.popoutTYPE		= szMapType;
-		ixmaps.popoutBOOKMARK	= szBookmark;
-
-		// here we can decide which mode of parameter passing we want (with query string or through ixmaps properties)
-		var szPopOutUrl = szUrl;
-
-		if ( !fFlag.match(/window/) ){
-			this.openDialog(null,null,szPopOutUrl,'','auto',400,450);
-		}
-		if ( !fFlag.match(/dialog/) ){
-			window.open(szPopOutUrl,'map popout'+Math.random(), 'alwaysRaised=yes, titlebar=no, toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=400, height=450');
-		}
-	};
-	ixmaps.mailMap = function(fFlag,szTemplateUrl){
-
-		var szMapService = this.szMapService;
-		var szMapUrl	 = this.htmlgui_getMapUrl();
-		var szMapType    = this.htmlgui_getMapTypeId();
-		// get envelope 
-		var szEnvelope = this.htmlgui_getEnvelopeString(1);
-		// get all themes
-		var szThemesJS = this.htmlgui_getThemesString();
-		// compose bookmark
-		var szBookmark = "map.Api.doZoomMapToGeoBounds("+szEnvelope+");"+szThemesJS;
-
-		var szHost = ""; //"http://"+$(location).attr('host');
-
-		// make url of the map template 
-		if ( !szTemplateUrl ){
-			szTemplateUrl = ixmaps.dispatch("ui/dispatch.htm?ui=full");
-		}
-		szTemplateUrl += ixmaps.getBaseMapParameter(szMapService);
-
-		// create complete url with query string 
-		var szUrl = szHost + szTemplateUrl;
-		szUrl += "&svggis=" + encodeURI(szMapUrl);
-		szUrl += "&maptype=" + szMapType;
-		szUrl += "&bookmark=" + encodeURIComponent(szBookmark);
-
-		var szSubject = "iXmaps - map link sent by user";		
-		var szBody    = "This email was sent to you by a user of iXmaps:\n\n"+
-						"The below link will open an interactive SVG map in HTML5 enabled browser (Chrome, Firefox and Safari):\n\n";		
-		var szBody2   = "\n\n(the link may be long because it contains zoom and charting parameter)\n";		
-		location.href='mailto:?subject='+szSubject+'&body='+encodeURI(szBody)+encodeURIComponent(szUrl)+encodeURI(szBody2)+'';
-	};
-
-	ixmaps.htmlgui_getMapUrl = function(){
-		return decodeURI(ixmaps.szUrlSVG);
-	};
-	ixmaps.htmlgui_getStoryUrl = function(){
-		return decodeURI( $(document).getUrlParam('story')					||
-						  $(window.parent.document).getUrlParam('story')	||
-						  $(window.parent.parent.document).getUrlParam('story') );
-	};
-	ixmaps.htmlgui_getMapTypeId = function(){
-		return htmlMap_getMapTypeId();
-	};
-	ixmaps.htmlgui_setMapTypeId = function(szId){
-		if ( szId != htmlMap_getMapTypeId() ){
-			ixmaps.htmlgui_setMapTypeBG(szId);
-			return htmlMap_setMapTypeId(szId);
+		if ( ixmaps.parentApi != ixmaps ){
+			ixmaps.parentApi.htmlgui_onWindowResize();
 		}
 	};
 
@@ -1895,70 +1713,22 @@ $Log: htmlgui.js,v $
 	}
 
 	ixmaps.htmlgui_setMapTypeBG = function(szId){
-
-		$("#css-modifier-container").remove();
-
-		if ( szId.match(/dark/i) || szId.match(/black/i) ){
-			$("#ixmap").css({"background":"black"});
-			$("#gmap").css({"background":"black"});
-
-			$( "#switchlegendbutton" ).css("background-color","#222222");
-			$( "#switchlegendbutton" ).css("border-color","#666666");
-
-			//$( "#switchmodebutton" ).css("background-color","#888888");
-			//$( "#switchmodebutton" ).css("border-color","#666666");
-
-			changeCss(".ui-dialog", "opacity:0.9" );
-			changeCss(".ui-dialog", "background:#222" );
-			changeCss(".ui-dialog-titlebar", "background:#222" );
-			changeCss(".ui-dialog-titlebar", "color:#888" );
-			changeCss(".legend-description", "color:#888" );
-			changeCss("tr.theme-legend-item-selected", "background:#333" );
-
-			changeCss("span.theme-button", "background:none" );
-			changeCss("span.theme-button", "color:white" );
-			changeCss("span.legend-button-settings", "color:#333333" );
-
-			changeCss(".btn-default","background-color:#444444");
-
-			$(".leaflet-bar a").css("opacity","0.7" );
-			$(".leaflet-bar a").css("background-color","#333333" );
-			$(".leaflet-bar a").css("color","#888888" );
-			$(".leaflet-bar a").css("border","solid #888888 0.5px" );
-
-
-		}else if ( szId.match(/gray/i) ){
-			$("#ixmap").css({"background":"#E6E6E6"});
-			$("#gmap").css({"background":"#E6E6E6"});
-			$( "#switchlegendbutton" ).css("background-color","#E6E6E6");
-			$( "#switchlegendbutton" ).css("border-color","#dddddd");
-		}else{
-			$("#ixmap").css({"background":"white"});
-			$("#gmap").css({"background":"white"});
-			$( "#switchlegendbutton" ).css("background-color","#ffffff");
-			$( "#switchlegendbutton" ).css("border-color","#dddddd");
-		}
-		// bubble it up !
-		try{
-			this.parentApi.htmlgui_setMapTypeBG(szId);
-		}
-		catch (e){
-		}
+		// dummy
 	};
 
 	ixmaps.htmlgui_saveBookmark = function(){
 		ixmaps.htmlgui_doSaveBookmark();
-//		ixmaps.openDialog('dialog','../../resources/html/help/help.html','?');
 	};
+
 	ixmaps.htmlgui_doSaveBookmark = function(szName){
 
-		var szBookMarkJS = this.htmlgui_getBookmarkString();
+		var szBookMarkJS = this.getBookmarkString();
 
 		htmlgui_setCookie("test", szBookMarkJS);
 		this.embeddedSVG.window.map.Api.displayMessage("Bookmark saved",1000);
 	};
 
-	ixmaps.htmlgui_getEnvelopeString = function(nZoom){
+	ixmaps.getEnvelopeString = function(nZoom){
 
 		var arrayPtLatLon = this.embeddedSVG.window.map.Api.getBoundsOfMapInGeoBounds();
 		arrayPtLatLon[0].x = Math.max(Math.min(arrayPtLatLon[0].x,180),-180);
@@ -1983,7 +1753,7 @@ $Log: htmlgui.js,v $
 		return szEnvelope;
 	};
 
-	ixmaps.htmlgui_getThemesString = function(){
+	ixmaps.getThemesString = function(){
 
 		var szThemesJS  = ixmaps.htmlgui_getParamString().replace(/\"/gi,"'");
 			szThemesJS += ixmaps.htmlgui_getFeaturesString().replace(/\"/gi,"'");
@@ -2003,7 +1773,7 @@ $Log: htmlgui.js,v $
 	};
 	ixmaps.htmlgui_getFeaturesString = function(){
 
-		var szFeatures = this.embeddedSVG.window.map.Api.getMapFeatures();
+		var szFeatures = this.embeddedSVG.window.map.Api.getMapFeatures()||"";
 
 		// scan for doubles and keep only last one 
 		// by creatating an object to reduce and remake the feature string form that
@@ -2020,8 +1790,78 @@ $Log: htmlgui.js,v $
 		}
 		return "map.Api.setMapFeatures('"+szResult+"');";
 	};
+	ixmaps.getScaleParam = function(){
 
-	ixmaps.htmlgui_getBookmarkString = function(nZoom){
+		return this.embeddedSVG.window.map.Api.getScaleParam();
+	};
+	ixmaps.getOptions = function(){
+
+		var szFeatures = this.embeddedSVG.window.map.Api.getMapFeatures();
+		if ( !szFeatures || szFeatures == "" ){
+			return null;
+		}
+		// scan for doubles and keep only last one 
+		// by creatating an object to reduce and remake the feature string form that
+
+		var szFeaturesA = szFeatures.split(";");
+		var result = {};
+		for ( i=0; i<szFeaturesA.length; i++ ){
+			var xA = szFeaturesA[i].split(":");
+			result[xA[0]] = xA[1];
+		}
+		return result;
+	};
+
+	ixmaps.getLayerSwitch = function(){
+
+		var layerA = ixmaps.getLayer();
+
+		var switchLayerObject = {};
+
+		for ( a in layerA ){
+			fOff = false;
+
+			var sub = false;
+			var layer = layerA[a];
+			for ( c in layer.categoryA ){
+				if ( c && (layer.categoryA[c].type != "single") && (layer.categoryA[c].legendname) ){
+					sub = true;
+				}
+			}
+
+			if ( sub ){
+				for ( c in layerA[a].categoryA ){
+					if ( layerA[a].categoryA[c].display == "none" )	{
+						fOff = true;
+					}
+				}
+				if ( fOff ){
+					var offlist = [];
+					var onlist = [];
+					switchLayerObject[a] = {};
+					for ( c in layerA[a].categoryA ){
+						if ( layerA[a].categoryA[c].display == "none" )	{
+							offlist.push(c);
+						}else{
+							onlist.push(c);
+						}
+					}
+					if ( offlist.length < onlist.length ){
+						switchLayerObject[a]["off"] = offlist;
+					}else{
+						switchLayerObject[a]["on"]  = onlist;
+					}
+				}
+			}else{
+				if ( layerA[a].szDisplay == "none" )	{
+					switchLayerObject[a] = {"display":"none"};
+				}
+			}
+		}
+		return switchLayerObject;
+	};
+
+	ixmaps.getBookmarkString = function(nZoom){ 
 
 		if ( !nZoom ){
 			nZoom = 1;
@@ -2032,7 +1872,7 @@ $Log: htmlgui.js,v $
 		szBookMarkJS += ixmaps.htmlgui_getParamString().replace(/\"/gi,"'");
 		szBookMarkJS += ixmaps.htmlgui_getFeaturesString().replace(/\"/gi,"'");
 
-		var szEnvelope = this.htmlgui_getEnvelopeString(nZoom);
+		var szEnvelope = this.getEnvelopeString(nZoom);
 
 		// make executable SVG map API call
 		szBookMarkJS += "map.Api.doZoomMapToGeoBounds("+szEnvelope+");";
@@ -2043,7 +1883,7 @@ $Log: htmlgui.js,v $
 
 		szBookMarkJS += "map.Api.doZoomMapToView("+szView+");";
 
-		szBookMarkJS += this.htmlgui_getThemesString();
+		szBookMarkJS += this.getThemesString();
 
 		return szBookMarkJS;
 	};
@@ -2069,9 +1909,6 @@ $Log: htmlgui.js,v $
 
 			// execute bookmark, which are direct Javascript calls
 			this.embeddedSVG.window.map.Api.executeJavascriptWithMessage(xxx,"-> Bookmark",100);
-
-//			// force HTML map synchronisation 
-//			setTimeout('ixmaps.htmlgui_synchronizeMap(false,true);',100);
 		}
 		catch (e){
 			try{
@@ -2109,11 +1946,6 @@ $Log: htmlgui.js,v $
 			this.embeddedSVG.window.map.Api.executeJavascriptWithMessage("map.Api"+bookmarkA[i],"...",100);
 		}
 
-		// force HTML map synchronisation 
-		if ( 0 && szBookmark.match(/doCenterMapToGeoBounds/) ){
-			this.HTML_hideMap();
-			setTimeout('ixmaps.htmlgui_synchronizeMap(false,true);',1000);
-		}
 	};
 
 	ixmaps.pushBookmark = function(szBookmark){
@@ -2142,8 +1974,8 @@ $Log: htmlgui.js,v $
 		}
 		if ( fClear ){
 			ixmaps.embeddedSVG.window.map.Api.clearAll();
-			if ( szScript.match(/CHOROPLETHE/) ){
-				ixmaps.embeddedSVG.window.map.Api.clearAllChoroplethe();
+			if ( szScript.match(/CHOROPLETH/) ){
+				ixmaps.embeddedSVG.window.map.Api.clearAllChoropleth();
 			}else{
 				ixmaps.embeddedSVG.window.map.Api.clearAllCharts();
 			}
@@ -2151,23 +1983,14 @@ $Log: htmlgui.js,v $
 		eval('ixmaps.embeddedSVG.window.'+szScript);
 	};
 
-
 	ixmaps.message = function(szMessage){
 		ixmaps.htmlgui_displayInfo(szMessage);
 	};
 	
-	/**
-	 * setBounds
-	 * @param bounds the new geo bounds with; array of 4 coordinates
-	 * @return void
-	 */
-	ixmaps.setBoundsXXX = function(bounds){alert("noooo");
-		ixmaps.embeddedSVG.window.map.Api.doSetMapToGeoBounds(
-			bounds[0],
-			bounds[1],
-			bounds[2],
-			bounds[3]);
-	};
+	// -----------------------------------------------------------
+	// map bounds, zoom, pan, ...
+	// -----------------------------------------------------------
+	
 	/**
 	 * setBounds
 	 * @param bounds array of 2 lat/lon pairs
@@ -2175,7 +1998,8 @@ $Log: htmlgui.js,v $
 	 */
 	ixmaps.setBounds = function(bounds){
 		ixmaps.htmlgui_setBounds([{lat:bounds[0],lng:bounds[1]},{lat:bounds[2],lng:bounds[3]}]);
-		htmlgui_synchronizeSVG(false);
+		ixmaps.htmlgui_synchronizeSVG(false);
+		return ixmaps;
 	};
 	/**
 	 * setView
@@ -2184,8 +2008,11 @@ $Log: htmlgui.js,v $
 	 * @return void
 	 */
 	ixmaps.setView = function(center,nZoom){
+		// GR 15.08.2018 call 2 times needed (magick)
 		ixmaps.htmlgui_setCenterAndZoom({lat:center[0],lng:center[1]},nZoom);
-		htmlgui_synchronizeSVG(false);
+		ixmaps.htmlgui_setCenterAndZoom({lat:center[0],lng:center[1]},nZoom);
+		ixmaps.htmlgui_synchronizeSVG(false);
+		return ixmaps;
 	};
 	/**
 	 * setCenter
@@ -2194,7 +2021,8 @@ $Log: htmlgui.js,v $
 	 */
 	ixmaps.setCenter = function(center){
 		ixmaps.htmlgui_setCenter({lat:center[0],lng:center[1]});
-		htmlgui_synchronizeSVG(true);
+		ixmaps.htmlgui_synchronizeSVG(true);
+		return ixmaps;
 	};
 	/**
 	 * setZoom
@@ -2203,7 +2031,8 @@ $Log: htmlgui.js,v $
 	 */
 	ixmaps.setZoom = function(nZoom){
 		ixmaps.htmlgui_setZoom(nZoom);
-		htmlgui_synchronizeSVG(false);
+		ixmaps.htmlgui_synchronizeSVG(false);
+		return ixmaps;
 	};
 	/**
 	 * minZoom
@@ -2212,7 +2041,8 @@ $Log: htmlgui.js,v $
 	 */
 	ixmaps.minZoom = function(nZoom){
 		ixmaps.htmlgui_minZoom(nZoom);
-		htmlgui_synchronizeSVG(false);
+		ixmaps.htmlgui_synchronizeSVG(false);
+		return ixmaps;
 	};
 	/**
 	 * getCenter
@@ -2240,100 +2070,57 @@ $Log: htmlgui.js,v $
 		return ixmaps.htmlgui_getBoundingBox();
 	};
 
-	// -----------------------------
-	// popup window handler
-	// -----------------------------
+	// -----------------------------------------------------------
+	// map layer handling
+	// -----------------------------------------------------------
+	
+	/**
+	 * get layer list
+	 * @return array array of layer objects
+	 */
+	ixmaps.getLayer = function(){
 
-	popupTools = function(szUrl){
-			if (ixmaps.toolsWindow){
-				try{
-					ixmaps.toolsWindow.focus();
-				}
-				catch (e){
-					ixmaps.toolsWindow = null;
-				}
-			}
-			if (!ixmaps.toolsWindow || ixmaps.toolsWindow.closed){
-				if ( szUrl == null || szUrl.length < 2 ){
-					szUrl = "../../../resources/html/popupresult.html";
-				}
-	//			ixmaps.toolsWindow = window.open(szUrl,"test","dependent=yes,alwaysRaised=yes,titlebar=no,width=400,height=500,resizable=yes,screenX=200,screenY=100");
-				ixmaps.toolsWindow = window.open(szUrl,"test",
-					"dependent=yes,alwaysRaised=yes,addressbar=no,titlebar=no,width=400,height=600,resizable=yes,screenX=200,screenY=100");
-			}
+		try {
+			return ixmaps.embeddedSVG.window.map.Api.getLayer();
+		}
+		catch (e){}
 	};
-	remove_popupTools = function(){
-			if ( ixmaps.toolsWindow ){
-				ixmaps.toolsWindow.close();
-			}
-	};
+	/**
+	 * get layer dependency list
+	 * @return array array of layer dependency objects
+	 */
+	ixmaps.getLayerDependency = function(){
 
-	popupResult = function(szUrl){
-			if (resultWindow){
-				try{
-					resultWindow.focus();
-				}
-				catch (e){
-					resultWindow = null;
-				}
-			}
-			if (!resultWindow){
-				if ( szUrl == null || szUrl.length < 2 ){
-					szUrl = "../../../resources/html/popupresult.html";
-				}
-				resultWindow = window.open(szUrl,"test","dependent=yes,alwaysRaised=yes,titlebar=no,width=400,height=500,resizable=yes,screenX=200,screenY=100");
-			}
+		try {
+			return ixmaps.embeddedSVG.window.map.Api.getLayerDependency();
+		}
+		catch (e){}
 	};
-	remove_popupHelp = function(){
-			if ( ixmaps.helpWindow ){
-				ixmaps.helpWindow.close();
-			}
-	};
+	/**
+	 * get tile Info
+	 * @return object map tile object
+	 */
+	ixmaps.getTileInfo = function(){
 
-	popupHelp = function(szUrl){
-			if (ixmaps.helpWindow){
-				try{
-					ixmaps.helpWindow.focus();
-				}
-				catch (e){
-					ixmaps.helpWindow = null;
-				}
-			}
-			if (!ixmaps.helpWindow){
-				if ( szUrl == null || szUrl.length < 2 ){
-					szUrl = "../html/help/help.html";
-				}
-				ixmaps.helpWindow = window.open(szUrl,"test","dependent=yes,alwaysRaised=yes,width=600,height=700,resizable=yes,scrollbars=yes");
-			}
+		try {
+			return ixmaps.embeddedSVG.window.map.Api.getTileInfo();
+		}
+		catch (e){}
+	};
+	/**
+	 * switch layer
+	 * @param szLayerName the name of the layer to switch visible/invisible
+	 * @param fState true or false
+	 * @return void
+	 */
+	ixmaps.switchLayer = function(szLayerName,fState){
+
+		try {
+			ixmaps.embeddedSVG.window.map.Api.switchLayer(szLayerName,fState);
+		}
+		catch (e){}
 	};
 
-	function htmlgui_contextualSearch(szField){
-		if (typeof(contextualSearch) != "undefined" ){
-			contextualSearch(szField);
-		}
-		else{
-			popupTools('popup.html');
-			setTimeout("ixmaps.toolsWindow.contextualSearch('"+szField+"')",10);
-		}
-	}
-	function htmlgui_showContextInfo(){
-		try{
-			var szId = ixmaps.embeddedSVG.window.map.Event.getContextMenuObjId();
-			ixmaps.embeddedSVG.window.map.Api.displayContextMenuTargetInfo();
-		}
-		catch(e){
-			alert("map api error!");
-		}
-	}
-	function htmlgui_createContextBuffer(){
-		try{
-			var szId = ixmaps.embeddedSVG.window.map.Event.getContextMenuObjId();
-			ixmaps.embeddedSVG.window.map.Api.createContextMenuTargetBuffer();
-		}
-		catch(e){
-			alert("map api error!");
-		}
-	}
 
 	// -----------------------------
 	// helper
@@ -2343,64 +2130,6 @@ $Log: htmlgui.js,v $
 		return ixmaps.embeddedSVG;
 	};
 
-	_HTML_TRACE = function(szMessage){
-		if ( typeof(console) != "undefined"  && typeof(console.log) != "undefined"  ){
-			console.log("_TRACE:"+szMessage);
-		}
-	};
-
-	// -----------------------------
-	// mouse wheel interception
-	// -----------------------------
-
-	/** This is high-level function; REPLACE IT WITH YOUR CODE.
-	 * It must react to delta being more/less than zero.
-	 */
-	function handle(delta) {
-
-		// GR 03.06.2014 if there is a map service basemap, do it with her api (safe!) 
-		if ( ixmaps.gmap && ixmaps.htmlMap ){
-			var nZoom = htmlMap_getZoom();
-			htmlMap_setZoom(nZoom+(delta>0?1:-1));
-			return;
-		}
-
-		if (delta < 0){
-			ixmaps.embeddedSVG.window.map.Api.doZoomMap(0.66);
-			/* something. */
-		}else{
-			ixmaps.embeddedSVG.window.map.Api.doZoomMap(1.5);
-			/* something. */
-		}
-		ixmaps.htmlgui_synchronizeMap(false,true);
-	}
-
-	function wheel(event){
-		var delta = 0;
-		if (!event){
-			event = window.event;
-		}
-		if (event.wheelDelta) {
-			delta = event.wheelDelta/120; 
-			if (window.opera){
-				delta = -delta;
-			}
-		} else if (event.detail) {
-			delta = -event.detail/3;
-		}
-		if (delta){
-			handle(delta);
-		}
-		if (event.preventDefault){
-			event.preventDefault();
-		}
-		event.returnValue = false;
-	}
-
-	// make public
-	ixmaps.do_wheelEvent = function(event){
-		wheel(event);
-	};
 	// -----------------------------
 	// D A T A    L O A D E R 
 	// -----------------------------
@@ -2408,637 +2137,498 @@ $Log: htmlgui.js,v $
 	/**
 	 * Is called by the svg map script to load external data from FusionTable, GeoRSS, GeoJson, ...
 	 * @param szUrl where to find the data
-	 * @param option description of the data source type
+	 * @param options description of the data source type
 	 * @type void
 	 */
-	ixmaps.htmlgui_loadExternalData = function(szUrl,option){ 
+	ixmaps.htmlgui_loadExternalData = function(szUrl,options){ 
+
+		if ( (!szUrl || (szUrl === undefined)) && !(options.type === "ext") ){
+			alert("htmlgui_loadExternalData: szUrl is 'undefined' !");
+			return;
+		}
+
+		// GR 16.07.2017
+		// if szUrl == type, than we have a javascript object 
+		// set the javascript object with name = options.name as external data
+		if ( szUrl && (szUrl == options.type) ){
+			this.setExternalData(eval(options.name),options);
+			return;
+		}
 
 		// GR 13.06.2014
 		// check if we have a complete path, if not, add story root and maybe ".js"
-		if ( option.ext && option.ext.length && !option.ext.match(/\//) ){
+		if ( options.ext && options.ext.length && !options.ext.match(/\//) ){
 			var root = ixmaps.storyRoot || ixmaps.parentApi.storyRoot || ixmaps.parentApi.parentApi.storyRoot || "";
-			option.ext = root + option.ext + (option.ext.match(/.js/)?"":".js");
+			options.ext = root + options.ext + (options.ext.match(/.js/)?"":".js");
 			// set the complete ext path for further use
-			option.theme.coTableExt = option.ext;
+			options.theme.coTableExt = options.ext;
 		}
-		ixmaps.HTML_showLoadingArray(["loading data ..."," ... "]);
 
-		if ( option.type == "ext" ){
-			$.getScript(option.ext)
+		ixmaps.showLoadingArray(["loading data ..."," ... "]);
+
+		// a) data is loaded by a specific data provider function
+		// -------------------------------------------------------
+		if ( options.type == "ext" ){
+			$.getScript(options.ext)
 				.done(function(script, textStatus) {
-				  __createThemeDataObjectExt(null,option.type,option);
+
+					options.setData = ixmaps.setExternalData;
+
+					try {
+						eval("ixmaps."+options.name+"(options.theme,options)");
+					} catch (e){
+						try {
+							eval("ixmaps.parentApi."+options.name+"(options.theme,options)");
+						}catch (e){
+							try {
+								eval("ixmaps.parentApi.parentApi."+options.name+"(options.theme,options)");
+							}catch (e){
+								try {
+									eval("ixmaps.queryData(options.theme,options)");
+								}catch (e){
+								}
+							}
+						}
+					}
 				})
 				.fail(function(jqxhr, settings, exception) {
-				  alert("external data provider: '"+option.ext+"' could not be loaded !",2000);
+				  alert("external data provider: '"+options.ext+"' could not be loaded !",2000);
 				});
-		}else
-		if ( option.type == "FT" ){
-			var options = {packages: ['corechart'], callback : function() {
-								__doFTImport(szUrl,option);
-							}};
-			google.load('visualization', '1', options);
-		}else
-		if ( option.type == "FTV1" ){
-			__doFTImportNew(szUrl,option);
-		}else
-		if ( (option.type == "csv") || (option.type == "CSV") ){
-			__doCSVImport(szUrl,option);
-		}else
-		if ( (option.type == "json") || (option.type == "JSON") || (option.type == "Json")){
-			__doJSONImport(szUrl,option);
-		}else
-		if ( (option.type == "jsonDB") || (option.type == "JSONDB") || (option.type == "JsonDB") || (option.type == "jsondb") ){
-			__doJsonDBImport(szUrl,option);
-		}else
-		if ( (option.type == "jsonstat") || (option.type == "JSONSTAT") ){
-			$.getScript("http://json-stat.org/lib/json-stat.js")
-			.done(function(script, textStatus) {
-			  __doLoadJSONstat(szUrl,option);
-			  return;
-			})
-			.fail(function(jqxhr, settings, exception) {
-			  ixmaps.htmlgui_displayInfo("'"+option.type+"' unknown format !",2000);
-			});
 		}else{
-			ixmaps.htmlgui_displayInfo("'"+option.type+"' unknown format !",2000);
-			setTimeout("ixmaps.htmlgui_killInfo();",3000);
-		}
-	};
-	/**
-	 * loadExternalData - wrapper for user calls
-	 * @param szMap the name of the embedded map
-	 * @param szThemeName the theme id string
-	 * @param szSourceName a (xml) theme definituion file 
-	 * @return a theme to pass to execScript/execBookmark
-	 */
-	ixmaps.loadExternalData = function(szMap,szUrl,opt){
-		this.htmlgui_loadExternalData(szUrl,opt);
-	};
 
-	/**
-	 * doFTImport  
-	 * reads from Google Fusion Table 
-	 * parses the data into the map data source
-	 * @param file filename
-	 * @param i filenumber
-	 * @type void
-	 */
-	function __doFTImport(ftId,opt) {
-
-       // Construct query
-        var query = "SELECT * FROM " + ftId;
-        var queryText = encodeURIComponent(query);
-        var gvizQuery = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + queryText);
-
-        // Send query and draw table with data in response
-        gvizQuery.send(function(response) {
-
-			var numRows = response.getDataTable().getNumberOfRows();
-			var numCols = response.getDataTable().getNumberOfColumns();
-
-			var newData = new Array();
-
-			var newRow = new Array();
-			for (var i = 0; i < numCols; i++) {
-				newRow.push(response.getDataTable().getColumnLabel(i));
-			}
-			newData.push(newRow);
-
-			for (var i = 0; i < numRows; i++) {
-				newRow = new Array();
-				for(var j = 0; j < numCols; j++) {
-					newRow.push(response.getDataTable().getValue(i, j));
-				}
-				newData.push(newRow);
-			}
-			// user defined callback
-			if ( opt.callback ){
-				opt.callback(newData,opt);
-				return;
-			}
-			// called by a theme 
-			__createThemeDataObject(newData,opt.type,opt);
-       });
-	}
-	/**
-	 * doFTImportNew 
-	 * reads from Google Fusion Table using API V1 (requires API key !)
-	 * parses the data into the map data source
-	 * @param file filename
-	 * @param i filenumber
-	 * @type void
-	 */
-	function __doFTImportNew(ftId,opt) {
-
-		var szKey = "AIzaSyDvly_8Nx4wPF-Otful4IdGVEvjNJdPl5M";
-		var szFT  = "https://www.googleapis.com/fusiontables/v1/query?";
-
-		// Construct query
-        var szUrl = szFT + "sql=SELECT * FROM " + ftId + "&key=" + szKey;
-
-		$.getJSON(szUrl,function( data, textStatus, jqxhr ) {
-
-			var newData = new Array();
-
-			newData.push(data.columns);
-			for (var i = 0; i < data.rows.length; i++) {
-				newData.push(data.rows[i]);
-			}
-			// user defined callback
-			if ( opt.callback ){
-				opt.callback(newData,opt);
-				return;
-			}
-			// called by a theme 
-			__createThemeDataObject(newData,opt.type,opt);
-		});
-	}
-
-	/**
-	 * doLoadJSONstat 
-	 * reads JSONstat format using JSONstat Javascript
-	 * parses the data into the map data source
-	 * @param szUrl JSONstat URL
-	 * @param opt options
-	 * @type void
-	 */
-	function __doLoadJSONstat(szUrl,opt) {
-
-		if ( !szUrl.match(/http:/) ){
-			var szPathA = ixmaps.embeddedApi.editor.szExternalDataPath.split('/');
-			szPathA = szPathA.slice(1);
-			szUrl = szPathA.join('/') + "jsonstat/" + szUrl;
-		}
-		JSONstat( szUrl, 
-			function(){
-				var dataA = new Array();
-				
-				// here we must ask for what dimension to use 
-				// TBD
-
-				// for now we take dimension 0 and 1
-				// 0 for the y axis = first column
-				// 1 for the x axis = values columns
-
-				// first row = column names
-				//
-				var row = [this.Dataset(0).Dimension(0).label];
-				var index = this.Dataset(0).Dimension(1).id;
-				for ( i=0; i<index.length; i++ ){
-					row.push(this.Dataset(0).Dimension(1).Category(index[i]).label);
-				}
-				dataA.push(row);
-
-				// data rows
-				//
-				for (var i=0; i<this.Dataset(0).Dimension(0).length; i++ ){
-					var row = new Array();
-					row.push(this.Dataset(0).Dimension(0).Category(this.Dataset(0).Dimension(0).id[i]).label);
-					for (var ii=0; ii<this.Dataset(0).Dimension(1).length; ii++ ){
-						row.push(this.Dataset(0).Data([i,ii]).value);
-					}
-						dataA.push(row);
-				}
-				// user defined callback
-				if ( opt.callback ){
-					opt.callback(dataA,opt);
-					return;
-				}else
-				// called by a theme 
-				{
-					__createThemeDataObject(dataA,opt.type,opt);
-				}
-			}
-		);
-	}
-
-	/**
-	 * doJsonDBImport 
-	 * reads JsonDB files from URL
-	 * JsonDB files are regural JavaScript files, the data object is parsed automatically on load 
-	 * @param file filename
-	 * @param i filenumber
-	 * @type void
-	 */
-	function __doJsonDBImport(szUrl,opt) {
-
-		_LOG("__doJsonDBImport: "+szUrl);
-
-		opt.url = szUrl;
-
-		$.getScript(szUrl+".gz")
+		// b) data is loaded by data.js
+		// -------------------------------------------------------
+			$.getScript("../../../data.js/data.js")
 			.done(function(script, textStatus) {
-			  __processJsonDBData(script,opt);
+
+				var broker = new Data.Broker();
+				broker.addSource(szUrl,options.type)
+					  .error(	function(e) { 
+						ixmaps.error("loading data error: "+e+"\n \n<span style='color:#ddd'>"+szUrl+"</span>"); 
+						ixmaps.showLoadingArrayStop();
+						ixmaps.hideLoading();
+					})
+					  .realize(	function(dataA) {
+
+					ixmaps.showLoadingArrayStop();
+					ixmaps.hideLoading();
+
+					var themeDataObj = dataA[0];
+
+					// if there is an ext data after processor defined, call it
+					// --------------------------------------------------
+					if ( typeof(options.ext) != "undefined" ){
+
+						_LOG("get external data processor");
+
+						$.getScript(options.ext)
+						.done(function(script, textStatus) {
+							var fError = 0;
+							/**
+							eval("var fu = ixmaps."+options.name+".after;");
+							if ( fu ){
+								try	{
+									themeDataObj = fu(themeDataObj);
+								} catch (e)	{
+									alert(options.ext+":\nerror on executing\nixmaps." +options.name+ ".after() !");
+								}
+							}else{
+								eval("var fu = ixmaps."+options.name+".process;");
+								if ( fu ){
+									try	{
+										themeDataObj = fu(themeDataObj);
+									} catch (e)	{
+										alert(options.ext+":\nerror on executing\nixmaps." +options.process+ ".after() !");
+									}
+								}else{
+									alert(options.ext+":\ndata processing functions\nixmaps." +options.name+ ".after or ixmaps."+options.name+ ".process\nnot found!");
+								}
+							}
+							**/
+							try {
+								eval("themeDataObj = ixmaps."+options.name+".after(themeDataObj) || themeDataObj");
+							} catch (e){
+								try {
+									eval("themeDataObj = ixmaps.parentApi."+options.name+".after(themeDataObj) || themeDataObj");
+								}catch (e){
+									try {
+										eval("themeDataObj = ixmaps.parentApi.parentApi."+options.name+".after(themeDataObj) || themeDataObj");
+									}catch (e){
+										try {
+											eval("themeDataObj = ixmaps."+options.name+".process(themeDataObj) || themeDataObj");
+										} catch (e){
+											try {
+												eval("themeDataObj = ixmaps.parentApi."+options.name+".process(themeDataObj) || themeDataObj");
+											}catch (e){
+												try {
+													eval("themeDataObj = ixmaps.parentApi.parentApi."+options.name+".process(themeDataObj) || themeDataObj");
+												}catch (e){
+													alert(options.ext+":\ndata processing functions\nixmaps." +options.name+ ".after or ixmaps."+options.name+ ".process\nnot found!");
+												}
+											}
+										}
+									}
+								}
+							}
+
+							_LOG("set processed data");
+
+							// set processed data
+							// --------------------------------------------------
+							ixmaps.embeddedSVG.window.map.Api.setThemeExternalData(null,themeDataObj,options.name);
+						})
+						.fail(function(jqxhr, settings, exception) {
+							alert("'"+options.ext+"' could not be loaded !");
+						});
+
+					// no processor defined, set data
+					// --------------------------------------------------
+					}else{
+						ixmaps.embeddedSVG.window.map.Api.setThemeExternalData(null,themeDataObj,options.name);
+					}
+				});
 			})
 			.fail(function(jqxhr, settings, exception) {
-				$.getScript(szUrl)
+				alert("'"+options.type+"' unknown format !");
+			});
+		}
+	};
+
+	/**
+	 * set theme data from data (javscript var) 
+	 * @param {object} data the object containing data (see type)
+	 * @param {object} opt optriobs to define the data
+	 * @return void
+	 * @example
+	 * ixmaps.setExternalData(dataObject,{type:"json",name:"myData"});
+	 */
+	ixmaps.setExternalData = function(data,opt) {
+
+		ixmaps.showLoadingArrayStop();
+		ixmaps.hideLoading();
+
+		if ( opt && opt.type && (opt.type != "jsonDB") && (opt.type != "dbtable") ){
+			if ( (typeof(Data) != "undefined")  && Data.object ){
+				// load the data using data.js
+				Data.object({"source":data,"type":opt.type}).import(function(mydata){
+					ixmaps.setExternalData(mydata,{type:"dbtable",name:opt.name});
+				});
+			}else{
+				$.getScript("../../../data.js/data.js")
 				.done(function(script, textStatus) {
-				  __processJsonDBData(script,opt);
-				})
-				.fail(function(jqxhr, settings, exception) {
-				  alert("external data (JsonDB) '"+szUrl+"' could not be loaded ! \n\nMaybe data source not found or is not of type 'JsonDB'?",2000);
+					// load the data using data.js
+					Data.object({"source":data,"type":opt.type}).import(function(mydata){
+						ixmaps.setExternalData(mydata,{type:"dbtable",name:opt.name});
+					});
 				});
-			});
-	}
-
-	function __processJsonDBData(script,opt) {
-
-		_LOG("__processJsonDBData:");
-
-		ixmaps.HTML_showLoading("data loaded ...");
-
-		// if there is an ext data processor defined, call it
-		// --------------------------------------------------
-		if ( typeof(opt.ext) != "undefined" ){
-			if ( opt.ext.length ){
-				$.getScript(opt.ext)
-					.done(function(script, textStatus) {
-					__callThemeDataObjectExt(script,opt);
-					})
-					.fail(function(jqxhr, settings, exception) {
-					  alert("external data provider: '"+opt.ext+"' could not be parsed !",2000);
-					});
-			}else{
-				__callThemeDataObjectExt(script,opt);
 			}
-		}else{
-			__setJsonDBData(script,opt);
+		} else {
+			ixmaps.embeddedSVG.window.map.Api.setThemeExternalData(null,data,opt.name);
 		}
-
-	}
-
-	function __callThemeDataObjectExt(script,opt){
-		_LOG("__callThemeDataObjectExt:");
-
-		var zValues = 0;
-		var nValues = 0;
-
-		// if there is an ext data processor defined, call it
-		// --------------------------------------------------
-		if ( typeof(opt.ext) != "undefined" ){
-			if ( eval("ixmaps."+opt.name) ){
-				eval("ixmaps."+opt.name+"(script)");
-			}else
-			if ( eval("ixmaps.parentApi."+opt.name) ){
-				eval("ixmaps.parentApi."+opt.name+"(script)");
-			}else
-			if ( eval("ixmaps.parentApi.parentApi."+opt.name) ){
-				eval("ixmaps.parentApi.parentApi."+opt.name+"(script)");
-			}
-		}
-		__setJsonDBData(script,opt);
-	}
-
-	function __setJsonDBData(script,opt) {
-		ixmaps.HTML_showLoadingArrayStop();
-		ixmaps.HTML_showLoading("creating theme ...");
-		setTimeout("ixmaps.HTML_hideLoading()",1000);
-		setTimeout("__doSetJsonDBData('"+opt.name+"','"+opt.url+"')",100);
-	}
-
-	__doSetJsonDBData = function(dataName,szUrl) {
-		if ( (eval("typeof("+dataName+")")) != "undefined" ){
-			eval("themeDataObj = "+dataName );
-			ixmaps.embeddedSVG.window.map.Api.setThemeExternalData(null,themeDataObj,dataName);
-		}else{
-			ixmaps.htmlgui_displayInfo("data '"+dataName+"' not defined");
-		}
-	};
-
-	/**
-	 * doCSVImport 
-	 * reads CSV files from URL
-	 * parses the data into the map data source
-	 * @param file filename
-	 * @param i filenumber
-	 * @type void
-	 */
-	function __doCSVImport(szUrl,opt) {
-
-		_LOG("__doCSVImport: "+szUrl);
-
-		$.ajax({
-			type: "GET",
-			url: szUrl,
-			dataType: "text",
-			success: function(data) {
-			  __processCSVData(data,opt);
-			},
-			error: function() {
-				__doCSVImport2(ixmaps.szUrlSVGRoot+"csv/"+szUrl,opt);
-			}
-		 });
-	}
-	function __doCSVImport2(szUrl,opt) {
-
-		_LOG("__doCSVImport2: "+szUrl);
-
-		$.ajax({
-			type: "GET",
-			url: szUrl,
-			dataType: "text",
-			success: function(data) {
-			  __processCSVData(data,opt);
-			},
-			error: function() {
-				alert("external data (csv) \"" + szUrl + "\" could not be loaded!");
-			}
-		 });
-	}
-
-	function __processCSVData(csv,opt) {
-
-		_LOG("__processCSVData:");
-
-		ixmaps.HTML_showLoadingArrayStop();
-		ixmaps.HTML_showLoading("data loaded ...");
-		setTimeout("ixmaps.HTML_hideLoading()",1000);
-
-		var c1 = null;
-		var c2 = null;
-		var newData1 = new Array(0);
-		var newData2 = new Array(0);
-
-		// GR 02.11.2015 nuovo csv parser Papa Parse by Matt Hold 
-		// GR 21.07.2016 if autodecet delimiter fails, try first ; and then ,   
-
-		var newData = Papa.parse(csv).data;
-		if ( newData[0].length != newData[1].length ){
-			_LOG("csv parser: autodetect failed");
-			_LOG("csv parser: delimiter = ;");
-			newData = Papa.parse(csv,{delimiter:";"}).data;
-			if ( newData[0].length != newData[1].length ){
-				_LOG("csv parser: delimiter = ; failed");
-				_LOG("csv parser: delimiter = ,");
-				newData = Papa.parse(csv,{delimiter:","}).data;
-				if ( newData[0].length != newData[1].length ){
-					_LOG("csv parser: delimiter = , failed");
-					alert("csv parsing error");
-				}
-			}
-		}
-
-		// if csv ends with /n, last element is " ", so we must pop it 
-		//
-		if ( newData[newData.length-1].length != newData[0].length ){
-			newData.pop();
-		}
-
-		// if only the first line ends with delimiter, we get one more (empty!) column
-		// the parser gives the first row with different length; 
-		// we must correct this here, because iXMaps checks every row's length with the first ones length later 
-		// 
-		if ( (newData[0].length - newData[1].length) == 1 ) {
-			if ( newData[0][newData[0].length-1] == " " ){
-				newData[0].pop();
-			}
-		}
-		// user defined callback
-		if ( opt.callback ){
-			opt.callback(newData,opt);
-			return;
-		}
-		// called by a theme 
-		if ( newData ){
-			__createThemeDataObject(newData,"csv",opt);
-			return true;
-		}
-		return false;
-	}
-	function __doCheckTable(newData,szSource){
-		for ( i=2; i<newData.length; i++ ){
-			if ( newData[i].length != newData[i-1].length ){
-				return false;
-			}
-		}
-		return newData[i-1].length;
-	}
-
-	/**
-	 * doLoadJSON 
-	 * reads a simple JSON table 
-	 * parses the data into the map data source
-	 * @param file filename
-	 * @param i filenumber
-	 * @type void
-	 */
-	function __doJSONImport(szUrl,opt) {
-
-		if ( !szUrl.match(/http:/) && !szUrl.match(/.\//) ){
-			var szPathA = ixmaps.embeddedApi.editor.szExternalDataPath.split('/');
-			szPathA = szPathA.slice(1);
-			szUrl = szPathA.join('/') + "json/" + szUrl;
-		}
-
-		$.getJSON(ixmaps.szCorsProxy+szUrl+".gz",
-			function(data){
-				__processJsonData(data,opt);
-			}).fail(function(e) { 
-				$.getJSON(ixmaps.szCorsProxy+szUrl,
-					function(data){
-						__processJsonData(data,opt);
-					}).fail(function(e) { 
-						ixmaps.HTML_showLoadingArrayStop();
-						$("#loading-text").html("<span style='font-size:32px'><span style='color:red'>loading error with: </span>'"+szUrl);
-					});
-			});
-	}
-	function __processJsonData(script,opt) {
-
-		var data = {};
-
-		if ( typeof(script) == "string" ){
-			try	{
-				eval("data = "+script );
-			}catch (e){
-				ixmaps.HTML_showLoadingArrayStop();
-				$("#loading-text").html("<span style='font-size:32px'><span style='color:red'>JSON parser error</span>'");
-				return;
-			}
-		}else{
-			data = script;
-		}
-
-		if ( ! data || (data.length == 0) ){
-			ixmaps.HTML_showLoadingArrayStop();
-			$("#loading-text").html("<span style='font-size:32px'><span style='color:red'>JSON parser error</span>'");
-			return;
-		}
-
-		var dataA = [];
-
-		var row = [];
-		for ( a in data[0] ){
-			row.push(a);
-		}
-		dataA.push(row);
-
-		for ( i=1; i<data.length;i++ ){
-			var row = [];
-			for ( a in data[0] ){
-				row.push(data[i][a]);
-			}
-			dataA.push(row);
-		}
-		__createThemeDataObject(dataA,"json",opt);
-	}
-
-	/**
-	 * createThemeDataObject  
-	 * take the loaded data and create a json object with the iXmaps data structure
-	 * @type void
-	 */
-	function __createThemeDataObject(dataA,szType,opt){
-
-		_LOG("__createThemeDataObject:");
-
-		var zValues = 0;
-		var nValues = 0;
-
-		ixmaps.HTML_showLoadingArrayStop();
-		ixmaps.HTML_hideLoading();
-		
-		// if there is an ext data processor defined, call it
-		// --------------------------------------------------
-		if ( typeof(opt.ext) != "undefined" ){
-			if ( opt.ext.length ){
-				$.getScript(opt.ext)
-					.done(function(script, textStatus) {
-					  __createThemeDataObjectExt(dataA,szType,opt);
-					})
-					.fail(function(jqxhr, settings, exception) {
-					  alert("external data provider: '"+opt.ext+"' could not be loaded !",2000);
-					});
-			}else{
-				__createThemeDataObjectExt(dataA,szType,opt);
-			}
-
-		// if not store data table as loaded
-		// --------------------------------------------------
-		}else{
-			__doCreateThemeDataObjectExt(dataA,szType,opt);
-		}
-
-	}
-
-	function __createThemeDataObjectExt(dataA,szType,opt){
-
-		_LOG("__createThemeDataObjectExt:");
-
-		var zValues = 0;
-		var nValues = 0;
-
-		// if there is an ext data processor defined, call it
-		// --------------------------------------------------
-		if ( typeof(opt.ext) != "undefined" ){
-			try {
-				eval("dataA = ixmaps."+opt.name+"(dataA)");
-			} catch (e){
-				try {
-					eval("dataA = ixmaps.parentApi."+opt.name+"(dataA)");
-				}catch (e){
-					try {
-						eval("dataA = ixmaps.parentApi.parentApi."+opt.name+"(dataA)");
-					}catch (e){
-					}
-				}
-			}
-		}
-		if ( dataA ){
-			__doCreateThemeDataObjectExt(dataA,szType,opt);
-		}
-	}
-
-	function __doCreateThemeDataObjectExt(dataA,szType,opt){
-
-		var zValues = 0;
-		var nValues = 0;
-
-		// cteate data object
-		// ------------------
-		var themeDataObj = new Object();
-
-		// first row of data => object.fields
-		// ------------
-		themeDataObj.fields = new Array ();
-		for ( var a in dataA[0] ){
-			themeDataObj.fields.push({id:(dataA[0][a].trim()||" "),typ:0,width:60,decimals:0});
-		}
-
-		// following rows => object.records
-		// records array
-		// --------------
-		themeDataObj.records = new Array ();
-
-		// get all values we want 
-		// loop over countries
-		for ( i=1; i<dataA.length; i++ ){
-			// add one record
-			var valuesA = new Array ();
-			for ( var a in dataA[i] ){
-				valuesA.push((dataA[i][a]||" "));
-			}
-			themeDataObj.records.push(valuesA);
-		}
-
-		// finish the data object by creating object.table
-		// -----------------------------------------------
-		themeDataObj.table = {records:dataA.length-1 , fields:dataA[0].length };
-
-		eval(opt.name + ' = themeDataObj;');
-
-		// if there is an ext data after processor defined, call it
-		// --------------------------------------------------
-		if ( typeof(opt.ext) != "undefined" ){
-			try {
-				eval("dataA = ixmaps."+opt.name+".after(dataA)");
-			} catch (e){
-				try {
-					eval("dataA = ixmaps.parentApi."+opt.name+".after(dataA)");
-				}catch (e){
-					try {
-						eval("dataA = ixmaps.parentApi.parentApi."+opt.name+".after(dataA)");
-					}catch (e){
-					}
-				}
-			}
-		}
-		// deploy the object into the map
-		// ------------------------------
-
-		ixmaps.embeddedSVG.window.map.Api.setThemeExternalData(null,themeDataObj,opt.name);
 	}
 	
-	/** 
-	 * all calls from the embedded SVG map
-	 * for documentation reasons
+	/**
+	 * set theme data from data (javscript var) 
+	 * @param {object} data the object containing data (see type)
+	 * @param {object} opt optriobs to define the data
+	 * @return void
+	 * @example
+	 * ixmaps.setData(dataObject,{type:"json",name:"myData"});
+	 */
+	ixmaps.setData = function(data,opt) {
+		this.setExternalData(data,opt);
+		return ixmaps;
+	};
 
-	ixmaps.htmlgui_onMapInit(window)
-	ixmaps.htmlgui_onMapResize(window)
-	ixmaps.htmlgui_onMapReady(window)
-	ixmaps.htmlgui_queryMapFeatures()
-	ixmaps.htmlgui_onSVGPointerIdle()
-	ixmaps.htmlgui_onZoomAndPan()
-	ixmaps.htmlgui_onInfoDisplayExtend(SVGDocument,szObjId)
-	ixmaps.htmlgui_setCurrentEnvelope = function(szEnvelope,fZoomto)
-	ixmaps.htmlgui_setCurrentEnvelopeByGeoBounds = function(ptSW,ptNE)
-	ixmaps.htmlgui_setCurrentCenterByGeoBounds = function(ptCenter)
-	ixmaps.htmlgui_setActiveTheme = function(szTheme)
-	ixmaps.htmlgui_setMapTool = function(szType)
-	ixmaps.htmlgui_setScaleSelect = function(szScale)
-	ixmaps.htmlgui_popupWindow = function(szUrl)
-	ixmaps.htmlgui_displayInfo = function(szMessage)
-	ixmaps.htmlgui_killInfo = function()
-	ixmaps.htmlgui_isHTMLMapVisible = function()
-	ixmaps.htmlgui_onNewTheme = function(szId)
-	ixmaps.htmlgui_onRemoveTheme = function(szId)
-	ixmaps.htmlgui_onErrorTheme = function(szId)
-	ixmaps.htmlgui_drawChart = function(SVGDocument,param)
-	ixmaps.htmlgui_drawChartAfter = function(SVGDocument,param)
+	/**
+	 * set local text; localize, change or suppress application messages; nearly every messsage of iXMaps can be changed by this 
+	 * method; simply define a localized message or even only a word of a message; you can also suppress the message defining an empty string ("") 
+	 * @param {String} szOrig the string to replace
+	 * @param {String} szLocal the localized string
+	 * @return void
+	 * @example
+	 * ixmaps.setLocalString("creating charts","...");
+	 * ixmaps.setLocalString("loading data ...","... caricando dati ...");
+	 */
+	ixmaps.setLocalString = function(szOrig,szLocal){
+		try {
+			this.embeddedSVG.window.map.Api.setLocalString(szOrig,szLocal);
+		}
+		catch (e){}
+	};
 
-	**/
+	/**
+	 * set local text; localize, change or suppress application messages; nearly every messsage of iXMaps can be changed by this 
+	 * method; simply define a localized message or even only a word of a message; you can also suppress the message defining an empty string ("") 
+	 * @param {String} szOrig the string to replace
+	 * @param {String} szLocal the localized string
+	 * @return void
+	 * @example
+	 * ixmaps.setLocal("creating charts","...");
+	 * ixmaps.setLocal("loading data ...","... caricando dati ...");
+	 */
+	ixmaps.setLocal = function(szOrig,szLocal){
+		try {
+			this.embeddedSVG.window.map.Api.setLocalString(szOrig,szLocal);
+		}
+		catch (e){}
+		return ixmaps;
+	};
 
-}( window.ixmaps = window.ixmaps || {}, jQuery ));
+	/**
+	 * set localize
+	 * @param {Object} localizeObj the json object with the global/local string pairs
+	 * @return void
+	 * @example
+	 * ixmaps.setLocalize({"creating charts":"...","loading data ...":"... caricando dati ..."});
+	 */
+	ixmaps.setLocalize = function(localizeObj){
+		for ( g in localizeObj ) {
+			ixmaps.setLocal(g,localizeObj[g]);
+		}
+	};
+
+	/**
+	 * load an ixmaps project    
+	 * @param szUrl the relative or absolute URL of the ixmaps project file
+	 * @type void
+	 */
+	ixmaps.xxloadProject = function(szUrl){
+
+		$.get(szUrl, function(data){
+
+			if ( typeof(data) == "string" ){
+				ixmaps.setProject(data);
+			}else{
+				ixmaps.setProject(JSON.stringify(data));
+			}
+
+		}).fail(function(e) { 
+			ixmaps.error('loading error with:'+szUrl);
+		});
+
+	};
+	
+	/**
+	 * set an ixmaps project from JSON   
+	 * @param project the JSON object to define the project
+	 * @param szFlag optional switches to set only parts of a project
+	 * @type void
+	 */
+	ixmaps.setProjectJSON = function(project,szFlag){ 
+
+		szFlag = szFlag || "";
+
+		if ( project ){
+			// new project JSON format with metadata; recognizable by project.map.map 
+			if ( project.map.map && !szFlag.match(/themeonly/i) ){
+				var map = project.map;
+				ixmaps.loadMap(map.map,function(){
+					if ( map.center && map.zoom ){
+						ixmaps.setView([map.center.lat,map.center.lng],map.zoom);
+						ixmaps.setView([map.center.lat,map.center.lng],map.zoom);
+					}
+					try
+					{
+					ixmaps.setOptions(map.options);
+					ixmaps.setScaleParam(map.scaleParam);
+					ixmaps.setMapTypeId(map.basemap);
+					ixmaps.setLocalize(map.localize);
+					}
+					catch (e)
+					{
+					}
+
+					if ( project.themes ){
+						for ( i in project.themes )	{
+							ixmaps.newTheme("project",project.themes[i],(i == 0)?"clear":"");
+						}
+					}else
+					if ( project.theme ){
+						ixmaps.newTheme("project",project.theme,"clear");
+					}else{
+						setTimeout("ixmaps.hideLoading()",250);
+					}
+					// GR 29.08.2018 must force to show SVG layer
+					// if not, it wasn't switched on sometimes 
+					setTimeout("ixmaps.showAll();",1000);
+				});
+				if ( project.search ){
+					ixmaps.search.szSearchSuffix = project.search;
+				}
+			}else
+			// old project JSON format without 
+			if ( project.map && !szFlag.match(/themeonly/i) ){
+				ixmaps.loadMap(project.map,function(map){
+					if ( project.center && project.zoom ){
+						ixmaps.setView([project.center.lat,project.center.lng],project.zoom);
+						ixmaps.setView([project.center.lat,project.center.lng],project.zoom);
+					}
+					try
+					{
+					ixmaps.setOptions(project.options);
+					ixmaps.setScaleParam(project.scaleParam);
+					ixmaps.setMapTypeId(project.basemap);
+					ixmaps.setLocalize(project.localize);
+					}
+					catch (e)
+					{
+					}
+
+					if ( project.themes ){
+						for ( i in project.themes )	{
+							ixmaps.newTheme("project",project.themes[i],(i == 0)?"clear":"");
+						}
+					}else
+					if ( project.theme ){
+						ixmaps.newTheme("project",project.theme,"clear");
+					}else{
+						setTimeout("ixmaps.hideLoading()",250);
+					}
+					// GR 29.08.2018 must force to show SVG layer
+					// if not, it wasn't switched on sometimes 
+					setTimeout("ixmaps.showAll();",1000);
+				});
+				if ( project.search ){
+					ixmaps.search.szSearchSuffix = project.search;
+				}
+			}else
+			if ( project.themes && !szFlag.match(/maponly/i) ){
+				for ( i in project.themes )	{
+					ixmaps.newTheme("project",project.themes[i],(i == 0)?"clear":"");
+				}
+			}else
+			if ( project.theme && !szFlag.match(/maponly/i) ){
+				ixmaps.newTheme("project",project.theme,"clear");
+			}else{
+				setTimeout("ixmaps.hideLoading()",250);
+			}
+		}
+
+	};
+
+	/**
+	 * set an ixmaps project from json string  
+	 * @param szProject the stringified project JSON
+	 * @type void
+	 */
+	ixmaps.setProject = function(szProject){
+
+		var project = null;
+		try	{
+			project = JSON.parse(szProject);
+		} catch (e){
+			ixmaps.error("Code: "+e);
+		}
+
+		if ( project ){
+			ixmaps.setProjectJSON(project);
+		}
+
+	};
+
+	/**
+	 * load an ixmaps project    
+	 * @param szUrl the relative or absolute URL of the ixmaps project file
+	 * @type void
+	 */
+	ixmaps.loadProject = function(szUrl,szFlag){ 
+
+		$.get(szUrl,
+			function(data){
+
+			var project = null;
+
+			if ( typeof(data) == "string" ){
+				try	{
+					project = JSON.parse(data);
+				} catch (e){
+					ixmaps.error("Code: "+e);
+				}
+			}else{
+				project = data;
+			}
+
+			szFlag = String(szFlag) || "";
+
+			if ( project ){
+				ixmaps.setProjectJSON(project,szFlag);
+			}
+
+		}).fail(function(e) { 
+			ixmaps.error('loading error with:'+szUrl);
+		});
+
+	};
+
+	/**
+	 * get an ixmaps project (JSON) string  
+	 * @type string
+	 * @return a project definition string (JSON)
+	 */
+	ixmaps.getProjectString = function(){
+
+		_LOG("make project definition string (JSON)");
+
+		// get definitions of actual map
+		//
+		var szMapType	= ixmaps.getMapTypeId();
+		var szMapUrl	= ixmaps.getMapUrl();
+		var szStoryUrl	= ixmaps.getStoryUrl();
+		var center		= ixmaps.getCenter();
+		var zoom		= ixmaps.getZoom();
+		var scaleParam	= ixmaps.getScaleParam();
+		var options		= ixmaps.getOptions();
+		var themesA		= ixmaps.getThemes();
+		var layerObj	= ixmaps.getLayerSwitch();
+
+		var szDate     = new Date().toString();
+		var szParent   = ixmaps.parent || "";
+
+		// get definitions actual theme(s)
+		//
+		szTheme =	ixmaps.getThemeDefinitionObj();
+		var themeDefA = [];
+		for ( i in themesA ){
+			themeDefA.push(ixmaps.getThemeDefinitionObj(themesA[i].szId));
+		}
+
+		// make the project object (JSON)
+		//
+		var project = {};
+		var map     = {};
+		var metadata= {};
+
+		metadata.title = "";
+		metadata.snippet = "";
+		metadata.descriptrion = "";
+		metadata.thumbnail = "";
+		metadata.about = "";
+
+		project.metadata = metadata;
+
+		map.map  = szMapUrl;
+		map.basemap  = szMapType;
+		map.scaleParam = scaleParam;
+		map.options = options;
+		map.center  = center;
+		map.zoom  = zoom; 
+
+		project.map = map;
+
+		project.themes = themeDefA;
+		project.layerMask = layerObj;
+
+		console.log(project);
+		console.log(JSON.stringify(project));
+
+		// return the project object (JSON) as string !
+		//
+		return JSON.stringify(project)
+	};
+	
+
+}(window, document));
 
 // -----------------------------
 // EOF

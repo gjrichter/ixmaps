@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" >
+	<title>iXmps - Editor - Dataimport</title>
+
+	<style>
+		body #importdiv{
+			background:#fff;
+			overflow:auto;
+			padding: 1em;
+		}
+	.fileContainer {
+		overflow: hidden;
+		position: relative;
+	}
+
+	.fileContainer [type=file] {
+		cursor: inherit;
+		display: block;
+		font-size: 999px;
+		filter: alpha(opacity=0);
+		min-height: 100%;
+		min-width: 100%;
+		opacity: 0;
+		position: absolute;
+		right: 0;
+		text-align: right;
+		top: 0;
+	}
+
+	/* Example stylistic flourishes */
+
+	.fileContainer {
+		font-weight: normal;
+		color: black;
+		background: white;
+		border: #888 solid 0.5px;
+		border-radius: .25em;
+		float: left;
+		padding: .5em;
+	}
+
+	.fileContainer [type=file] {
+		cursor: pointer;
+	}
+
+	</style>
+</head>
+
+<!-- End of Header ------------------------ -->
+
+<body>
+	<div id="importdiv">
+		<div>
+			<p>Please select a <a href="#" title="select a valid ixmaps project file; format: JSON">iXMaps project file</a> from your drive</p>
+
+			<label class="fileContainer">
+				select project file
+				<input id=fileInput type="file" name=files[] multiple/>
+			</label>
+
+			<input type="text" id="fileName" style="width:80%;height:36px;font-size:1.1em"></input>&nbsp;<a href='#' id="loadFile" style="vertical-align:3px">
+				<button type="button" class="btn btn-md">
+				load project
+				</button>
+			</a>
+
+			<img src="../../ui/html/resources/images/loading_round.gif" id="load-file-spinner" style="height:24px;vertical-align:top;display:none">
+			<hr />
+		</div>
+	</div>
+
+	<script src="../../ui/libs/csv/jquery.csv.js"></script>
+	<script src="../../ui/libs/csv/papaparse.min.js"></script>
+	<script>
+
+	$(document).ready(function() {
+
+		var fFTReady = false;
+
+		if(isAPIAvailable()) {
+			$('#fileInput').bind('change', handleFileSelect);
+		}
+		$('#loadFile').bind('click', doLoadFile);
+
+		_LOG = function(text){
+			console.log(text);
+		};
+
+	});
+	function FTReady(){
+		fFTReady = true;
+	}
+
+	/**
+	 * isAPIAvailable  
+	 * checks the browser support for the HTML5 File API
+	 * displays a warning if the browser doesn't support it
+	 * @type boolean
+	 * @return true,false
+	 */
+	function isAPIAvailable() {
+		// Check for the various File API support.
+		if (window.File && window.FileReader && window.FileList && window.Blob) {
+			  // Great success! All the File APIs are supported.
+			  return true;
+		} else {
+			  alert("The browser you're using does not currently support\nthe HTML5 File API. As a result the file loading demo\nwon't work properly.");
+			  return false;
+		}
+	}
+	/**
+	 * handleFileSelect  
+	 * parses the textfield input into the map data source
+	 * @param evt the evemt handle
+	 * @type void
+	 */
+	function handleFileSelect(evt) { 
+		var files = evt.target.files; // FileList object
+		for(var i=0, len=files.length; i<len; i++) {
+			doFile(files[i], i);
+		}
+	}
+	/**
+	 * doFile  
+	 * reads the file and
+	 * parses the data into the map data source
+	 * @param file filename
+	 * @param i filenumber
+	 * @type void
+	 */
+	 var actFile = null;
+	function doFile(file, i) {
+		$("#fileName").val(file.name);
+		actFile = file;
+	}
+	/**
+	 * doLoadFile  
+	 * reads the file and
+	 * parses the data into the map data source
+	 * @param file filename
+	 * @param i filenumber
+	 * @type void
+	 */
+	function doLoadFile() {
+
+		$("#load-file-spinner").show();
+		var reader = new FileReader();
+		reader.readAsText(actFile);
+
+		reader.onload = function(event){
+			var project = null;
+
+			ixmaps.setProject("map",event.target.result);
+
+			// close the dialog
+			__killDialog();
+		};
+		reader.onerror = function(){
+			alert('Unable to read ' + actFile.name);
+		};
+
+	}
+
+	// ------------------------
+	// end of code 
+	// ------------------------
+
+	</script>
+
+	<!------------------------
+	  end of file
+	------------------------ ->
+
+</body>
+</html>

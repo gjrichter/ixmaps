@@ -1,0 +1,265 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" >
+<title>iXmps - Editor - save project</title>
+<script>
+
+   	/**************************************************************** 
+	 *
+	 * Theme 
+	 *
+	 ****************************************************************/
+
+	/**
+	 * This is the Theme class.  
+	 * It realizes an object to configure and realize a map theme 
+	 * @constructor
+	 * @throws 
+	 * @return A new Theme object
+	 */
+	function Theme(definition) {
+		this.obj = null;
+		this.szTheme = null;
+
+		if ( typeof(definition) == "string" ){
+			this.szTheme = definition;
+			this.parse(definition);
+		}else{
+			this.obj = definition;
+			//this.szTheme = JSON.stringify(definition);
+		}
+	}
+	Theme.prototype.parse = function(szThemeDef){
+		var szRaw = szThemeDef.replace(/\n\t+/g,'');
+		try	{
+			this.obj = JSON.parse(szRaw);
+		} catch (e){
+			ixmaps.parentApi.error("Code: "+e);
+		}
+	};
+	Theme.prototype.getString = function(){
+		if ( !this.szTheme ){
+			this.szTheme = JSON.stringify(this.obj);
+		}
+		return this.szTheme;
+	};
+	Theme.prototype.getObj = function(){
+		if ( !this.obj ){
+			this.parse(definition);
+		}
+		return this.obj;
+	};
+	Theme.prototype.getPrettyString = function(){
+		this.szPrettyString = "";
+		this.tab = 1;
+		this.recurs = 0;
+		this.formatObj(this.obj);
+		return this.szPrettyString;
+	};
+	Theme.prototype.isArray = function(obj) {
+		return Object.prototype.toString.call(obj) === '[object Array]';
+	};
+	Theme.prototype.formatObj = function(obj){
+
+		if ( ++this.recurs > 10 ){
+			return;
+		}
+		if ( this.isArray(obj) ){
+
+			this.szPrettyString += '[';
+			var n = 0;
+			for ( var a in obj ){
+				if ( obj[a] ){
+					if ( typeof(obj[a]) == "object" ){
+						this.szPrettyString += (n?',':'');
+						this.tab++;
+						this.formatObj(obj[a]);
+						this.tab--;
+					}else{
+						this.szPrettyString += (n?',\n':'\n') + (this.getIndent()) + '"'+String(obj[a]).replace(/\"/g,"\\\"")+'"';
+					}
+					n++;
+				}
+			}
+			this.szPrettyString += ']';
+
+		}
+		else{
+
+			this.szPrettyString += '{';
+
+			var n = 0;
+			for ( var a in obj ){
+				if ( a == "parent" || a == "listItem" || a == "gOverlayObject" || a == "gOverlayObjectPartsA" || a == "setLine" || a == "setPolygon" || a == "setPosition"){
+					continue;
+				}
+				if ( obj[a] == null ){
+					continue;
+				}
+				if ( typeof(obj[a]) == "object" ){
+					this.szPrettyString += (n?',\n':'\n') + (this.getIndent()) + '"'+a+'": ' ;
+					this.tab++;
+					this.formatObj(obj[a]);
+					this.tab--;
+					n++;
+				}else{
+					this.szPrettyString += (n?',\n':'\n') + (this.getIndent()) + '"'+a+'": "'+String(obj[a]).replace(/\"/g,"\\\"")+'"';
+					n++;
+				}
+			}
+			this.szPrettyString += '\n'+(this.getIndent())+'}';
+		}
+
+		this.recurs--;
+	};
+	Theme.prototype.getIndent = function(){
+		var szTab = "";
+		for ( var i=0; i<this.tab; i++ ){
+			szTab += "\t";
+		}
+		return szTab;
+	};
+
+
+	$(document).ready(function() {
+
+		if(isAPIAvailable()) {
+
+			var theme = new Theme(ixmaps.getProjectString());
+			ixmaps.szProject = theme.getPrettyString();
+
+			ixmaps.szTitle = (theme.getObj().themes[0])?(theme.getObj().themes[0].style.title || ""):"";
+			ixmaps.szTitle = ixmaps.szTitle.replace(/ /g,"_");
+
+			$("#project-title").val("ixmaps_project_"+ixmaps.szTitle+".json");
+		}
+	});
+
+	/**
+	 * isAPIAvailable  
+	 * checks the browser support for the HTML5 File API
+	 * displays a warning if the browser doesn't support it
+	 * @type boolean
+	 * @return true,false
+	 */
+	function isAPIAvailable() {
+		// Check for the various File API support.
+		if (window.File && window.FileReader && window.FileList && window.Blob) {
+			  // Great success! All the File APIs are supported.
+			  return true;
+		} else {
+			  alert("The browser you're using does not currently support\nthe HTML5 File API. As a result the file loading demo\nwon't work properly.");
+			  return false;
+		}
+	}
+	function saveTextAsFile(szText,szFilename)
+	{
+		var textToWrite = szText;
+		var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
+		var fileNameToSaveAs = szFilename || "project.json";
+
+		var downloadLink = document.createElement("a");
+		downloadLink.download = fileNameToSaveAs;
+		downloadLink.innerHTML = "Download File";
+		if (window.URL != null)
+		{
+			// Chrome allows the link to be clicked
+			// without actually adding it to the DOM.
+			downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+		}
+		else
+		{
+			// Firefox requires the link to be added to the DOM
+			// before it can be clicked.
+			downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+			downloadLink.onclick = destroyClickedElement;
+			downloadLink.style.display = "none";
+			document.body.appendChild(downloadLink);
+		}
+
+		downloadLink.click();
+	}
+
+	function destroyClickedElement(event)
+	{
+		document.body.removeChild(event.target);
+	}
+
+	// ------------------------
+	// end of code 
+	// ------------------------
+
+</script>
+
+<!-- Styles ------------------------ -->
+
+<style>
+	body #exportdiv{
+		background:#fff;
+		overflow:auto;
+		height:50%;
+		padding: 1em;
+		-moz-box-shadow: 0px 1px 8px /*{global-box-shadow-size}*/ 			rgba(0,0,0,.5) /*{global-box-shadow-color}*/ ;
+		-webkit-box-shadow: 0px 1px 8px /*{global-box-shadow-size}*/ 		rgba(0,0,0,.5) /*{global-box-shadow-color}*/ ;
+		box-shadow: 0px 1px 8px /*{global-box-shadow-size}*/ 				rgba(0,0,0,.5) /*{global-box-shadow-color}*/ ;
+	}
+	legend{
+		font-size: 1.1em;
+	}
+	textarea {
+		width:90%;
+	}
+	/* Track */
+	::-webkit-scrollbar-track {
+		-webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.1); 
+		-webkit-border-radius: 0px;
+		border-radius: 0px;
+	}
+	/* Handle */
+	::-webkit-scrollbar-thumb {
+		-webkit-border-radius: 0px;
+		border-radius: 0px;
+		background: rgba(232,232,232,0.6); 
+		-webkit-box-shadow: inset 0 0 0px rgba(0,0,0,0.1); 
+	}
+	::-webkit-scrollbar-thumb:window-inactive {
+		background: rgba(222,222,222,0.4); 
+	}
+
+</style>
+</head>
+
+<!-- End of Header ------------------------ -->
+
+  <body  >
+
+	<div id="exportdiv">
+		<div data-role="fieldcontain" data-inline="true">
+			<form>
+			  <fieldset>
+				<legend>save the actual view as project</legend>
+				<span class="help-block">the project will contain the actual theme and map bounds</br>
+				you can redefine the project filename below as you like</span>
+				<input id="project-title" type="text" class="input" size="40" style="font-size:1.1em"></input>
+			  </fieldset>
+			</form>	
+		</div>
+		<div style="margin-top:2em;">
+			<a href='javascript:var szFilename = $("#project-title").val();saveTextAsFile(ixmaps.szProject,szFilename);'>
+				<button type="button" class="btn btn-md">
+				save
+				</button>
+			</a>
+			<a href='javascript:__killDialog();'>
+				<button type="button" class="btn btn-md">
+				cancel
+				</button>
+			</a>
+		</div>
+	</div>
+
+  </body>
+
+ </html> 

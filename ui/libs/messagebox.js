@@ -86,17 +86,17 @@ function getMessageContent(messagType, header, content) {
 
     if (messagType == MESSAGE_TYPE.Confirmation) {
         messageContent += ''
-        + '<a id="MsgOkButton" href="#" data-role="button"><div style="margin:5px;">ok</div></a>'
+        + '<a id="MsgOkButton" href="#" data-role="button"><div class="messagebox_button" >ok</div></a>'
         + ''
         + '<div style="height:2px;background:white">'
         + '</div>'
         + ''
-        + '<a id="CancelButton" href="#" data-role="button"><div style="margin:5px;">cancel</div></a>'
+        + '<a id="CancelButton" href="#" data-role="button"><div class="messagebox_button" >cancel</div></a>'
         + '';
     }else
     if (messagType == MESSAGE_TYPE.Information || messagType == MESSAGE_TYPE.Error) {
         messageContent += ''
-        + '<a id="MsgOkButton" href="#" data-role="button" ><div style="margin:5px;">ok</div></a>'
+        + '<a id="MsgOkButton" href="#" data-role="button" ><div class="messagebox_button" >ok</div></a>'
         + '';
     }
 

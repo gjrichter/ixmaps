@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>iXMaps Project Viewer</title>
+	<meta name="author" content="ixmaps" />
+	<meta name="description" content="ixmaps story" />
+	<meta name="keywords"  content="ixmaps,corruption,map" />
+	<meta name="Resource-type" content="Document" />
+
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.9.0/css/bootstrap-slider.min.css" />
+
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/css/jquery.fullPage.css" />
+	<link rel="stylesheet" type="text/css" href="index.css" />
+	<link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/css/icomoon.css" rel="stylesheet" />    
+	<style>
+
+	.story-body{
+		background-color: rgba(255,255,255,0.75);
+	}
+	.shareBtns a {
+		color: #aaa;
+	}
+	a {
+		color: #aaa;
+	}
+	.footer {
+	}
+	.footer p {
+		background-color: rgba(235,235,235,0.7);
+		padding: 0.8em;
+	}
+	.footer a {
+		color: #428bca;
+	}
+	.inline-legend{
+		background-color: rgba(239,235,239,0.7);
+	}
+	.title{
+		font-size: 2.5em;
+		background-color: rgba(255,255,255,0.5);
+	}
+	.inline-legend-tool-button{	
+		color:#444444;
+		xxbackground:#ffffff;
+		padding:0.4em;
+	}
+	.navbar-pad-original {
+		-moz-box-shadow: 0px 2px 10px /*{global-box-shadow-size}*/ 			rgba(0,0,0,.2) /*{global-box-shadow-color}*/ ;
+		-webkit-box-shadow: 0px 2px 10px /*{global-box-shadow-size}*/ 		rgba(0,0,0,.2) /*{global-box-shadow-color}*/ ;
+		box-shadow: 0px 2px 10px /*{global-box-shadow-size}*/ 				rgba(0,0,0,.2) /*{global-box-shadow-color}*/ ;
+		xxborder-bottom: solid #ddd 1px;
+	}
+
+	.slider-handle {
+		position: absolute;
+		top: 0px;
+		width: 20px;
+		height: 20px;
+		background-color: #ddd;
+		background-image: none;
+		filter: none;
+		box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.05) 0px 1px 2px;
+		background-repeat: repeat-x;
+		border-width: 0px;
+		border-style: solid;
+		border-color: transparent;
+		border-image: initial;
+	}
+	.facet a, .facet-active a {
+		font-family: arial;
+		color: black;
+	}
+	a.link {
+		text-decoration: underline;
+	}
+	#loadProjectButton > a,#loadProjectHideButton > a{
+		text-decoration: none;
+	}
+
+	body #importdiv{
+		background:#fff;
+		overflow:auto;
+		padding: 1em;
+	}
+	.fileContainer {
+		overflow: hidden;
+		position: relative;
+	}
+
+	.fileContainer [type=file] {
+		cursor: inherit;
+		display: block;
+		font-size: 999px;
+		filter: alpha(opacity=0);
+		min-height: 100%;
+		min-width: 100%;
+		opacity: 0;
+		position: absolute;
+		right: 0;
+		text-align: right;
+		top: 0;
+	}
+
+	/* Example stylistic flourishes */
+
+	.fileContainer {
+		font-weight: normal;
+		color: black;
+		background: white;
+		border: #888 solid 0.5px;
+		border-radius: .25em;
+		float: left;
+		padding: .5em;
+	}
+
+	.fileContainer [type=file] {
+		cursor: pointer;
+	}
+	
+	legend {
+		border: 0;
+	}
+
+	.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+		color: #555;
+		background-color: white;
+		border: 1px solid #ddd;
+		border-bottom-color: transparent;
+		cursor: default;
+	}
+	</style>
+
+</head>
+<body class="story-body">
+
+	<div id="header" class="navbar-fixed-top"  style="position:fixed;top:0;left:0;width:99%;height:40px;padding:0px 20px 50px 0px;background:#ffffff;z-index:9999" >
+		<div class="container" style="margin-top:0.9em" >
+			<div class="row">
+				<div class="col-lg-8 col-lg-offset-2">
+					<div class="header" aria-hidden="true">
+						<div class="linkSocialContainer" style="float:left">
+							<span class="linkContainer"></span>
+							<span class="shareBtns" style="font-size:24px">
+								<a href="javascript:ixmaps.popupShare()">
+								<i class="shareIcon blackHover share_facebook icon-facebook-squared" title="Share on Facebook" tabindex="-1"></i></a>
+								<a href="javascript:ixmaps.popupBookmarks()">
+								<i class="icon shareIcon blackHover share_twitter icon-bookmark" title="Open bookmarks dialog" tabindex="-1"></i></a>
+								<a href="javascript:ixmaps.popupShare()">
+								<span class="fa fa-share fa-fw" ></span></a>
+								<a href="javascript:ixmaps.loadStoryTool('./filter.html',{frame:true})" >
+								<i class="icon shareIcon blackHover share_bitly icon-filter" title="Filter" tabindex="-1" style="margin-left:0.2em" ></i></a>
+								<a href="javascript:ixmaps.loadStoryTool('./layer.html')" >
+								<i class="icon shareIcon blackHover share_bitly icon-map" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i></a>
+								<a href="javascript:ixmaps.loadStoryTool('./about.html')" >
+								<i class="icon shareIcon blackHover share_bitly icon-info" title="About" tabindex="-1" style="margin-left:0.2em" ></i></a>
+								<a href="javascript:ixmaps.loadStoryTool('./menu.html')" >
+								<i class="icon shareIcon blackHover share_bitly icon-list2" title="Menu" tabindex="-1" style="margin-left:0.1em" ></i></a>
+								<a href="javascript:ixmaps.loadStoryTool('./table.html',{frame:true})" >
+								<i class="icon shareIcon blackHover share_bitly icon-table2" title="Menu" tabindex="-1" style="margin-left:0.2em" ></i></a>
+							</span>
+						</div>
+						<div class="linkSocialContainer" style="float:right;margin-right:-1.5em;margin-top:0.2em;">
+							<span class="linkContainer"></span>
+							<span class="shareBtns" style="font-size:18px">
+									<a href="javascript:ixmaps.fullScreen()">
+								<i class="icon shareIcon blackHover share_bitly icon-cross" title="Info" tabindex="-1" style="margin-left:0.2em" ></i></a>
+							</span>
+						</div>
+						<div class="logoContainer" style="float:right;margin-right:-10px;display:none">
+							<table>
+								<tr>
+									<td class="logoWrapper">
+										<a class="logoLink" target="_blank" tabindex="-1">
+											<img class="logoImg" src="" height="60px" style="opacity:0.8"/>
+										</a>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+
+		<div class="section" id="section1" style="margin:0;padding:1em 2em 0em 1em" >
+			<div class="intro up down">
+				<div >
+					<form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
+					<fieldset>
+						<legend>iXMaps Project Viewer
+							<span id="loadProjectButton" style="display:none"> 
+								<a href="javascript:$('#loadProject').show();$('#loadProjectButton').hide();$('#loadProjectHideButton').show()" title="load project">[+]</a></span>
+							<span id="loadProjectHideButton" style="display:none"> 
+								<a href="javascript:$('#loadProject').hide();$('#loadProjectButton').show();$('#loadProjectHideButton').hide()" title="load project">[-]</a></span>
+							<span id="saveProjectButton" style="display:none"> 
+								<a href="javascript:ixmaps.popupProject()" title="save project">[->]</a></span>
+							</legend>
+						<input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+						<div id="loadProject" style="margin-top:-1em;">
+							<input type="file" id="fileselect" name="fileselect[]" multiple="multiple" style="display:none"/>
+							<div id="filedrag" style="clear:both;height:10em;width:100%;border:dashed #dddddd 2px;">drop files here</div>
+							<label class="fileContainer" for="fileselect" style="position:relative;top:-5em;left:33%">or select project</label>
+						</div>
+
+					</fieldset>
+
+					</form>
+				</div>
+				<div id="messages">
+				</div>				
+
+			</div>
+
+		</div>
+		<div class="section" id="section2" style="margin-top:-2em"  >
+			<div class="intro up down">
+
+				<ul id="legendTabs" class="nav nav-tabs">
+					<li class="active"><a href="#" onclick="activateTab($(this))">Theme 1</a></li>
+<!--
+					<li><a href="#" onclick="activateTab($(this))">Theme 2</a></li>
+					<li><a href="#" onclick="activateTab($(this))">Theme 3</a></li>
+-->
+				</ul>
+
+				<div id='themeLegendDiv' class='inline-legend' style="margin-top:-2.5em;clear:both;display:none"></div>
+
+			</div>
+
+		</div>
+
+
+	</div>
+
+
+	<!-- ==== MODAL DIALOG ==== -->
+	<div id="modal-dialog-1" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="z-index:9999">
+	  <div class="modal-dialog modal-lg">
+		  <div class="modal-content">
+			...
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		  </div>
+	  </div>
+	</div>
+	<div id="modal-dialog-2" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="z-index:9999">
+	  <div class="modal-dialog modal-lg">
+		  <div class="modal-content">
+			...
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		  </div>
+	  </div>
+	</div>
+	<div id="modal-dialog-3" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="white;z-index:9999">
+	  <div class="modal-dialog modal-lg">
+		  <div class="modal-content">
+			...
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		  </div>
+	  </div>
+	</div>
+
+	<!--[if IE]>
+		<script type="text/javascript">
+			 var console = { log: function() {} };
+		</script>
+	<![endif]-->
+
+ 	<script type="text/javascript" src="assets/plugins/jquery-1.10.2.js"></script>
+
+	<script type="text/javascript">
+
+		// ===========================================
+		//
+		// !! get ixmaps api from story parent/opener
+		//
+		// ===========================================
+
+		var ixmaps = null;
+		if ( window.opener ){
+			ixmaps = window.opener.ixmaps;
+		}else
+		if ( parent ){
+			ixmaps = parent.window.ixmaps;
+		}
+		else{
+			alert("error: missing parent window for themes !");
+		}
+
+		ixmaps.initialized = true;
+
+
+		$(document).ready(function() {
+
+			var project =  "";
+			var api = ixmaps;
+			while ( api.parentApi && (api.parentApi != api) ){
+				api = api.parentApi;
+			}
+			if ( api.project ){
+				var project =  api.project;
+			}
+						
+			// -----------------------------------------------
+			// load themes script
+			// and initialize map if all loaded
+			// -----------------------------------------------
+
+			$.when(
+				$.getScript( "./index.js" ),
+				$.getScript( "./inline_legend.js" ),
+				$.getScript("../../../../ui/js/tools/layer_legend.js"),
+				$.Deferred(function( deferred ){
+					$( deferred.resolve );
+				})
+			).done(function(){
+				ixmaps.htmlgui_setMapTypeBG(api.getMapTypeId());
+
+			}).fail(function(){
+				alert("script loading "+arguments[2].toString());
+			});
+
+		});
+
+		// ------------------------------
+		// page handling
+		// ------------------------------
+
+		$( window ).resize(function() {
+			// refresh scrollspy !!!
+			$('[data-spy="scroll"]').each(function () {  
+			  var $spy = $(this).scrollspy('refresh')  
+			}); 
+			$('.fp-controlArrowUpDown').css("left",(window.innerWidth/2-25)+"px");
+			//$('body').css("font-size",window.innerWidth/33+"px");
+		});
+
+		var isTouch = (('ontouchstart' in window) || (navigator.msMaxTouchPoints > 0));
+		if (isTouch){
+			$("::-webkit-scrollbar").css("display","none"); 
+		}
+
+		$('#fullpage').fadeIn( "slow");
+
+		ixmaps.htmlgui_onItemClick = function(szId){
+
+			if(szId.match(/theme/)){
+				var data = ixmaps.getData('map',szId);
+				var szTitle = data.title;
+				ixmaps.szMapItemId = szId;
+				ixmaps.loadStoryTool('./item.html');
+				return true;
+			}
+			else{
+				//ixmaps.hideStoryTool();
+				return false;
+			}
+		};
+
+		var tabDivA = [];
+		activateTab = function(el){
+			el.parent().parent().find("li").removeClass("active");
+			el.parent().addClass("active");
+			$("#"+tabDivA[0]).hide();
+			$("#"+tabDivA[1]).hide();
+			$("#"+tabDivA[2]).hide();
+			for ( i=1; i<=3; i++ ){
+				if ( eval("el.text().match(/1/)") ){
+					$("#"+tabDivA[0]).show();
+				}else
+				if ( eval("el.text().match(/2/)") ){
+					$("#"+tabDivA[1]).show();
+				}else
+				if ( eval("el.text().match(/3/)") ){
+					$("#"+tabDivA[2]).show();
+				}
+			}
+		}
+
+	</script>
+
+
+	<script src="filedrag.js"></script>
+
+</body>
+</html>

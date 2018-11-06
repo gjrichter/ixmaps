@@ -187,9 +187,6 @@ DonutChart.prototype.realize = function(){
 			nSum += this.partsA[i].nPercent;
 			nSqrtSum += Math.sqrt(this.partsA[i].nPercent);
 		}
-		if ( 0 && (nSum<100) ){
-			nSqrtSum += Math.sqrt(100-nSum);
-		}
 		for ( var ii=0;ii<this.partsA.length;ii++ ){
 			this.partsA[ii].nPercent = Math.round(100/nSqrtSum*Math.sqrt(this.partsA[ii].nPercent));
 			if ( this.szStyle.match(/VOLUME/) ){
@@ -205,7 +202,7 @@ DonutChart.prototype.realize = function(){
 		if ( nSum != 100 ){
 			if ( this.szStyle.match(/AUTOCOMPLETE/) && (nSum < 100) ){
 				var compl = Math.floor((100-nSum)*100000)/100000;
-				this.addPart(compl,this.partsA[0].nHeight,"#eeeeee",0,"");
+				this.addPart(compl,this.partsA[0]?this.partsA[0].nHeight:0,"#eeeeee",0,"");
 			}else{
 				for ( var i=0;i<this.partsA.length;i++ ){
 					this.partsA[i].nPercent = this.partsA[i].nPercent/nSum*100;
@@ -217,7 +214,7 @@ DonutChart.prototype.realize = function(){
 	// if we have a donut, do some rotation to make the donut symmetric
 	// if parametrized, put biggest to top
 
-	if ( (this.nRadInner || this.szStyle.match(/VOLUME/)) && !this.szStyle.match(/NOROTATE/) ){
+	if ( this.szStyle.match(/SYMMETRIC/) ){
 
 		if ( this.szStyle.match(/STARBURST/) ){
 			nEndAngle = 360 - Math.floor((360/this.partsA.length/2));
@@ -234,29 +231,34 @@ DonutChart.prototype.realize = function(){
 			}
 		}
 	}
+	if ( this.szStyle.match(/HALF/) ){
+		nEndAngle = 270;
+	}
 
 	// here we go
+
+	nMaxAngle = this.szStyle.match(/HALF/)?180:360;
 
 	this.nRadOuterMaxL = 0;
 	this.nRadOuterMaxR = 0;
 	for ( i=0;i<this.partsA.length;i++ ){
-		var nAngle = this.partsA[i].nPercent/100*360;
+		var nAngle = this.partsA[i].nPercent/100*nMaxAngle;
 		var nGapAngle = 0;
 		if ( this.szStyle.match(/STARBURST/) ){
-			nAngle = 360/this.partsA.length;
+			nAngle = nMaxAngle/this.partsA.length;
 		}
 		if ( this.szStyle.match(/XSRAYS/) ){
-			nAngle = 360/this.partsA.length;
+			nAngle = Math.min(nMaxAngle/12,nMaxAngle/this.partsA.length);
 			nGapAngle = nAngle*0.40;
 			this.nRadInner = 35;
 		}else
 		if ( this.szStyle.match(/SRAYS/) ){
-			nAngle = 360/this.partsA.length;
+			nAngle = Math.min(nMaxAngle/10,nMaxAngle/this.partsA.length);
 			nGapAngle = nAngle*0.33;
 			this.nRadInner = 35;
 		}else
 		if ( this.szStyle.match(/RAYS/) ){
-			nAngle = 360/this.partsA.length;
+			nAngle = Math.min(nMaxAngle/8,nMaxAngle/this.partsA.length);
 			nGapAngle = nAngle*0.25;
 			this.nRadInner = 35;
 		}
@@ -732,6 +734,8 @@ function pathDrawArc(nX, nY, nRadius, nStartAngle, nEndAngle){
 	var rad1,rad2;
 	var oct;
 	var szPath = ' ';
+
+	nStartAngle = nStartAngle%360;
 
 	if ( nStartAngle > nEndAngle ){
 		szPath += pathDrawArc(nX, nY, nRadius, nStartAngle, 360);

@@ -19,6 +19,3392 @@ $Log: mapscript2.js,v $
  * @author Guenter Richter guenter.richter@medienobjekte.de
  * @version 1.1 
  */
+// .............................................................................
+// v i e w p o r t            
+// .............................................................................
+
+/**
+ * Create a new Map.Viewport instance.  
+ * @class It realizes an object to place the map anto the SVG canvas
+ * <ul>
+ * <li>It initializes the map display area within the SVG document and, if wished, draws a frame around.</li>
+ * <li>This frame can be generated also in form of panning buttons.</li>
+ * <li>The parametration is done by map.setFeatures();</li> 
+ * </ul>
+ * @constructor
+ * @throws 
+ * @param evt the actual event
+ * @return A new Map.Viewport Object
+ */
+Map.Viewport = function(evt){
+	var SVGDoc = evt?evt.target.ownerDocument:SVGDocument;
+
+	if (map.Scale.metadataNode){
+		/** holds metadata information of alignments */
+		this.alignmentNode	= map.Scale.metadataNode.getElementsByTagNameNS(szMapNs,"alignments").item(0);
+		/** holds the alignment definition for new popup windows */
+		this.szPopupAlignment = this.alignmentNode?this.alignmentNode.getAttributeNS(null,"popupwindow"):"";
+		this.szPopupAlignment = szLocalPopupAlignment?szLocalPopupAlignment:this.szPopupAlignment;
+	}
+
+	// GR 26.09.2007 set background color of map
+	this.eventRect = SVGDocument.getElementById("mapbackground:eventrect");
+	if (this.eventRect){
+		if ( szMapBackgroundStyle ){
+			this.eventRect.setAttributeNS(null,"style",szMapBackgroundStyle+";pointer-events:all");
+		}
+		if ( szMapBackgroundColor ){
+			this.eventRect.setAttributeNS(null,"style","fill:"+szMapBackgroundColor+";opacity:1;pointer-events:all");
+		}
+	}
+
+	this.clipToolsGroup();
+
+	this.createPanBorder();
+
+	this.createNorthArrow();
+
+	return true;
+};
+Map.Viewport.prototype = new Map();
+
+/**
+ * refresh map viewport (after resize)
+ */
+Map.Viewport.prototype.reformat = function (){
+	this.clipToolsGroup();
+	this.createPanBorder();
+	this.createNorthArrow();
+};
+/**
+ * clip the tools group (zoom/select rect ...) to the map size 
+ */
+Map.Viewport.prototype.clipToolsGroup = function (){
+	map.Dom.setClipRect(SVGToolsGroup,new box( map.Scale.mapPosition.x+map.Scale.normalX(nMapBorderWidth)
+											  ,map.Scale.mapPosition.y+map.Scale.normalY(nMapBorderWidth)
+											  ,map.Scale.bBox.width-map.Scale.normalX(nMapBorderWidth)*2
+											  ,map.Scale.bBox.height-map.Scale.normalY(nMapBorderWidth)*2));
+
+	this.widgetBox  = new box( map.Scale.mapPosition.x+map.Scale.normalX(nMapBorderWidth)
+							  ,map.Scale.mapPosition.y+map.Scale.normalY(nMapBorderWidth+nToolMarginTop)
+							  ,map.Scale.bBox.width-map.Scale.normalX(nMapBorderWidth)*2
+							  ,map.Scale.bBox.height-map.Scale.normalY(nMapBorderWidth)*2);
+};
+/**
+ * create the panning buttons of the viewport map frame 
+ */
+Map.Viewport.prototype.createPanBorder = function (){
+	var SVGDoc = SVGDocument;
+	if ( fMapBorder ){
+		var widgetGroup  = SVGDoc.getElementById("widgets:antizoomandpan");
+		if ( widgetGroup ){
+			var szFill = szMapBorderColor;
+			var nWidth = map.Scale.normalX(nMapBorderWidth);
+
+			var borderGroup = SVGDoc.getElementById("mapBorderClipCover");
+			if (borderGroup){
+				borderGroup.parentNode.removeChild(borderGroup);
+			}
+			var newGroup = map.Dom.newGroup(widgetGroup,"mapBorderClipCover");
+			newGroup.setAttributeNS(null,"style","fill:white;opacity:1.0");
+			widgetGroup.insertBefore(newGroup,widgetGroup.firstChild);
+
+			map.Dom.newShape('rect',newGroup,0
+											,0
+											,map.Scale.mapPosition.x
+											,map.Scale.viewBox.height
+											,"");
+			map.Dom.newShape('rect',newGroup,0
+											,0
+											,map.Scale.viewBox.width+10000
+											,map.Scale.mapPosition.y
+											,"");
+			map.Dom.newShape('rect',newGroup,0
+											,map.Scale.mapPosition.y+map.Scale.bBox.height
+											,map.Scale.viewBox.width+10000
+											,map.Scale.viewBox.height-(map.Scale.mapPosition.y+map.Scale.bBox.height)+10000
+											,"");
+			map.Dom.newShape('rect',newGroup,map.Scale.mapPosition.x+map.Scale.bBox.width
+											,0
+											,map.Scale.viewBox.width-(map.Scale.mapPosition.x+map.Scale.bBox.width)+10000
+											,map.Scale.bBox.height
+											,"");
+
+			borderGroup = SVGDoc.getElementById("mapBorder");
+			if (borderGroup){
+				borderGroup.parentNode.removeChild(borderGroup);
+			}
+			newGroup = map.Dom.newGroup(widgetGroup,"mapBorder");
+
+			if( fMapBorder3D && map.Scale.mapPosition.x ){
+				szFill = "#ffffff";
+				widgetGroup.insertBefore(newGroup,widgetGroup.firstChild);
+				// newGroup.setAttributeNS(null,"style","filter:url(#DropShadowFilterTools:antizoomandpan)");
+				newGroup.fu.setPosition(0,0);
+				// top, bottom, left, right
+				var nWidth = map.Scale.normalX(250);
+				var nForceVisibility = map.Scale.normalX(-3);
+				var newShape = null;
+				newShape = map.Dom.newShape('rect',newGroup,map.Scale.mapPosition.x,map.Scale.mapPosition.y-nWidth+nForceVisibility,map.Scale.bBox.width,nWidth,"fill:"+szFill+";opacity:0.5");
+				newShape.setAttributeNS(null,"style","filter:url(#DropShadowFilterTools:antizoomandpan)");
+				newShape = map.Dom.newShape('rect',newGroup,0,map.Scale.mapPosition.y+map.Scale.bBox.height-nForceVisibility,map.Scale.mapPosition.x+map.Scale.bBox.width,nWidth,"fill:"+szFill+";opacity:0.5");
+				newShape.setAttributeNS(null,"style","filter:url(#DropShadowFilterTools:antizoomandpan)");
+				newShape = map.Dom.newShape('rect',newGroup,0,0,map.Scale.mapPosition.x,map.Scale.mapPosition.y+map.Scale.bBox.height,"fill:"+szFill+";opacity:0.5");
+				newShape.setAttributeNS(null,"style","filter:url(#DropShadowFilterTools:antizoomandpan)");
+				newShape = map.Dom.newShape('rect',newGroup,map.Scale.mapPosition.x+map.Scale.bBox.width-nForceVisibility,0,nWidth,map.Scale.mapPosition.y+map.Scale.bBox.height,"fill:"+szFill+";opacity:0.5");
+				newShape.setAttributeNS(null,"style","filter:url(#DropShadowFilterTools:antizoomandpan)");
+			}
+			else{
+				newGroup.setAttributeNS(null,"transform","matrix(1 0 0 1 "+ map.Scale.mapPosition.x +" "+ map.Scale.mapPosition.y +")");
+				map.Dom.newShape('rect',newGroup,0,0,map.Scale.bBox.width,nWidth,"fill:"+szFill+";opacity:1.0");
+				map.Dom.newShape('rect',newGroup,0,map.Scale.bBox.height-nWidth,map.Scale.bBox.width,nWidth,"fill:"+szFill+";opacity:1.0");
+				map.Dom.newShape('rect',newGroup,0,0,nWidth,map.Scale.bBox.height,"fill:"+szFill+";opacity:1.0");
+				map.Dom.newShape('rect',newGroup,map.Scale.bBox.width-nWidth,0,nWidth,map.Scale.bBox.height,"fill:"+szFill+";opacity:1.0");
+				if ( nMapBorderWidth > 2 ){
+					var szStyle = szMapPanBorderStyle+";stroke-width:"+map.Scale.normalX(1)+";opacity:1.0";
+					var szOnoverStyle = szMapPanBorderOnoverStyle+";stroke-width:"+map.Scale.normalX(1)+";opacity:1.0";
+					var panButton = null;
+					var bBox = map.Scale.bBox;
+					var nCorner = bBox.width/10;
+					var nPan = bBox.width/3/+map.Scale.normalX(1);
+					panButton = map.Dom.newShape('rect',newGroup,nCorner,0,bBox.width-nCorner*2,nWidth,szStyle);
+					panButton.setAttributeNS(null,"onclick","map.Viewport.doPanMap(0,"+(nPan)+")");
+					panButton.setAttributeNS(szMapNs,"tooltip","pan");
+					panButton.setAttributeNS(szMapNs,"onoverstyle",szOnoverStyle);
+					panButton = map.Dom.newShape('rect',newGroup,nCorner,bBox.height-nWidth-1,bBox.width-nCorner*2,nWidth,szStyle);
+					panButton.setAttributeNS(null,"onclick","map.Viewport.doPanMap(0,"+(-nPan)+")");
+					panButton.setAttributeNS(szMapNs,"tooltip","pan");
+					panButton.setAttributeNS(szMapNs,"onoverstyle",szOnoverStyle);
+					panButton = map.Dom.newShape('rect',newGroup,0,nCorner,nWidth,bBox.height-nCorner*2,szStyle);
+					panButton.setAttributeNS(szMapNs,"onoverstyle",szOnoverStyle);
+					panButton.setAttributeNS(null,"onclick","map.Viewport.doPanMap("+(nPan)+",0)");
+					panButton.setAttributeNS(szMapNs,"tooltip","pan");
+					panButton.setAttributeNS(szMapNs,"onoverstyle",szOnoverStyle);
+					panButton = map.Dom.newShape('rect',newGroup,bBox.width-nWidth-1,nCorner,nWidth,bBox.height-nCorner*2,szStyle);
+					panButton.setAttributeNS(null,"onclick","map.Viewport.doPanMap("+(-nPan)+",0)");
+					panButton.setAttributeNS(szMapNs,"onoverstyle",szOnoverStyle);
+					panButton.setAttributeNS(szMapNs,"tooltip","pan");
+					panButton = map.Dom.newShape('path',newGroup,'M'+0+','+0+' l '+nCorner+','+0+' '+0+','+nWidth+' '+(-(nCorner-nWidth))+','+0+' '+0+','+(nCorner-nWidth)+' '+(-nWidth)+','+0+' z',szStyle);
+					panButton.setAttributeNS(szMapNs,"onoverstyle",szOnoverStyle);
+					panButton.setAttributeNS(null,"onclick","map.Viewport.doPanMap("+(nPan)+","+(nPan)+")");
+					panButton.setAttributeNS(szMapNs,"tooltip","pan");
+					panButton.setAttributeNS(szMapNs,"onoverstyle",szOnoverStyle);
+					panButton = map.Dom.newShape('path',newGroup,'M'+bBox.width+','+bBox.height+' l '+(-nCorner)+','+0+' '+0+','+(-nWidth)+' '+((nCorner-nWidth))+','+0+' '+0+','+(-(nCorner-nWidth))+' '+(nWidth)+','+0+' z',szStyle);
+					panButton.setAttributeNS(szMapNs,"tooltip","pan");
+					panButton.setAttributeNS(szMapNs,"onoverstyle",szOnoverStyle);
+					panButton.setAttributeNS(null,"onclick","map.Viewport.doPanMap("+(-nPan)+","+(-nPan)+")");
+					panButton.setAttributeNS(szMapNs,"tooltip","pan");
+					panButton.setAttributeNS(szMapNs,"onoverstyle",szOnoverStyle);
+					panButton = map.Dom.newShape('path',newGroup,'M'+bBox.width+','+0+' l '+(-nCorner)+','+0+' '+0+','+nWidth+' '+((nCorner-nWidth))+','+0+' '+0+','+(nCorner-nWidth)+' '+(nWidth)+','+0+' z',szStyle);
+					panButton.setAttributeNS(null,"onclick","map.Viewport.doPanMap("+(-nPan)+","+(nPan)+")");
+					panButton.setAttributeNS(szMapNs,"onoverstyle",szOnoverStyle);
+					panButton.setAttributeNS(szMapNs,"tooltip","pan");
+					panButton = map.Dom.newShape('path',newGroup,'M'+0+','+bBox.height+' l '+nCorner+','+0+' '+0+','+(-nWidth)+' '+(-(nCorner-nWidth))+','+0+' '+0+','+(-(nCorner-nWidth))+' '+(-nWidth)+','+0+' z',szStyle);
+					panButton.setAttributeNS(null,"onclick","map.Viewport.doPanMap("+(nPan)+","+(-nPan)+")");
+					panButton.setAttributeNS(szMapNs,"tooltip","pan");
+					panButton.setAttributeNS(szMapNs,"onoverstyle",szOnoverStyle);
+				}
+			}
+		}
+	}
+};
+/**
+ * executes the panning buttons of the viewport map frame 
+ * @param nDeltyX the x panning amount in pixel
+ * @param nDeltyY the y panning amount in pixel
+ */
+Map.Viewport.prototype.doPanMap = function (nDeltaX,nDeltaY){
+	executeWithMessage("map.Viewport.panMap("+nDeltaX+","+nDeltaY+")","please wait ...",100);
+};
+/**
+ * helper for the execution of the panning buttons; needed to get a message displayed  
+ * @param nDeltyX the x panning amount in pixel
+ * @param nDeltyY the y panning amount in pixel
+ */
+Map.Viewport.prototype.panMap = function (nDeltaX,nDeltaY){
+	map.Zoom.setNewPan(nDeltaX,nDeltaY);
+	map.Event.doDefaultZoom(null);
+};
+/**
+ * set the map background color
+ * @param szColor the new background color
+ */
+Map.Viewport.prototype.setBackgroundColor = function(szColor){
+	if (this.eventRect){
+		this.eventRect.setAttributeNS(null,"style","fill:"+szColor+";opacity:1;pointer-events:all");
+	}
+};
+/**
+ * toggle the border to pan the map 
+ */
+Map.Viewport.prototype.togglePanBorder = function(){
+	var SVGDoc = SVGDocument;
+	var borderGroup = SVGDoc.getElementById("mapBorder");
+	if (borderGroup){
+		borderGroup.parentNode.removeChild(borderGroup);
+	}
+	else{
+		map.Viewport.createPanBorder();
+	}
+};
+/**
+ * create the north arrow rotation slider
+ */
+Map.Viewport.prototype.createNorthArrow = function (){
+
+	if (!fNorthArrow){
+		return;
+		}
+	var SVGDoc = SVGDocument;
+	var widgetGroup  = SVGDoc.getElementById("widgets:antizoomandpan");
+	if ( widgetGroup ){
+		var szVisible = "none";
+		if (this.northGroup){
+			szVisible = this.northGroup.style.getPropertyValue("display");
+			this.northGroup.parentNode.removeChild(this.northGroup);
+		}
+		this.northGroup = map.Dom.newGroup(widgetGroup,"mapNorthArrow");
+		if ( szVisible ) {
+			this.northGroup.style.setProperty("display",szVisible);
+		}	
+
+		if ( szNorthArrowPosition == "TOP" ){
+			this.northGroup.fu.setPosition(	this.widgetBox.x+this.widgetBox.width-map.Scale.normalX(75)
+											,map.Scale.normalX(45+nToolMarginTop));
+		}else{
+			this.northGroup.fu.setPosition(	 this.widgetBox.x+this.widgetBox.width-map.Scale.normalX(75)
+											,this.widgetBox.y+map.Scale.normalX((this.widgetBox.y?50:60)+nToolMarginTop));
+		}
+
+		var nHeight = map.Scale.normalY(30);
+		var nWidth  = map.Scale.normalY(12);
+		map.Dom.newShape('circle',this.northGroup,0,0,nHeight,"fill:white;opacity:0.2");
+
+		map.Dom.newShape('path',this.northGroup,'M'+0+','+(-nHeight/2)+' l '+nWidth/2+','+nHeight*1.2+' '+(-nWidth/2)+','+(-nHeight/5)+' '+(-nWidth/2)+','+(nHeight/5)+' z','fill:#444444;stroke:#ffffff;stroke-width:'+map.Scale.normalX(0.4)+';');
+		map.Dom.newText(this.northGroup,map.Scale.normalX(-5),map.Scale.normalY(-19),"font-family:arial;font-size:"+map.Scale.normalX(12)+"px;font-weight:bold;fill:#444444;stroke:white;stroke-width:0.2;pointer-events:none","N");
+		map.Dom.newShape('rect',this.northGroup,-nWidth/2,-nHeight,nWidth,nHeight,"fill:green;opacity:0.0");
+		
+		if ( fNorthArrow == "rotatable" ){
+			// GR 11.11.2010 
+			this.northGroup.setAttributeNS(null,"cursor","pointer");
+			this.northGroup.setAttributeNS(szMapNs,"tooltip",map.Dictionary.getLocalText("click to move it"));
+			this.northArrowObj = new RotationSlider(this.northGroup,100,"0,360","1",90,9);
+			if ( this.northArrowObj ){
+				this.northArrowObj.parent = this;
+			}
+		}
+
+		// GR 16.03.2012 zoom buttons below north arrow
+		var zoomIn = new Button(this.northGroup,"mapNorthArrow:zoomin","BUTTON",'#plus_button1'
+									,"map.Zoom.doZoomMap(2)"
+									,""
+									,"zoom in");
+		zoomIn.setPosition(map.Scale.normalY(0),map.Scale.normalY(40));
+		zoomIn.scale(1.3,1.3);
+		zoomIn.nodeObj.style.setProperty("fill-opacity","0.5","");
+		var zoomOut = new Button(this.northGroup,"mapNorthArrow:zoomout","BUTTON",'#minus_button1'
+									,"map.Zoom.doZoomMap(0.5)"
+									,""
+									,"zoom out");
+		zoomOut.setPosition(map.Scale.normalY(0),map.Scale.normalY(40+nNormalButtonSize*2));
+		zoomOut.scale(1.3,1.3);
+		zoomOut.nodeObj.style.setProperty("fill-opacity","0.5","");
+	}
+};
+Map.Viewport.prototype.onClick = function(evt){
+	if ( this.northArrowObj ){
+		executeWithMessage("map.Scale.setRotation(null,"+0+")","...");
+	}
+};
+Map.Viewport.prototype.onMouseUp = function(evt){
+	if ( this.northArrowObj && !fRotateOnMouseMove ){
+		executeWithMessage("map.Scale.setRotation(null,"+this.northArrowObj.getAngle()+")","...");
+	}
+};
+Map.Viewport.prototype.onMouseMove = function(evt){
+	if ( this.northArrowObj && fRotateOnMouseMove ){
+		var newAngle = this.northArrowObj.getAngle();
+		if ( newAngle != this.nAngle ){
+			map.Scale.setRotation(null,newAngle);
+			this.nAngle = newAngle;
+		}
+	}
+};
+Map.Viewport.prototype.showNorthArrow = function (){
+	if ( this.northGroup ){
+		this.northGroup.style.setProperty("display","inline","");
+	}
+};
+Map.Viewport.prototype.hideNorthArrow = function (){
+	if ( this.northGroup && (this.northGroup.style.getPropertyValue("display") != "none") ){
+		this.northGroup.style.setProperty("display","none","");
+		if ( this.northArrowObj ){
+			executeWithMessage("map.Scale.setRotation(null,"+0+")","...");
+		}
+	}
+};
+/**
+ * clip the map
+ */
+Map.Viewport.prototype.clipMap = function (newWidth){
+	var clipRect = SVGDocument.getElementById("mapcliprect");
+	if (clipRect){
+		clipRect.setAttributeNS(null,"width",map.Scale.normalX(newWidth));
+	}
+};
+/**
+ * clip a layer
+ */
+Map.Viewport.prototype.clipLayer = function (szName,newWidth){
+
+	if ( !szName ){
+		szName = _activeTheme;
+	}
+	var layerObj = SVGDocument.getElementById(szName);
+	var layerObjV = SVGDocument.getElementById(szName+":values");
+
+	if ( typeof(this.lastClippedLayer) != "undefined" && (this.lastClippedLayer != layerObj) ){
+		map.Dom.setClipRect(this.lastClippedLayer,new box(-map.Scale.mapOffset.x,-map.Scale.mapOffset.y,map.Scale.bBox.width,map.Scale.bBox.height));
+		this.lastClippedLayer = null;
+	}
+	if ( typeof(this.lastClippedLayerV) != "undefined" && (this.lastClippedLayerV != layerObjV) ){
+		map.Dom.setClipRect(this.lastClippedLayerV,new box(-map.Scale.mapOffset.x,-map.Scale.mapOffset.y,map.Scale.bBox.width,map.Scale.bBox.height));
+		this.lastClippedLayerV = null;
+	}
+	if (layerObj){
+		map.Dom.setClipRect(layerObj,new box(-map.Scale.mapOffset.x,-map.Scale.mapOffset.y,map.Scale.normalX(newWidth),map.Scale.bBox.height));
+		this.lastClippedLayer = layerObj;
+	}
+	if (layerObjV){
+		map.Dom.setClipRect(layerObjV,new box(-map.Scale.mapOffset.x,-map.Scale.mapOffset.y,map.Scale.normalX(newWidth),map.Scale.bBox.height));
+		this.lastClippedLayerV = layerObjV;
+	}
+};
+
+// .............................................................................
+// z o o m      
+// .............................................................................
+
+/**
+ * Create a new Map.Zoom instance.  
+ * @class It realizes an object for defining and executing zoomin actions
+ * @constructor
+ * @throws 
+ * @return A new Map.Zoom Object
+ */
+Map.Zoom = function(nZoom) {
+
+	_TRACE("--- init zoom");
+
+	/** the SVG node, that realises the internal map coordinate offset @type DOM node */
+	this.canvasNode = SVGDocument.getElementById("mapcanvas");
+	/** the SVG node, that realises the map zooming and panning @type DOM node */
+	this.zoomNode   = SVGDocument.getElementById("mapzoomandpan");
+	/** the actual zooming factor (&gt;= 1) @type double */
+	this.nZoom = 1;
+	/** the actual zooming factor for X axis */
+	this.nZoomX = 1;
+	/** the actual zooming factor for Y axis */
+	this.nZoomY = 1;
+	/** if != null, it containes a zooming factor to set by {@link #execute} @type double */
+	this.doZoom = null;
+	/** if != null, it containes an area (box object) to zoom to by {@link #execute} @type box */
+	this.doArea = null;
+	/** if != null, it containes a new (point object) to center the map by {@link #execute} @type point */
+	this.doCenter = null;
+	/** flag to note if any map area has been set, the map has been initialized  */
+	this.fAreaSet = false;
+	if ( nZoom && (nZoom > 1) ){
+		this.doExecuteZoomMap(nZoom,1);
+	}
+};
+Map.Zoom.prototype = new Map();
+
+/**
+ * init map zoom and pan
+ */
+Map.Zoom.prototype.init = function(){
+	if (map.Scale.initZoomNode){
+		_TRACE("map.Scale.initZoomNode");
+		var minBoundX  = Number(map.Scale.initZoomNode.getAttribute('MinBoundX'));
+		var maxBoundX  = Number(map.Scale.initZoomNode.getAttribute('MaxBoundX'));
+		var minBoundY  = Number(map.Scale.initZoomNode.getAttribute('MinBoundY'));
+		var maxBoundY  = Number(map.Scale.initZoomNode.getAttribute('MaxBoundY'));
+		//	GR 09.10.2011 new degree
+		if ( map.Scale.initZoomNode.getAttribute('units') == "degree" ){
+			this.doZoomMapToGeoBounds(minBoundY,minBoundX,maxBoundY,maxBoundX);
+		}else{
+			this.Zoom.doZoomMapToEnvelope(minBoundX,maxBoundX,minBoundY,maxBoundY);
+		}
+	}
+};
+/**
+ * resets zoom
+ */
+Map.Zoom.prototype.toFullExtend = function(){
+//	displayMessage("please wait ...");
+	setTimeout("map.Zoom.reset()",100);
+};
+/**
+ * sets a new zoom
+ * @param newZoom zoom factor to set (&gt;=1)
+ */
+Map.Zoom.prototype.setNewZoom = function(newZoom){
+	this.doZoom = newZoom;
+//	displayMessage("please wait ...");
+//	setTimeout("map.Zoom.execute()",500);
+	map.Zoom.execute();
+};
+/**
+ * executes a new pan
+ * @param nDeltaX relative x position change
+ * @param nDeltaY relative y position change
+ */
+Map.Zoom.prototype.setNewPan = function(nDeltaX,nDeltaY){
+	this.doPanMap(nDeltaX,nDeltaY);
+};
+/**
+ * sets a new area
+ * @param newArea box with SVG coordinates to zoom to
+ */
+Map.Zoom.prototype.setNewArea = function(newArea){
+	this.fAreaSet = true;
+	if ( !this.doSetAreaByParentMap(newArea) ){
+		this.doArea = new box(newArea.x,newArea.y,newArea.width,newArea.height);
+		map.Zoom.execute();
+	}
+};
+/**
+ * sets a new center
+ * @param newArea box with SVG coordinates to center to
+ */
+Map.Zoom.prototype.setNewCenter = function(newArea){
+	if ( !this.doCenterByParentMap(newArea) ){
+		this.doCenter = new box(newArea.x,newArea.y,newArea.width,newArea.height);
+		map.Zoom.execute();
+	}
+};
+/**
+ * executes stacked zooming operations (is called onTimeout()) 
+ */
+Map.Zoom.prototype.execute = function(){
+
+	if (this.doZoom){
+		this.doExecuteZoomMap(this.doZoom,this.nZoom);
+		this.nZoom = this.doZoom;
+		this.doZoom = null;
+	}
+	if (this.doArea){
+		this.doZoomMapToArea(this.doArea);
+		this.doArea = null;
+	}
+	if (this.doCenter){
+		this.doCenterMapToArea(this.doCenter);
+		this.doCenter = null;
+	}
+
+	if(SVGPopupGroup){
+		SVGPopupGroup.fu.clear();
+	}
+};
+/**
+ * cancel executing
+ */
+Map.Zoom.prototype.cancel = function(){
+
+	this.doZoom = null;
+	this.doArea = null;
+	this.doCenter = null;
+};
+/**
+ * reset map zooming
+ */
+Map.Zoom.prototype.reset = function(){
+	this.zoomNode.setAttributeNS(null,"transform","matrix(1 0 0 1 0 0)");
+	SVGRootElement.currentTranslate.x = 0;
+	SVGRootElement.currentTranslate.y = 0;
+	this.nZoom = 1;
+	map.Event.doDefaultZoom(null);
+	clearMessage(100);
+};
+/**
+ * query map zoom and pan as box in svg coordinates 
+ * @type box
+ * @return a box object with x,y,width,height in SVG coordinates
+ */
+Map.Zoom.prototype.getBox = function(){
+
+	var canvasMatrixA = getMatrix(this.canvasNode);
+	var zoomMatrixA = getMatrix(this.zoomNode);
+	var xOff = -canvasMatrixA[4]/this.nZoomX;
+	var yOff = -canvasMatrixA[5]/this.nZoomY;
+
+	// GR 15.11.2007 respect canvas rotation  
+	// var pRotated = map.Scale.rotatePoint(new point(zoomMatrixA[4],zoomMatrixA[5]),-1);
+	// zoomMatrixA[4] = pRotated.x;
+	// zoomMatrixA[5] = pRotated.y;
+
+	xOff -= (map.Scale.normalX(SVGRootElement.currentTranslate.x) + zoomMatrixA[4]) / this.nZoomX;
+	yOff -= (map.Scale.normalY(SVGRootElement.currentTranslate.y) + zoomMatrixA[5]) / this.nZoomY;
+	return new box(xOff,yOff,map.Scale.bBox.width/this.nZoomX,map.Scale.bBox.height/this.nZoomY);
+};
+/**
+ * query map zoom and pan as envelope 
+ * @type array
+ * @return an array of 2 point objects with the min and max coordinates
+ */
+Map.Zoom.prototype.getEnvelope = function(){
+
+	var rectArea = this.getBox();
+	var pt1 = map.Scale.getMapCoordinate(rectArea.x,rectArea.y);
+	var pt2 = map.Scale.getMapCoordinate(rectArea.x+rectArea.width,rectArea.y+rectArea.height);
+	return new Array(pt1,pt2);
+};
+/**
+ * query map zoom and pan as envelope string
+ * @type string
+ * @return a string of the type "MinBoundX='1234.123 ..."
+ */
+Map.Zoom.prototype.getEnvelopeString = function(){
+
+	var ptEnvelopeA = this.getEnvelope();
+	return String("MinBoundX='"+ptEnvelopeA[0].x+"' MaxBoundX='"+ptEnvelopeA[1].x+"' MinBoundY='"+ptEnvelopeA[1].y+"' MaxBoundY='"+ptEnvelopeA[0].y+"'");
+};
+/**
+ * query map zoom and pan as box in fraction values. Usefull to actualize the overwievmap  
+ * @type box
+ * @return a box object with actual zoom and pan defined as follows: 
+ * <ul>
+ * <li>x,y = pan position from 0...1 (0.5 = central position)</li>
+ * <li>width,height = visible portion from 0...1 (1 = full extent)</li> 
+ * </ul>
+ */
+Map.Zoom.prototype.getFractionBox = function(){
+
+	var zoomMatrixA = getMatrix(this.zoomNode);
+	// GR 15.11.2007 respect canvas rotation  
+	var pRotated = map.Scale.rotatePoint(new point(zoomMatrixA[4],zoomMatrixA[5]),-1);
+	zoomMatrixA[4] = pRotated.x;
+	zoomMatrixA[5] = pRotated.y;
+	xOff = (map.Scale.normalX(SVGRootElement.currentTranslate.x) + zoomMatrixA[4]) / this.nZoomX;
+	yOff = (map.Scale.normalY(SVGRootElement.currentTranslate.y) + zoomMatrixA[5]) / this.nZoomY;
+	var maxXoff = map.Scale.bBox.width-map.Scale.bBox.width/this.nZoomX;
+	var maxYoff = map.Scale.bBox.height-map.Scale.bBox.height/this.nZoomY;
+	if ( maxXoff > 0 && maxYoff > 0 ){
+		return new box(0.5-xOff/maxXoff,0.5-yOff/maxYoff,1/this.nZoomX,1/this.nZoomY);
+	}
+	return new box(0,0,1/this.nZoomX,1/this.nZoomY);
+};
+/**
+ * set map zoom and pan to a box given in fraction values. Usefull to execute zooming and panning via overwievmap  
+ * @param nbox with x,y,width,height given as follows
+ * <ul>
+ * <li>x,y = pan position from 0...1 (0.5 = central position)</li>
+ * <li>width,height = visible portion from 0...1 (1 = full extent)</li> 
+ * </ul>
+ */
+Map.Zoom.prototype.setFractionBox = function(nBox){
+
+	// calculate real width/height of fraction box
+	var nWidth  = map.Scale.bBox.width*nBox.width;
+	var nHeight = map.Scale.bBox.height*nBox.height;
+	// calculate real offset range
+	var maxXoff = map.Scale.bBox.width-nWidth;
+	var maxYoff = map.Scale.bBox.height-nHeight;
+	// offset is fraction of this range
+	var xOff = maxXoff*nBox.x + map.Scale.bBox.x;
+	var yOff = maxYoff*nBox.y + map.Scale.bBox.y;
+	var zoomBox = new box(xOff,yOff,nWidth,nHeight);
+
+	map.Zoom.setNewCenter(zoomBox);
+};
+/**
+ * clip zoom or center area to map limits
+ * @param rectArea the area to clip
+ * @type box
+ * @return the clipped area
+ */
+Map.Zoom.prototype.clipArea = function(rectArea){
+
+	// 1. force area to the aspect ratio of the map
+	//
+	if ( rectArea.width/rectArea.height != map.Scale.bBox.width/map.Scale.bBox.height ){
+		if ( rectArea.width>rectArea.height ){
+			rectArea.height = rectArea.width/map.Scale.bBox.width*map.Scale.bBox.height;
+		}
+		else{
+			rectArea.width = rectArea.height/map.Scale.bBox.height*map.Scale.bBox.width;
+		}
+	}
+
+	// 2. clip the area
+	//
+	var leftMargin	 = rectArea.x - map.Scale.bBox.x;
+	var rightMargin  = map.Scale.bBox.x+map.Scale.bBox.width - (rectArea.x+rectArea.width);
+	var topMargin	 = rectArea.y - map.Scale.bBox.y;
+	var bottomMargin = map.Scale.bBox.y+map.Scale.bBox.height - (rectArea.y+rectArea.height);
+
+	if ( leftMargin < 0 || rightMargin < 0 || topMargin < 0 || bottomMargin < 0 ){
+		if ( leftMargin < 0 && rightMargin < 0 ){
+			rectArea.x = map.Scale.bBox.x;
+			rectArea.width = map.Scale.bBox.width;
+		}
+		else if ( leftMargin < 0 ){
+			rectArea.x += (-leftMargin);
+			rectArea.width -= (rightMargin>(-leftMargin))?0:(-leftMargin)-rightMargin;
+		}
+		else if ( rightMargin < 0 ){
+			rectArea.x -= (-rightMargin);
+			return this.clipArea(rectArea);
+		}
+		if ( topMargin < 0 && bottomMargin < 0 ){
+			rectArea.y = map.Scale.bBox.y;
+			rectArea.height = map.Scale.bBox.heigt;
+		}
+		else if ( topMargin < 0 ){
+			rectArea.y += (-topMargin);
+			rectArea.height -= (bottomMargin>(-topMargin))?0:(-topMargin)-bottomMargin;
+		}
+		else if ( bottomMargin < 0 ){
+			rectArea.y -= (-bottomMargin);
+			return this.clipArea(rectArea);
+		}
+	}
+
+	return rectArea;
+};
+/**
+ * checks if a given box (map coordinates) is within the zoom box
+ * @param bBox the box to check 
+ * @type boolean
+ * @return true or false
+ */
+Map.Zoom.prototype.isVisibleBox = function(bBox){
+
+	try{
+		var zoomBox = this.getBox();
+		if ( bBox.x+bBox.width 	< zoomBox.x					||
+			 bBox.x				> zoomBox.x+zoomBox.width	||
+			 bBox.y+bBox.height	< zoomBox.y					||
+			 bBox.y				> zoomBox.y+zoomBox.height  ){
+			return false;
+		}
+		return true;
+	}
+	catch (e){
+		return false;
+	}
+};
+/**
+ * checks if a given box (map coordinates) is completely within the zoom box
+ * @param bBox the box to check 
+ * @type boolean
+ * @return true or false
+ */
+Map.Zoom.prototype.isCompletelyVisibleBox = function(bBox){
+
+	var zoomBox = this.getBox();
+	if ( bBox.x 			< zoomBox.x					||
+		 bBox.x+bBox.width	> zoomBox.x+zoomBox.width	||
+		 bBox.y				< zoomBox.y					||
+		 bBox.y+bBox.height	> zoomBox.y+zoomBox.height  ){
+		return false;
+	}
+	return true;
+};
+
+/**
+ * execute map zooming
+ * @param nZoom the new zoom fator 
+ * @param nOldZoom the actual zoom factor
+ */
+Map.Zoom.prototype.doExecuteZoomMap = function(nZoom,nOldZoom){
+
+	nZoom = this.checkZoomLimit(nZoom);
+	if ( nZoom == this.nZoom ){
+		return;
+	}
+
+	var zoomMatrixA = getMatrix(this.zoomNode);
+	var newX = (SVGRootElement.currentTranslate.x + map.Scale.embedX(zoomMatrixA[4])) / nOldZoom * nZoom;
+	var newY = (SVGRootElement.currentTranslate.y + map.Scale.embedX(zoomMatrixA[5])) / nOldZoom * nZoom;
+
+	this.nZoomX = this.nZoomX / nOldZoom * nZoom;
+	this.nZoomY = this.nZoomY / nOldZoom * nZoom;
+
+	if ( fPanByViewer ){
+		this.zoomNode.setAttributeNS(null,"transform","matrix("+this.nZoomX+" 0 0 "+this.nZoomY+" 0 0)");
+		SVGRootElement.currentTranslate.x = newX;
+		SVGRootElement.currentTranslate.y = newY;
+	}
+	else {
+		this.zoomNode.setAttributeNS(null,"transform","matrix("+this.nZoomX+" 0 0 "+this.nZoomY+" "+map.Scale.normalX(newX)+" "+map.Scale.normalY(newY)+")");
+	}
+	this.nZoom = nZoom;
+	map.Event.doDefaultZoom(null);
+};
+/**
+ * execute map zooming to an area
+ * @param rectArea the area to zoom to 
+ */
+Map.Zoom.prototype.doZoomMapToArea = function(rectArea){
+
+	// debug: mark the area to zoom to
+    // ---------------------------------
+	// try{
+	// 	var objectGroup = map.Layer.objectGroup;
+	// 	map.Dom.clearGroup(objectGroup);
+	// 		map.Dom.newShape('rect',objectGroup,rectArea.x,rectArea.y,rectArea.width,rectArea.height,"stroke:black;stroke-width:20;fill:none")
+	// 		map.Dom.newShape('line',objectGroup,rectArea.x,rectArea.y,rectArea.x+rectArea.width,rectArea.y+rectArea.height,"stroke:black;stroke-width:20;fill:none")
+	// 		map.Dom.newShape('line',objectGroup,rectArea.x,rectArea.y+rectArea.height,rectArea.x+rectArea.width,rectArea.y,"stroke:black;stroke-width:20;fill:none")
+	// 	}catch (e){	}
+
+	this.fAreaSet = true;
+
+	var canvasMatrixA = getMatrix(this.canvasNode);
+	var mapCanvas = new point(canvasMatrixA[4],canvasMatrixA[5]);
+
+	var nNewZoom = Math.min(map.Scale.bBox.width/rectArea.width,map.Scale.bBox.height/rectArea.height);
+
+	var nNewZoomX = map.Scale.bBox.width/rectArea.width;
+	var nNewZoomY = map.Scale.bBox.height/rectArea.height;
+
+	nNewZoom = Math.round(nNewZoom*1000000)/1000000;
+
+	nNewZoomX = Math.round(nNewZoomX*1000000)/1000000;
+	nNewZoomY = Math.round(nNewZoomY*1000000)/1000000;
+
+	var nNewZoomChecked = this.checkZoomLimit(nNewZoom);
+	if ( nNewZoomChecked != nNewZoom ){
+		rectArea.scale(nNewZoom/nNewZoomChecked);
+	}
+	nNewZoom = nNewZoomChecked;
+
+	if ( nNewZoom == this.nZoom ){
+		this.doCenterMapToArea(rectArea);
+		return;
+	}
+
+	// GR 15.08.2013
+	if ( fPreserveMapRatio ){
+		nNewZoomX = nNewZoomY = nNewZoom;
+	}
+
+	// zoom with different modes
+	if ( fZoomByViewer && fPanByViewer ){
+		this.zoomNode.setAttributeNS(null,"transform","matrix(1 0 0 1 0 0)");
+		SVGRootElement.currentScale = nNewZoom;
+	}
+	else if ( fPanByViewer ){
+		this.zoomNode.setAttributeNS(null,"transform","matrix("+nNewZoomX+" 0 0 "+nNewZoomY+" 0 0)");
+		SVGRootElement.currentScale = 1;
+	}
+	else{
+		this.zoomNode.setAttributeNS(null,"transform","matrix("+nNewZoomX+" 0 0 "+nNewZoomY+" "+0+" "+0+")");
+	}
+	this.nZoom = nNewZoom;
+	this.nZoomX = nNewZoomX;
+	this.nZoomY = nNewZoomY;
+	this.doCenterMapToArea(rectArea);
+
+};
+/**
+ * execute map centering to an area
+ * @param rectArea the area to center to 
+ */
+Map.Zoom.prototype.doCenterMapToArea = function(rectArea){
+
+	this.fAreaSet = true;
+	this.fExternalZoom = false;
+
+	var canvasMatrixA = getMatrix(this.canvasNode);
+	var mapCanvas = new point(canvasMatrixA[4],canvasMatrixA[5]);
+
+	var zoomMatrixA = getMatrix(this.zoomNode);
+	var nZoom = zoomMatrixA[0];
+	var nZoomX = zoomMatrixA[0];
+	var nZoomY = zoomMatrixA[3];
+
+	// calculate center
+	rectArea.x	+= rectArea.width/2;
+	rectArea.y	+= rectArea.height/2;
+
+	// to new map zoom
+	rectArea.x	= rectArea.x*nZoomX+mapCanvas.x;
+	rectArea.y	= rectArea.y*nZoomY+mapCanvas.y;
+
+	// new pan position
+	var newX = -(rectArea.x) + map.Scale.bBox.width/2;
+	var newY = -(rectArea.y) + map.Scale.bBox.height/2;
+
+	// GR 15.11.2007 respect canvas rotation  
+	var pRotated = map.Scale.rotatePoint(new point(newX,newY));
+	newX = pRotated.x;
+	newY = pRotated.y;
+
+	// zoom and pan with different modes
+	if ( fZoomByViewer && fPanByViewer ){
+		SVGRootElement.currentScale = nNewZoom;
+		SVGRootElement.currentTranslate.x = map.Scale.embedX(newX-rectArea.width/2)*nNewZoomX;
+		SVGRootElement.currentTranslate.y = map.Scale.embedY(newY-rectArea.height/2)*nNewZoomY;
+	}
+	else if ( fPanByViewer ){
+		SVGRootElement.currentTranslate.x = map.Scale.embedX(newX);
+		SVGRootElement.currentTranslate.y = map.Scale.embedY(newY);
+	}
+	else{
+		var ptOld = getTranslate(this.zoomNode);
+		this.zoomNode.setAttributeNS(null,"transform","matrix("+nZoomX+" 0 0 "+nZoomY+" "+newX+" "+newY+")");
+		// GR 31.12.2010
+		this.doPanFixed(newX-ptOld.x,newY-ptOld.y);
+	}
+
+	if ( !fFroozeDynamicContent ){
+		if ( map.isIdle() ){
+			map.Event.doDefaultZoom(null);
+		}else{
+			map.pushAction('map.Event.doDefaultZoom(null)');
+		}
+	}
+};
+Map.Zoom.prototype.doPanFixed = function(deltaX,deltaY){
+	var fixedNodes = SVGFixedGroup.childNodes;
+	for ( var i=0; i<fixedNodes.length; i++ ){
+		var ptPos = fixedNodes.item(i).fu.getPosition();
+		fixedNodes.item(i).fu.setPosition(ptPos.x+deltaX,ptPos.y+deltaY);
+	}
+	var toolsNodes = SVGToolsGroup.childNodes;
+	for ( var i=0; i<toolsNodes.length; i++ ){
+		var ptPos = toolsNodes.item(i).fu.getPosition();
+		toolsNodes.item(i).fu.setPosition(ptPos.x+deltaX,ptPos.y+deltaY);
+	}
+};
+
+/**
+ * execute map area zoom tool
+ * ! if SVG on top of a HTML map, foreward call to the HTML map !
+ * @param rectArea the new area to zoom to given in widget (=screen) coordinates
+ */
+Map.Zoom.prototype.doZoomMapToWidgetRect = function(rectArea){
+
+	var fCenter = Math.min(rectArea.width,rectArea.height) < map.Scale.normalX(25) ? true : false;
+
+	var pStart = new point(rectArea.x,rectArea.y);
+	var pEnd   = new point(rectArea.x-rectArea.width,rectArea.y-rectArea.height);
+
+	var zoomMatrixA = getMatrix(map.Scale.zoomNode);
+	var nZoomX = zoomMatrixA[0];
+	var nZoomY = zoomMatrixA[3];
+	
+	// from widget to canvas
+	var matrixA = antiZoomAndPanList.getActualMatrix();
+
+	// GR 15.11.2007 respect canvas rotation  
+	var pRotated = map.Scale.rotatePoint(new point(zoomMatrixA[4],zoomMatrixA[5]),-1);
+	zoomMatrixA[4] = pRotated.x;
+	zoomMatrixA[5] = pRotated.y;
+
+	rectArea.x		= (rectArea.x)*matrixA[0]+matrixA[4];
+	rectArea.y		= (rectArea.y)*matrixA[3]+matrixA[5];
+	rectArea.width	= rectArea.width*matrixA[0];
+	rectArea.height	= rectArea.height*matrixA[3];
+
+	// from canvas to map
+	rectArea.x		= rectArea.x-map.Scale.mapPosition.x-map.Scale.mapOffset.x;
+	rectArea.y		= rectArea.y-map.Scale.mapPosition.y-map.Scale.mapOffset.y;
+
+	// subtract old map zoom and pan
+	rectArea.x		= (rectArea.x-zoomMatrixA[4])/nZoomX;
+	rectArea.y		= (rectArea.y-zoomMatrixA[5])/nZoomY;
+	rectArea.width  = rectArea.width/nZoomX;
+	rectArea.height = rectArea.height/nZoomY;
+
+	if (fCenter){
+		map.Zoom.setNewCenter(rectArea);
+	}else{
+		map.Zoom.setNewArea(rectArea);
+	}
+};
+/**
+ * execute map zooming to an envelope ( geo cordinate bounding box )
+ * @param minBoundX the x value of the min geo coordinate  
+ * @param maxBoundX the x value of the max geo coordinate  
+ * @param minBoundY the y value of the min geo coordinate  
+ * @param maxBoundY the y value of the max geo coordinate  
+ */
+Map.Zoom.prototype.doZoomMapToEnvelope = function(minBoundX,maxBoundX,minBoundY,maxBoundY){
+
+	if ( this.doCheckEnvelope(minBoundX,maxBoundX,minBoundY,maxBoundY) ) {
+		var nLeft   = (minBoundX-map.Scale.minBoundX)/map.Scale.mapUnitsPPX - map.Scale.mapOffset.x;
+		var nRight  = (maxBoundX-map.Scale.minBoundX)/map.Scale.mapUnitsPPX - map.Scale.mapOffset.x;
+		var nTop    = map.Scale.maxY - map.Scale.minY - (maxBoundY-map.Scale.minBoundY)/map.Scale.mapUnitsPPY - map.Scale.mapOffset.y;
+		var nBottom = map.Scale.maxY - map.Scale.minY - (minBoundY-map.Scale.minBoundY)/map.Scale.mapUnitsPPY - map.Scale.mapOffset.y;
+
+		map.Zoom.setNewArea(new box(nLeft,nTop,nRight-nLeft,nBottom-nTop),300); 
+	}else{
+		map.Zoom.doZoomMapToLayer('maplayer');
+	}
+
+};
+/**
+ * execute map center to an envelope ( geo cordinate bounding box )
+ * @param minBoundX the x value of the min geo coordinate  
+ * @param maxBoundX the x value of the max geo coordinate  
+ * @param minBoundY the y value of the min geo coordinate  
+ * @param maxBoundY the y value of the max geo coordinate  
+ */
+Map.Zoom.prototype.doCenterMapToEnvelope = function(minBoundX,maxBoundX,minBoundY,maxBoundY){
+
+	if ( this.doCheckEnvelope(minBoundX,maxBoundX,minBoundY,maxBoundY) ) {
+		var nLeft   = (minBoundX-map.Scale.minBoundX)/map.Scale.mapUnitsPPX - map.Scale.mapOffset.x;
+		var nRight  = (maxBoundX-map.Scale.minBoundX)/map.Scale.mapUnitsPPX - map.Scale.mapOffset.x;
+		var nTop    = map.Scale.maxY - map.Scale.minY - (maxBoundY-map.Scale.minBoundY)/map.Scale.mapUnitsPPY - map.Scale.mapOffset.y;
+		var nBottom = map.Scale.maxY - map.Scale.minY - (minBoundY-map.Scale.minBoundY)/map.Scale.mapUnitsPPY - map.Scale.mapOffset.y;
+
+		map.Zoom.doCenterMapToArea(new box(nLeft,nTop,nRight-nLeft,nBottom-nTop)); 
+	}
+};
+/**
+ * execute map center to a geo position given in Lat/Lon
+ * @param lat the latitude of the geo position
+ * @param lon the longitude of the geo position
+ */
+Map.Zoom.prototype.doCenterMapToGeoPosition = function(lat,lon){
+	var ptCenter = map.Scale.getMapCoordinateOfLatLon(lat,lon);
+	if ( ptCenter ){
+		if ( !this.doSetCenterByParentMap(ptCenter.x,ptCenter.y) ){
+			this.doCenterMapToEnvelope(ptCenter.x,ptCenter.x,ptCenter.y,ptCenter.y);
+		}
+	}
+	else{
+		displayMessage("missing projection ! lat/lon could not be resolved",1000);
+	}
+};
+/**
+ * execute map center to bounds given in Lat/Lon
+ * @param latSW the latitude  of the South West point
+ * @param lonSW the longitude of the North East point
+ * @param latNE the latitude  of the South West point
+ * @param lonNE the longitude of the North East point
+ */
+Map.Zoom.prototype.doCenterMapToGeoBounds = function(latSW,lonSW,latNE,lonNE){
+	this.fExternalZoom = false;
+	var ptSW = map.Scale.getMapCoordinateOfLatLon(latSW,lonSW);
+	var ptNE = map.Scale.getMapCoordinateOfLatLon(latNE,lonNE);
+	if ( ptSW && ptNE ){
+		this.doCenterMapToEnvelope(ptSW.x,ptNE.x,ptSW.y,ptNE.y);
+	}
+	else{
+		displayMessage("missing projection ! lat/lon could not be resolved",1000);
+	}
+};
+/**
+ * execute map zoom to bounds given in Lat/Lon
+ * ! if SVG on top of a HTML map, foreward call to the HTML map !
+ * @param latSW the latitude  of the South West point
+ * @param lonSW the longitude of the North East point
+ * @param latNE the latitude  of the South West point
+ * @param lonNE the longitude of the North East point
+ */
+Map.Zoom.prototype.doZoomMapToGeoBounds = function(latSW,lonSW,latNE,lonNE){
+	var ptSW = map.Scale.getMapCoordinateOfLatLon(latSW,lonSW);
+	var ptNE = map.Scale.getMapCoordinateOfLatLon(latNE,lonNE);
+	if ( ptSW && ptNE ){
+		if ( !this.doSetEnvelopeByParentMap(ptSW.x,ptNE.x,ptSW.y,ptNE.y) ){
+			this.doZoomMapToEnvelope(ptSW.x,ptNE.x,ptSW.y,ptNE.y);
+		}
+	}
+	else{
+		displayMessage("missing projection ! lat/lon could not be resolved",1000);
+	}
+};
+/**
+ * execute map pan to given center in Lat/Lon and zoom level
+ * ! if SVG on top of a HTML map, foreward call to the HTML map !
+ * @param center point array with latitude,longitude
+ * @param nZoom zoom level of hosting tile map
+ */
+Map.Zoom.prototype.doZoomMapToView = function(center,nZoom){
+	try{
+		HTMLWindow.ixmaps.htmlgui_setCenterAndZoom({lat:center[0],lng:center[1]},nZoom);
+	}
+	catch (e){
+		return false;
+	}
+};
+/**
+ * execute map zoom to bounds given in Lat/Lon
+ * ! if SVG on top of a HTML map, foreward call to the HTML map !
+ * @param latSW the latitude  of the South West point
+ * @param lonSW the longitude of the North East point
+ * @param latNE the latitude  of the South West point
+ * @param lonNE the longitude of the North East point
+ */
+Map.Zoom.prototype.doZoomMapToLayer = function(szLayerName){
+	_TRACE("---- ************ ----- doZoomMapToLayer -------------------");
+
+	if ( fPendingNewGeoBounds ){
+		fPendingNewGeoBounds = false;
+		return;
+	}
+
+	var layerNode = SVGDocument.getElementById(szLayerName);
+	var bBox = map.Dom.getBox(layerNode);
+	var ptOffset = map.Scale.getMapOffset(layerNode);
+	bBox.x += ptOffset.x;
+	bBox.y += ptOffset.y;
+	var allBox = new box(bBox.x,bBox.y,bBox.width,bBox.height);
+	allBox.scale(0.8);
+
+	// GR 29.04.2012 because of an error in CHROME, getBox() gets the box wrong (can't handle negative coordinates)
+	// so we have to do the job; svggis creates now a <g> with id = layername::bbox, there we can find the bounds of one layer
+	// we loop over all layer and make the hull
+	//
+	if ( szLayerName == "maplayer" ){
+		var minX = 30000;
+		var minY = 30000;
+		var maxX = -30000;
+		var maxY = -30000;
+		var fDone = false;
+		for ( a in map.Layer.listA ){
+			if ( !a.match(/legend/) ){
+				var layerBoxNode = SVGDocument.getElementById(a+"::bbox");
+				if ( layerBoxNode ){
+					minX = Math.min(minX,Number(layerBoxNode.getAttributeNS(null,"minboundx")));
+					minY = Math.min(minY,Number(layerBoxNode.getAttributeNS(null,"minboundy")));
+					maxX = Math.max(maxX,Number(layerBoxNode.getAttributeNS(null,"maxboundx")));
+					maxY = Math.max(maxY,Number(layerBoxNode.getAttributeNS(null,"maxboundy")));
+					fDone = true;
+				}
+			}
+		}
+		if ( fDone ){
+			allBox = new box(minX,minY,Math.abs(maxX-minX),Math.abs(maxY-minY));
+		}
+	}
+
+	if ( allBox.width && allBox.height && allBox.width < map.Scale.bBox.width && allBox.height < map.Scale.bBox.height ){
+		if ( !map.Zoom.doSetAreaByParentMap(allBox) ){
+
+			// debug: mark the area to zoom to
+			// ---------------------------------
+			/**
+			try{
+				var objectGroup = map.Layer.objectGroup;
+				map.Dom.clearGroup(objectGroup);
+					map.Dom.newShape('rect',objectGroup,allBox.x,allBox.y,allBox.width,allBox.height,"stroke:black;stroke-width:20;fill:none")
+					map.Dom.newShape('line',objectGroup,allBox.x,allBox.y,allBox.x+allBox.width,allBox.y+allBox.height,"stroke:black;stroke-width:20;fill:none")
+					map.Dom.newShape('line',objectGroup,allBox.x,allBox.y+allBox.height,allBox.x+allBox.width,allBox.y,"stroke:black;stroke-width:20;fill:none")
+					_TRACE("box!!!:"+allBox.x+','+allBox.y+','+allBox.width+','+allBox.height);
+				}catch (e){	}
+			**/
+			map.hideMap();
+			map.Zoom.setNewArea(allBox);
+		}
+	}
+};
+/**
+ * execute map sync to bounds given in Lat/Lon
+ * @param latSW the latitude  of the South West point
+ * @param lonSW the longitude of the North East point
+ * @param latNE the latitude  of the South West point
+ * @param lonNE the longitude of the North East point
+ */
+Map.Zoom.prototype.doSetMapToGeoBounds = function(latSW,lonSW,latNE,lonNE){
+	this.fExternalZoom = false;
+	var ptSW = map.Scale.getMapCoordinateOfLatLon(latSW,lonSW);
+	var ptNE = map.Scale.getMapCoordinateOfLatLon(latNE,lonNE);
+	if ( ptSW && ptNE ){
+		map.hideMap();
+		this.doZoomMapToEnvelope(ptSW.x,ptNE.x,ptSW.y,ptNE.y);
+	}
+	else{
+		displayMessage("missing projection ! lat/lon could not be resolved",1000);
+	}
+};
+/**
+ * get map center in Lat/Lon
+ * @TYPE point
+ * @return the center point in lat (point.y) lon (point.x) 
+ */
+Map.Zoom.prototype.getCenterOfMapInGeoPosition = function(){
+	var rectArea = this.getBox();
+	var ptCenter = map.Scale.getMapCoordinate(rectArea.x+rectArea.width/2,rectArea.y+rectArea.height/2);
+	ptCenter = map.Scale.getGeoCoordinateOfPoint(ptCenter.x,ptCenter.y); 
+	return (ptCenter);
+};
+/**
+ * get the actual map view (zoom/pan ) in Lat/Lon
+ * @TYPE array of points
+ * @return the bounds, array of 2 points (SouthWest, NorthEast) in lat (point.y) lon (point.x) 
+ */
+Map.Zoom.prototype.getBoundsOfMapInGeoBounds = function(){
+	var rectArea = this.getBox();
+	var ptSW = map.Scale.getMapCoordinate(rectArea.x,rectArea.y+rectArea.height);
+	var ptNE = map.Scale.getMapCoordinate(rectArea.x+rectArea.width,rectArea.y);
+	ptSW = map.Scale.getGeoCoordinateOfPoint(ptSW.x,ptSW.y); 
+	ptNE = map.Scale.getGeoCoordinateOfPoint(ptNE.x,ptNE.y); 
+	return (new Array(ptSW,ptNE));
+};
+/**
+ * check if envelope (geo cordinate bounding box) is (even partially) within the map extension
+ * @param minBoundX the x value of the min geo coordinate  
+ * @param maxBoundX the x value of the max geo coordinate  
+ * @param minBoundY the y value of the min geo coordinate  
+ * @param maxBoundY the y value of the max geo coordinate
+ * @type boolean
+ * @return true, if within map extension
+ */
+Map.Zoom.prototype.doCheckEnvelope = function(minBoundX,maxBoundX,minBoundY,maxBoundY){
+
+	if ( !fLimitMapToExtent ){
+		return true;
+	}
+	if ( (minBoundX < map.Scale.minBoundX) &&
+		 (maxBoundX > map.Scale.maxBoundX) &&
+		 (minBoundY < map.Scale.minBoundY) &&
+		 (maxBoundY > map.Scale.maxBoundY) &&
+		 (maxBoundX-minBoundX) > ((map.Scale.maxBoundX-map.Scale.minBoundX)*2) ){
+		displayMessage("position outside",500);
+		return false;
+	}
+	if ( (minBoundX > map.Scale.maxBoundX) ||
+		 (maxBoundX < map.Scale.minBoundX) ||
+		 (minBoundY > map.Scale.maxBoundY) ||
+		 (maxBoundY < map.Scale.minBoundY)  ){
+		displayMessage("position outside",500);
+		return false;
+	}
+	return true;
+};
+/**
+ * check if we can set the new area by a HTML parent map, leads to less recursion
+ * in synchronisation, because the parent map has its own possible zoom values 
+ * @param rectArea the area to fit the map in
+ * @type boolean
+ * @return true, if new area has been set 
+ */
+Map.Zoom.prototype.doSetAreaByParentMap = function(rectArea){
+	var ptSW = map.Scale.getMapCoordinate(rectArea.x,rectArea.y);
+	var ptNE = map.Scale.getMapCoordinate(rectArea.x+rectArea.width,rectArea.y+rectArea.height);
+	return this.doSetEnvelopeByParentMap(ptSW.x,ptNE.x,ptSW.y,ptNE.y);
+};
+/**
+ * check if we can set the new envelope by a HTML parent map, leads to less recursion
+ * in synchronisation, because the parent map has its own possible zoom values 
+ * @param minBoundX the x value of the min geo coordinate  
+ * @param maxBoundX the x value of the max geo coordinate  
+ * @param minBoundY the y value of the min geo coordinate  
+ * @param maxBoundY the y value of the max geo coordinate
+ * @type boolean
+ * @return true, if new envelope has been set 
+ */
+Map.Zoom.prototype.doSetEnvelopeByParentMap = function(minBoundX,maxBoundX,minBoundY,maxBoundY){
+
+	try{
+		ptSW = map.Scale.getGeoCoordinateOfPoint(minBoundX,minBoundY); 
+		ptNE = map.Scale.getGeoCoordinateOfPoint(maxBoundX,maxBoundY);
+		this.fExternalZoom = true;
+		return HTMLWindow.ixmaps.htmlgui_setCurrentEnvelopeByGeoBounds(ptSW,ptNE);
+	}
+	catch (e){
+		return false;
+	}
+};
+/**
+ * check if we can set the new area by a HTML parent map, leads to less recursion
+ * in synchronisation, because the parent map has its own possible zoom values 
+ * @param rectArea the area to fit the map in
+ * @type boolean
+ * @return true, if new area has been set 
+ */
+Map.Zoom.prototype.doCenterByParentMap = function(rectArea){
+	var ptSW = map.Scale.getMapCoordinate(rectArea.x+rectArea.width/2,rectArea.y+rectArea.height/2);
+	return this.doSetCenterByParentMap(ptSW.x,ptSW.y);
+};
+/**
+ * check if we can set the new envelope by a HTML parent map, leads to less recursion
+ * in synchronisation, because the parent map has its own possible zoom values 
+ * @param minBoundX the x value of the min geo coordinate  
+ * @param maxBoundX the x value of the max geo coordinate  
+ * @param minBoundY the y value of the min geo coordinate  
+ * @param maxBoundY the y value of the max geo coordinate
+ * @type boolean
+ * @return true, if new envelope has been set 
+ */
+Map.Zoom.prototype.doSetCenterByParentMap = function(minBoundX,minBoundY){
+
+	try{
+		ptCenter = map.Scale.getGeoCoordinateOfPoint(minBoundX,minBoundY); 
+		return HTMLWindow.ixmaps.htmlgui_setCurrentCenterByGeoBounds(ptCenter);
+	}
+	catch (e){
+		return false;
+	}
+};
+/**
+ * execute map zooming by factor and mode 
+ * @param nFactor the zoom fator (to be set absolute or relative)
+ * @param szMode 'absolute' or 'byscale' or 'relative' (default)
+ * @type int
+ * @return new map scale ( for sample 25000 which means 1:25000 )
+ */
+Map.Zoom.prototype.doZoomMap = function(nFactor,szMode){
+
+	if (  this.zoomNode ){
+
+		displayMessage("please wait ...",500);
+
+		var matrixA = getMatrix(map.Zoom.zoomNode);
+		var nOldZoom = matrixA[0];
+		var nZoom = nOldZoom;
+
+		// zoom to full extend
+		if (nFactor == 0){
+			this.toFullExtend();
+			return Math.round(map.Scale.nMapScale);
+		}
+		else{
+			switch (szMode){
+				case 'absolute':	nZoom = nFactor; break;
+				case 'byscale':		nZoom =  map.Scale.nTrueMapScale/nFactor; break;
+				default:			nZoom *= nFactor; break;
+			}
+		}
+        this.setNewZoom(nZoom);
+		return Math.round(map.Scale.nMapScale/nZoom);
+	}	
+};
+/**
+ * execute map panning by dx, dy 
+ * @param nDeltaX pan map for this dx 
+ * @param nDeltaY pan map for this dy
+ */
+Map.Zoom.prototype.doPanMap = function(nDeltaX,nDeltaY){
+
+	var zoomMatrixA = getMatrix(this.zoomNode);
+	var nZoomX = zoomMatrixA[0];
+	var nZoomY = zoomMatrixA[3];
+
+	var newX = SVGRootElement.currentTranslate.x + nDeltaX;
+	var newY = SVGRootElement.currentTranslate.y + nDeltaY;
+
+	// GR 15.11.2007 respect canvas rotation  
+	var pRotated = map.Scale.rotatePoint(new point(newX,newY));
+	newX = pRotated.x;
+	newY = pRotated.y;
+
+	newX += map.Scale.embedX(zoomMatrixA[4]);
+	newY += map.Scale.embedY(zoomMatrixA[5]);
+
+
+	if ( fPanByViewer ){
+		SVGRootElement.currentTranslate.x = newX;
+		SVGRootElement.currentTranslate.y = newY;
+	}
+	else {
+		newX = map.Scale.normalX(newX);
+		newY = map.Scale.normalY(newY);
+
+		var ptOld = getTranslate(this.zoomNode);
+		this.zoomNode.setAttributeNS(null,"transform","matrix("+nZoomX+" 0 0 "+nZoomY+" "+newX+" "+newY+")");
+
+		this.doPanFixed(newX-ptOld.x,newY-ptOld.y);
+	}
+
+	// GR 17.06.2013 correct sync error 
+	try{
+		var rectArea = this.getBox();
+		var pt1 = map.Scale.getMapCoordinate(rectArea.x+rectArea.width/2,rectArea.y+rectArea.height/2);
+		this.doSetCenterByParentMap(pt1.x,pt1.y);
+	}
+	catch (e){
+		try{
+			HTMLWindow.ixmaps.htmlgui_setCurrentEnvelope(this.getEnvelopeString(),false);
+		}
+		catch (e){
+		}
+	}
+};
+/**
+ * execute map panning by viewer by dx, dy 
+ * @param nDeltaX pan map for this dx 
+ * @param nDeltaY pan map for this dy
+ */
+Map.Zoom.prototype.doPanMapByViewer = function(nDeltaX,nDeltaY){
+
+	var newX = SVGRootElement.currentTranslate.x + nDeltaX;
+	var newY = SVGRootElement.currentTranslate.y + nDeltaY;
+	SVGRootElement.currentTranslate.x = newX;
+	SVGRootElement.currentTranslate.y = newY;
+};
+/**
+ * check if new zoom within zoom limit 
+ * @param nNewZoom new zoom value to check 
+ * @type int
+ * @return the checked and clipped zoom
+ */
+Map.Zoom.prototype.checkZoomLimit = function(nNewZoom){
+	var nLimit = 1000000;
+	if ( fPDFEmbed ){
+		nLimit = 20;
+		if ( map.Tiles && (map.Tiles.nCount > 1) ){
+			nLimit = 20;
+		}
+	}
+	if (nNewZoom >= nLimit){
+		displayMessage("zoom limit !",1000);
+		return nLimit;
+	}
+	nNewZoom = Math.round(nNewZoom*1000000)/1000000;
+	return nNewZoom;
+};
+/**
+ * remove clipping of zoomed map (may be important for pattern) 
+ * @param evt the mouse event
+ */
+Map.Zoom.prototype.removeClipping = function(evt){
+	if (fClipMapDynamic){
+		var mapClipNode = SVGDocument.getElementById("mapclip");
+		mapClipNode.setAttributeNS(null,"clip-path","");
+	}
+};
+/**
+ * activate clipping of zoomed map (may be important for panning) 
+ * @param evt the mouse event
+ */
+Map.Zoom.prototype.activateClipping = function(evt){
+	if (fClipMapDynamic){
+		var mapClipNode = SVGDocument.getElementById("mapclip");
+		mapClipNode.setAttributeNS(null,"clip-path","url(#mapclippath)");
+	}
+};
+/**
+ * execute mousemove event, inherited from the overviewmap (does nothing)
+ * @param evt the mouse event
+ */
+Map.Zoom.prototype.onMouseMove = function(evt){
+};
+/**
+ * execute mousedown event, inherited from the overviewmap (does nothing)
+ * @param evt the mouse event
+ */
+Map.Zoom.prototype.onMouseDown = function(evt){
+};
+/**
+ * execute mouseup event, inherited from the overviewmap. Set the map and zoom according to the position and size of the select rectangle of the overviewmap
+ * @param evt the mouse event
+ */
+Map.Zoom.prototype.onMouseUp = function(evt){
+	this.setFractionBox( new box(this.overviewThumbObj.fraction.x,this.overviewThumbObj.fraction.y,1/this.nZoomX,1/this.nZoomY));
+};
+
+// .............................................................................
+// layer handling              
+// .............................................................................
+
+/**
+ * Create a new Map.Layer instance.  
+ * @class It realizes an object for layer handling
+ * @constructor
+ * @throws 
+ * @return A new Map.Layer Object
+ */
+Map.Layer = function(evt){
+
+	_TRACE("--- init layer");
+
+	/** the SVG document containing the layer */
+	this.document = evt?evt.target.ownerDocument:SVGDocument;
+	/** the metadata node describing the layer features @type DOM node */
+	this.layerNode = SVGDocument.getElementById("maplayer");
+	/** array to hold the {@link Map.Layer.Item} objects, that each describe one single layer @type array */
+	this.listA = new Array(0);
+	/** array (named!) to hold the {@link Map.Layer.Dependency} objects, that describe the layer dependencies (minscale,maxscale,...) @type named array */
+	this.depListA = new Array(0);
+	/** array (named!) to hold the groups generated for dynamic theme label */
+	this.generatedLabelA = new Array(0);
+	/** array to hold layer nodes (=features) that has temporary been changed by adding a style attribute; usefull later, to remove the style @type DOM node*/
+	this.changedFeatureNodesA = new Array(0);
+	/** the node to create new objects (charts,...) */
+	this.objectGroup = SVGDocument.getElementById(szObjectGroupId);
+	/** flag to define group switching abilities */
+	this.fSwitchSublayer = true;
+	/** actual feature scaling, to be used to adapt loaded tiles */
+	this.nFeatureScale = 1;
+	/** actual object scaling, to be used to adapt new map objects in themes */
+	this.nObjectScale = 1;
+	/** dynamic object scaling, is changed by zoom */
+	this.nDynamicObjectScale = 1;
+
+	var i = 0;
+	var layerNodesA = SVGDocument.getElementsByTagNameNS(szMapNs,"theme");
+	_TRACE("--- - init layer list" );
+	if ( layerNodesA.length ){
+		this.listA["legend_body"] = new Map.Layer.Item(null);
+		for ( i=0; i<layerNodesA.length; i++){
+			this.listA[layerNodesA.item(i).getAttributeNS(null,"name")] = new Map.Layer.Item(layerNodesA.item(i));
+		}
+	}
+	var scaleDepNodes = SVGDocument.getElementsByTagNameNS(szMapNs,"scaledependency");
+	if (scaleDepNodes.length <= 0){
+		return;
+	}
+	_TRACE("--- - init scale dependent layer");
+	for ( i=0;i<scaleDepNodes.length ;i++ ){
+		var depId    = scaleDepNodes.item(i).getAttributeNS(null,"feature");
+		this.depListA[depId] = new Map.Layer.Dependency(scaleDepNodes.item(i));
+	}
+};
+Map.Layer.prototype = new Map();
+
+/**
+ * Create a new Map.Layer.Item instance.  
+ * @class It realizes an object for layer handling
+ * @constructor
+ * @throws 
+ * @return A new Map.Layer.Item Object
+ */
+Map.Layer.Item = function(layerNode){
+	if (layerNode){
+		/** the name of the layer @type string */
+		this.szName = layerNode.getAttributeNS(null,"name");
+		/** the legend name of the layer @type string */
+		this.szLegendName = layerNode.getAttributeNS(null,"legendname");
+		/** a flag for layer specific features. 
+		 *  <br><br>
+		 *  the following values can be combined with '|' 
+		 *  <br><br>
+		 *  <table>
+		 *  <tr><td><em>value</em></td><td><em>feature</em></td></tr>
+		 *  <tr><td>'info'</td><td>layer contains info metadata fields</td></tr>
+		 *  <tr><td>'invisiblepan'</td><td>layer must be switched off during panning</td></tr>
+		 *  </table>
+		 * @type string
+		*/
+		this.szFlag = layerNode.getAttributeNS(null,"flag");
+		/** specifies the layer shape type. 
+		 *  <br><br>
+		 *  the layer can be of type 
+		 *  <br><br>
+		 *  <table>
+		 *  <tr><td>'point'</td><td>realized by &lt;use&gt; elemets</td></tr>
+		 *  <tr><td>'line'</td><td>realized by &lt;path&gt; elements</td></tr>
+		 *  <tr><td>'polygon'</td><td>realized by closed &lt;path&gt; elements</td></tr>
+		 *  </table>
+		*/
+		this.szType = layerNode.getAttributeNS(null,"type");
+		/** the number of (grouped) shape items */
+		this.nItems = Number(layerNode.getAttributeNS(null,"items"));
+		/** specifies the renderer type of the layer. 
+		 *  <br><br>
+		 *  <table>
+		 *  <tr><td>'0'</td><td>normal shape</td></tr>
+		 *  <tr><td>'1'</td><td>rendered exactly by the value of a specific field</td></tr>
+		 *  <tr><td>'2'</td><td>rendered by ranges of the the value of a specific field</td></tr>
+		 *  <tr><td>'4'</td><td>layer has label</td></tr>
+		 *  <tr><td>'8'</td><td>layer has extended label</td></tr>
+		 *  </table>
+		 * @type int
+		*/
+		this.nRenderer = layerNode.getAttributeNS(null,"renderer");
+		/** the name of the field used for rendering (see szType) @type string */
+		this.szRenderer = layerNode.getAttributeNS(null,"rendererfield");
+		/** the name of the field used for label lookup (see szType) @type string */
+		this.szLabel = layerNode.getAttributeNS(null,"label");
+		/** the name of the field used for grouping the shapes of a layer (to allow selection) @type string */
+		this.szSelection = layerNode.getAttributeNS(null,"selection");
+		/** the name of the field used to filter shapes */
+		this.szFilter = layerNode.getAttributeNS(null,"filter");
+		/** the allowed value(s) of the filter field */
+		this.szFilterValue = layerNode.getAttributeNS(null,"filtervalue");
+		/** if defined, this SVG style should be used for highlighting @type string */
+		this.szHighlight = layerNode.getAttributeNS(null,"highlightstyle");
+		/** the initial visibility of the layer @type string */
+		this.szDisplay = layerNode.getAttributeNS(null,"display");
+		/** the initial visibility of the labels @type string */
+		this.szDisplayLabel = layerNode.getAttributeNS(null,"displaylabel");
+		/** a place to store the space layer label do occupy */
+		this.labelBoxA = null;
+
+		/** category list GR 24.06.2014 */
+		this.categoryA = null;
+		var categoryNodesA = layerNode.getElementsByTagNameNS(szMapNs,"category");
+		if ( categoryNodesA.length ){
+			this.categoryA = [];
+			for ( var i=0; i<categoryNodesA.length; i++){
+				var obj = this.categoryA[categoryNodesA.item(i).getAttributeNS(null,"name")] = new Object();
+				obj.legendname = categoryNodesA.item(i).getAttributeNS(null,"legendname");			
+				obj.fill = categoryNodesA.item(i).getAttributeNS(null,"fill");			
+				obj.stroke = categoryNodesA.item(i).getAttributeNS(null,"stroke");			
+				obj.style = categoryNodesA.item(i).getAttributeNS(null,"style");			
+				obj.display = "inline";			
+			}
+		}
+	}
+	else{
+		this.szFlag = "";
+		this.szType = "dummy";
+		this.szDisplay = "inline";
+		this.szDisplayLabel = "inline";
+	}
+};
+/**
+ * Create a new Map.Layer.Dependency instance.  
+ * @class It realizes an object for layer scale depemdecies
+ * @constructor
+ * @throws 
+ * @return A new Map.Layer.Dependency Object
+ */
+Map.Layer.Dependency = function(scaleDepNode){
+	if (scaleDepNode){
+		/** the id of the layer @type string */
+		this.shapeId  = scaleDepNode.getAttributeNS(null,"shape");
+		/** the name of the layer (== id) @type string */
+		this.szFeature = scaleDepNode.getAttributeNS(null,"feature");
+		/** the name of te CSS style, that defines the layer style @type string */
+		this.depClass = scaleDepNode.getAttributeNS(null,"classname");
+		/** the upper scale limit as number @type int */
+		this.nUpper = 100000000000;
+		/** the lower scale limit as number @type int */
+		this.nLower = 0;
+		/** the lower scale limit (1:nnn...) for the visibility of this layer @type string */
+		this.depLower = scaleDepNode.getAttributeNS(null,"lower");
+		/** the upper scale limit (1:nnnnnn...) for the visibility of this layer @type string */
+		this.depUpper = scaleDepNode.getAttributeNS(null,"upper");
+		if (this.depUpper && this.depUpper.length){
+			this.nUpper = Number(this.depUpper.split(':')[1]);
+		}
+		if (this.depLower && this.depLower.length){
+			this.nLower = Number(this.depLower.split(':')[1]);
+		}
+// GR 25.12.2006 actual display attribute must be set to 'inline', corresponds to the CSS preset
+//
+//		/** the visibility attribute of the layer resulting from the actual scale @type string */
+//		this.szDisplayAttribute = String('none');
+//		if((map.Scale.nMapScale*map.Scale.nZoomScale >= this.nLower) && (map.Scale.nMapScale*map.Scale.nZoomScale <= this.nUpper)){ 
+//			this.szDisplayAttribute = String('inline');
+//		}
+		this.szDisplayAttribute = String('inline');
+	}
+};
+function __doSwitchGroupTheme(szTheme,szState){
+		_TRACE("doSwitchGroupTheme: "+szTheme);
+	var itemNode = SVGDocument.getElementById("legend:"+szState+":"+szTheme);
+	if (itemNode && map.Legend){
+		_TRACE("doSwitchGroupTheme: "+szTheme);
+		map.Legend.execLegendMouseClick(null,itemNode,szTheme,szState);
+		map.Legend.execLegendMouseClick(null,itemNode,szTheme+":label",szState);
+	}
+}
+function __doSwitchGroupThemes(szLayer,nState){
+	var szLegendGroup = 'legend:collapsable:'+szLayer.split(":")[0];
+	var legendGroup = SVGDocument.getElementById(szLegendGroup);
+	if (legendGroup){
+		var layerA = legendGroup.childNodes;
+		for ( i=0; i<layerA.length; i++){
+			if (layerA.item(i).nodeType == 1){
+				var szTheme = layerA.item(i).getAttributeNS(null,"id").split("legend:setactive:")[1];
+				if ( !szTheme ){
+					szTheme = layerA.item(i).getAttributeNS(null,"id").split("legend:item:")[1];
+				}
+				var szState = nState?"on":"off";
+				// GR 12.02.2008 !! check names (szTheme != szLayer) to avoid infinite recursion
+				if ( szTheme && (szTheme != szLayer) ){
+					// GR 14.12.2008 names with " cannot be done; see setTimeout(" ...
+					if ( szTheme.match(/"/)){
+						continue;
+					}
+					// GR 14.12.2008 if we have no check groups, skip
+					if (!SVGDocument.getElementById("legend:"+szState+":"+szTheme)){
+						continue;
+					}
+					if ( (nState == false) || map.Layer.isScaleDependentLayerOn(szTheme) ){
+						_TRACE("__doSwitchGroupTheme(\""+szTheme+"\",\""+szState+"\")");
+						setTimeout("__doSwitchGroupTheme(\""+szTheme+"\",\""+szState+"\")",i*10);
+					}
+				}
+			}
+		}
+	}
+}
+/**
+ * switch layer on/off;
+ * dispatches to the different switching routines dependent on the presence of CSS or tiles
+ * @param evt the event
+ * @param szLayer the name of the layer
+ * @param szClassName the name of the style to make inline/none
+ * @param nState true or false
+ * @type boolean
+ * @return true, if the layer switching could been executed
+ */
+Map.Layer.prototype.switchLayer = function(evt,szLayer,szClassName,nState){
+	var szDisplay = nState?'inline':'none';
+	var layerItem = this.listA[szLayer.split(':')[0]];
+
+	// a legend group is not a layer; so we have done here 
+	if (szClassName && szClassName.match(/legendgroup/)){
+		return true;
+	}
+	// a group is switched by its members
+	// GR 24.11.2007; do also for sublayer, if this.fSwitchSublayer is true
+//	if (szLayer && szLayer.match(/group/) && !szLayer.match(/label/)){
+	if (szLayer && !szLayer.match(/label/) && !szLayer.match(/::/) && (szLayer.match(/group/) || this.fSwitchSublayer) ){
+		_TRACE("*** switchgroup: \""+szLayer+"\" Item="+layerItem+" Class="+szClassName+" State="+nState);
+		var szLegendGroup = 'legend:collapsable:'+szLayer.split(":")[0];
+		var legendGroup = SVGDocument.getElementById(szLegendGroup);
+		if (legendGroup){
+			_TRACE("__doSwitchGroupThemes(\""+szLayer+"\","+nState+")");
+			setTimeout("__doSwitchGroupThemes(\""+szLayer+"\","+nState+")",250);
+		}
+	}
+	// GR 24.11.2007; if we switch sublayer, switch also the lead layer, and its checkbox
+	if (szLayer && !szLayer.match(/label/) && szLayer.match(/::/) && (nState == true) ){
+		var nTemp = this.fSwitchSublayer;
+		this.fSwitchSublayer = false;
+		this.switchLayer(evt,szLayer.split("::")[0],szClassName,true);
+		this.fSwitchSublayer = nTemp;
+		// do it here 
+		var targetNode = SVGDocument.getElementById("legend:off:"+szLayer.split("::")[0]);
+		if ( targetNode && (targetNode.style.getPropertyValue("display") != "inline") ){
+			targetNode = SVGDocument.getElementById("legend:suboff:"+szLayer.split("::")[0]);
+			if (targetNode){
+				targetNode.style.setProperty("display","inline","");
+			}
+		}
+	}
+
+	// may be there is a background 
+	if ( szLayer.match(/label/) && !szLayer.match(/:bg/) ){
+		this.switchLayer(evt,szLayer+":bg",szClassName,nState);
+	}
+
+	_TRACE("switchLayer "+szLayer+' Item='+layerItem+' Class='+szClassName);
+	if ( szLayer.split("::")[1] && layerItem.categoryA[szLayer.split("::")[1]] ) {
+		layerItem.categoryA[szLayer.split("::")[1]].display = szDisplay;
+	}
+	
+	if (layerItem ){
+		if( this.switchLayerByFeature(szLayer,nState) ){
+			if ( szLayer.match(/:label/) ){
+				layerItem.szDisplayLabel = szDisplay;
+			}
+			else{
+				layerItem.nState = nState;
+				layerItem.szDisplay = szDisplay;
+			}
+			_TRACE("done by feature group");
+			if (layerItem.szLabel){
+				this.adaptLabel(evt);
+			}
+			setTimeout("map.Layer.adaptLabel()",100);
+			return true;
+		}
+		else{
+			if ( this.switchLayerOnTiles(szLayer,nState) ){
+				if ( szLayer.match(/:label/) ){
+					layerItem.szDisplayLabel = szDisplay;
+				}
+				else{
+					layerItem.nState = nState;
+					layerItem.szDisplay = szDisplay;
+				}
+				_TRACE("done by feature tiles groups");
+				if (layerItem.szLabel){
+					this.adaptLabel(evt);
+				}
+				setTimeout("map.Layer.adaptLabel()",100);
+				return true;
+			}
+		}
+	}
+	if ( szClassName && !szLayer.match(/:label/) ){ 
+		this.switchLayerByCSS(null,szLayer,szClassName,nState?'inline':'none');
+		if (layerItem ){
+			layerItem.szDisplay = szDisplay;
+		}
+		setTimeout("map.Layer.adaptLabel()",100);
+		_TRACE("done by CSS style");
+		return true;
+	}
+
+	_TRACE("not done");
+	return false;
+};
+/**
+ * switch layer on/off on tiles.
+ * <br>gets a list of the layer ids with the tiles extensions
+ * <br>then calls 'switchLayerByFeature()' for every tiled layer part
+ * @param szLayer the name of the layer
+ * @param nState true or false
+ * @type boolean
+ * @return true, if the switching could been executed
+ */
+Map.Layer.prototype.switchLayerOnTiles = function(szLayer,nState){
+	var nRetval = false;
+	if ( map.Tiles && map.Tiles.nCount > 0 ){
+		var szTilesIdA  = map.Tiles.getTileNodeIds(szLayer);
+		for ( var i=0; i<szTilesIdA.length; i++ ){
+			nRetval = this.switchLayerByFeature(szTilesIdA[i],nState)?true:nRetval;
+		}
+	}
+	return nRetval;
+};
+/**
+ * switch layer on/off by changing style property 
+ * @param szLayer the id of the layer
+ * @param nState true or false
+ * @type boolean
+ * @return true, if the switching could been executed
+ */
+Map.Layer.prototype.switchLayerByFeature = function(szLayer,nState){
+	var x;
+	var nRetval = false;
+	var featureNode = this.document.getElementById(szLayer);
+	if( featureNode ){
+		this.addChangedFeatureNode(featureNode);
+		if (featureNode.getAttributeNS(null,"class") == "linetemplate"	 ||
+			featureNode.getAttributeNS(szMapNs,"class") == "linetemplate" ){
+			if (szLayer.match(/#/)){
+				var szIdA = szLayer.split('#');
+				for ( x=0; x<10; x++ ){
+					featureNode = this.document.getElementById(szIdA[0]+'_'+x+'#'+szIdA[1]);
+					if( featureNode ){
+						featureNode.style.setProperty('display',nState?'inline':'none',"");
+						nRetval = true;
+					}
+				}
+			}
+			else{
+				for ( x=0; x<10; x++ ){
+					featureNode = this.document.getElementById(szLayer+'_'+x);
+					if( featureNode ){
+						featureNode.style.setProperty('display',nState?'inline':'none',"");
+						nRetval = true;
+					}
+				}
+			}
+		}
+		else{
+			featureNode.style.setProperty('display',nState?'inline':'none',"");
+			nRetval = true;
+		}
+	}
+	return nRetval;
+};
+/**
+ * switch layer by classname on/off
+ * @param evt the event
+ * @param szLayer the name of the layer
+ * @param szClassName the name of the style to make inline/none
+ * @param szProperty the new display property
+ */
+Map.Layer.prototype.switchLayerByCSS = function(evt,szLayer,szClassName,szProperty){
+	_TRACE("switchLayerByCSS:"+szClassName+','+szProperty+' layer:'+szLayer);
+	
+	if (szClassName == "(null)"){
+		return;
+	}
+	// check if complex layer, if yes, switch all assoziated styles
+	if ( szLayer ){
+		szLayer = szLayer.split(':')[0];
+		var layerItem = this.listA[szLayer+"_1"];
+		if (layerItem){
+			var szCSS = szClassName.substr(szLayer.length,szClassName.length-szLayer.length);
+			var nCSS = parseInt(szCSS);
+			var nSubStyle = parseInt(szCSS.substr(szCSS.length-1,1));
+
+			szCSS = szClassName.substr(0,szLayer.length);
+			var i=1;
+			while ( (layerItem = this.listA[szLayer+"_"+i]) ){
+				nCSS++;
+				this.switchLayerByCSS(evt,null,szCSS+"-"+i+nCSS+"s"+(nSubStyle),szProperty);
+				i++;
+			}
+			return;
+		}
+	}
+
+	if ( map.Scale.CSSStyleNodes ){
+		var styleNodes = map.Scale.CSSStyleNodes;
+
+		map.CSS = new Map.CSS(map.Scale.CSSStyleNodes);
+		map.CSS.setStyle(szClassName,'display',szProperty);
+		map.Scale.fCSSStyleNodeChanged = true;
+		styleNodes.firstChild.nextSibling.nodeValue = map.CSS.getStyleString();
+
+		displayMessage("please wait ...",500);
+		setTimeout("map.Scale.refreshCSSStyles()",200);
+	}
+};
+/**
+ * switch scale dependant layer on/off.
+ * <br>called everytime when scale is changed
+ * <br>also called, when layer is switched by legend button
+ * @param evt the event
+ * @param targetGroup root node to search for layer (if null, SVGRootElement is used)
+ */
+Map.Layer.prototype.switchScaleDependentLayer = function(evt,targetGroup){
+
+	if (!fDynamicLayer){
+		return;
+	}
+	var szNewDisplayAttribute = "";
+	if ( this.depListA == null ){
+		return;
+	}
+	_TRACE('Map.Layer: switch scale dependent layer -->');
+
+	// calculate new display state and switch legend entry
+	// ---------------------------------------------------
+
+	var a = 0;
+	for ( a in this.depListA ){
+		if((map.Scale.nTrueMapScale*map.Scale.nZoomScale >= this.depListA[a].nLower) && (map.Scale.nTrueMapScale*map.Scale.nZoomScale <= this.depListA[a].nUpper)){ 
+			szNewDisplayAttribute = String('inline');
+		}
+		else{
+			szNewDisplayAttribute = String('none');
+			if ( !this.depListA[a].shapeId.match(/:label/) && (map.Scale.nTrueMapScale*map.Scale.nZoomScale > this.depListA[a].nUpper) ){
+				if ( !map.Themes || (map.Themes.getThemeCount() == 0) ){
+					displayMessage("'"+this.depListA[a].shapeId+"' not visible at actual zoom level!",3000,"notify");
+				}
+			}
+		}
+		if ( this.depListA[a].szDisplayAttribute != szNewDisplayAttribute ){
+			this.depListA[a].szDisplayAttribute = szNewDisplayAttribute;
+			if ( this.isChangedFeature(this.depListA[a].shapeId)){
+				if ( this.depListA[a].szOldDisplayAttribute != szNewDisplayAttribute ){
+//					this.removeChangedFeatures(this.depListA[a].shapeId);
+				}
+				else{
+					_TRACE("++++++ !!!!! ++++++");
+					continue;
+				}
+			this.depListA[a].szOldDisplayAttribute = this.depListA[a].szDisplayAttribute;
+			}
+
+			var szFeature = this.depListA[a].szFeature;
+			if ( map.Legend ){
+				map.Legend.switchLegendCheckBox(evt,szFeature,szNewDisplayAttribute);
+			}
+		}
+
+		try{
+			var shapeId = this.depListA[a].shapeId;
+			if (shapeId.match(/label/)){
+				var szLayerId = shapeId.split(':')[0];
+				this.listA[shapeId.split(':')[0]].szDisplayLabel = szNewDisplayAttribute;
+			}
+			else{
+				this.listA[shapeId].szDisplay = szNewDisplayAttribute;
+			}
+		}
+		catch (e){
+			alert("Syntax error: "+shapeId);
+		}
+	}
+
+	// switch the dependent layer
+	// ---------------------------------------------------
+	// if we have css styles defined, switch layer by css class definition
+	// -------------------------------------------------------------------
+	var szStylesValue = "";
+	if ( map.Scale.CSSStyleNodes && fSwitchByCSS ){
+		var styleNodes = map.Scale.CSSStyleNodes; 
+		szStylesValue = styleNodes.firstChild.nextSibling.nodeValue;
+
+		// must be done every time ???? magic 
+		map.CSS = new Map.CSS(map.Scale.CSSStyleNodes);
+
+		var depClass = null;
+		var depObj = null;
+		for ( a in this.depListA ){
+			depObj = this.depListA[a]; 
+			if ( depObj.szDisplayAttribute != depObj.szOldDisplayAttribute ){
+				depClass = depObj.depClass;
+				if ( depClass.length > 3 ){
+					map.CSS.setStyle(depClass,'display',depObj.szDisplayAttribute);
+					map.Scale.fCSSStyleNodeChanged = true;
+				}
+				else{
+					var shapeObj = SVGDocument.getElementById(depObj.shapeId);
+					if ( shapeObj ){
+						shapeObj.style.setProperty("display",depObj.szDisplayAttribute,"");
+					}
+				}
+			}
+		}
+		if ( map.Scale.fCSSStyleNodeChanged ){
+			_TRACE("Map.Layer: .! Layer CSS Style changed !");
+			styleNodes.firstChild.nextSibling.nodeValue = map.CSS.getStyleString();
+		}
+	_TRACE('Map.Layer: .switch scale dependent layer done');
+	}
+	// else switch layer by group style attribute
+	// ------------------------------------------
+	else {
+		targetGroup = targetGroup?targetGroup:SVGRootElement;
+
+		var nodeA = targetGroup.getElementsByTagName('g');
+		for ( var n=0; n<nodeA.length;n++){
+			var szId = nodeA.item(n).getAttributeNS(null,"id");
+			var depId = map.Tiles.getMasterId(szId);
+			if ( this.depListA[depId] ){
+				nodeA.item(n).style.setProperty("display",this.depListA[depId].szDisplayAttribute,"");
+			}
+			continue;
+		}
+		_TRACE('Map.Layer: .switch scale dependent layer [no css] done');
+	}
+};
+/**
+ * test if layer is scale dependent layer 
+ * @param szLayerId the id of the layer to check
+ * @type boolean
+ * @return true or false
+ */
+Map.Layer.prototype.isScaleDependentLayer = function(szLayerId){
+	if ( this.depListA && this.depListA[szLayerId] ){
+		return true;
+	}
+	return false;
+};
+/**
+ * test if scale dependent layer is actually on 
+ * @param szLayerId the id of the layer to check
+ * @type boolean
+ * @return true or false
+ */
+Map.Layer.prototype.isScaleDependentLayerOn = function(szLayerId){
+	if ( this.depListA && this.depListA[szLayerId] ){
+		return this.depListA[szLayerId].szDisplayAttribute.match(/none/)?false:true;
+	}
+	return true;
+};
+/**
+ * zoom in as much to make shure, the specific layer is switched on 
+ * @param szLayerId the id of the layer to check
+ * @type void
+ */
+Map.Layer.prototype.zoomToScaleDependentLayerOn = function(szLayerId){
+
+	if ( typeof(this.listA[szLayerId]) == 'undefined' ){
+		return;
+	}
+
+	// GR 24.04.2015 get pending zoom done
+	map.Event.doDefaultZoom(null);
+
+	// get actual scale and lower scale of scaledependent layer or tile set
+	var nScale = map.Scale.nTrueMapScale*map.Scale.nZoomScale;
+	var nUpper = 0;
+	if ( this.depListA && this.depListA[szLayerId] && this.depListA[szLayerId].nUpper ){
+		nUpper = this.depListA[szLayerId].nUpper;
+	}else{
+		nUpper = map.Tiles.depUpper?map.Tiles.depUpper.split(":")[1]:0;
+	}
+	// now calcalate the zoom delta to get the layer (tiles) switched on
+	var nDelta = Math.ceil(nScale/nUpper);
+	// get the actual envelope and zoom in by the calcolated delta
+	var allBox = map.Zoom.getBox();
+	var newWidth  = allBox.width/nDelta;
+	var newHeight = allBox.height/nDelta;
+	allBox.x += (allBox.width-newWidth)/2;
+	allBox.y += (allBox.height-newHeight)/2;
+	allBox.width = newWidth;
+	allBox.height = newHeight;
+	map.Zoom.setNewArea(allBox);
+	// GR 22.10.2014 needed to initiate tile loading, 
+	setTimeout("map.Tiles.switchScaleDependentTiles()",5000);
+};
+/**
+ * test if scale dependent layer is actually on 
+ * @param szLayerId the id of the layer to check
+ * @type boolean
+ * @return true or false
+ */
+Map.Layer.prototype.isLayerOn = function(szLayerId){
+	if (this.listA[szLayerId]){
+		return this.listA[szLayerId].szDisplay.match(/none/)?false:true;
+	}
+	return false;
+};
+/**
+ * change opacity of one layer.
+ * @param szLayer the name of the layer
+ * @param nDelta opacity change factor
+ * @type boolean
+ * @return true, if the opacity changing could been executed
+ */
+Map.Layer.prototype.changeLayerOpacity = function(szLayer,nDelta){
+	var nRetval = false;
+	nRetval = this.changeOpacity(szLayer,nDelta);
+	if ( !nRetval ){
+		nRetval = this.changeOpacityOnTiles(szLayer,nDelta);
+	}
+	return nRetval;
+};
+/**
+ * change opacity on tiled layer.
+ * <br>gets a list of the layer ids with the tiles extensions
+ * <br>then calls 'changeOpacity()' for every tiled layer part
+ * @param szLayer the name of the layer
+ * @param nDelta opacity change factor
+ * @type boolean
+ * @return true, if the opacity changing could been executed
+ */
+Map.Layer.prototype.changeOpacityOnTiles = function(szLayer,nDelta){
+	var nRetval = false;
+	if ( map.Tiles && map.Tiles.nCount > 0 ){
+		var szTilesIdA  = map.Tiles.getTileNodeIds(szLayer);
+		for ( var i=0; i<szTilesIdA.length; i++ ){
+			nRetval = this.changeOpacity(szTilesIdA[i],nDelta)?true:nRetval;
+		}
+	}
+	else{
+		nRetval = this.changeOpacity(szLayer,nDelta)?true:nRetval;
+	}
+	return nRetval;
+};
+/**
+ * change opacity on layer.
+ * @param szLayer the id of the layer
+ * @param nDelta opacity change factor
+ * @type boolean
+ * @return true, if the switching could been executed
+ */
+Map.Layer.prototype.changeOpacity = function(szLayer,nDelta){
+	var x;
+	var nRetval = false;
+	var featureNode = this.document.getElementById(szLayer);
+	if( featureNode ){
+		if (featureNode.getAttributeNS(null,"class") == "linetemplate"	 ||
+			featureNode.getAttributeNS(szMapNs,"class") == "linetemplate" ){
+			if (szLayer.match(/#/)){
+				var szIdA = szLayer.split('#');
+				for ( x=0; x<10; x++ ){
+					featureNode = this.document.getElementById(szIdA[0]+'_'+x+'#'+szIdA[1]);
+					if( featureNode ){
+						this.changeNodeOpacity(featureNode,nDelta);
+						nRetval = true;
+					}
+				}
+			}
+			else{
+				for ( x=0; x<10; x++ ){
+					featureNode = this.document.getElementById(szLayer+'_'+x);
+					if( featureNode ){
+						this.changeNodeOpacity(featureNode,nDelta);
+						nRetval = true;
+					}
+				}
+			}
+		}
+		else{
+			this.changeNodeOpacity(featureNode,nDelta);
+			nRetval = true;
+		}
+	}
+	return nRetval;
+};
+/**
+ * helper to change the opacity of one node
+ * @param nodeObj the DOM node to change the opacity property
+ * @param nDelta the opacity change factor
+ * @param szOpacityProperty (optional) the opacity property, if not "opacity"
+ */
+Map.Layer.prototype.changeNodeOpacity = function(nodeObj,nDelta,szOpacityProperty){
+
+	var szOpacity = nodeObj.style.getPropertyValue(szOpacityProperty?szOpacityProperty:"opacity");
+	if ( !szOpacity || szOpacity.length == 0 ) {
+		szOpacity = "1";
+	}
+	var nOpacity = Number(szOpacity);
+	nOpacity = nOpacity*nDelta;
+	nOpacity = Math.min(1,nOpacity);
+	nOpacity = Math.max(0,nOpacity);
+	nodeObj.style.setProperty(szOpacityProperty?szOpacityProperty:"opacity",String(nOpacity),"");
+};
+/**
+ * called on init and SVG import to initialize the pattern matrix (adapt it to the actual scaling)
+ * @param evt the event
+ * @param rootGroup root node to search for pattern (if null, SVGRootElement is used)
+ */
+Map.Layer.prototype.initPatternScaling = function(evt,rootGroup){
+
+	if ( !rootGroup ){
+		rootGroup = SVGRootElement;
+	}
+	var patternScale = 1/map.Scale.getEmbedScale()*map.Scale.nFeatureScaling;
+	var patternMatrixA = null;
+
+	// get pattern --------------------------------------------
+	nodeA = rootGroup.getElementsByTagName('pattern');
+
+	for ( i=0; i<nodeA.length;i++){
+		if (!nodeA.item(i).getAttributeNS(null,"id").match(/antizoomandpan/)){
+			patternMatrixA = getPatternMatrix(nodeA.item(i));
+			nodeA.item(i).setAttributeNS(null,"patternTransform","matrix("+patternScale+" 0 0 "+patternScale+" "+String(0)+" "+String(0)+")");
+		}
+	}
+};
+
+Map.Layer.prototype.changeLineScaling = function(evt,nDelta){
+	this.doFeatureScaling(nDelta);
+	map.Scale.nLineScaling *= nDelta;
+};
+Map.Layer.prototype.changeLabelScaling = function(evt,nDelta){
+	this.doLabelScaling(nDelta);
+	map.Scale.nLabelScaling *= nDelta;
+};
+/**
+ * called when scale is changed to adapt the map feature styles ( dynamic feature scaling )
+ * @param evt the event
+ * @param newscale the scale to adapt the styles to
+ */
+Map.Layer.prototype.changeFeatureScaling = function(evt,newScale,fOverride){
+
+	if (newScale >= 1 && map.Scale.featureScaling_lastScale >= 1 && !fOverride){
+		return;
+	}
+	// patern must not be dynamically scaled
+	var patternScale = newScale/map.Scale.getEmbedScale();
+
+	var newObjectScale = newScale;
+
+	if ( fFeatureScalingDynamic ){
+		_TRACE("fFeatureScalingDynamic:"+newScale+" d:"+Math.log(1/newScale));
+			var nD = Math.log(1/newScale);
+			if ( nD > 1 ){
+				newScale *= nD;
+			}
+	}
+	
+	map.Layer.nFeatureScale = newScale;
+	map.Layer.nDynamicScale = map.Layer.nFeatureScale/map.Scale.nZoomScale;
+
+	var nDelta = newScale/map.Scale.featureScaling_lastScale;
+	map.Scale.featureScaling_lastScale = newScale;
+
+	if ( nDelta === 0 || nDelta === 1 ){
+		return;
+	}
+	if (!fFeatureScaling){
+		this.doObjectScaling(newObjectScale);
+		return;
+	}
+
+	var nodeA = null;
+	var i = 0;
+	var n = 0;
+
+	_TRACE('feature scaling -->');
+
+	// pattern --------------------------------------------
+	nodeA = SVGRootElement.getElementsByTagName('pattern');
+
+	var zoomMatrixA = getMatrix(map.Scale.zoomNode);
+	var nZoom = zoomMatrixA[0];
+	var newX  = zoomMatrixA[4] + map.Scale.scaleX(SVGRootElement.currentTranslate.x);
+	var newY  = zoomMatrixA[5] + map.Scale.scaleY(SVGRootElement.currentTranslate.y);
+	newX  = -newX*patternScale;
+	newY  = -newY*patternScale;
+
+	for ( i=0; i<nodeA.length;i++){
+		if (!nodeA.item(i).getAttributeNS(null,"id").match(/antizoomandpan/)){
+			var patternMatrixA = getPatternMatrix(nodeA.item(i));
+			nodeA.item(i).setAttributeNS(null,"patternTransform","matrix("+patternScale+" 0 0 "+patternScale+" "+String(newX)+" "+String(newY)+")");
+		}
+	}
+	_TRACE('.feature scaling: pattern done');
+
+	// check if relative scaling (stroke, symbols, ...) is necessary 
+	// -------------------------------------------------------------
+
+	var SVGDoc = evt?evt.target.ownerDocument:SVGDocument;
+	
+	// if features are originally scaled < 1; increase scaling til 1:1 
+	var fDoit = true;
+	if ( map.Scale.nFeatureScaling < 1 ){
+		fDoit = false;
+		if ( (nDelta < 1) && (map.Scale.nFeatureScaling*map.Zoom.nZoom >= 1) ){
+			if ( map.Scale.nFeatureScaling*map.Zoom.nZoom*nDelta < 1 ){
+				nDelta = 1/map.Scale.nFeatureScaling/map.Zoom.nZoom;
+			}
+			fDoit = true;
+		}
+		if ( (nDelta > 1) && (map.Scale.nFeatureScaling*map.Zoom.nZoom*nDelta >= 1) ){
+			if ( map.Scale.nFeatureScaling*map.Zoom.nZoom < 1 ){
+				nDelta = map.Zoom.nZoom*nDelta/(1/map.Scale.nFeatureScaling);
+			}
+			fDoit = true;
+		}
+	}
+	if (!fDoit){
+		return;
+	}
+
+	// filter --------------------------------------------
+	nodeA = SVGRootElement.getElementsByTagName('filter');
+
+	for ( i=0; i<nodeA.length;i++){
+		if (!nodeA.item(i).getAttributeNS(null,"id").match(/antizoomandpan/)){
+			var childsA = nodeA.item(i).childNodes;
+			for ( c=0; c<childsA.length;c++){
+				if (childsA.item(c).nodeName == 'feMorphology' ){
+					childsA.item(c).setAttributeNS(null,"radius",Number(childsA.item(c).getAttributeNS(null,"radius"))*nDelta);
+				}
+				if (childsA.item(c).nodeName == 'feOffset' ){
+					childsA.item(c).setAttributeNS(null,"dx",Number(childsA.item(c).getAttributeNS(null,"dx"))*nDelta);
+					childsA.item(c).setAttributeNS(null,"dy",Number(childsA.item(c).getAttributeNS(null,"dy"))*nDelta);
+				}
+				if (childsA.item(c).nodeName == 'feGaussianBlur' ){
+					childsA.item(c).setAttributeNS(null,"stdDeviation",Number(childsA.item(c).getAttributeNS(null,"stdDeviation"))*nDelta);
+				}
+			}
+		}
+	}
+	_TRACE('.feature scaling: filter done');
+
+	// styles --------------------------------------------
+
+	this.doFeatureScaling(nDelta);
+
+	// label --------------------------------------------
+
+	this.doLabelScaling(nDelta);
+
+	// symbols --------------------------------------------
+
+	var tmpNewScale = newScale;
+	var tmpDelta = nDelta;
+	var markerNode = SVGDocument.getElementById('marker_symbols');
+	if ( markerNode ){
+		nodeA = markerNode.childNodes;
+		for ( i=0; i<nodeA.length;i++){
+			if ( nodeA.item(i).nodeType != 1 ){
+				continue;
+			}
+			var szId = nodeA.item(i).getAttributeNS(null,"id");
+			if ( !szId || !szId.length || szId.match(/antizoomandpan/)) {
+				continue;
+			}
+			if ( (matrixA = getMatrix(nodeA.item(i))) ){
+				matrixA[0] *= nDelta;
+				matrixA[3] *= nDelta;
+				setMatrix(nodeA.item(i),matrixA);
+				map.Scale.scaledSymbolsA["#"+szId] = true;
+			}
+		}
+	}
+	var symbolsNode = SVGDocument.getElementById('symbolstore');
+	if ( symbolsNode ){
+		nodeA = symbolsNode.getElementsByTagName('g');
+		_TRACE("S Y M B O L S T O R E : "+nodeA.length+" symbols to scale");
+		for ( i=0; i<nodeA.length;i++){
+			var szId = nodeA.item(i).getAttributeNS(null,"id");
+			if ( !szId || !szId.length || !szId.match(/symbol/) || szId.match(/antizoomandpan/)  ) {
+				continue;
+			}
+			if ( (matrixA = getMatrix(nodeA.item(i))) ){
+				matrixA[0] *= nDelta;
+				matrixA[3] *= nDelta;
+				matrixA[4] *= nDelta;
+				matrixA[5] *= nDelta;
+				setMatrix(nodeA.item(i),matrixA);
+				map.Scale.scaledSymbolsA["#"+szId] = true;
+			}
+		}
+	}
+	var legendNode = SVGDocument.getElementById("widgets:antizoomandpan");
+	nodeA = legendNode.getElementsByTagName('use');
+	_TRACE("L E G E N D N O D E : "+nodeA.length+" symbols to scale");
+	for ( i=0; i<nodeA.length;i++){
+		var szRefId = nodeA.item(i).getAttributeNS(szXlink,'href');
+		if ( !map.Scale.scaledSymbolsA[szRefId] ){
+			continue;
+		}
+		if ( (matrixA = getMatrix(nodeA.item(i))) ){
+			matrixA[0] /= nDelta;
+			matrixA[3] /= nDelta;
+			setMatrix(nodeA.item(i),matrixA);
+		}
+	}
+	nodeA = SVGHiddenGroup.getElementsByTagName('use');
+	_TRACE("H I D D E N N O D E : "+nodeA.length+" symbols to scale");
+	for ( i=0; i<nodeA.length;i++){
+		var szRefId = nodeA.item(i).getAttributeNS(szXlink,'href');
+		if ( !map.Scale.scaledSymbolsA[szRefId] ){
+			continue;
+		}
+		if ( (matrixA = getMatrix(nodeA.item(i))) ){
+			matrixA[0] /= nDelta;
+			matrixA[3] /= nDelta;
+			setMatrix(nodeA.item(i),matrixA);
+		}
+	}
+	newScale = tmpNewScale;
+	nDelta = tmpDelta;
+
+	_TRACE('.feature scaling: symbols done');
+
+	this.scaleTextOffsets(SVGRootElement,newScale,nDelta,SVGDoc.getElementById("mapstyles"));
+
+	this.scaleLineDecorations(SVGRootElement,newScale);
+
+	// objects --------------------------------------------
+	this.doObjectScaling(newObjectScale);
+
+	_TRACE('.feature scaling done');
+};
+/**
+ * called by changeFeatureScaling to change the scaling of generated objects (charts,...)
+ * @param nDelta the scaling factor
+ */
+Map.Layer.prototype.doFeatureScaling = function(nDelta){
+
+	var szStylesValue = null;
+	var szNewStylesValue = null;
+
+	var SVGDoc = SVGDocument;
+
+	// css styles --------------------------------------------
+	var cssStyles = SVGDoc.getElementById("mapstyles");
+	if ( cssStyles ){
+		szStylesValue = cssStyles.firstChild.nextSibling.nodeValue;
+
+		szNewStylesValue = __scaleLineStyleString(szStylesValue,nDelta);
+		cssStyles.firstChild.nextSibling.nodeValue = szNewStylesValue;
+		map.Scale.fCSSStyleNodeChanged = true;
+		_TRACE('.feature scaling: CSS styles done');
+	}
+	else{
+	// normal style attributes -------------------------------------------
+		if( fFeatureScalingByLayer ){
+			// mode A: 
+			// do it layer by layer 
+			// ---------------------
+			// first collect all nodes to scale
+			var nodeTempA = null;
+			var nodeStyleA = new Array(0);
+			var nodeStyleDeltaA = new Array(0);
+			var fGot = false;
+			var tilesDone = false;
+
+			// loop over all layer
+			for ( a in map.Layer.listA ){
+				var layerItem = map.Layer.listA[a];
+
+				// handle tiled layer
+				if ( layerItem.szFlag.match(/tiled/) ){
+					if ( !tilesDone ){
+						tilesDone = true;
+						// on first tiled layer, than do all tiles
+						var tileInfoA = map.Tiles.getTileInfo();
+						if ( tileInfoA ){
+							for ( var i=0; i<tileInfoA.length; i++){
+								var nDeltaTBD = Number(tileInfoA[i].tileGroup.getAttributeNS(szMapNs,"deltaTBD"));
+
+								if ( tileInfoA[i].tileGroup.style.getPropertyValue("display") == "inline" ){
+
+
+								    _TRACE("**** doFeatureScaling for:"+tileInfoA[i].tileGroup.getAttributeNS(null,"id"));
+									nodeTempA = tileInfoA[i].tileGroup.getElementsByTagName('g');
+									for ( var j=0; j<nodeTempA.length; j++ ){
+										if ( !nodeTempA.item(j).getAttributeNS(null,"id").match(/:label/) ) {
+											nodeStyleA[nodeStyleA.length] = nodeTempA.item(j);
+											nodeStyleDeltaA[nodeStyleA.length-1] = nDeltaTBD?nDeltaTBD:1;
+										}
+									}
+									tileInfoA[i].tileGroup.setAttributeNS(szMapNs,"deltaTBD","1");
+								}
+								else{
+									if ( tileInfoA[i].tileGroup.hasChildNodes() ){ 
+										tileInfoA[i].tileGroup.setAttributeNS(szMapNs,"deltaTBD",String(nDelta*(nDeltaTBD?nDeltaTBD:1)));
+									}
+								}
+							}
+						}
+					}
+				}
+				// handle normal layer
+				else {
+					if ( layerItem.szName ){
+						var layerNode = SVGDocument.getElementById(layerItem.szName);
+						if (layerNode){
+							nodeStyleA[nodeStyleA.length] = layerNode;
+							nodeStyleDeltaA[nodeStyleA.length-1] = 1;
+							nodeTempA = layerNode.getElementsByTagName('g');
+							for ( var j=0; j<nodeTempA.length; j++ ){
+								if ( !nodeTempA.item(j).getAttributeNS(null,"id").match(/:label/) ) {
+									nodeStyleA[nodeStyleA.length] = nodeTempA.item(j);
+									nodeStyleDeltaA[nodeStyleA.length-1] = 1;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// get all mapobjects g nodes GR 20.09.2011 for BUFFER chart styles
+			var layerNode = SVGDocument.getElementById("mapobjects");
+			nodeTempA = layerNode.getElementsByTagName('g');
+			for ( var j=0; j<nodeTempA.length; j++ ){
+				nodeStyleA[nodeStyleA.length] = nodeTempA.item(j);
+				nodeStyleDeltaA[nodeStyleA.length-1] = 1;
+			}
+
+			// =====================================================
+			// now scale the style attributes of the collected nodes
+			// =====================================================
+			for ( n=0; n<nodeStyleA.length;n++){
+				var szStyle = nodeStyleA[n].getAttributeNS(null,"style");
+				if (szStyle && szStyle.length){
+					szNewStylesValue = __scaleLineStyleString(szStyle,nDelta*nodeStyleDeltaA[n]);
+					nodeStyleA[n].setAttributeNS(null,"style",szNewStylesValue);
+				}
+			}
+		}
+		else{
+			// mode B: 
+			// search for all <g> in canvas, and scale the styles
+			// --------------------------------------------------
+			alert("B!!!");
+			nodeA = map.Scale.canvasNode.getElementsByTagName('g');
+			for ( n=0; n<nodeA.length;n++){
+				if (antiZoomAndPanList.isContained(nodeA.item(n))){
+					continue;
+				}
+				var szStyle = nodeA.item(n).getAttributeNS(null,"style");
+				if (szStyle && szStyle.length){
+					szNewStylesValue = __scaleLineStyleString(szStyle,nDelta);
+					nodeA.item(n).setAttributeNS(null,"style",szNewStylesValue);
+				}
+			}
+		}
+		_TRACE('.feature scaling: '+nodeA.length+' styles done');
+	}
+};
+/**
+ * called by changeFeatureScaling to change the scaling of generated objects (charts,...)
+ * @param nDelta the scaling factor
+ */
+Map.Layer.prototype.doObjectScaling = function(newScale){	
+
+	if ( !fObjectScaling ){
+		return;
+	}
+
+	map.Layer.nObjectScale = newScale;
+
+	if ( fObjectScaling == "dynamic" ){
+
+		/** get the dynamic factor by comparing the actual map scale to the normal size scale
+		**  actual scale = (map.Scale.nTrueMapScale*map.Scale.nZoomScale)
+		**/
+		var dx = (map.Scale.nTrueMapScale*map.Scale.nZoomScale)/map.Scale.nNormalSizeScale;
+
+		/** dynamically scale the objects by qubic root function **/
+		map.Layer.nObjectScale *= Math.pow(1/dx,1/map.Scale.nDynamicScalePow);	
+			
+		/** old dynamic scale
+		var nD = Math.log(1/newScale);
+		if ( nD > 1 ){
+			newScale *= nD;
+		}
+		**/
+	}
+
+	/** store the dynamic scale part for use in maptheme
+	**/
+	map.Layer.nDynamicObjectScale = map.Layer.nObjectScale / newScale;
+
+	var nDelta = map.Layer.nObjectScale/map.Scale.objectScaling_lastScale;
+	map.Scale.objectScaling_lastScale = map.Layer.nObjectScale;
+
+	if ( nDelta === 0 || nDelta === 1 ){
+		return;
+	}
+
+	_TRACE("---- ???? ---- map.Scale.nObjectScaling = "+map.Scale.nObjectScaling);
+	var fDoit = true;
+	// if objects are originally scaled < 1; increase scaling til 1:1 
+	if ( map.Scale.nObjectScaling < 1 ){
+		fDoit = false;
+		if ( (nDelta < 1) && (map.Scale.nObjectScaling*map.Zoom.nZoom >= 1) ){
+			if ( map.Scale.nObjectScaling*map.Zoom.nZoom*nDelta < 1 ){
+				nDelta = 1/map.Scale.nObjectScaling/map.Zoom.nZoom;
+			}
+			fDoit = true;
+		}
+		if ( (nDelta > 1) && (map.Scale.nObjectScaling*map.Zoom.nZoom*nDelta >= 1) ){
+			if ( map.Scale.nObjectScaling*map.Zoom.nZoom < 1 ){
+				nDelta = map.Zoom.nZoom*nDelta/(1/map.Scale.nObjectScaling);
+			}
+			fDoit = true;
+		}
+	}
+	// here we go
+	if ( fDoit ){
+		_TRACE('.feature scaling: objects begin');
+		var objectGroup = map.Layer.objectGroup;
+		nodeA = objectGroup.childNodes;
+		for ( i=0; i<nodeA.length;i++){
+			if (antiZoomAndPanList.isContained(nodeA.item(i))){
+				continue;
+			}
+			var objectsA = nodeA.item(i).childNodes;
+			for ( ii=0; ii<objectsA.length;ii++){
+				if ( (matrixA = getMatrix(objectsA.item(ii))) ){
+					matrixA[0] *= nDelta;
+					matrixA[3] *= nDelta;
+					setMatrix(objectsA.item(ii),matrixA);
+				}
+			}
+		}
+	}
+	_TRACE('.feature scaling: objects done');
+};
+/**
+ * called on pan to do tiles which get visible and have stored feature scaling
+ * @param evt the event
+ */
+Map.Layer.prototype.doStoredFeatureScaling = function(evt){
+
+	if (!fFeatureScaling){
+		return;
+	}
+	// styles --------------------------------------------
+
+	var szStylesValue = null;
+	var szNewStylesValue = null;
+	var SVGDoc = evt?evt.target.ownerDocument:SVGDocument;
+
+	// css styles --------------------------------------------
+	if ( SVGDoc.getElementById("mapstyles") ){
+		return;
+	}
+	// normal style attributes -------------------------------------------
+	// first collect all nodes to scale
+	var nodeTempA = null;
+	var nodeStyleA = new Array(0);
+	var nodeStyleDeltaA = new Array(0);
+
+	// loop over all tiles
+	var tileInfoA = map.Tiles.getTileInfo();
+	if ( tileInfoA ){
+		for ( var i=0; i<tileInfoA.length; i++){
+			if ( tileInfoA[i].tileGroup.style.getPropertyValue("display") == "inline" ){
+				var nDeltaTBD = Number(tileInfoA[i].tileGroup.getAttributeNS(szMapNs,"deltaTBD"));
+				if ( nDeltaTBD && (nDeltaTBD != 1) ){
+					_TRACE("****** !!! doStoredFeatureScaling for:"+tileInfoA[i].tileGroup.getAttributeNS(null,"id"));
+					nodeTempA = tileInfoA[i].tileGroup.getElementsByTagName('g');
+					for ( var j=0; j<nodeTempA.length; j++ ){
+						nodeStyleA[nodeStyleA.length] = nodeTempA.item(j);
+						nodeStyleDeltaA[nodeStyleA.length-1] = nDeltaTBD?nDeltaTBD:1;
+						tileInfoA[i].tileGroup.setAttributeNS(szMapNs,"deltaTBD","1");
+					}
+					/**
+					nodeTempA = tileInfoA[i].tileGroup.getElementsByTagName('text');
+					for ( var j=0; j<nodeTempA.length; j++ ){
+						nodeStyleA[nodeStyleA.length] = nodeTempA.item(j);
+						nodeStyleDeltaA[nodeStyleA.length-1] = nDeltaTBD?nDeltaTBD:1;
+						tileInfoA[i].tileGroup.setAttributeNS(szMapNs,"deltaTBD","1");
+					}
+					**/
+				}
+			}
+		}
+	}
+	// now scale the style attributes of the collected nodes
+	for ( n=0; n<nodeStyleA.length;n++){
+		if ( !nodeStyleA[n].getAttributeNS(null,"id").match(/:label/) ) {
+			var szStyle = nodeStyleA[n].getAttributeNS(null,"style");
+			if (szStyle && szStyle.length){
+				szNewStylesValue = __scaleLineStyleString(szStyle,nodeStyleDeltaA[n]);
+				nodeStyleA[n].setAttributeNS(null,"style",szNewStylesValue);
+			}
+		}
+	}
+
+_TRACE('.stored scaling done');
+};
+/**
+ * helper function to scale text offsets; must be adapted on zooming, if baselineshift is used, only the text backgrounds need to be repositioned 
+ * @param targetGroup the DOM node to start with
+ * @param newScale the new zoom scale
+ * @param nDelta new zoom scale / old zoom scale
+ * @param cssStylesNode DOM node of the css styles used to define the text height (may be null)
+ */
+Map.Layer.prototype.scaleTextOffsets = function(targetGroup,newScale,nDelta,cssStyles){
+
+	// text backgrounds --------------------------------------------
+	var nodeA = targetGroup.getElementsByTagName('rect');
+	for ( i=0; i<nodeA.length;i++){
+		var szId = nodeA.item(i).getAttributeNS(null,'id');
+		if (szId && szId.match(/textbg/)){
+			var textNode = nodeA.item(i).nextSibling.nextSibling;
+			if (textNode && (textNode.nodeName == "text") ){
+				var bBox = map.Dom.getBox(textNode);
+				if ( bBox.width < 0 || bBox.height < 0 ){
+					nodeA.item(i).setAttributeNS(null,'width',0);
+					nodeA.item(i).setAttributeNS(null,'height',0);
+					continue;
+				}
+				// changes though css are not yet active at this time
+				if (cssStyles){
+					bBox.x *= nDelta;
+					bBox.y *= nDelta;
+					bBox.width *= nDelta;
+					bBox.height *= nDelta;
+				}
+				var nMargin = map.Scale.normalX(1)*newScale;
+				nodeA.item(i).setAttributeNS(null,'x',bBox.x-nMargin);
+				nodeA.item(i).setAttributeNS(null,'y',bBox.y-nMargin);
+				nodeA.item(i).setAttributeNS(null,'width',bBox.width+nMargin*2);
+				nodeA.item(i).setAttributeNS(null,'height',bBox.height+nMargin*2);
+			}
+		}
+	}
+	// texts --------------------------------------------
+	nodeA = targetGroup.getElementsByTagName('text');
+	for ( i=0; i<nodeA.length;i++){
+		szId = nodeA.item(i).parentNode.getAttributeNS(null,'id');
+		if (szId && szId.match(/label/)){
+			var textNode = nodeA.item(i);
+			var szTransform = textNode.getAttributeNS(null,'transform');
+			if ( szTransform ){
+				szTransformA = szTransform.split(" ");
+				for ( var ii=0; ii<szTransformA.length; ii++ ){
+					if ( szTransformA[ii].match(/translate/) ){
+						szTrans = szTransformA[ii].substr(10,szTransformA[ii].length-11);
+						szTransA = szTrans.split(',');
+						x = Number(szTransA[0])*nDelta;
+						y = Number(szTransA[1])*nDelta;
+						szTransformA[ii] = "translate("+x+","+y+")";
+					}
+				}
+				var szNew = "";
+				for ( var ii=0; ii<szTransformA.length; ii++ ){
+					szNew = szNew + szTransformA[ii] + " ";
+				}
+				textNode.setAttributeNS(null,'transform',szNew);
+			}
+		}
+	}
+
+	_TRACE('.feature scaling: text offsets done');
+
+};
+/**
+ * helper function to set and scale linedecoration shift ( needed for Chrome, Firefox, ...)
+ * @param targetGroup the DOM node to start with
+ * @param newScale the new zoom scale
+ */
+Map.Layer.prototype.scaleLineDecorations = function(targetGroup,newScale){
+
+	var nodeA =  targetGroup.getElementsByTagName('text');
+	for ( i=0; i<nodeA.length;i++){
+		if ( nodeA.item(i) && nodeA.item(i).getAttributeNS(null,"id") && nodeA.item(i).getAttributeNS(null,"id").match(/linedecoration/) ){
+			var szDominantBaseline = nodeA.item(i).style.getPropertyValue("dominant-baseline");
+			var nBaselineShift = parseFloat(nodeA.item(i).style.getPropertyValue("baseline-shift"));
+			var nSize = parseFloat(nodeA.item(i).style.getPropertyValue("font-size"));
+			var nYoff = 0;
+			if ( szDominantBaseline == "mathematical" ){
+				nYoff += nSize/3;
+			}
+			if ( szDominantBaseline == "hanging" ){
+				nYoff -= nSize;
+			}
+			nYoff -= nBaselineShift * newScale;
+			nodeA.item(i).setAttributeNS(null,"dy",nYoff);
+		}
+	}
+	_TRACE('.feature scaling: linedecoration done');
+
+};
+/**
+ * change the scaling of all label
+ * @param evt the event
+ * @param nDelta the scaling factor
+ */
+Map.Layer.prototype.doLabelScaling = function(nDelta){
+
+	var szStylesValue = null;
+	var szNewtylesValue = null;
+
+	var SVGDoc = SVGDocument;
+
+	// css styles --------------------------------------------
+	var cssStyles = SVGDoc.getElementById("mapstyles");
+	if ( cssStyles ){
+		szStylesValue = cssStyles.firstChild.nextSibling.nodeValue;
+
+		szNewStylesValue = __scaleTextStyleString(szStylesValue,nDelta);
+		cssStyles.firstChild.nextSibling.nodeValue = szNewStylesValue;
+		map.Scale.fCSSStyleNodeChanged = true;
+		map.Scale.refreshCSSStyles();
+
+		_TRACE('.label scaling: CSS styles done');
+	}
+	else{
+		var nodeA = null;
+		var i = 0;
+		var n = 0;
+
+		_TRACE('! label scaling -->');
+
+		// search for all <g> in canvas, and scale the styles
+		// --------------------------------------------------
+		nodeA = map.Scale.canvasNode.getElementsByTagName('g');
+		for ( n=0; n<nodeA.length;n++){
+			if (antiZoomAndPanList.isContained(nodeA.item(n))){
+				continue;
+			}
+			var szId = nodeA.item(n).getAttributeNS(null,"id");
+			if ( !szId || (szId.length == 0) || !(szId.match(/label/)) ){
+				continue;
+			}
+			var szStyle = nodeA.item(n).getAttributeNS(null,"style");
+			if (szStyle && szStyle.length){
+				if ( nDelta == 0 ){
+					map.Layer.switchLayer(null,szId,null,(nodeA.item(n).style.getPropertyValue("display")=="none")?true:false);
+				}else{
+
+					szNewStylesValue = __scaleStyleString(szStyle,nDelta);
+					nodeA.item(n).setAttributeNS(null,"style",szNewStylesValue);
+
+					// also in childs (grouped label with different scale!)
+					childA = nodeA.item(n).childNodes;
+					for ( c=0; c<childA.length;c++){
+						if ( childA.item(c).nodeName == "text" ){
+							var szStyle = childA.item(c).getAttributeNS(null,"style");
+							if (szStyle && szStyle.length){
+
+								szNewStylesValue = __scaleStyleString(szStyle,nDelta);
+								childA.item(c).setAttributeNS(null,"style",szNewStylesValue);
+
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	// new GR 14.10.2013 
+	// search for all <text> in generated value label and scale the styles
+	// -------------------------------------------------------------------
+
+	_TRACE("scale generated label");
+
+	for ( l in map.Layer.generatedLabelA ){
+		if ( map.Layer.generatedLabelA[l]){
+			nodeA = map.Layer.generatedLabelA[l].getElementsByTagName('text');
+			for ( n=0; n<nodeA.length;n++){
+				var szStyle = nodeA.item(n).getAttributeNS(null,"style");
+				if (szStyle && szStyle.length){
+					szNewStylesValue = __scaleStyleString(szStyle,nDelta);
+					nodeA.item(n).setAttributeNS(null,"style",szNewStylesValue);
+				}
+			}
+		}
+	}
+
+	_TRACE('.label scaling done');
+
+	this.adaptLabel(null);
+};
+/**
+ * change the scaling of elements within the object layer of the map
+ * @param evt the event
+ * @param nDelta the scaling factor
+ * @param objGroup the DOM node of the object layer
+ */
+Map.Layer.prototype.changeObjectScaling = function(evt,nDelta,objGroup){
+
+	var nodeA = null;
+	var i = 0;
+	var n = 0;
+
+	_TRACE('! object scaling -->');
+
+	if ( nDelta == 0 ){
+		nDelta = 1/map.Scale.nObjectScaling;
+	}
+	if ( objGroup ){
+
+		// a) only objects of a specified group ----------------------
+
+		var objectsA = objGroup.childNodes;
+		for ( i=0; i<objectsA.length;i++){
+			if ( (matrixA = getMatrix(objectsA.item(i))) ){
+				matrixA[0] *= nDelta;
+				matrixA[3] *= nDelta;
+				setMatrix(objectsA.item(i),matrixA);
+			}
+
+			var dObject = objectsA.item(i).childNodes[0];
+			if ( dObject && (matrixA = getMatrix(dObject)) ){
+				matrixA[4] /= Math.pow(nDelta,0.5);
+				matrixA[5] /= Math.pow(nDelta,0.5);
+				setMatrix(dObject,matrixA);
+			}
+		}
+	}
+	else {
+
+		// b) all objects --------------------------------------------
+
+		if ( ((map.Scale.nObjectScaling * nDelta) > 8  ) ||
+			 ((map.Scale.nObjectScaling * nDelta) < 1/10) ){
+			_TRACE('.object scaling is on limit! not done');
+			return;
+		}
+
+		map.Scale.nObjectScaling *= nDelta;
+
+		var objectGroup = map.Layer.objectGroup;
+		nodeA = objectGroup.childNodes;
+		for ( i=0; i<nodeA.length;i++){
+			if (antiZoomAndPanList.isContained(nodeA.item(i))){
+				continue;
+			}
+			var objectsA = nodeA.item(i).childNodes;
+			for ( ii=0; ii<objectsA.length;ii++){
+				if ( (matrixA = getMatrix(objectsA.item(ii))) ){
+					matrixA[0] *= nDelta;
+					matrixA[3] *= nDelta;
+					setMatrix(objectsA.item(ii),matrixA);
+				}
+				/**
+				var dObject = objectsA.item(ii).childNodes[0];
+				if ( dObject && (matrixA = getMatrix(dObject)) ){
+					matrixA[4] /= Math.pow(nDelta,0.5);
+					matrixA[5] /= Math.pow(nDelta,0.5);
+					setMatrix(dObject,matrixA);
+				}
+				**/			}
+		}
+	}
+_TRACE('.object scaling done');
+};
+/**
+ * set the rotation of elements within the object layer of the map
+ * @param evt the event
+ * @param nRot the rotation angle
+ * @param objGroup the DOM node of the object layer
+ */
+Map.Layer.prototype.setObjectRotate = function(evt,nRot,objGroup){
+
+	var nodeA = null;
+	var i = 0;
+	var n = 0;
+
+	_TRACE('! object rotate -->');
+
+	// objects --------------------------------------------
+	if ( objGroup ){
+		var objectsA = objGroup.childNodes;
+		for ( i=0; i<objectsA.length;i++){
+			setRotate(objectsA.item(i),(360+Number(nRot))%360);
+		}
+	}
+	else {
+		var objectGroup = map.Layer.objectGroup;
+		nodeA = objectGroup.childNodes;
+		for ( i=0; i<nodeA.length;i++){
+			if (antiZoomAndPanList.isContained(nodeA.item(i))){
+				continue;
+			}
+			var objectsA = nodeA.item(i).childNodes;
+			for ( ii=0; ii<objectsA.length;ii++){
+				setRotate(objectsA.item(ii),(360+Number(nRot))%360);
+			}
+		}
+	}
+_TRACE('.object rotate done');
+};
+/**
+ * set the rotation of the loaded pattern
+ * @param evt the event
+ * @param nRot the rotation angle
+ * @param rootGroup optional base node for pattern elements
+ */
+Map.Layer.prototype.setPatternRotate = function(evt,nRot,rootGroup){
+	var nodeA = null;
+	var i = 0;
+	var n = 0;
+	_TRACE('! pattern rotate -->');
+	if ( !rootGroup ){
+		rootGroup = SVGRootElement;
+	}
+	_TRACE('! pattern rotate 2 -->');
+	// get pattern --------------------------------------------
+	nodeA = rootGroup.getElementsByTagName('pattern');
+	_TRACE('! pattern rotate 3 -->');
+	for ( i=0; i<nodeA.length;i++){
+		if (!nodeA.item(i).getAttributeNS(null,"id").match(/antizoomandpan/)){
+			setRotate(nodeA.item(i),(360+Number(nRot))%360,"patternTransform");
+			_TRACE('.pattern rotate:'+i);
+		}
+	}
+_TRACE('.pattern rotate done');
+};
+/**
+ * set the rotation of elements within the object layer of the map
+ * @param evt the event
+ * @param nRot the rotation angle
+ * @param objGroup the DOM node of the object layer
+ */
+Map.Layer.prototype.setSymbolRotate = function(evt,nRot,objGroup){
+
+	var nodeA = null;
+	var i = 0;
+	var n = 0;
+
+	_TRACE('! symbol rotate -->');
+
+	var markerNode = SVGDocument.getElementById('marker_symbols');
+	if ( markerNode ){
+		nodeA = markerNode.childNodes;
+		for ( i=0; i<nodeA.length;i++){
+			if ( nodeA.item(i).nodeType != 1 ){
+				continue;
+			}
+			var szId = nodeA.item(i).getAttributeNS(null,"id");
+			if ( !szId || !szId.length || szId.match(/antizoomandpan/)) {
+				continue;
+			}
+			setRotate(nodeA.item(i),(360+Number(nRot))%360);
+			map.Scale.rotatedSymbolsA["#"+szId] = true;
+		}
+	}
+	var symbolsNode = SVGDocument.getElementById('symbolstore');
+	if ( symbolsNode ){
+		nodeA = symbolsNode.getElementsByTagName('g');
+		_TRACE("S Y M B O L S T O R E : "+nodeA.length+" symbols to rotate");
+		for ( i=0; i<nodeA.length;i++){
+			var szId = nodeA.item(i).getAttributeNS(null,"id");
+			if ( !szId || !szId.length || !szId.match(/symbol/) || szId.match(/antizoomandpan/)  ) {
+				continue;
+			}
+			setRotate(nodeA.item(i),(360+Number(nRot))%360);
+			map.Scale.rotatedSymbolsA["#"+szId] = true;
+		}
+	}
+	var legendNode = SVGDocument.getElementById("widgets:antizoomandpan");
+	nodeA = legendNode.getElementsByTagName('use');
+	_TRACE("L E G E N D N O D E : "+nodeA.length+" symbols to rotate");
+	for ( i=0; i<nodeA.length;i++){
+		var szRefId = nodeA.item(i).getAttributeNS(szXlink,'href');
+		if ( !map.Scale.rotatedSymbolsA[szRefId] ){
+			continue;
+		}
+		setRotate(nodeA.item(i),(360+Number(-nRot))%360);
+	}
+	nodeA = SVGHiddenGroup.getElementsByTagName('use');
+	_TRACE("H I D D E N N O D E : "+nodeA.length+" symbols to rotate");
+	for ( i=0; i<nodeA.length;i++){
+		var szRefId = nodeA.item(i).getAttributeNS(szXlink,'href');
+		if ( !map.Scale.rotatedSymbolsA[szRefId] ){
+			continue;
+		}
+		setRotate(nodeA.item(i),(360+Number(-nRot))%360);
+	}
+_TRACE('.object rotate done');
+};
+/**
+ * change the rotation of elements within the object layer of the map
+ * @param evt the event
+ * @param nDelta the scaling factor
+ * @param objGroup the DOM node of the object layer
+ */
+Map.Layer.prototype.changeObjectRotate = function(evt,nDelta,objGroup){
+
+	var nodeA = null;
+	var i = 0;
+	var n = 0;
+
+	_TRACE('! object rotate -->');
+
+	// objects --------------------------------------------
+	if ( objGroup ){
+		var objectsA = objGroup.childNodes;
+		for ( i=0; i<objectsA.length;i++){
+			var nRot = getRotateAttributeValue(objectsA.item(i));
+			setRotate(objectsA.item(i),(360+Number(nRot)+Number(nDelta))%360);
+		}
+	}
+	else {
+		var objectGroup = map.Layer.objectGroup;
+		nodeA = objectGroup.childNodes;
+		for ( i=0; i<nodeA.length;i++){
+			if (antiZoomAndPanList.isContained(nodeA.item(i))){
+				continue;
+			}
+			var objectsA = nodeA.item(i).childNodes;
+			for ( i=0; i<objectsA.length;i++){
+				var nRot = getRotateAttributeValue(objectsA.item(i));
+				setRotate(objectsA.item(i),(360+Number(nRot)+Number(nDelta))%360);
+			}
+		}
+	}
+_TRACE('.object rotate done');
+};
+/**
+ * change the rotation of all label
+ * @param evt the event
+ * @param nDelta the scaling factor
+ */
+Map.Layer.prototype.setLabelRotate = function(evt,nRot){
+
+	var nodeA = null;
+	var i = 0;
+	var n = 0;
+
+	_TRACE('! label rotate -->');
+
+	// search for all <text> in canvas, and scale the styles
+	// --------------------------------------------------
+	nodeA = map.Layer.layerNode.getElementsByTagName('text');
+	for ( n=0; n<nodeA.length;n++){
+		if (antiZoomAndPanList.isContained(nodeA.item(n))){
+			continue;
+		}
+		if (  nodeA.item(n).firstChild && (nodeA.item(n).firstChild.nodeName == "textPath") ){
+			continue;
+		} 
+		setRotate(nodeA.item(n),(360+Number(nRot))%360);
+	}
+	_TRACE('.label rotate done');
+
+	this.adaptLabel();
+};
+/**
+ * change the rotation of all label
+ * @param evt the event
+ * @param nDelta the scaling factor
+ */
+Map.Layer.prototype.changeLabelRotate = function(evt,nDelta){
+
+	var nodeA = null;
+	var i = 0;
+	var n = 0;
+
+	_TRACE('! label rotate -->');
+
+	// search for all <text> in canvas, and scale the styles
+	// --------------------------------------------------
+	nodeA = map.Scale.canvasNode.getElementsByTagName('text');
+	for ( n=0; n<nodeA.length;n++){
+		if (antiZoomAndPanList.isContained(nodeA.item(n))){
+			continue;
+		}
+		if (  nodeA.item(n).firstChild && (nodeA.item(n).firstChild.nodeName == "textPath") ){
+			continue;
+		} 
+		var nRot = getRotateAttributeValue(nodeA.item(n));
+		setRotate(nodeA.item(n),(360+Number(nRot)+Number(nDelta))%360);
+	}
+	_TRACE('.label rotate done');
+
+	this.adaptLabel();
+};
+/**
+ * realize dynamic label  
+ * @param evt the actual event
+ * @param rootNode the DOM node from which on to look for labels on path
+ */
+Map.Layer.prototype.adaptLabel = function(evt,rootNode){
+	// initiate dynamic label, if wanted
+	if ( fAdaptLabelToScaling ){
+		this.adaptLabelToScaling(evt,rootNode);
+	}
+	if ( fCheckLabelOverlap || fCheckLabelSpace || fCheckLabelSqueeze ){
+		if (rootNode){
+			this.prepareCheckOverlap(evt,rootNode);
+		}
+		this.checkLabelOverlapping(evt,rootNode);
+	}
+};
+/**
+ * checks labels on paths; displays label only if path is long enough
+ * first clears all label on path and than calls the executing function ( if 'delayed' set, on timeout )
+ * @param evt the actual event
+ * @param rootNode the DOM node from which on to look for labels on path
+ */
+Map.Layer.prototype.adaptLabelToScaling = function(evt,rootNode){
+
+	if (!rootNode){
+		rootNode = SVGRootElement;
+	}
+	if ( (fAdaptLabelToScaling || fCheckLabelOnlyOne) ){
+		var fDoit = false;
+		for ( a in map.Layer.listA ){
+			var layerItem = map.Layer.listA[a];
+			if ( (layerItem.nRenderer & (4|8)) && (layerItem.szType == "line") && (layerItem.szDisplayLabel == "inline") ){
+				fDoit = true;
+			}
+		}
+		if (!fDoit){
+			return;
+		}
+
+		// hide texts on path
+		var nodeA = rootNode.getElementsByTagName('textPath');
+		if ( map.Scale.oldZoomScale != map.Scale ){
+			for ( var i=0; i<nodeA.length;i++ ){
+				if ( !nodeA.item(i).parentNode.getAttributeNS(null,"id").match(/:linedecoration/) ){
+					nodeA.item(i).parentNode.style.setProperty('display','none',"");
+				}
+			}
+		}
+
+		// init processing, if not yet done
+		if ( !map.Label.fAdaptLabelToScalingPending ){
+			map.Label.fAdaptLabelToScalingPending = true;
+			if ( fAdaptLabelToScaling == 'delayed' ){
+				map.pushAction('setTimeout("map.Label.adaptLabelToScaling(null)",1500)');
+			}
+			else{
+				map.pushAction('map.Label.adaptLabelToScaling(null,null)');
+			}
+		}
+	}
+};
+/**
+ * check for overlapping label, and try to correct this by changing the labels position (at the moment only vertically)
+ * @param evt the actual event
+ * @param rootNode the DOM node to start looking for labels
+ */
+Map.Layer.prototype.checkLabelOverlapping = function(evt,rootNode){
+
+	if ( fCheckLabelOverlap || fCheckLabelSpace || fCheckLabelSqueeze ){
+		if (!rootNode){
+			rootNode = map.Layer.layerNode;
+		}
+		if (!rootNode){
+			rootNode = map.Scale.canvasNode;
+		}
+		map.Label.initCheckOverlap(rootNode);
+	}
+};
+/**
+ * hide label to prepare for check overlapping
+ * @param evt the actual event
+ * @param rootNode the DOM node to start looking for labels
+ */
+Map.Layer.prototype.prepareCheckOverlap = function(evt,rootNode){
+
+	if ( (fCheckLabelOverlap || fCheckLabelSpace)  ){
+		if (!rootNode){
+			rootNode = map.Layer.layerNode;
+		}
+		if (!rootNode){
+			rootNode = map.Scale.canvasNode;
+		}
+		map.Label.prepareCheckOverlap(rootNode);
+	}
+};
+/**
+ * add this node to the list of changed features
+ * @param featureNode the node to add
+ */
+Map.Layer.prototype.addChangedFeatureNode = function(featureNode){
+	var i;
+	if ( this.changedFeatureNodesA ){
+		for ( i=0; i<this.changedFeatureNodesA.length; i++){
+			if (this.changedFeatureNodesA[i] == featureNode ){
+				return;
+			}
+		}
+		_TRACE("addChangedFeatureNode:"+featureNode.getAttributeNS(null,"id"));
+		this.changedFeatureNodesA[this.changedFeatureNodesA.length] = featureNode;
+	}
+};
+/**
+ * check, if we have changed this layer manually
+ * @param szId the id of the theme (layer)
+ */
+Map.Layer.prototype.isChangedFeature = function(szId){
+	var i,k;
+	if ( this.changedFeatureNodesA ){
+		for ( i=0; i<this.changedFeatureNodesA.length; i++){
+			if (map.Tiles.getMasterId(this.changedFeatureNodesA[i].getAttributeNS(null,"id")) == szId ){
+				return true;
+			}
+		}
+	}
+	return false;
+};
+/**
+ * remove all feature changes from a defined theme (layer); uses the list: changedFeatureNodesA
+ * @param szId the id of the theme (layer)
+ */
+Map.Layer.prototype.removeChangedFeatures = function(szId){
+	var i,k;
+	if ( this.changedFeatureNodesA ){
+		for ( i=0; i<this.changedFeatureNodesA.length; i++){
+			if (map.Tiles.getMasterId(this.changedFeatureNodesA[i].getAttributeNS(null,"id")) == szId ){
+				_TRACE("removeChangedFeatures["+i+"]("+this.changedFeatureNodesA.length+"):"+this.changedFeatureNodesA[i].getAttributeNS(null,"id"));
+				this.changedFeatureNodesA[i].setAttributeNS(null,"style","");
+				for ( k=i ; k<this.changedFeatureNodesA.length-1; k++){
+					this.changedFeatureNodesA[k] = this.changedFeatureNodesA[k+1];
+				}
+				this.changedFeatureNodesA.length--;
+				i--;
+			}
+		}
+	}
+};
+/**
+ * set pointer events to active layer
+ * @param szId layer id
+ * @return true if done
+ */
+Map.Layer.prototype.setPointerEvents = function(szId){
+	for ( a in map.Layer.listA ){
+		var szName = map.Layer.listA[a].szName;
+		if ( szName ){
+			var layerObj = SVGDocument.getElementById(szName);
+			var szValue = ( szId == null || szId == szName )? null : "none"; 
+			if ( layerObj ){
+				if (szValue){
+					layerObj.style.setProperty("pointer-events",szValue,"");
+				}else{
+					layerObj.style.removeProperty("pointer-events");
+				}
+			}
+		}
+		// TBD in tiles
+	}
+};
+/**
+ * get the layer object of the containing layer given the id of one layer item
+ * @param szId and arbitrary item id
+ * @type {@link Map.Layer.Item}
+ * @return a layer object, if defined
+ */
+Map.Layer.prototype.getLayerObj = function(szId){
+	if (!szId){
+		return null;
+	}
+	var szTheme = szId.split('#')[0].split(':')[0];
+	if ( szTheme == 'legend' ){
+		szTheme = szId.split(':')[2];
+	}	
+	return this.listA[szTheme];
+};
+/**
+ * get the name of the containing layer given the id of one layer item  
+ * @param szId and arbitrary item id
+ * @type string
+ * @return a layer name, if object is within a layer, or null
+ */
+Map.Layer.prototype.getLayerName = function(szId){
+	var layerObj = this.getLayerObj(szId);
+	if ( layerObj ){
+		return layerObj.szName;
+	}
+	return null;
+};
+/**
+ * get the containing layer object of an arbitrary node 
+ * @param nodeObj and arbitrary SVG node
+ * @type {@link Map.Layer.Item}
+ * @return a layer object, if defined, or null
+ */
+Map.Layer.prototype.getLayerObjOfNode = function(nodeObj){
+	if (nodeObj){
+		while ( nodeObj.parentNode && nodeObj.parentNode.nodeName != 'SVG' ){
+			var layerObj = this.getLayerObj(nodeObj.getAttributeNS(null,"id"));
+			if ( layerObj ){
+				return  layerObj;
+			}
+			nodeObj = nodeObj.parentNode;
+		}
+	}
+	return null;
+};
+/**
+ * get the containing layer node of any node 
+ * @param nodeObj and arbitrary SVG node
+ * @type Dom node
+ * @return the shape node, if the given node is part of a layer, or null
+ */
+Map.Layer.prototype.getLayerItemNodeOfNode = function(nodeObj){
+	while ( nodeObj.parentNode && nodeObj.parentNode.nodeName != 'SVG' ){
+		var layerObj = this.getLayerObj(nodeObj.getAttributeNS(null,"id"));
+		if ( layerObj ){
+			return  nodeObj;
+		}
+		nodeObj = nodeObj.parentNode;
+	}
+	return null;
+};
+/**
+ * get all shape nodes (on all tiles) of a layer object given an arbitrary node within one shape node
+ * @param nodeObj and arbitrary SVG node
+ * @type array
+ * @return an array of all relevant layer shape nodes
+ */
+Map.Layer.prototype.getLayerItemNodes = function(nodeObj){
+	var layerItemNode = this.getLayerItemNodeOfNode(nodeObj);
+	if ( layerItemNode ){
+		var szId = layerItemNode.getAttributeNS(null,"id");
+		var layerObj = this.getLayerObj(szId);
+		if ( ((layerObj.szType == "point") && fTileTextNoClip) || (map.Tiles.getMasterId(szId) == szId) ){
+			return new Array(layerItemNode);
+		}
+		return map.Tiles.getTileNodes(map.Tiles.getMasterId(szId));
+	}
+	return new Array(0);
+};
+/**
+ * get the class or style attribute of one map node defined by itself or any parent
+ * @param nodeObj and arbitrary SVG node
+ * @return object with clas and/or style arguments
+ */
+Map.Layer.prototype.getStyleOrClass = function(nodeObj){
+	var retObj = new Object();
+	retObj.szClass = map.Dom.getAttributeByNodeOrParents(nodeObj,null,"class");
+	retObj.szStyle = map.Dom.getAttributeByNodeOrParents(nodeObj,null,"style");
+	return retObj;
+};
+/**
+ * check if the given node is part of the map 
+ * @param nodeObj and arbitrary SVG node
+ * @type boolean
+ * @return true or false
+ */
+Map.Layer.prototype.isMapObject = function(nodeObj){
+	while ( nodeObj ){
+		if ( nodeObj == map.Scale.canvasNode ){
+			return true;
+		}
+		nodeObj = nodeObj.parentNode;
+	}
+	return false;
+};
+/**
+ * check if the given layer is loaded 
+ * if tiled, check if at least one tile is loaded 
+ * @param nodeObj and arbitrary SVG node
+ * @type boolean
+ * @return true or false
+ */
+Map.Layer.prototype.isLoaded = function(szLayer){
+	var layerObj = this.getLayerObj(szLayer);
+	if ( layerObj ){
+		if ( layerObj.szFlag.match(/tiled/) ){
+			return map.Tiles.isAnyLayerTileLoaded();
+		}else{
+			return true;
+		}
+	}
+	return false;
+};
 
 // --------------------------------------------------------------------------------- 
 // label handling ( check space and overlap ) 
@@ -318,28 +3704,34 @@ Map.Label.prototype.collectCheckOverlap = function(){
 					if ( subLayerNodeA && (subLayerNodeA.length > 0) ){
 						for ( var s=0; s<subLayerNodeA.length; s++ ){
 							nodeTempA = subLayerNodeA.item(s).getElementsByTagName('text');
+							if ( nodeTempA.length )	{
+								_TRACE(".test "+nodeTempA.length+" label");
+								// reverse index because represents rendering 
+								for ( var i=nodeTempA.length-1; i>=0; i-- ){
+									this.addCheckItem(nodeTempA.item(i));
+								}
+							}
+						}	
+					}else{
+						nodeTempA = layerNode.getElementsByTagName('text');
+						if ( nodeTempA.length )	{
 							_TRACE(".test "+nodeTempA.length+" label");
 							// reverse index because represents rendering 
 							for ( var i=nodeTempA.length-1; i>=0; i-- ){
 								this.addCheckItem(nodeTempA.item(i));
 							}
-						}	
-					}else{
-						nodeTempA = layerNode.getElementsByTagName('text');
-						_TRACE(".test "+nodeTempA.length+" label");
-						// reverse index because represents rendering 
-						for ( var i=nodeTempA.length-1; i>=0; i-- ){
-							this.addCheckItem(nodeTempA.item(i));
 						}
 					}
 				}
 				var layerNode = SVGDocument.getElementById(layerItem.szName+":values");
 				if (layerNode){
 					nodeTempA = layerNode.getElementsByTagName('text');
-					_TRACE(".test "+nodeTempA.length+" values");
-					// reverse index because represents rendering 
-					for ( var i=nodeTempA.length-1; i>=0; i-- ){
-						this.addCheckItem(nodeTempA.item(i));
+					if ( nodeTempA.length )	{
+						_TRACE(".test "+nodeTempA.length+" values");
+						// reverse index because represents rendering 
+						for ( var i=nodeTempA.length-1; i>=0; i-- ){
+							this.addCheckItem(nodeTempA.item(i));
+						}
 					}
 				}
 			}
@@ -357,8 +3749,12 @@ Map.Label.prototype.collectCheckOverlap = function(){
 
 	_TRACE(".collected and tested: "+this.checkItemA.length+" label to check");
 	this.zoomScale = map.Scale.nZoomScale;
-
-	setTimeout("map.Label.getBoxCheckOverlap(0)",100);
+	
+	if ( this.checkItemA.length ){
+		setTimeout("map.Label.getBoxCheckOverlap(0)",100);
+	}else{
+		this.fCheckLabelOverlappingPending = false;
+	}
 };
 /**
  * get the boxes of the label list items to check; function goes to sleep every 25 items
@@ -613,23 +4009,12 @@ Map.Label.prototype.execCheckLabelOverlappingOne = function(nIndex){
 				var boxB    = this.checkOvlA[j].bBox;
 
 				if ( fCheckLabelOnlyOne && (szTextA == szTextB) ){
-					if ( 0 ){
-						var dA = Number(cItem.textNode.getAttributeNS(szMapNs,"dcenter"));
-						var dB = Number(this.checkOvlA[j].textNode.getAttributeNS(szMapNs,"dcenter"));
-						if ( dA < dB ){
-							this.checkOvlA[j].bBox = null;
-							this.checkOvlA[j].setDisplay("none");
-							continue;
-						}
-					}
-					if ( 1 ){
-						var dA = Number(cItem.textNode.getAttributeNS(szMapNs,"partlen"));
-						var dB = Number(this.checkOvlA[j].textNode.getAttributeNS(szMapNs,"partlen"));
-						if ( dA > dB ){
-							this.checkOvlA[j].bBox = null;
-							this.checkOvlA[j].setDisplay("none");
-							continue;
-						}
+					var dA = Number(cItem.textNode.getAttributeNS(szMapNs,"partlen"));
+					var dB = Number(this.checkOvlA[j].textNode.getAttributeNS(szMapNs,"partlen"));
+					if ( dA > dB ){
+						this.checkOvlA[j].bBox = null;
+						this.checkOvlA[j].setDisplay("none");
+						continue;
 					}
 					cItem.setDisplay("none");
 					cItem.bBox = null;
@@ -673,7 +4058,7 @@ Map.Label.prototype.execCheckLabelOverlappingOne = function(nIndex){
 						// label on point, possible position changes depending on label position
 						// --------------------------------------------------------------------
 
-						var fontHeight = parseInt(cItem.textNode.style.getPropertyValue("font-size"));
+						var fontHeight = parseInt(cItem.textNode.style.getPropertyValue("font-size")) || 14;
 
 						// 1. check move down
 						if ( boxA.y >= boxB.y && (nPos == 11 || nPos == 12 || nPos == 1 || nPos == 9 || nPos == 3 || nPos == 0) ){
@@ -837,12 +4222,6 @@ Map.Label.prototype.execAdaptLabelToScaling = function(startIndex){
 				// GR 22.06.2006 only one label
 				szText = nodeA[i].firstChild.nodeValue;
 				// GR 09.01.2007 to verify
-				if ( 0 && fTileTextNoClip ){
-					if ( this.ALTS_textA[szText] ){
-						continue;
-					}
-				}
-				else
 				if ( this.ALTS_textA[szText+szIdTile] ){
 					// label on tile borders must be multiple
 					var tileNodesA = map.Tiles.getTileNodes(map.Tiles.getMasterId(szRefId));
@@ -1088,11 +4467,6 @@ Map.Sleep.prototype.checkSleep = function(szContinueParam,nTimeout){
 		}
 		return true;
 	}
-	if ( 0 && this.runningTime && (this.checkSleepMaxCount > 100 ) && 
-			((__timer_getSEC() - this.runningTime) > 5) ){
-		this.checkSleepMaxCount --;
-	}
-
 	return false;
 };
 /**
@@ -1546,7 +4920,7 @@ Map.Tiles.prototype.clearTiles = function(evt){
 		}
 		// GR 11.03.2011 TBD if tiles are initially invisible, but in scale range, we must load them for themes
 		if ( (1||this.isAnyTiledLayerVisible()) &&
-		     (map.Scale.getTrueMapScale()*map.Scale.nZoomScale >= nLower) && (map.Scale.getTrueMapScale()*map.Scale.nZoomScale <= nUpper) ){ 
+		     (map.Scale.nTrueMapScale*map.Scale.nZoomScale >= nLower) && (map.Scale.nTrueMapScale*map.Scale.nZoomScale <= nUpper) ){ 
 			return false;
 		}
 		var tilesInfoA = this.getTileInfo();
@@ -1813,6 +5187,11 @@ Map.Event.prototype.defaultMouseOver = function(evt){
 		}
 	}
 
+	// GR 22.02.2018 non lecit call 
+	if (szMapToolType == ""){
+		return;
+	}
+
 	// mouse over popup window
 	if (SVGPopupGroup.fu.isContained(onoverShape) || SVGFixedGroup.fu.isContained(onoverShape)) {
 		if ( this.popupContextObj ){
@@ -1824,6 +5203,16 @@ Map.Event.prototype.defaultMouseOver = function(evt){
 		this.onoverPopup = false;
 	}
 		
+	// HTML interface interception
+	try{
+		if ( HTMLWindow.ixmaps.htmlgui_onItemClick(mapObject.szId) ){
+			__circleHighlight(evt,mapObject);
+			killTooltip();
+			return null;
+		}
+	}
+	catch (e){
+	}
 	// mouse over shape
 	if (( !this.onoverPopup					 ) && 
 		( __normalHighlight(evt,onoverShape) ) &&
@@ -1839,10 +5228,6 @@ Map.Event.prototype.defaultMouseOver = function(evt){
 		catch (e){
 		}
 	}else{
-		// GR 10.12.2013 test
-		if ( 0 && !this.onoverPopup ){
-			SVGPopupGroup.fu.clear();
-		}
 		__simpleHighlight(evt,onoverShape);
 		this.tooltipDone = displayTooltip(evt,onoverShape);
 	}
@@ -1903,7 +5288,7 @@ __simpleHighlightRemove = function(evt,onoverShape){
  * @param onovershape the shape that caused the mouse over
  * @return true if shape has been highlighted 
  */
-__normalHighlight = function(evt,onoverShape){
+var __normalHighlight = function(evt,onoverShape){
 
 	if (__isChart(evt,onoverShape)){
 		new MapObject(onoverShape).fu.scale(1.05,1.05);
@@ -1960,13 +5345,51 @@ __normalHighlight = function(evt,onoverShape){
 	return retVal;
 };
 /**
+ * handles highlighting of map shapes by drawing a circle around.
+ * checks active layer, tiles etc.
+ * @type boolean
+ * @param evt the event handle
+ * @param onovershape the shape that caused the mouse over
+ * @return true if shape has been highlighted 
+ */
+var __circleHighlight = function(evt,mapObject){
+
+	if ( !mapObject.objNode ){
+		mapObject = new MapObject(mapObject);
+	}
+	if ( !mapObject.objNode ){
+		return false;
+	}
+
+	if ( 0 ){
+		var highlightGroup = map.Dom.newGroup(map.Layer.objectGroup,":highlightgroup");
+		var itemNode = map.Dom.newGroup(highlightGroup);
+		var nRadius		 = map.Scale.normalX(50) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+		var nStrokeWidth = map.Scale.normalX(10) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+		map.Dom.newShape('circle',itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:black;stroke-width:"+(nStrokeWidth*1.1)+"px;pointer-events:none");
+		map.Dom.newShape('circle',itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:white;stroke-width:"+nStrokeWidth+"px;pointer-events:none");
+		itemNode.fu.setPosition(mapObject.objNode.parentNode.fu.getPosition().x,mapObject.objNode.parentNode.fu.getPosition().y);
+		return true;
+	}
+
+
+
+
+	if (highLightList && !highLightList.checkItem(mapObject.objNode)){
+		highLightList.unlock();
+		highLightList.removeAll();
+		highLightList.addItem(mapObject.objNode,"circle");
+		highLightList.lock();
+	}
+};
+/**
  * checks, if shapes is part of a chart.
  * @type boolean
  * @param evt the event handle
  * @param onovershape the shape that caused the mouse over
  * @return true if shape is part of a chart
  */
-__isChart = function(evt,onoverShape){
+var __isChart = function(evt,onoverShape){
 	mapObj = new MapObject(onoverShape);
 	if ( mapObj.szId.match(/chartgroup/) || mapObj.szId.match(/chart:box/) ){
 		var theme = map.Themes.getTheme(mapObj.szId.split(":")[0]);
@@ -2062,7 +5485,11 @@ Map.Event.prototype.defaultMouseClick = function(evt){
 	}
 	// HTML interface interception
 	try{
-		HTMLWindow.ixmaps.htmlgui_onItemClick(szId);
+		if ( HTMLWindow.ixmaps.htmlgui_onItemClick(szId) ){
+			__circleHighlight(evt,mapObject);
+			killTooltip();
+			return null;
+		}
 	}
 	catch (e){
 	}
@@ -2125,7 +5552,7 @@ Map.Event.prototype.defaultMouseDown = function(evt){
 		__setContextMenu(evt);
 		return;
 	}
-	if ( evt.button != 0 ){
+	if ( evt.button && (evt.button != 0) ){
 		return;
 	}
 	this.fMouseDown = true;
@@ -2503,15 +5930,13 @@ Map.Event.prototype.doDefaultZoom = function(evt){
 		}
 		try{
 			// set actul zoom and pan in html interface ( 1:xxx )
-			HTMLWindow.ixmaps.htmlgui_setScaleSelect(String(__formatValue(Math.floor(map.Scale.getTrueMapScale()*map.Scale.nZoomScale)),0,"BLANK"));
+			HTMLWindow.ixmaps.htmlgui_setScaleSelect(String(__formatValue(Math.floor(map.Scale.nTrueMapScale*map.Scale.nZoomScale)),0,"BLANK"));
 		}
 		catch (e){
 		}
 	}
 
 	zoomAndPanHistory.newItem();
-
-	map.Zoom.actualizeOverviewMap(evt);
 
 	map.Scale.refreshCSSStyles();
 
@@ -2587,7 +6012,7 @@ Map.Event.prototype.doPrintZoom = function(evt){
 
 	try{
 		// set actul zoom and pan in html interface ( 1:xxx )
-		HTMLWindow.ixmaps.htmlgui_setScaleSelect(String(__formatValue(Math.floor(map.Scale.getTrueMapScale()*map.Scale.nZoomScale)),0,"BLANK"));
+		HTMLWindow.ixmaps.htmlgui_setScaleSelect(String(__formatValue(Math.floor(map.Scale.nTrueMapScale*map.Scale.nZoomScale)),0,"BLANK"));
 		// report actual envelope 
 		HTMLWindow.ixmaps.htmlgui_setCurrentEnvelope(map.Zoom.getEnvelopeString(),(map.Scale.oldZoomScale != map.Scale.nZoomScale));
 	}
@@ -2812,11 +6237,6 @@ InfoContainer.prototype.create = function(){
 		this.ptOffset.x = -(this.ptOffset.x*2);
 		this.ptOffset.y = (this.ptOffset.y*3);
 	}
-	if(0 && fObjectPseudoShadow){
-		this.shadowNode = map.Dom.newShape('rect',this.objectNode,map.Scale.normalX(2),map.Scale.normalY(2),map.Scale.normalX(objectwidth),map.Scale.normalY(objectheight),"fill:#666666;stroke:#888888;opacity:0.6");
-		this.shadowNode.setAttributeNS(null,"rx",map.Scale.normalX(nInfoRoundRect));
-		this.shadowNode.setAttributeNS(null,"ry",map.Scale.normalX(nInfoRoundRect));
-	}
  	// create background  
 	this.frameNode = map.Dom.newShape('rect',this.objectNode,0,0,map.Scale.normalX(objectwidth),map.Scale.normalY(objectheight),"fill:#ffffff;stroke:black;stroke-width:"+map.Scale.normalX(0)+"");
 	this.frameNode.setAttributeNS(null,"rx",map.Scale.normalX(nInfoRoundRect*2));
@@ -2847,6 +6267,7 @@ InfoContainer.prototype.create = function(){
 		this.workspaceClipRect = map.Dom.setClipRect(this.workspaceNode,new box(0,0,objectwidth,objectheight));
 	}
 	this.objectNode.setAttributeNS(null,"onclick","map.Event.moveToFrontOfGroup(evt)");
+	this.objectNode.setAttributeNS(null,"ontouchend","map.Event.moveToFrontOfGroup(evt)");
 
 	// create the buttons
 	if ( this.szMode.match(/fix/) ){
@@ -3314,6 +6735,7 @@ Button.prototype.draw = function(evt) {
 			buttonRect.setAttributeNS(null,"onmouseup","map.Event.stopMouseEvent(evt)");
 			buttonRect.setAttributeNS(null,"onmouseout","map.Event.stopMouseEvent(evt)");
 			buttonRect.setAttributeNS(null,"onclick",this.szActionOn);
+			buttonRect.setAttributeNS(null,"ontouchend",this.szActionOn);
 			buttonRect.setAttributeNS(szMapNs,"tooltip",this.szTooltip);
 		}
 		var newText = map.Dom.newText(this.shapeObj,0,0,szFontStyle,szText);
@@ -3327,6 +6749,7 @@ Button.prototype.draw = function(evt) {
 		buttonNode.setAttributeNS(null,"onmouseup","map.Event.stopMouseEvent(evt)");
 		buttonNode.setAttributeNS(null,"onmousedown","map.Event.stopMouseEvent(evt)");
 		buttonNode.setAttributeNS(null,"onclick",this.szActionOn);
+		buttonNode.setAttributeNS(null,"ontouchend",this.szActionOn);
 		buttonNode.setAttributeNS(szMapNs,"tooltip",this.szTooltip);
 		this.buttonNode = buttonNode;
 	}
@@ -3377,6 +6800,7 @@ Button.prototype.setActionOn = function(szActionOn) {
 	this.szActionOn = szActionOn;
 	if (this.buttonNode){
 		this.buttonNode.setAttributeNS(null,"onclick",this.szActionOn);
+		this.buttonNode.setAttributeNS(null,"ontouchend",this.szActionOn);
 	}
 };
 /**
@@ -5132,10 +8556,6 @@ setMapTool = function(szType){
 	if ( (szType == "pan") ){
 		deactivateTheme(_activeTheme);
 	}
-	if (szType == "overviewmap" ){
-		map.Zoom.showOverviewMap();
-		return;
-	}
 
 	// GR 12.07.2013 clear overlays
 	killTooltip();
@@ -5154,14 +8574,6 @@ setMapTool = function(szType){
 	catch (e){
 	}
 
-};
-/**
- * get actual map tool name
- * @type string
- * @return string that describes the tool type ( "zoomarea",...)
- */
-getMapTool = function(){
-	return szMapToolType;
 };
 
 /**
@@ -5686,9 +9098,11 @@ HighLight.prototype.unlock = function(){
  * @return A new HighLightItem Object
  */
 function HighLightItem(itemNode,szMode) {
-	itemNode = map.Layer.getLayerItemNodeOfNode(itemNode);
-	if ( !itemNode ){
-		return null;
+	if ( szMode != "circle" ){
+		itemNode = map.Layer.getLayerItemNodeOfNode(itemNode);
+		if ( !itemNode ){
+			return null;
+		}
 	}
 	/** the DOM node to be highlighted @type DOM node */
 	this.node = itemNode;
@@ -5703,6 +9117,19 @@ function HighLightItem(itemNode,szMode) {
 HighLightItem.prototype.doHighLight = function(){
 	var onoverShape = this.node;
 	if (onoverShape){
+
+		if ( this.szMode && this.szMode == "circle"){
+			this.highlightGroup = map.Dom.newGroup(map.Layer.objectGroup,":highlightgroup");
+			this.itemNode = map.Dom.newGroup(this.highlightGroup);
+			var nRadius		 = map.Scale.normalX(50) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+			var nStrokeWidth = map.Scale.normalX(10) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+			var nDash = map.Scale.normalX(5) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+			map.Dom.newShape('circle',this.itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:black;stroke-dasharray:"+nDash+" "+nDash+";stroke-width:"+(nStrokeWidth*1.1)+"px;pointer-events:none");
+			map.Dom.newShape('circle',this.itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:white;stroke-dasharray:"+nDash+" "+nDash+";stroke-width:"+nStrokeWidth+"px;pointer-events:none");
+			this.itemNode.fu.setPosition(this.node.parentNode.fu.getPosition().x,this.node.parentNode.fu.getPosition().y);
+			return true;
+		}
+
 		var mapObj = new MapObject(onoverShape);
 		var layerInfo = map.Layer.getLayerObj(mapObj.szId);
 		var szHighlightStyle = layerInfo.szHighlight;
@@ -5786,9 +9213,7 @@ HighLightItem.prototype.doHighLight = function(){
 			this.highlighted = true;
 			return true;
 		}
-		else{
-			return false;
-		}
+
 	return false;
 	}
 };
@@ -5818,7 +9243,7 @@ var __info_infoShape = null;
 function displayInfo(evt,infoShape,szMode){
 
 	var position = null;
-	if (evt){
+	if (evt && !evt.touches){
 		position = map.Scale.getClientMousePosition(evt,SVGPopupGroup);
 	}
 	else{
@@ -5839,6 +9264,10 @@ function displayInfo(evt,infoShape,szMode){
 		return doDisplayInfo(position.x,position.y,szMode);
 	}
 }
+Map.prototype.displayInfo = function(evt,infoShape,szMode){
+	displayInfo(evt,infoShape,szMode);
+};
+
 /**
  * Clear the info timeout, so a pending info display is not executed.
  * Called if the mouse gets 'out', or before a new info display is defined.
@@ -5959,7 +9388,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 	var szInfoTitle = map.Label.getLabel(szObjId);
 
 	// GR 13.05.2016 if no title yet, try to get it from the active theme
-	if ( !szInfoTitle && map.Themes.activeTheme ){
+	if ( map.Themes.activeTheme ){
 		szInfoTitle = map.Themes.getTitle(szObjId,map.Themes.activeTheme);
 	}
 
@@ -6016,7 +9445,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 					}
 				}
 				if ( !chartGroup.hasChildNodes() ){
-					var chartId = infoShape.getAttributeNS(null,"id");
+					var chartId = infoShape.getAttributeNS(null,"id")||"";
 					_TRACE("now try this  '"+chartId.split(":")[1]+"'");
 					szShapeId = chartId.split(":")[1];
 					if ( szShapeId ){
@@ -6118,7 +9547,8 @@ doDisplayInfo = function(xPos,yPos,szMode){
 			}else{
 				ptNull = map.Themes.getChart(szShapeId,chartGroup,"VALUES|ZOOM|AXIS",chartTheme);
 				// GR 10.02.2017 test second chart to show the labels
-				if ( chartTheme.szFlag.match(/PIE/) ){
+				//if ( chartTheme.szFlag.match(/PIE/) && (chartTheme.partsA.length > 1) ){
+				if ( chartTheme.szFlag.match(/COUNTS/) && (chartTheme.partsA.length > 1) ){
 					var xGroup = map.Dom.newGroup(chartGroup,"info:chart:x");
 					var temp = chartTheme.nNormalSizeValue;
 					chartTheme.nNormalSizeValue = map.Themes.getMaxValue(szShapeId,chartTheme)*10;
@@ -6272,7 +9702,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 		// make info text grid
 		// ===================
 		if ( textA.length ){
-			var newText = createTextGrid(SVGDocument,infoWorkspace,szInfoId+":textgrid",textA,2);
+			var newText = createTextGrid(SVGDocument,infoWorkspace,szInfoId+":textgrid",textA,2,14);
 			newText.fu.setPosition(map.Scale.normalX(5),contentBox.height);
 		}
 
@@ -6349,6 +9779,9 @@ _removeInfo = function(evt){
 		setTimeout("_removeInfo()",250);
 	}
 };
+Map.prototype.removeInfo = function(){
+		SVGFixedGroup.fu.clear();
+};
 
 /**
  * helper to delay the info display
@@ -6424,19 +9857,34 @@ createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumn
 	// create field rect for the values
 	var fBgPattern = SVGDocument.getElementById("TextLinesBgPattern");
 	szStyle = bgStyle?bgStyle:"fill:#ffffff;stroke:"+(szTextGridStyle.match(/background/)?"1":"none");
+
 	// finally create the text 
 	var newBgA = new Array(0);
 	var newLA = new Array(0);
+
+	// this we need later to reposition text elements by line height
+	var nodeA = new Array(lines);
+	for (var i = 0; i < lines; i++) {
+	  nodeA[i] = new Array(nColumns);
+	}
+
 	var newxGroup = map.Dom.newNode('g',newGroup);
 	var xOffset = map.Scale.normalX(5);
 	var yOffset = map.Scale.normalX(3);
+	var maxWidth = Math.min(map.Scale.normalX(250),map.Scale.bBox.width/5);
 
 	for (c=0;c<nColumns;c++ ){
+		var dy = map.Scale.normalY(lineheight);
 		for (i=0;i<lines;i++){
 			if ( nColumns > 1 && c==0 && !fBgPattern && szTextGridStyle.match(/background/) && (!szTextGridStyle.match(/alternate/)||i%2) ){
-				newBgA[i] = map.Dom.newShape('rect',newxGroup,0,map.Scale.normalY((i)*lineheight+2)+yOffset,100,map.Scale.normalY(lineheight-1),"fill:#f0f0f0;stroke:none;opacity:1.0");
+				//newBgA[i] = map.Dom.newShape('rect',newxGroup,0,map.Scale.normalY((i)*lineheight+2)+yOffset,100,map.Scale.normalY(lineheight-1),"fill:#f0f0f0;stroke:none;opacity:1.0");
 			}
-			var newLine = map.Dom.newText(newxGroup,0,(i+1)*map.Scale.normalY(lineheight),"font-family:arial;font-size:"+map.Scale.normalY(fontheight)+"px;fill:"+szInfoBodyColor+"",textArray[i+c*lines]);
+			var newLine = map.Dom.newText(newxGroup,0,dy,"font-family:arial;font-size:"+map.Scale.normalY(fontheight)+"px;fill:"+szInfoBodyColor+"",textArray[i+c*lines]);
+
+			map.Dom.wrapText(newLine,maxWidth);
+
+			nodeA[i][c] = newLine;
+			
 			newLA[i] = newLine;
 			if (nColumns > 1 && c==0 && !fBgPattern){
 				if (szTextGridStyle.match(/firstsmall/)){
@@ -6480,6 +9928,24 @@ createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumn
 			var bgWidth = xOffset;
 		}
 	}
+
+	// reposition (y) text elements line by line
+
+	var dY = map.Scale.normalY(lineheight);
+	for (var i=0;i<lines;i++){
+		var maxY = map.Scale.normalY(lineheight);
+		for (var c=0;c<nColumns;c++){
+			maxY = Math.max(maxY,map.Dom.getBox(nodeA[i][c]).height);
+			//maxY = Math.max(nodeA[i][c].getAttributeNS(null,"y"));
+		}
+		for (var c=0;c<nColumns;c++){
+			var matrixA = getMatrix(nodeA[i][c]);
+			matrixA[5] += dY;
+			setMatrix(nodeA[i][c],matrixA);
+		}
+		dY += maxY+map.Scale.normalY(2);
+	}
+
 	bBox = map.Dom.getBox(newxGroup);
 	for (i=0;i<lines;i++){
 		if (newBgA[i]){
@@ -6530,11 +9996,7 @@ function createTextField(SVGDocument,SVGTargetGroup,szId,szText,fontheight){
 		__textField_shadow = newShadow;
 		__textField_fontheight = fontheight;
 
-		if ( 0 && szViewer.match(/Netscape/) ){
-			setTimeout("sizeTextField()",10);
-		}else{
-			sizeTextField();
-		}
+		sizeTextField();
 		
 		return newGroup;
 	}
@@ -6574,7 +10036,7 @@ function displayScale(evt,szPosition){
 		return;
 	}
 	var fontheight   = 12;
-	var nScale		 = map.Scale.getTrueMapScale()*map.Scale.nZoomScale;
+	var nScale		 = map.Scale.nTrueMapScale*map.Scale.nZoomScale;
 	var nDez		 = 0;
 
 	// calculate the units of the scale
@@ -6598,17 +10060,16 @@ function displayScale(evt,szPosition){
 	}
 	// get the unit in SVG width
 	var nScaleUnitWidth = (nScale/(map.Scale.nMapScale*map.Scale.nZoomScale)) * (map.Scale.nMapPPI/nInch);
-
+ 
 	// prepare the scale display group
 	var scaleGroup = map.Dom.getObjectById("legend:scalegroup");
 	if (!scaleGroup){
-		return;
+		scaleGroup = map.Dom.newGroup(SVGMenuGroup,'legend:scalegroup');
 	}
 	if (!scaleGroup.hasChildNodes() && !szPosition){
-		return;
+		//return;
 	}
 	scaleGroup.fu.clear();
-
 	var szBarUnits  = scaleGroup.getAttributeNS(szMapNs,"scaleunits");
 	var szBarColor  = scaleGroup.getAttributeNS(szMapNs,"barcolor");
 	var szBarBgColor  = scaleGroup.getAttributeNS(szMapNs,"bgcolor");
@@ -6643,7 +10104,7 @@ function displayScale(evt,szPosition){
 
 	// make the scale text ( 1:xxx )
 	if ( 1 ){
-		var nDispScale = map.Scale.getTrueMapScale()*map.Scale.nZoomScale;
+		var nDispScale = map.Scale.nTrueMapScale*map.Scale.nZoomScale;
 		if ( nDispScale >= 1 ){
 			var szScale = "1:"+String(__formatValue(nDispScale,0,"BLANK"));
 		}
@@ -6657,52 +10118,47 @@ function displayScale(evt,szPosition){
 	var nFrame = 2;
 
 	if ( nBarMaxWidth > 0 ){
-	// make the scale measurement graphic
-	var nXpos = 0;
-	var nYpos = 5;
-	var szUnits = szBarUnits.length?szBarUnits:"meters";
-	var nUnits = 100;
-	if ( szUnits == 'feet' ){
-		nUnits = 33.3;
-		if (nScale>30000){
-			szUnits = "miles";
-			nUnits = 5280*33.3;
+		// make the scale measurement graphic
+		var nXpos = 0;
+		var nYpos = 5;
+		var szUnits = szBarUnits.length?szBarUnits:"meters";
+		var nUnits = 100;
+		if ( szUnits == 'feet' ){
+			nUnits = 33.3;
+			if (nScale>30000){
+				szUnits = "miles";
+				nUnits = 5280*33.3;
+			}
 		}
-	}
-	else
-		if (nScale>10000){
-			szUnits = "km";
-			nUnits = 100000;
-	}
-	for (var i=0;i<20 ;i++ ){
-		var szStyle = i%2==1?szBarStyle1:szBarStyle2;
-		map.Dom.newShape('rect',scaleGroup,map.Scale.normalX(nXpos),map.Scale.normalY(nYpos),map.Scale.normalX(nScaleUnitWidth),map.Scale.normalY(5),szStyle);
-		var nText = Math.floor(nScale/nUnits*i*100)/100;
-		var szText = szUnits;
-		if ( i > 0 ){
-			szText = Math.floor(nText)!=nText?String(nText):String(Math.floor(nText));
+		else
+			if (nScale>10000){
+				szUnits = "km";
+				nUnits = 100000;
 		}
-		map.Dom.newText(scaleGroup,(i === 0)?map.Scale.normalX(nXpos):map.Scale.normalX(nXpos-4),map.Scale.normalY(nYpos+5+fontheight/3*2),"font-family:arial;font-size:"+map.Scale.normalY(fontheight/3*2)+"px;fill:"+szInfoBodyColor+";pointer-events:none;",szText);
+		for (var i=0;i<20 ;i++ ){
+			var szStyle = i%2==1?szBarStyle1:szBarStyle2;
+			map.Dom.newShape('rect',scaleGroup,map.Scale.normalX(nXpos),map.Scale.normalY(nYpos),map.Scale.normalX(nScaleUnitWidth),map.Scale.normalY(5),szStyle);
+			var nText = Math.floor(nScale/nUnits*i*100)/100;
+			var szText = szUnits;
+			if ( i > 0 ){
+				szText = Math.floor(nText)!=nText?String(nText):String(Math.floor(nText));
+			}
+			map.Dom.newText(scaleGroup,(i === 0)?map.Scale.normalX(nXpos):map.Scale.normalX(nXpos-4),map.Scale.normalY(nYpos+5+fontheight/3*2),"font-family:arial;font-size:"+map.Scale.normalY(fontheight/3*2)+"px;fill:"+szInfoBodyColor+";pointer-events:none;",szText);
 
-		nXpos += nScaleUnitWidth;
-		if ( ( (nBarMaxWidth > 1) && (nXpos > nBarMaxWidth) ) ||
-			 ( map.Scale.mapPosition.x && (map.Scale.normalX(nXpos) > map.Scale.bBox.width*9/10))	|| 
-			 (!map.Scale.mapPosition.x && (map.Scale.normalX(nXpos) > map.Scale.bBox.width/2))	){
-			break;
+			nXpos += nScaleUnitWidth;
+			if ( ( (nBarMaxWidth > 1) && (nXpos > nBarMaxWidth) ) ||
+				 ( map.Scale.mapPosition.x && (map.Scale.normalX(nXpos) > map.Scale.bBox.width*9/10))	|| 
+				 (!map.Scale.mapPosition.x && (map.Scale.normalX(nXpos) > map.Scale.bBox.width/2))	){
+				break;
+			}
 		}
-	}
-	var perCm = ((map.Scale.getTrueMapScale()*map.Scale.nZoomScale)/nUnits);
-	if ( perCm > 100 ){
-		perCm = Math.round(perCm);
-	}
-	else{
-		perCm = Math.round(perCm*100)/100;
-	}
-	if ( 0 ){
-		szText = "One Centimeter = "+perCm+" "+szUnits;
-		nXpos = map.Dom.getBox(textNode).width+map.Scale.normalX(10);
-		map.Dom.newText(scaleGroup,nXpos,map.Scale.normalY(nYpos-3),"font-family:arial;font-size:"+map.Scale.normalY(fontheight/3*2)+"px;fill:"+szInfoBodyColor+";pointer-events:none;",szText);
-	}
+		var perCm = ((map.Scale.nTrueMapScale*map.Scale.nZoomScale)/nUnits);
+		if ( perCm > 100 ){
+			perCm = Math.round(perCm);
+		}
+		else{
+			perCm = Math.round(perCm*100)/100;
+		}
 	}else{
 		// make dummy rect
 		map.Dom.newShape('rect',scaleGroup,map.Scale.normalX(50),map.Scale.normalY(20),map.Scale.normalX(1),map.Scale.normalY(1),"fill:white;opacity:0;");
@@ -6719,7 +10175,7 @@ function displayScale(evt,szPosition){
 		bgRect.setAttributeNS(null,"rx",map.Scale.normalY(2));
 		bgRect.setAttributeNS(null,"ry",map.Scale.normalY(2));
 	}
-
+	
 	// position the scale
 	if (szPosition){
 		var nXoff = map.Scale.normalX(8);
@@ -6735,6 +10191,7 @@ function displayScale(evt,szPosition){
 			scaleGroup.fu.setPosition(xpos+nMapBorder,-bBox.y+map.Scale.normalY(nFrame)+map.Scale.normalY(1)+nMapBorder);
 		}
 	}
+	scaleGroup.fu.setPosition(50,map.Scale.normalY(map.Scale.getEmbedHeight()/map.Scale.getEmbedScale())-90);
 
 	if (bgRect){
 		var szNextPosition = scaleGroup.fu.getPosition().y>map.Scale.normalY(100)?'top':'bottom';
@@ -6745,6 +10202,7 @@ function displayScale(evt,szPosition){
 		SVGPopupGroup.fu.clear();
 		scaleGroup.setAttributeNS(szMapNs,"tooltip","click to move it");
 	}
+
 }
 
 // .............................................................................
@@ -6939,10 +10397,6 @@ Map.Legend.prototype.init = function(evt){
 		this.blockRecursion = false;
 	}
 
-	if (0 && legendBodyWorkspace){
-		legendBodyWorkspace.setAttributeNS(null,"transform","");
-	}
-
 	// get the elements (header,body,footer) of the legend
 	try {
 		var legendBox = map.Dom.getBox(legendBodyWorkspace?legendBodyWorkspace:legendBody);
@@ -6967,13 +10421,6 @@ Map.Legend.prototype.init = function(evt){
 				}
 			}
 		}
-	}
-	if (legendToolbar && (legendToolbar.parentNode == legendBodyFt)){
-		var overviewMap = SVGDoc.getElementById("legend:overviewmap");
-		overviewMap.fu = new Methods(overviewMap);
-		legendToolbar.fu = new Methods(legendToolbar);
-		var toolBox = legendToolbar.fu.getBox();
-		overviewMap.fu.setPosition(overviewMap.fu.getPosition().x,toolBox.height);
 	}
 	if ( headerBox.y || headerBox.height ){
 		legendBodyFr.fu = new Methods(legendBodyFr);
@@ -7035,11 +10482,7 @@ Map.Legend.prototype.init = function(evt){
 					if( fMapBorder3D && SVGDocument.getElementById(szShadowFilterId) ){
 						xButtonObj.nodeObj.style.setProperty("filter","url(#"+szShadowFilterId+")","");
 					}
-					if ( 0 && style == 1 ){
-						xButtonObj.setPosition(map.Scale.normalX(9),map.Scale.mapPosition.y+map.Scale.normalY(10));
-					}else{
-						xButtonObj.setPosition(map.Scale.normalX(9),map.Scale.mapOffset.y+map.Scale.normalY(14));
-					}
+					xButtonObj.setPosition(map.Scale.normalX(9),map.Scale.mapOffset.y+map.Scale.normalY(14));
 				}
 			}
 		}
@@ -7113,14 +10556,8 @@ Map.Legend.prototype.init = function(evt){
 
 		if (legendBodyFt){
 			legendBodyFt.fu = new Methods(legendBodyFt);
-			// if legend not in map, footer on fix position
-			if ( 1 || map.Scale.viewBox.width-map.Scale.bBox.width > 0 ){
-				legendBodyFt.fu.setPosition(0,map.Scale.legendHeight-footerBox.height-map.Scale.normalY(2)); //-map.Scale.normalY(6));
-			}
-			// if legend in map, footer on variable position
-			else{
-				legendBodyFt.fu.setPosition(0,Math.min(headerBox.height+legendBox.height,map.Scale.legendHeight-footerBox.height));
-			}
+			// footer on fix position
+			legendBodyFt.fu.setPosition(0,map.Scale.legendHeight-footerBox.height-map.Scale.normalY(2)); //-map.Scale.normalY(6));
 			// clip the footer
 			map.Dom.setClipRect(legendBodyFt,new box(0,0,map.Scale.legendWidth-map.Scale.normalX(1),map.Scale.viewBox.height));
 		}
@@ -7147,21 +10584,12 @@ Map.Legend.prototype.init = function(evt){
 			if ( 1 || legendBox.height > nMaxLegendBoxHeight){
 				var legendBodyFrMove = SVGDoc.getElementById("legend_body:workspace:movabley");
 				if (legendBodyFrMove){
-
-					if (1){
-						var maxBox = new box(newClipRect.getAttributeNS(null,"x"),newClipRect.getAttributeNS(null,"y"),newClipRect.getAttributeNS(null,"width"),newClipRect.getAttributeNS(null,"height"));
-						this.scrollObj = new ScrollArea(evt,null,null,maxBox.width/map.Scale.normalX(1),maxBox.height/map.Scale.normalY(1),scrollBarWidth);
-						this.scrollObj.workspaceNode = legendBodyFrMove;
-						this.scrollObj.cliprectNode = newClipRect;
-						if ( this.scrollObj ){
-							this.scrollObj.reformat(evt);
-						}
-					}
-					else{
-						this.scrollObj = new ScrollBar(legendBodyFrMove,new point(0,0),map.Dom.getBox(newClipRect),map.Scale.normalX(scrollBarWidth),map.Scale.normalY(scrollBarWidth),map.Scale.normalX(1) );
-						if ( this.scrollObj ){
-							this.scrollObj.draw(evt);
-						}
+					var maxBox = new box(newClipRect.getAttributeNS(null,"x"),newClipRect.getAttributeNS(null,"y"),newClipRect.getAttributeNS(null,"width"),newClipRect.getAttributeNS(null,"height"));
+					this.scrollObj = new ScrollArea(evt,null,null,maxBox.width/map.Scale.normalX(1),maxBox.height/map.Scale.normalY(1),scrollBarWidth);
+					this.scrollObj.workspaceNode = legendBodyFrMove;
+					this.scrollObj.cliprectNode = newClipRect;
+					if ( this.scrollObj ){
+						this.scrollObj.reformat(evt);
 					}
 				}
 			}
@@ -7319,10 +10747,6 @@ Map.Legend.prototype.checkGroupCollapse = function(evt,leadNode){
 					var szIdA = szId.split(':');
 					if ( szIdA[0] == 'legend' && szIdA[1] == 'item' ){
 						var collapseButtonNode = SVGDoc.getElementById("legend:collapse:"+szIdA[2]);
-						// GR 14.12.2006 layer checkboxes no longer collapse groups
-						if ( 0 && !collapseButtonNode ){
-							collapseButtonNode = SVGDoc.getElementById("legend:off:"+szIdA[2]);
-						}
 						this.legendMouseClick(evt,collapseButtonNode);
 					}
 				}

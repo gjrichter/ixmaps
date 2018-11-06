@@ -586,16 +586,16 @@ MapSelection.prototype.selectShapes = function(startIndex){
 			this.nSum		 = 0;
 			this.nCount		 = 0;
 			this.nExactCount = 0;
-			this.nMin		 = 100000000000;
-			this.nMax		 = 0;
-			this.nMinSize = 300000000;
-			this.nMaxSize = 0;
+			this.nMin		 = Number.MAX_VALUE;
+			this.nMax		 = -Number.MAX_VALUE;
+			this.nMinSize = Number.MAX_VALUE;
+			this.nMaxSize = -Number.MAX_VALUE;
 			this.nSumSize = 0;
 			for ( var k=0;k<map.Themes.activeTheme.szFieldsA.length;k++){
 				this.nOrigValuesSumA[k] = 0;
 				this.nValuesSumA[k] = 0;
-				this.nValuesMinA[k] = 100000000000;
-				this.nValuesMaxA[k] = 0;
+				this.nValuesMinA[k] = Number.MAX_VALUE;
+				this.nValuesMaxA[k] = -Number.MAX_VALUE;
 			}
 			for ( var i=0; i<this.partsA.length; i++ ){
 				this.partsA[i].nCount = 0;
@@ -1064,7 +1064,7 @@ MapSelection.prototype.showInfo = function(fDone){
 		this.drawTextforOneQuadrant = this.activeTheme.drawTextforOneQuadrant;
 		this.createTextLabel = this.activeTheme.createTextLabel;
 
-		// 1. themes with 1 value (choroplethe or bubble,square ...
+		// 1. themes with 1 value (CHOROPLETH or bubble,square ...
 		// ---------------------------------------------------------
 		if ( this.nValuesSumA.length == 1 ){
 
@@ -1403,17 +1403,12 @@ MapSelection.prototype.showInfo = function(fDone){
 					nChartScale = 1.8;
 				}
 
-				//GR 11.03.2013 try! for SEQUENC themes, make colorschemelegend and not sum chart
-				if ( 1 || this.szFlag.match(/SEQUENCE/) ){
-					this.drawColorSchemeLegend = this.activeTheme.drawColorSchemeLegend;
-					this.nOrigSumA = this.activeTheme.nOrigSumA;
-					this.nSum = this.activeTheme.nSum;
-					this.szField100 = this.activeTheme.szField100;
-					var legendNode = this.drawColorSchemeLegend(chartGroup,"test");
-					legendNode.fu.scale(0.9/nChartScale,0.9/nChartScale);
-				}else{
-					var ptNull = map.Themes.getChart(null,chartGroup,this.szFlag.match(/SIZE/)?"VALUES|NORMSIZE|AXIS":"VALUES|NORMSIZE|AXIS",this);
-				}
+				this.drawColorSchemeLegend = this.activeTheme.drawColorSchemeLegend;
+				this.nOrigSumA = this.activeTheme.nOrigSumA;
+				this.nSum = this.activeTheme.nSum;
+				this.szField100 = this.activeTheme.szField100;
+				var legendNode = this.drawColorSchemeLegend(chartGroup,"test");
+				legendNode.fu.scale(0.9/nChartScale,0.9/nChartScale);
 
 				var chartBox = map.Dom.getBox(chartGroup);
 				if ( chartBox.width > 0 && chartBox.height > 0){
@@ -1436,23 +1431,6 @@ MapSelection.prototype.showInfo = function(fDone){
 	// restore saved value
 	szTextGridStyle = temp;
 
-	// GR 04.12.2008 test test test	
-	if ( 0 && this.activeTheme.szFlag.match(/CHOROPLETHE/) ){
-		var szColor = "yellow";
-		var nValue = Number(this.nValuesSumA[0])/this.nCount;
-		if(this.fField100) {
-			nValue = Number(this.itemA["selection"].nValuesA[0]);
-		}
-		for ( var i=0;i<this.partsA.length;i++ ){
-			if (nValue < this.partsA[i].max){
-				szColor = this.partsA[i].color;
-				break;
-			}
-		}
-		for ( var i=0;i<this.highLightList.itemA.length; i++ ){
-			this.highLightList.itemA[i].itemNode.style.setProperty("fill",szColor,"");
-		} 
-	}
 };
 
 /**

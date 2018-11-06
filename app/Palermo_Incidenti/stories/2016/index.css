@@ -175,12 +175,12 @@ p{
 	.fp-controlArrow.fp-prev {
 		left: 15px;
 		width: 0;
-		border-width: 38.5px 34px 38.5px 0;
+		border-width: 26.5px 27px 26.5px 0;
 		border-color: transparent #ddd transparent transparent;
 	}
 	.fp-controlArrow.fp-next {
 		right: 15px;
-		border-width: 38.5px 0 38.5px 34px;
+		border-width: 26.5px 0 26.5px 27px;
 		border-color: transparent transparent transparent #ddd;
 	}
 

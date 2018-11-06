@@ -1,0 +1,1257 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<title>IXMAPS embed</title>
+	<meta name="Author" content="Guenter Richter" />
+	<meta name="Keywords" content="map SVG HTML5 Javascript maps interactive charts ixmaps" />
+	<meta name="Description" content="core html page for ixmaps SVG interactive map applications in overlay on leaflet basemaps"
+	/>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+	<!-- IE Fix for HTML5 Tags -->
+	<!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+	<!--========================================================================= 
+	  we need scripting
+	<!--========================================================================= -->
+
+	<noscript>
+		<div style="position:absolute;top:100px;left:100px;width:500px">
+			<b>JavaScript must be enabled in order for you to use iXMaps.</b>
+			<br>
+			<br> However, it seems JavaScript is either disabled or not supported by your browser. To view the map application, enable
+			JavaScript by changing your browser options, and then try again.</div>
+	</noscript>
+
+	<!--========================================================================= -->
+
+	<link rel="shortcut icon" href="../resources/images/ixmaps_logo.png" />
+
+	<link rel="stylesheet" type="text/css" href="../../ui/html/assets/css/icomoon.css" />
+	<link rel="stylesheet" type="text/css" href="../../ui/libs/jquery/ui/css/smoothness/jquery-ui-1.8.16.custom.css" />
+	<link rel="stylesheet" type="text/css" href="../css/jquery-ui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/custom.css" />
+	<link rel="stylesheet" type="text/css" href="../css/messagebox.css" />
+	<link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
+	<link rel="stylesheet" type="text/css" href="../css/legend.css" />
+
+	<!--========================================================================= -->
+
+	<style type="text/css">
+		a:hover {
+			background-color: yellow;
+			text-decoration: underline;
+		}
+	</style>
+	<style type="text/css">
+		/* style the scrollbar */
+
+		::-webkit-scrollbar {
+			width: 15px;
+		}
+
+		/* Track */
+
+		::-webkit-scrollbar-track {
+			box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+			-webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+			-webkit-border-radius: 0px;
+			border-radius: 0px;
+		}
+
+		/* Handle */
+
+		::-webkit-scrollbar-thumb {
+			-webkit-border-radius: 0px;
+			border-radius: 0px;
+			background: rgba(212, 212, 212, 0.6);
+			box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.1);
+			-webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.1);
+		}
+
+		::-webkit-scrollbar-thumb:window-inactive {
+			background: rgba(222, 222, 222, 0.4);
+		}
+
+		/* popup dialogs */
+
+		.ui-dialog {
+			opacity: 1;
+			-moz-box-shadow: 0px 0px 0px #888;
+			-webkit-box-shadow: 0px 0px 0px #888;
+			box-shadow: 0px 0px 0px #888;
+			border: solid #888 0.5px;
+		}
+
+		.ui-dialog-title {
+			font-size: 0.9em;
+		}
+
+		.ui-dialog .ui-dialog-titlebar {
+			padding: 0.5em 0.5em 0.6em 0.7em;
+			margin-bottom: 0.3em;
+		}
+
+		.ui-dialog .ui-dialog-content {
+			margin: 0 0.3em 0.5em 0.3em;
+		}
+
+		.ui-dialog .ui-dialog-titlebar-close {
+			padding: 5px;
+		}
+
+		.ui-dialog .ui-dialog-titlebar-close:hover,
+		.ui-dialog .ui-dialog-titlebar-close:focus {
+			padding: 4px;
+			background: none;
+		}
+
+		.toolbutton {
+			background: #ffffff;
+			background-size: 8px;
+			border: #aaa solid 0.5px;
+			border-radius: 0.5em;
+		}
+
+		#switchmodebutton {
+			background: #ffffff url(../resources/images/info.png) no-repeat 95% 95%;
+			background-size: 14px;
+		}
+
+		/* geo search */
+
+		.search-box {
+			width: 275px;
+			margin: 0;
+			float: left;
+			outline: none;
+			font-size: 1.2em;
+			border: 0;
+			margin-left: 0.2em;
+		}
+
+		.search-container {
+			width: 275px;
+			margin: 0;
+			float: left;
+			outline: none;
+			border: 1px solid #ddd;
+			font-size: 1.1em;
+			border-radius: 6px;
+			background: #ffffff url(../resources/images/search.png) no-repeat 98% 50%;
+			background-size: 28px;
+		}
+
+		.search-btn {
+			background-color: #0079c6;
+			padding: 9px 13px;
+			color: white;
+			float: left;
+			font-size: 0.9em;
+			cursor: pointer;
+			border-radius: 6px;
+			-moz-box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
+			;
+			-webkit-box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
+			;
+			box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
+			;
+		}
+
+		.result-list {
+			font-family: Verdana, Helvetica, arial;
+			display: none;
+			border: 1px solid lightgray;
+			border-top: none;
+			position: absolute;
+			z-index: 9999;
+			box-sizing: border-box;
+			font-size: 1.2em;
+			-moz-box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
+			;
+			-webkit-box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
+			;
+			box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
+			;
+		}
+
+		.result-item {
+			background-color: white;
+			border-bottom: 1px solid lightgray;
+			padding: 8px;
+			cursor: pointer;
+			width: auto;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+
+		.result-item:last-child {
+			border: none;
+		}
+
+		.result-item.selected {
+			background-color: whitesmoke;
+		}
+
+		/* color select */
+
+		.colorlist {
+			padding: 0px;
+			margin: 0px;
+			margin-left: -10px;
+			border: 0;
+		}
+
+		.colorlistitem {
+			padding: 1px;
+			margin: 3px;
+			border: 0;
+		}
+
+		.colorlistitem>a {
+			text-decoration: none;
+			padding: 3px;
+			margin: 3px;
+			border: 0;
+		}
+
+		.colorlistitem>a:hover {
+			text-decoration: none;
+			background: #fd8;
+		}
+
+		/* theme legend */
+
+		a.theme-button {
+			text-decoration: none;
+			margin-right: 0.01em;
+		}
+
+		span.theme-button {
+			font-size: 14px;
+			color: #444444;
+			background: #ffffff;
+			padding: 0.5em;
+		}
+
+		span.legend-button-settings {
+			color: #eeeeee;
+		}
+
+		table.theme-legend {
+			font-size: 0.8em;
+			line-height: 0.9em;
+			color: #888888;
+			max-width: 300px;
+		}
+
+
+		td.theme-legend {
+			max-width: 200px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		td.theme-legend-count {
+			min-width: 60px;
+			overflow: hidden;
+		}
+
+		tr.theme-legend-item-selected {
+			background: #F9F4C2;
+		}
+
+		/* loading message */
+
+		.loading-text-div {
+			position: absolute;
+			top: 47%;
+			width: 100%;
+			opacity: 1;
+			z-index: 99;
+			text-align: center;
+		}
+
+		.loading-text {
+			font-family: arial;
+			font-size: 48px;
+			opacity: 1;
+			color: #777;
+			padding: 3px 1em 3px 1em;
+			border: solid #666 1px;
+			border-radius: 0.2em;
+			background: rgb(255, 255, 255, 0.6 );
+		}
+
+		#loading-gif {
+			margin-top: -1em;
+		}
+
+		#loading-gif>img {
+			display: block;
+			margin: 1em auto;
+			height: 64px;
+		}
+
+
+		#divlogo {
+			pointer-events:none;
+			z-index:99;
+			visibility:hidden;
+			}
+		#logo-image {
+			position:absolute;
+			top:60px;
+			left:10px;
+			padding-top:2px;
+			padding-left:5px;
+			padding-right:5px;
+			background: rgba(255, 255, 255, 0.9);
+			border-radius:2px
+			}
+		#logo-image span {
+			font-family:helvetica,arial,sans;
+			color:#444;
+			font-size:0.7em;
+			vertical-align:3px;
+			padding:0px;
+			margin:0px;
+			}
+		#logo-image img {
+			height:12px;
+			}
+
+		#attribution-div {
+			position:absolute;
+			bottom:0px;
+			left:0px;
+			z-index:999
+			}
+		#attribution {
+			font-family: arial;
+			font-size: 12px;
+			color:#666;
+			background-color:rgba(255,255,255,0.5);
+			margin-left:50px;
+			padding: 0.1em 0.5em;
+			}
+
+		/* map */
+
+		#attribution a {
+			text-decoration: none;
+			color: #428bca;
+			font-family: helvetica, arial, sans;
+			font-size: 12px;
+		}
+
+
+		p.legend-description {
+			margin-top: 1em;
+			margin-bottom: 1em;
+			font-size: 0.6em;
+		}
+
+		#title {
+			font-family: arial;
+			color: #666666;
+			font-size: 1.3em;
+			line-height: 1.1em;
+			padding: 0.2em 0.5em;
+		}
+
+		.title-field {
+			position: absolute;
+			top: 11px;
+			height: 32px;
+			max-width: 200px;
+			display: none;
+			z-index: 9999;
+			border: #d8d8d8 solid 1px;
+			border-radius: 0.3em;
+			background: #ffffff;
+			opacity: 0.95;
+			-moz-box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
+			;
+			-webkit-box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
+			;
+			box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
+			;
+		}
+
+		.shadow {
+			-webkit-box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.4);
+			box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.4);
+		}
+
+		.contextmenu {
+			font-family: aria,verdana;
+			position:absolute;
+			left:50%;
+			top:50%;
+			z-index:99999;
+		}
+		.contextmenu li {
+			list-style-type: none;
+		}
+		.contextmenu a {
+			text-decoration:none;
+			border-bottom:solid #ddd 1px;
+		}
+
+		.icon-context {
+			color:#66aaff;
+			color:#aaaaaa;
+			vertical-align:-5%;
+		}
+
+	</style>
+
+	<!--========================================================================= -->
+
+</head>
+
+<body style="margin:0px;padding:0px;overflow:hidden;">
+
+	<!--========================================================================= 
+		the map space
+	<!--========================================================================= -->
+
+	<div id="ixmap" style="position:relative;top:0px;left:0px;overflow:hidden;font-size:11px;background:none;">
+
+		<div id="onmapbuttondiv" style="position:absolute;top:13px;left:10px;opacity:0.95;width:0px;line-height:30px;display:none;z-index:1000">
+
+			<button type="button" id="opensidebarbutton" title="open sidebar" class="toolbutton shadow" style="height:40px;width:40px;display:none">
+				<label for="opensidebarbutton" style="height:36px;">
+					<img id="opensidebarbuttonicon" src="../resources/images/list-grey.png" style="height:24px;margin-left:-8px;margin-right:-4px;opacity:0.8"
+					/>
+				</label>
+			</button>
+
+			<button type="button" id="switchmodebutton" title="info/pan" class="toolbutton shadow" style="height:40px;width:40px;display:none;">
+				<label for="switchmodebutton" style="height:36px;">
+					<img id="switchmodebuttonicon" src="../resources/images/mano.png" style="height:24px;margin-left:-5px;margin-right:-4px;"
+					/>
+				</label>
+			</button>
+
+			<button type="button" id="switchtoolsbutton" title="show toolbar" class="toolbutton shadow" style="height:40px;width:40px;display:none;">
+				<label for="switchtoolsbutton" style="height:36px;">
+					<img id="switchmodebuttonicon" src="../resources/images/gear_empty.png" style="height:24px;margin-left:-5px;margin-right:-4px;"
+					/>
+				</label>
+			</button>
+
+			<button type="button" id="switchsearchbutton" title="show searchbar" class="toolbutton shadow" style="height:40px;width:40px;display:none;vertical-align:-4px;">
+				<label for="switchsearchbutton" style="height:36px;">
+					<img id="switchsearchbuttonicon" src="../resources/images/search.png" style="height:29px;margin-left:-3px;margin-top:2px;opacity:0.6"
+					/>
+				</label>
+			</button>
+
+			<button type="button" id="switchhelpbutton" title="show searchbar" class="toolbutton shadow" style="height:40px;width:40px;display:none;vertical-align:-4px;">
+				<label for="switchhelpbutton" style="height:36px;">
+					<img id="switchhelpbuttonicon" src="../resources/images/info_gray.png" style="height:29px;margin-left:-5px;margin-top:2px;opacity:0.6"
+					/>
+				</label>
+			</button>
+
+			<button type="button" id="switchinfobutton" title="end info window mode" class="toolbutton shadow" style="height:40px;width:40px;display:none;">
+				<label for="switchinfobutton" style="height:36px;">
+					<img id="switchinfobuttonicon" src="../resources/images/info_window.png" style="height:24px;margin-left:-5px;margin-right:-4px;"
+					/>
+				</label>
+			</button>
+
+			<button type="button" id="switchsplitterbutton" title="end info window mode" class="toolbutton shadow" style="height:40px;width:40px;display:none;">
+				<label for="switchsplitterbutton" style="height:36px;">
+					<img id="switchsplitterbuttonicon" src="../resources/images/splitter.png" style="height:24px;margin-left:-5px;margin-right:-4px;"
+					/>
+				</label>
+			</button>
+
+
+
+			<span id="embedlogo" style="vertical-align:-2px;margin-left:5px;display:none;">
+				<img id="logo" src="../resources/images/ixmaps_logo_grey_transparent.png" height="20px">
+			</span>
+
+		</div>
+
+		<div class="search-container" style="position:absolute;top:11px;left:98px;z-index:999999;display:none;width:0;">
+			<input class="search-box" type="text" placeholder="trova ..." style="height:24px;padding:7px;" />
+		</div>
+		<div class="result-list"></div>
+
+		<div id="onmapbuttondivbottom" style="position:absolute;bottom:30px;right:10px;display:inline;opacity:0.95;z-index:999;display:none">
+
+			<button type="button" id="switchlegendbutton" title="switch legend display" style="height:40px;width:40px;display:none;">
+				<label for="switchlegendbutton" style="height:36px;">
+					<img id="switchlegendbuttonicon" src="../resources/images/dialog_gray.png" style="height:28px;margin-top:3px;margin-left:-4px;opacity:0.8"
+					/>
+				</label>
+			</button>
+
+		</div>
+
+		<!-- title -->
+		<div id="title" class="title-field" style="z-index:1000;display:none;">
+		</div>
+
+		<!-- legend -->
+		<div id="map-legend" class="map-legend" style="z-index:1000;display:none;">
+		</div>
+
+	</div>
+
+	<!--========================================================================= 
+		loading, messages, help etc
+	<!--========================================================================= -->
+
+	<div id="divlogo" style="pointer-events:none;z-index:99;visibility:hidden;">
+		<div id="logo-image">
+			<span>application:</span>
+			<img alt="logo" src="../resources/images/ixmaps_logo_transparent.png" />
+		</div>
+	</div>
+
+	<div id="divloading" style="pointer-events:none;z-index:9999">
+		<div id="loading-text-div" class="loading-text-div">
+			<span id="loading-text" class="loading-text">IXMAPS</span>
+			<div id="loading-gif">
+				<img src="../resources/images/loading_blue.gif" />
+			</div>
+		</div>
+	</div>
+
+	<div id="attribution-div">
+		<span id="attribution"></span>
+	</div>
+
+	<div id="divstart" style="	visibility:hidden;
+								position:absolute;
+								top:0px;
+								left:0px;
+								width:100%;
+								height:100%;
+								z-index:1000;">
+		<div id="start-text-div" style="position:absolute;top:45%;left:40%">
+			<a id="start-text" href="javascript:__startMap()" style="font-family:serif;
+								font-size:48px;
+								color:#666666;
+								background-color:#dddddd;
+								padding: 0px 12px 3px 8px;
+								-moz-border-radius: 15px;
+								border-radius: 15px;
+								text-align:center">start</a>
+			</p>
+		</div>
+	</div>
+	<div id="velo" style="	visibility:hidden;
+								background-color:#444444;
+								opacity:0.2;
+								position:absolute;
+								top:0px;
+								left:0px;
+								width:100%;
+								height:100%;
+								z-index:1000;" width="100%" height="100%">
+	</div>
+	<div id="help" style="visibility:hidden">
+	</div>
+	<div id="dialog" style="visibility:hidden">
+	</div>
+	<div id="legend" style="visibility:hidden">
+	</div>
+	<div id="sidebar" style="visibility:hidden">
+	</div>
+	<div id="projects" style="visibility:hidden;">
+	</div>
+
+	<div id="contextmenu" class="contextmenu" style="display:none;" onmouseover="__contextmenuOver($(this))" onmouseout="__contextmenuOut($(this))";>
+	  <ul class="dropdown-menu" style="display:inline">
+		<li><a href="javascript:ixmaps.popupTools()">
+			<i class="icon icon-context icon-cog" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
+			&nbsp;open tools</a></li>
+		<li><a href="javascript:ixmaps.popupThemeEditor()">
+			<i class="icon icon-context icon-pencil" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
+			&nbsp;edit theme</a></li>
+		<li><a href="javascript:ixmaps.popupShare()">
+			<i class="icon icon-context icon-share" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
+			&nbsp;share map</a></li>
+		<li><a href="javascript:ixmaps.popupProject()">
+			<i class="icon icon-context icon-download" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
+			&nbsp;save project</a></li>
+		<li><a href="http://www.ixmaps.com" target="_blank" style="margin-top:0.2em;border:0;color:#ccc">iXmaps</a></li>
+	  </ul>
+	  <a href="#" style="border:0">iXmaps context menu</a>
+	</div>
+
+
+	<!--========================================================================= -->
+</body>
+
+<!--========================================================================= -->
+
+<script src="../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+<script src="../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+
+<script src="../libs/getUrlParam/js/jquery.getUrlParam.js"></script>
+<script src="../libs/modernizr/js/testsvg.js"></script>
+<script src="../libs/messagebox.js"></script>
+
+<script type="text/javascript" src="../js/htmlgui.js">
+</script>
+<script type="text/javascript" src="../js/htmlgui_sync.js">
+</script>
+<script type="text/javascript" src="../js/htmlgui_sync_Leaflet.js">
+</script>
+
+<script type="text/javascript" src="../js/htmlgui_dialog.js">
+</script>
+<script type="text/javascript" src="../js/htmlgui_story.js">
+</script>
+
+<script type="text/javascript" src="../js/tools/history.js">
+</script>
+
+<script type="text/javascript" src="../../../data.js/data.js"></script>
+
+<!--========================================================================= -->
+
+<link rel="stylesheet" href="../../ui/libs/leaflet-1.3.4/leaflet.css" />
+
+<script src="../../ui/libs/leaflet-1.3.4/leaflet.js"></script>
+
+
+<!--========================================================================= -->
+
+
+<!--========================================================================= -->
+
+<script type="text/javascript">
+	(function (ixmaps, $, undefined) {
+
+		ixmaps.fLegendVisible = true;
+
+		var szControls = "small";
+		var szSvgLegendFlag = "nolegend";
+		var szHTMLLegendFlag = "1";
+
+		// GR 12.02.2015 define fallback default map, used if parameter SVGGIS is empty  
+		var szDefaultMap = "../../maps/svg/maps/generic/mercator.svgz";
+
+		$(document).ready(function () {
+
+			// check browser SVG capability
+
+			if (!Modernizr.svg) {
+				alert("sorry ! your browser has no native SVG support;\n\nPlease try:   Chrome, Firefox, Safari, Opera or IE9");
+			}
+
+			// get ixmaps API from opener or parent
+
+			if (window.opener) {
+				ixmaps.parentApi = window.opener.ixmaps;
+				ixmaps.szName = window.opener.name;
+			} else
+			if (parent) {
+				ixmaps.parentApi = parent.window.ixmaps;
+				ixmaps.szName = parent.window.name;
+			} else {
+				alert("error: missing parent window for parameter !");
+			}
+
+			// register the embedded map
+			// --------------------------
+			// in case the parent page holds more than one embedded map,
+			// we can sync them if parameter name is given
+
+			if ($(document).getUrlParam('name')) {
+				ixmaps.szName = $(document).getUrlParam('name');
+			}
+			ixmaps.szPath = $(location).attr('pathname');
+			if (ixmaps.parentApi) {
+				try {
+					ixmaps.parentApi.registerApi(ixmaps, ixmaps.szName || "map", window);
+				} catch (e) {}
+			}
+
+			// get application id
+			// --------------------------
+			// used to create app specific bookmark store
+
+			if ($(document).getUrlParam('appid')) {
+				ixmaps.szAppId = $(document).getUrlParam('appid');
+				ixmaps.setAppId($(document).getUrlParam('appid'));
+			}
+
+			// --------------------------
+			// configure ui by URL params  
+			// --------------------------
+
+			// title
+
+			if (!$(document).getUrlParam('title')) {
+				$("#title").remove();
+			}
+
+			// big legend
+
+			if ($(document).getUrlParam('legend') ||
+				$(document).getUrlParam('child')) {
+				$("#switchlegendbutton").remove();
+				$.getScript("../js/tools/legend.js", function () {
+					var state = $(document).getUrlParam('legend');
+					ixmaps.legendState = ((state == 'true') ? "1" : state);
+					$.getScript("../js/tools/layer_legend.js", function () {});
+				});
+			}
+
+			// small legend
+
+			if ($(document).getUrlParam('themelegend')) {
+				$.getScript("../js/tools/theme_legend.js", function () {
+					szHTMLLegendFlag = $(document).getUrlParam('themelegend');
+					ixmaps.fLegendVisible = (szHTMLLegendFlag != "0");
+				});
+			} else {
+				$("#switchlegendbutton").remove();
+				ixmaps.fLegendVisible = false;
+			}
+
+			// tool buttons
+
+			if ($(document).getUrlParam('toolbutton') ||
+				$(document).getUrlParam('tools') ||
+				$(document).getUrlParam('options')) {
+				$("#switchmodebutton").show();
+				setTimeout('$("#onmapbuttondiv").show();', 1000);
+				$("#switchtoolsbutton").show();
+				$("#switchmodebutton").button().click(function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+					__switchInputMode();
+				});
+				$("#switchinfobutton").button().click(function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+					__switchInfoMode();
+				});
+				$("#switchlegendbutton").button().click(function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+					__switchLegendMode();
+				});
+				$("#switchtoolsbutton").button().click(function (e) {
+
+					e.preventDefault();
+					e.stopPropagation();
+
+					htmlMap_showMapTypeControl();
+
+					if (0) {
+						ixmaps.openDialog(e, 'dialog', './tools/popuptools_jquery.html', '', 'auto', 350, 800);
+					} else {
+						if ($(document).getUrlParam('bigtools')) {
+							ixmaps.openDialog(e, 'dialog', './tools/popuptools_jquery.html', '', 'auto', 380, 350);
+						} else {
+							var szPos = String(parseInt($(ixmaps.gmapDiv).css('left')) + 10) + ',55';
+							ixmaps.openDialog(e, 'dialog', './tools/popuptools_line_v2.html', '', szPos, 700, 100);
+							$("#dialog").css("height", "100%");
+							$("#dialog").css("width", "90%");
+							$("#dialog").css("position", "absolute");
+							$("#dialog").css("top", "10px");
+							$("#dialog").css("overflow", "hidden");
+						}
+					}
+				});
+			} else {
+				$("#switchtoolsbutton").remove();
+				if ($(document).getUrlParam('modebutton') && ($(document).getUrlParam('modebutton') == "1")) {
+					$("#switchmodebutton").show();
+				}
+			}
+
+			// geonames search
+
+			if ($(document).getUrlParam('search')) {
+
+				ixmaps.search.szSearchSuffix = $(document).getUrlParam('search');
+
+				$("#switchsearchbutton").show();
+				$("#switchsearchbutton").button().click(function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+					$(".search-container").css('top', $("#switchsearchbutton").offset().top);
+					$(".search-container").css('left', $("#switchsearchbutton").offset().left);
+					$("#switchsearchbutton").hide();
+					$(".search-container").show().animate({
+						width: "400px"
+					}, 500);
+					$(".search-box").show();
+				});
+				$(".search-container").click(function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+					$(".search-container").animate({
+						width: "0px"
+					}, 500);
+					$(".search-container").hide();
+					$(" .search-box").val("");
+					$("#switchsearchbutton").show();
+				});
+				$(".search-box").click(function (e) {
+					e.stopPropagation();
+				});
+				setTimeout('$("#onmapbuttondiv").show();', 1000);
+			}
+
+			// ----------------------
+			// align user interface
+			// ----------------------
+
+			if ($(document).getUrlParam('align')) {
+				if ($(document).getUrlParam('align') == "left") {
+					$(".map-legend").css("left", "60px");
+					$(".map-legend").css("top", "12px");
+					$(".title-field").css("left", "100px");
+				}
+				if ($(document).getUrlParam('align') == "right") {
+					$("#onmapbuttondiv").css("left", "");
+					$("#onmapbuttondiv").css("right", "60px");
+					$(".map-legend").css("right", "80px");
+					$(".title-field").css("right", "100px");
+				}
+			} else {
+				$(".title-field").css("left", "100px");
+			}
+
+			// ====================
+			// create the map app
+			// ====================
+
+			if ($(document).getUrlParam('autoplay') != "false") {
+				var szMap = decodeURIComponent($(document).getUrlParam('svggis'));
+				szMap = (szMap && (szMap != "null")) ? szMap : szDefaultMap;
+				map = new ixmaps.map("ixmap", {
+					mapService: "leaflet",
+					maptype: decodeURIComponent($(document).getUrlParam('maptype')),
+					svg: szMap,
+					mapsize: "fullscreen",
+					mode: szSvgLegendFlag,
+					controls: szControls,
+					silent: decodeURIComponent($(document).getUrlParam('silent'))
+				});
+			} else {
+				$("#divstart").css("visibility", "visible");
+				$("#divloading").css("visibility", "hidden");
+			}
+
+			// set attribution (bottom left on map space)
+
+			var attribution = decodeURIComponent(unescape($(document).getUrlParam('attribution')));
+			$("#attribution").html((attribution && (attribution != "null")) ? attribution : "");
+
+			ixmaps.attribution = attribution;
+			ixmaps.date = decodeURIComponent(unescape($(document).getUrlParam('date')));
+			ixmaps.parent = decodeURIComponent(unescape($(document).getUrlParam('parent')));
+
+			// change input mode ?
+
+			if ($(document).getUrlParam('mode')) {
+				var mode = $(document).getUrlParam('mode');
+				ixmaps.execBookmark("map.Api.setMapTool('" + mode + "')", false);
+				__setInputMode(mode);
+			}
+
+			ixmaps.setAutoSwitchInfo(true);
+
+			// is there a bookmark to execute at load ? 
+
+			if ($(document).getUrlParam('bookmark')) {
+				x = $(document).getUrlParam('bookmark');
+				szBookmark = decodeURIComponent(((typeof (x) != "string") ? x.join("") : x));
+				ixmaps.execBookmark(szBookmark, false);
+			}
+			// show/hide toolsbar elements
+			__switchBannerElements();
+			setTimeout("__switchBannerElements()", 5000);
+
+			htmlMap_enableScrollWheelZoom();
+		});
+
+		// =======================
+		// $(document).ready done
+		// =======================
+
+		// on windiow resize
+
+		$(window).resize(function (e) {
+			$("#banner").css('width', window.innerWidth + 'px');
+			__switchBannerElements();
+			if (e.target.nodeName != 'DIV') {
+				var height = $("#legend").parent().height();
+				var width = $("#legend").parent().width();
+				$("#legend").parent().css("left", (window.innerWidth - width - 20) + "px");
+				$("#legend").parent().css("top", (window.innerHeight - height - 40) + "px");
+			}
+		});
+
+		// ----------------------
+		// button executer
+		// ----------------------
+
+		__switchBannerElements = function () {
+
+			var toolsWidth = parseInt($("#tools").css('width'));
+			var visiToolWidth = parseInt($("#visiswitch").css('width'));
+			var chartToolWidth = parseInt($("#chartsdiv").css('width'));
+			if (window.innerWidth > (toolsWidth + visiToolWidth + chartToolWidth + 10)) {
+				$("#visiswitch").show();
+				$("#chartsdiv").show();
+			} else
+			if (window.innerWidth > (toolsWidth + chartToolWidth + 30)) {
+				$("#visiswitch").hide();
+				$("#chartsdiv").show();
+			} else {
+				$("#visiswitch").hide();
+				$("#chartsdiv").hide();
+			}
+
+			if (!$(document).getUrlParam('align') == "right") {
+				$("#onmapbuttondiv").css('left', String(parseInt($(ixmaps.gmapDiv).css('left')) + 10) + "px");
+			}
+
+			if ($(document).getUrlParam('child')) {
+				if ((window.innerWidth < 650) || !ixmaps.embedlogo) {
+					$("#embedlogo").hide();
+				} else {
+					$("#embedlogo").show();
+				}
+				if (window.innerWidth < 500) {
+					$("#onmapbuttondiv").hide();
+				} else {
+					$("#onmapbuttondiv").show();
+				}
+			}
+		};
+
+		__switchInputMode = function (szSource) {
+
+			switch (ixmaps.getMapTool()) {
+				case 'info':
+					ixmaps.mapTool((szSource && (szSource == "button")) ? 'pan' : 'idle');
+					ixmaps.switchAndroidEventPane(true);
+					$("#switchmodebuttonicon").attr("src", "../resources/images/mano.png");
+					$("#switchmodebuttonicon").css("opacity", "1");
+					$("#switchmodebutton").css("background", "#ffffff url(../resources/images/info.png) no-repeat 95% 95%");
+					$("#switchmodebutton").css("background-size", "13px");
+					$("#switchinfobutton").hide();
+					break;
+				case 'pan':
+				default:
+					ixmaps.mapTool('info');
+					ixmaps.switchAndroidEventPane(false);
+					$("#switchmodebuttonicon").attr("src", "../resources/images/info.png");
+					$("#switchmodebutton").css("background", "#ffffff url(../resources/images/mano.png) no-repeat 98% 95%");
+					$("#switchmodebutton").css("background-size", "13px");
+					$("#switchmodebuttonicon").css("opacity", "1");
+					break;
+			}
+		};
+
+		__setInputMode = function (szMode) {
+			try {
+				switch (szMode) {
+					case 'info':
+						$("#switchmodebuttonicon").attr("src", "../resources/images/info.png");
+						$("#switchmodebutton").css("background", "#ffffff url(../resources/images/mano.png) no-repeat 98% 95%");
+						$("#switchmodebutton").css("background-size", "13px");
+						$("#switchmodebuttonicon").css("opacity", "1");
+						break;
+					case 'pan':
+					default:
+						$("#switchmodebuttonicon").attr("src", "../resources/images/mano.png");
+						$("#switchmodebuttonicon").css("opacity", "1");
+						$("#switchmodebutton").css("background", "#ffffff url(../resources/images/info.png) no-repeat 95% 95%");
+						$("#switchmodebutton").css("background-size", "13px");
+						break;
+				}
+			} catch (e) {}
+			try {
+				$("#" + mode)[0].checked = true;
+				$("#tools").buttonset('refresh');
+			} catch (e) {}
+		};
+
+		__switchInfoMode = function () {
+			$("#switchinfobutton").hide();
+			ixmaps.mapTool('pan');
+			//ixmaps.mapTool( 'info');
+		};
+
+		// ------------------------------------------- 
+		// start function in case: autoplay==false 
+		// -------------------------------------------
+
+		__startMap = function () {
+
+			$("#divstart").hide();
+			var szMap = decodeURIComponent($(document).getUrlParam('svggis'));
+			szMap = (szMap && (szMap != "null")) ? szMap : szDefaultMap;
+
+			map = new ixmaps.map("ixmap", {
+				mapService: decodeURIComponent($(document).getUrlParam('mapservice')),
+				maptype: decodeURIComponent($(document).getUrlParam('maptype')),
+				svg: szMap,
+				mapsize: "fix",
+				mode: szSvgLegendFlag,
+				controls: szControls
+			});
+
+			// is there a bookmark to execute at load ?
+			ixmaps.onMapReady = function () {
+				if ($(document).getUrlParam('bookmark')) {
+					x = $(document).getUrlParam('bookmark');
+					szBookmark = decodeURIComponent(((typeof (x) != "string") ? x.join("") : x));
+					ixmaps.execBookmark(szBookmark, false);
+				}
+				ixmaps.toggleThemeLegends(false);
+			};
+		};
+
+		// -------------------------------------------
+		// other helper
+		// -------------------------------------------
+
+		ixmaps.setMapTool = function (szId) {
+			$("#" + szId).click();
+		};
+
+		ixmaps.setColorScheme = function (index) {
+			ixmaps.changeThemeStyle(null, "colorscheme:" + index, "set");
+			$("#colorList").dialog("close");
+		};
+
+		ixmaps.switchUi = function (fFlag) {
+			if (fFlag) {
+				$("#onmapbuttondiv").show();
+				$("#onmapbuttondivbottom").show();
+				htmlMap_showMapControl();
+			} else {
+				$("#onmapbuttondiv").hide();
+				$("#onmapbuttondivbottom").hide();
+				htmlMap_hideMapControl();
+			}
+		};
+
+		// -------------------------------------------
+		// search tool 
+		// ------------------------------------------- 
+
+		ixmaps.search = ixmaps.search || {};
+
+		ixmaps.search.positionResultList = function (input) {
+			$('.result-list').css({
+				width: input.outerWidth(),
+				top: input.offset().top + input.outerHeight(),
+				left: input.offset().left
+			});
+		};
+
+		ixmaps.search.showQueryMessage = function () {
+			$('.result-list').empty();
+			this.positionResultList($('.search-box'));
+			var itemObject = $('<div class="result-item" title="searching"><em>searching ...</em></div>');
+			$('.result-list').append(itemObject);
+			$('.result-list').show();
+		};
+
+		ixmaps.search.renderResults = function (result) {
+			$('.result-list').empty();
+			this.positionResultList($('.search-box'));
+			if (!result) {
+				var itemObject = $('<div class="result-item" title="not found"><em>' + $('.search-box').val() +
+					'</em> not found!</div>');
+				$('.result-list').append(itemObject);
+				$('.result-list').show();
+				return;
+			}
+			var i = 0;
+			result.forEach(function (item) {
+				if (++i < 10) {
+					var itemStr = '<div class="result-item" title="' + item.display_name + '">' + item.display_name + '</div>';
+					var itemObject = $(itemStr);
+					itemObject.data(item);
+					$('.result-list').append(itemObject);
+				}
+			});
+			$('.result-list').show();
+		};
+
+		ixmaps.search.renderMap = function (data) {
+
+			ixmaps.search.result = data;
+
+			var x = (Number(data.boundingbox[0]) + Number(data.boundingbox[1])) / 2;
+			var y = (Number(data.boundingbox[2]) + Number(data.boundingbox[3])) / 2;
+
+			if (data.class == "place") {
+				ixmaps.setView([x, y], 13);
+			} else {
+				ixmaps.setBounds([Number(data.boundingbox[0]), Number(data.boundingbox[2]), Number(data.boundingbox[1]), Number(
+					data.boundingbox[3])]);
+			}
+
+			var __szBookmark = "map.Api.doZoomMapToGeoBounds(" + data.boundingbox[0] + "," + data.boundingbox[2] + "," + data.boundingbox[
+				1] + "," + data.boundingbox[3] + ");";
+			setTimeout("ixmaps.execBookmark('" + __szBookmark + "')", 100);
+
+			$('.search-box').val(data.display_name.replace(data.address.hamlet + ', ', ''));
+		};
+
+		ixmaps.search.szSearchSuffix = "";
+		ixmaps.search.queryNominatim = function () {
+			ixmaps.search.lastSearch = $('.search-box').val();
+			var query = encodeURIComponent($('.search-box').val() + ((this.szSearchSuffix.length > 1) ? ("," + this.szSearchSuffix) :
+				""));
+			$('.error').hide();
+			$('.result-list').empty().hide();
+
+			this.showQueryMessage();
+
+			$.ajax({
+				url: "http://open.mapquestapi.com/nominatim/v1/search.php?key=9VpTwb1ib382pomWexOxmr2J67UtDJKN&q=" + query +
+					"&format=json&addressdetails=1",
+				success: function (result) {
+					if (result.length) {
+						ixmaps.search.renderResults(result);
+					} else {
+						ixmaps.search.renderResults(null);
+						$('.error').show();
+					}
+				}
+			});
+		};
+
+		ixmaps.search.selectResult = function (item) {
+			$('.result-item').removeClass('selected');
+			item.addClass('selected');
+		};
+
+		ixmaps.search.renderMapFromResult = function () {
+			var target = $('.result-item.selected');
+			ixmaps.search.renderMap(target.data());
+			$('.result-list').empty().hide();
+		};
+
+		$('.result-list')
+			.on('click', '.result-item', ixmaps.search.renderMapFromResult)
+			.on('mouseenter', '.result-item', function (e) {
+				$(e.currentTarget).addClass('selected');
+			})
+			.on('mouseleave', '.result-item', function (e) {
+				$(e.currentTarget).removeClass('selected');
+			});
+
+		$(document).on('keydown', '.search-box', function (e) {
+			var pressed = e.which;
+			var keys = {
+				enter: 13,
+				up: 38,
+				down: 40
+			};
+			if (pressed === keys.enter) {
+				$('.result-item.selected').length ? ixmaps.search.renderMapFromResult() : ixmaps.search.queryNominatim();
+			} else if (pressed === keys.up) {
+				if (!$('.result-item.selected').length || $('.result-item.selected').is(':first-child')) {
+					// Choose last
+					ixmaps.search.selectResult($('.result-item:last-child'));
+				} else {
+					// Choose prev item
+					ixmaps.search.selectResult($('.result-item.selected').prev());
+				}
+			} else if (pressed === keys.down) {
+				if (!$('.result-item.selected').length || $('.result-item.selected').is(':last-child')) {
+					// Choose first 
+					ixmaps.search.selectResult($('.result-item:first-child'));
+				} else {
+					// Choose next item
+					ixmaps.search.selectResult($('.result-item.selected').next());
+				}
+			} else {
+				if ($('.result-item').length) {
+					$('.result-list').empty().hide();
+				}
+			}
+		});
+
+		var __queryNominatimTimeout = null;
+
+		$(document).on('keyup', '.search-box', function (e) {
+			var pressed = e.which;
+			var keys = {
+				enter: 13,
+				up: 38,
+				down: 40
+			};
+			if (pressed !== keys.enter) {
+				if (__queryNominatimTimeout) {
+					clearTimeout(__queryNominatimTimeout);
+				}
+				__queryNominatimTimeout = setTimeout("ixmaps.search.queryNominatim()", 500);
+			}
+		});
+
+		$(document).on('blur', '.search-box', function () {
+			if ($('.result-item').length) {
+				setTimeout("$('.result-list').empty().hide();", 500);
+			}
+		});
+
+
+		document.addEventListener( "contextmenu", function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			$("#contextmenu")[0].style.left = e.pageX - 20 + 'px';
+			$("#contextmenu")[0].style.top  = e.pageY - 20 + 'px';
+			$("#contextmenu").show();
+			return true;
+		});
+
+		var	__contextMenuTrigger = null;
+		__contextmenuOver = function(el){
+			clearTimeout(__contextMenuTrigger);
+			__contextMenuTrigger = true;
+		}
+
+		__contextmenuOut = function(el){
+			__contextMenuTrigger = setTimeout("$('#contextmenu').hide()",100);
+		}
+
+		$(document).on('click', '.search-btn', ixmaps.search.queryNominatim);
+		// ------------------------------------------- 
+		// END search tool 
+		// ------------------------------------------- 
+
+	}(window.ixmaps = window.ixmaps || {}, jQuery));
+</script>
+
+</html>

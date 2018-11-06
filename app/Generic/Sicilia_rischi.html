@@ -1,0 +1,63 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<meta charset="iso-8859-1">	
+	<title>Map Viewer</title>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+
+    <link rel="shortcut icon" href="../../ui/images/ixmaps_logo.png">
+	<script type="text/javascript" src = "../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+
+	<script>
+
+	__ui		= "../../ui/html/main_sync_story_frame.html?basemap=ll&minimal=1&tilemap=show&nolegend=1&layout=right"; 
+	__map		= "../../maps/svg/maps/Sicilia/rischi_sicilia.svgz";
+	__story		= "../../app/Generic/stories/master/story/index.html";
+	__bound		= "map.Api.doZoomMapToGeoBounds(38.055052631279246,13.270540250664288,38.1652677087305,13.439626680488056)";
+	__attribute	= ""; 
+
+	__resize = function(){
+			$("#map").attr("height",((window.innerHeight-5))+"px");
+			$("#map").attr("width",((window.innerWidth))+"px");
+	}
+	$(document).ready(function() {
+			__resize();
+			$("#map").attr("src",__ui+
+					"&svggis="+__map+
+					"&story="+__story+
+					"&sidebar=28%&overlap=0&mapcontrol=true&maptype=OpenStreetMap - Osmarenderer&search=Italy"+
+					"&bookmark="+__bound+
+					"&attribution="+__attribute);
+	});
+	$(window).resize(function() {
+			__resize();
+	});
+	</script>
+</head>
+
+
+<body style="margin:0px;padding:0px;">
+
+	<!-- Container -->
+	<div id="container" style="margin:0px;padding:0px;margin-left:auto;margin-right:auto;overflow:hidden" >
+
+		<!-- Credits -->
+
+		<!-- Content -->
+		<div style="overflow:hidden;">
+			<iframe id="map" width="100%" height="840px" style="border:0;overflow:hidden" src= ></iframe>
+		</div>
+		<!-- fine Content -->
+
+		<!-- Footer -->
+		<div id="footer" style="position:relative;">
+		</div>
+		<!-- fine Footer -->
+
+	</div>
+	<!-- fine Container -->
+
+</body>
+
+</html>

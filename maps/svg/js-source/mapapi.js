@@ -109,6 +109,39 @@ Map.Api.prototype.setMapLocal = function(szPath,szFiles){
 Map.Api.prototype.setLocalString = function(szOrig,szLocal){
 	this.map.Dictionary.replace(szOrig,szLocal);
 };
+/**
+ * set layer state
+ * @param layerSwitchObject defines the layer and sublayer to switch
+ */
+Map.Api.prototype.setMapLayer = function(szLayerObj){
+	if ( map.fInitializing ){
+		this.map.pushAction("map.Api.setMapLayer(\""+szLayerObj+"\"");
+		return;
+	}
+	var layerObj = JSON.parse(szLayerObj);
+	for ( l in layerObj ){
+		if ( layerObj[l].display && (layerObj[l].display == "none") ){
+			this.switchLayer(String(l),false);
+		}
+		if ( layerObj[l].off ){
+			for ( c in layerObj[l].off ){
+				this.switchLayer(l+"::"+layerObj[l].off[c],false);
+			}
+		}
+		if ( layerObj[l].on ){
+			var layerA = this.getLayer();
+			var categoryA = layerA[l].categoryA;
+			for ( x in categoryA ){
+				this.switchLayer(l+"::"+x,false);
+			}
+			for ( c in layerObj[l].on ){
+				if ( layerObj[l].on[c].length ){
+					this.switchLayer(l+"::"+layerObj[l].on[c],true);
+				}
+			}
+		}
+	}
+};
 
 /*****************
  *  bookmark API
@@ -288,24 +321,24 @@ Map.Api.prototype.pendingNewGeoBounds = function(){
  * @fFlag true or false
  */
 Map.Api.prototype.setVisibility = function(fFlag){
-	var mapTool = new MapTool(evt,"nothing");
+	var mapTool = new MapTool(null,"nothing");
 	if ( fFlag == "invisible" ){
-		mapTool.hideLayer(evt);
+		mapTool.hideLayer(null);
 	}else{
-		mapTool.showLayer(evt);
+		mapTool.showLayer(null);
 	}
 };
 /**
  * hide the overview map
  */
 Map.Api.prototype.hideOverviewMap = function(){
-	this.map.Zoom.hideOverviewMap();
+	//this.map.Zoom.hideOverviewMap();
 };
 /**
  * show the overview map (if defined)
  */
 Map.Api.prototype.showOverviewMap = function(){
-	this.map.Zoom.showOverviewMap();
+	//this.map.Zoom.showOverviewMap();
 };
 /**
  * hide the north harrow
@@ -467,6 +500,12 @@ Map.Api.prototype.getLayer = function(){
 Map.Api.prototype.getLayerDependency = function(){
 	return this.map.Layer.depListA;
 };
+/**
+ * get tile info
+ */
+Map.Api.prototype.getTileInfo = function(){
+	return this.map.Tiles;
+};
 	
 /*****************
  *  map tool API
@@ -497,7 +536,7 @@ Map.Api.prototype.setMapTool = function(szType){
  * @return the map tool name
  */
 Map.Api.prototype.getMapTool = function(){
-	return getMapTool();
+	return szMapToolType;
 };
 /**
  * check if specified map tool is active (may be called by context menu to check item)
@@ -505,11 +544,6 @@ Map.Api.prototype.getMapTool = function(){
  * @return 'yes' or 'no'
  */
 Map.Api.prototype.isMapTool = function(szType){
-	if (szType == "overviewmap" ){
-		if ( this.map.Zoom.overviewThumbObj ){
-			return 'yes';
-		}
-	}
 	if ( szMapToolType == szType ){
 		return 'yes';
 	}
@@ -600,6 +634,20 @@ Map.Api.prototype.getMapThemeDataRow = function(szId,szItemId){
 	return null;
 };
 /**
+ * get position of one theme item
+ * @param szId the name of the theme
+ * @return a string with the field name (or null)
+ */
+Map.Api.prototype.getMapThemeItemPosition = function(szId,szItemId){
+	var themeObj = map.Themes.getTheme(szId);
+	if (themeObj){
+		var nodeA = themeObj.getItemNodes(szItemId);
+		var pos =  map.Scale.getScreenPosition(nodeA[0]);
+		return pos;
+	}
+	return null;
+};
+/**
  * get the chart one theme item or overview
  * @param szId the name of the theme
  * @return a string with the field name (or null)
@@ -634,7 +682,8 @@ Map.Api.prototype.executeJavascriptWithMessage = function(szJS,szText,nTimeout){
 	// GR 16.07.2011 replace all " with \" in szJS string and call via pushAction
 	if ( szJS && typeof(szJS != "undefined" ) ){
 		this.map.pushAction("map.Api.executeWithPush = true;");
-		this.map.pushAction("executeWithMessage(\""+szJS.replace(/\"/gi,"\\\"")+"\",\""+szText+"\","+nTimeout+")");
+
+		this.map.pushAction("executeWithMessage(\""+szJS.replace(/\\/gi,"\\\\").replace(/\"/gi,"\\\"")+"\",\""+szText+"\","+nTimeout+")");
 		this.map.pushAction("map.Api.executeWithPush = false;");
 	}
 //	executeWithMessage(szJS,szText,nTimeout);
@@ -756,6 +805,7 @@ Map.Api.prototype.showLegend = function(){
  * clear all map tools, highlights, themes, selections etc.
  */
 Map.Api.prototype.clearAll = function(){
+	this.map.Themes.fWaitingforData = true;
 	this.map.clearAll();
 };
 /**
@@ -769,9 +819,9 @@ Map.Api.prototype.clearAllCharts = function(){
 /**
  * clear all chart themes
  */
-Map.Api.prototype.clearAllChoroplethe = function(){
+Map.Api.prototype.clearAllChoropleth = function(){
 	if ( this.map.Themes ){
-		this.map.Themes.removeAllChoroplethe();
+		this.map.Themes.removeAllChoropleth();
 	}
 };
 /**
@@ -1144,7 +1194,7 @@ Map.Api.prototype.createContextMenuTargetBuffer = function(){
 			var szSubLayer = szTemp.split("::")[1];
 			var layerObj = this.map.Layer.getLayerObjOfNode(contextObj.objNode);
 		}
-		this.map.Themes.newTheme2(szLayer,layerObj.szRenderer,'',"type:CHART|BUFFER;align:center;colorscheme:#aa4400;ranges:"+szSubLayer+";buffersize:1000;opacity:0.3;label:Ripetitore",
+		this.map.Themes.newTheme(szLayer,layerObj.szRenderer,'',"type:CHART|BUFFER;align:center;colorscheme:#aa4400;ranges:"+szSubLayer+";buffersize:1000;opacity:0.3;label:Ripetitore",
 					'Buffer (1 km)','Ripetitore');
 	}
 };
@@ -1163,7 +1213,7 @@ Map.Api.prototype.createTheme = function(szThemes,szFields,szField100,szFlag,col
 	return this.map.Themes.newTheme(szThemes,szFields,szField100,szFlag,colorScheme,szTitle,szLabelA);
 };
 /**
- * Create a new map theme. This can be a choroplethe theme (colorize shapes) or charts (bubbles, bar charts, pies ...).<br>
+ * Create a new map theme. This can be a CHOROPLETH theme (colorize shapes) or charts (bubbles, bar charts, pies ...).<br>
  * A theme can be created on base of one or more layer (szThemes) and a list of data fields to process.<br>
  * When the theme is been created, a theme legend will pop up.
  * @param szThemes the map layer(themes) to include into the new map theme; one ore more layer separated by '|'
@@ -1171,21 +1221,21 @@ Map.Api.prototype.createTheme = function(szThemes,szFields,szField100,szFlag,col
  * @param szField100 the name of the field to take the 100% or fraction value 
  * @param szStyle define the theme style
  * <br><br>szStyle is a string to define multiple properties with a syntax similar to CSS styles.<br>
- * <br>Sample: <em>'type:CHOROPLETHE;classes:5;colorscheme:spectrum'</em>
+ * <br>Sample: <em>'type:CHOROPLETH;classes:5;colorscheme:spectrum'</em>
  * <br><br>The following properties can be set in szStyles:
  * <br><br>
  *  <table >
  *  <tr align="left"><th>property</th><th>decription</th><th>sample</th></tr>
- *  <tr><td>type</td><td>the theme/chart type</td><td>type:CHOROPLETHE|QUANTILE<br>type:CHART|BAR|3D|STACKED</td></tr>
+ *  <tr><td>type</td><td>the theme/chart type</td><td>type:CHOROPLETH|QUANTILE<br>type:CHART|BAR|3D|STACKED</td></tr>
  *  <tr><td  colspan="3" ><em>here is a list of all possible types</em></td></tr>
  *  <tr><td  colspan="3" >
  *   <table border="1" >
- *   <tr><td>CHOROPLETHE</td><td>colorize map shapes (poligons,lines)</td></tr>
+ *   <tr><td>CHOROPLETH</td><td>colorize map shapes (poligons,lines)</td></tr>
  *   <tr><td></td><td>
  *   <table border="1" >
  *   <tr><td>EQUIDISTANT</td><td>generate equidistant classes</td></tr>
  *   <tr><td>QUANTILE</td><td>generate classes with equal number of members</td></tr>
- *   <tr><td>BUFFER</td><td>extends CHOROPLETHE on lines</td></tr>
+ *   <tr><td>BUFFER</td><td>extends CHOROPLETH on lines</td></tr>
  *   <tr><td>EXACT</td><td>select color by value </td></tr>
  *   <tr><td>RANGE</td><td>select color by given value ranges</td></tr>
  *   <tr><td>DOMINANT</td><td>select color by the greatest value</td></tr>
@@ -1242,7 +1292,7 @@ Map.Api.prototype.createTheme = function(szThemes,szFields,szField100,szFlag,col
  *  </table>
  *  </td></tr>
  *  <tr height="20"><td></td></tr>
- *  <tr><td>classes</td><td>define the number of classes for choroplethe themes</td><td>1 - 50</td></tr>
+ *  <tr><td>classes</td><td>define the number of classes for CHOROPLETH themes</td><td>1 - 50</td></tr>
  *  <tr><td>colorscheme</td><td>define a colorscheme</td><td>e.g. 'colorscheme:#eeeeff,#0000dd'</td></tr>
  *  <tr><td>colorstyle</td><td>define color scheme derivations for 'spectrum' colorscheme</td><td>e.g. 'colorstyle:pastel'</td></tr>
  *  <tr><td>filter</td><td>filter for 'DOMINANT' themes; defines the condition together with dfilter</td><td>min / max / mean / median</td></tr>
@@ -1263,24 +1313,29 @@ Map.Api.prototype.createTheme = function(szThemes,szFields,szField100,szFlag,col
  * @return A new MapTheme object
  * <br><br>
  * <strong>Samples:</strong>
- * <br> this.map.Api.newMapTheme("layer","fieldA","","style=type:CHOROPLETHE|EQUIDISTANT;classes:10;colorscheme:spectrum,pastel"); 
- * <br> this.map.Api.newMapTheme("layer","fieldA","field100","style=type:CHOROPLETHE;",title="this theme"); 
+ * <br> this.map.Api.newMapTheme("layer","fieldA","","style=type:CHOROPLETH|EQUIDISTANT;classes:10;colorscheme:spectrum,pastel"); 
+ * <br> this.map.Api.newMapTheme("layer","fieldA","field100","style=type:CHOROPLETH;",title="this theme"); 
  * <br><br>
 */
 Map.Api.prototype.newMapTheme = function(szThemes,szFields,szField100,szStyle,szTitle,szLabel){
 	if ( this.map.Zoom.fExternalZoom ){
-		this.map.pushAction("map.Api.newMapTheme(\""+szThemes+"\",\""+szFields+"\",\""+szField100+"\",\""+szStyle+"\",\""+szTitle+"\",\""+szLabel+"\")");
+		this.map.pushAction("map.Api.newMapTheme(\""+szThemes+"\",\""+szFields+"\",\""+szField100+"\",\""+szStyle.replace(/\\/gi,"\\\\").replace(/\"/gi,"\\\"")+"\",\""+szTitle+"\",\""+szLabel+"\")");
 		return;
 	}else
 	if ( this.executeWithPush){
-		this.map.pushAction("map.Themes.newTheme2(\""+szThemes+"\",\""+szFields+"\",\""+szField100+"\",\""+szStyle+"\",\""+szTitle+"\",\""+szLabel+"\")");
+		this.map.pushAction("map.Themes.newTheme(\""+szThemes+"\",\""+szFields+"\",\""+szField100+"\",\""+szStyle+"\",\""+szTitle+"\",\""+szLabel+"\")");
 	}else{
-		return this.map.Themes.newTheme2(szThemes,szFields,szField100,szStyle,szTitle,szLabel);
+		return this.map.Themes.newTheme(szThemes,szFields,szField100,szStyle,szTitle,szLabel);
 	}
 };
 
 Map.Api.prototype.newMapThemeByObj = function(themeObj){
 	return this.map.Themes.newThemeByObj(themeObj);
+};
+
+
+Map.Api.prototype.refreshTheme = function(szId){
+	this.map.Themes.refreshTheme(szId);
 };
 
 /**
@@ -1290,8 +1345,8 @@ Map.Api.prototype.newMapThemeByObj = function(themeObj){
  * The following styles can be changed/set:
  * <br><br>
  *  <table>
- *  <tr><td>type</td><td>change the theme/chart type</td><td>CHOROPLETHE,QUANTILE,BUBBLE,etc. see create chart for complete list</td></tr>
- *  <tr><td>classes</td><td>change the number of classes for choroplethe themes</td><td>1 - 50</td></tr>
+ *  <tr><td>type</td><td>change the theme/chart type</td><td>CHOROPLETH,QUANTILE,BUBBLE,etc. see create chart for complete list</td></tr>
+ *  <tr><td>classes</td><td>change the number of classes for CHOROPLETH themes</td><td>1 - 50</td></tr>
  *  <tr><td>colorscheme</td><td>define a new colorscheme</td><td>e.g. 'colorscheme:#eeeeff,#0000dd'</td></tr>
  *  <tr><td>colorstyle</td><td>define color scheme derivations for 'spectrum' colorscheme</td><td>e.g. 'colorstyle:pastel'</td></tr>
  *  <tr><td>filter</td><td>filter for 'DOMINANT' themes; defines the condition together with dfilter</td><td>min / max / mean / median</td></tr>
@@ -1301,13 +1356,13 @@ Map.Api.prototype.newMapThemeByObj = function(themeObj){
  *  </table>
  * <br>
  * <strong>Samples:</strong>
- * <br> this.map.Api.changeThemeStyle("type:CHOROPLETHE|EQUIDISTANT;classes:10;colorscheme:spectrum,pastel;overviewchart:PIE|3D"); 
+ * <br> this.map.Api.changeThemeStyle("type:CHOROPLETH|EQUIDISTANT;classes:10;colorscheme:spectrum,pastel;overviewchart:PIE|3D"); 
  * <br> this.map.Api.changeThemeStyle("type:CHART|BUBBLE|SURFACE|VALUE"); 
  * <br> this.map.Api.changeThemeStyle("type:CHART|PIE|DONUT|3D|VOLUME");
  * <br><br>
  * <strong>Hints:</strong>
  * <br>
- * CHOROPLETHE type can be changed only to BUBBLE type.<br>
+ * CHOROPLETH type can be changed only to BUBBLE type.<br>
  * CHART type can be changed into DOMINANT type.<br>
  */
 Map.Api.prototype.changeContextThemeStyle = function(contextNode,szStyle){
@@ -1338,6 +1393,16 @@ Map.Api.prototype.selectFilterItems = function(szId){
 };
 Map.Api.prototype.popupThemeStyleMenu = function(szId){
 	this.map.Themes.chartTypeMenu(null,szId);
+};
+Map.Api.prototype.highlightThemeItems = function(szId,szItems,szSeparator){
+	this.map.Themes.doHighlightItems(szId,szItems,szSeparator);
+	//this.map.Themes.highlightItems(null,szId,szItems,szSeparator);
+};
+Map.Api.prototype.clearHighlightThemeItems = function(szId){
+	this.map.Themes.clearHighlightItems(null,szId);
+};
+Map.Api.prototype.zoomToTheme = function(szId){
+	this.map.Themes.zoomTo(null,szId);
 };
 
 /**
@@ -1496,3 +1561,28 @@ Map.Api.prototype.getShapeMetadataArray = function(objNode){
 	}
 	return null;
 };
+
+
+Map.Api.prototype.highlightItem = function(szId){
+	var objNode = SVGDocument.getElementById(szId);
+	var shapeNodesA = map.Layer.getLayerItemNodes(objNode);
+	highLightList.unlock();
+	highLightList.removeAll();
+	for ( var i=0; i<shapeNodesA.length; i++ ){
+		highLightList.removeItem(shapeNodesA[i]);
+		highLightList.addItem(shapeNodesA[i]);
+	}
+	highLightList.lock();
+};
+Map.Api.prototype.clearHighlight = function(){
+	highLightList.unlock();
+	highLightList.removeAll();
+};
+
+/**
+ * generate ARCXML code from a map shape<br>
+ * (may be called by context menu and generates than the ARCXML code of the context menu mouse object)
+ */
+Map.Api.prototype.getLayerLegendSVG= function(layerName){
+	alert(layerName);
+}

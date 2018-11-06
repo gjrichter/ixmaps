@@ -1,0 +1,995 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>iXmps - Editor - Dataimport</title>
+	<!-- Styles ------------------------ -->
+
+	<link href="../../app/Editor/assets/css/site.min.css" rel="stylesheet">
+	<style>
+		body #importdiv {
+			overflow: auto;
+			padding: 1em;
+		}
+
+		textarea {
+			width: 90%;
+		}
+
+		legend {
+			xxborder:0;
+		}
+
+		.filenameOrUrl {
+			width: 80%;
+			height:34px;
+			font-size:1.1em;
+		}
+
+		.fileContainer {
+			overflow: hidden;
+			position: relative;
+		}
+
+		.fileContainer [type=file] {
+			cursor: inherit;
+			display: block;
+			font-size: 999px;
+			filter: alpha(opacity=0);
+			min-height: 100%;
+			min-width: 100%;
+			opacity: 0;
+			position: absolute;
+			right: 0;
+			text-align: right;
+			top: 0;
+		}
+
+		/* Example stylistic flourishes */
+
+		.fileContainer {
+			font-weight: normal;
+			color: black;
+			background: white;
+			border: #888 solid 0.5px;
+			border-radius: .25em;
+			float: left;
+			padding: .5em;
+		}
+
+		.fileContainer [type=file] {
+			cursor: pointer;
+		}
+
+		/* Track */
+
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+			-webkit-border-radius: 0px;
+			box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+			border-radius: 0px;
+		}
+
+		/* Handle */
+
+		::-webkit-scrollbar-thumb {
+			-webkit-border-radius: 0px;
+			border-radius: 0px;
+			background: rgba(232, 232, 232, 0.6);
+			-webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.1);
+			box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.1);
+		}
+
+		::-webkit-scrollbar-thumb:window-inactive {
+			background: rgba(222, 222, 222, 0.4);
+		}
+	</style>
+</head>
+
+<!-- End of Header ------------------------ -->
+
+<body>
+	<div id="importdiv" style="margin-bottom:5em">
+
+		<h3 style="margin-top:-0.6em">add data ...</h3>
+		<div >
+			<form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
+			<fieldset>
+				<input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+				<div id="loadProject">
+					<input type="file" id="fileSelect" name="fileselect[]" multiple="multiple" style="display:none"/>
+					<div id="filedrag" style="clear:both;height:8em;width:100%;border:dashed #dddddd 2px;padding:0 0.25em">drop <b>.cvs</b> or<b> .json</b> file here </div>
+					<label class="fileContainer" for="fileSelect" style="position:relative;top:-5em;left:33%">or select file from disk</label>
+				</div>
+			</fieldset>
+			</form>
+		</div>
+
+		<div id="localdiskinfo" style="clear:both;padding:0.5em 0.5em 1px 0.5em;margin:-1.5em 0em 0.8em 0em;background:#ddd">
+			<p style="font-size:0.95em;">Data you add from your <strong>local disk</strong> is <strong>not</strong> uploaded to any server or cloud service.</p><p style="font-size:0.95em;">If you want to <strong>publish</strong> your work later you need to specify a <strong>web based data source</strong>.</p>
+		</div>
+		<div>
+			<center>
+				<img src="../resources/images/loading_blue.gif" id="load-file-spinner" style="height:64px;margin:-0.4em 0 0 -2em;display:none">
+			</center>
+		</div>
+
+		<div id="info"></div>
+		<section id="section-special-files">
+		<div>
+			<p>enter a <em>CSV</em> or <em>GeoJson</em> data source
+				<a href="#" title="First line must contains fieldnames and values must be separated by ';'">URL</a>
+				<br>
+				<span style="font-size:0.8em;">
+					<span>
+			</p>
+			<input type="text" id="dataURL" class="filenameOrUrl"></input>&nbsp;
+			<input id="loadData" type="button" class="btn btn-md btn-default" value="Load" style="vertical-align:top;" />
+			<img src="../resources/images/loading_blue.gif" id="load-url-spinner" style="height:24px;vertical-align:top;display:none">
+		</div>
+
+		<!-- some public data URL's -->
+		<a href="#" onclick="$('#dataSamples').show()">try some public data ...</a>
+		<div id="dataSamples" style="display:none">
+			<ul>
+			<li>
+				<a href="#" 
+				onclick="$('#dataURL').val('https://cdn.rawgit.com/ondata/alberimonumentaliitalia/c3c82d9a/alberiMonumentali.csv');" >
+				alberi monumentali d'italia</a>
+			</li>
+			<li>
+				<a href="#" 
+				onclick="$('#dataURL').val('https://raw.githubusercontent.com/washingtonpost/data-school-shootings/master/school-shootings-data.csv');" >
+				school shootings USA</a>
+			</li>
+			<li>
+				<a href="#" 
+				onclick="$('#dataURL').val('https://raw.githubusercontent.com/wri/global-power-plant-database/master/output_database/global_power_plant_database.csv');" >
+				global power plant database</a>
+			</li>
+			</ul>
+		</div>
+
+		<div style="display:none">
+		<div>
+			<p>or give a JSON file
+				<a href="#" title="First line must contains fieldnames and values must be separated by ';'">URL</a>
+				<br>
+				<span style="font-size:0.8em;">
+					<span>
+			</p>
+			<input type="text" id="jsonURL" class="filenameOrUrl"></input>&nbsp;
+			<input id="loadJSON" type="button" class="btn btn-md btn-default" value="Load" style="vertical-align:top;" />
+			<img src="../resources/images/loading_blue.gif" id="load-json-spinner" style="height:24px;vertical-align:top;display:none">
+			<hr />
+		</div>
+		<div>
+			<p>or give a GEO JSON file
+				<a href="#" title="First line must contains fieldnames and values must be separated by ';'">URL</a>
+				<br>
+				<span style="font-size:0.8em;">
+					<span>
+			</p>
+			<input type="text" id="geojsonURL" class="filenameOrUrl"></input>&nbsp;
+			<input id="loadGEOJSON" type="button" class="btn btn-md btn-default" value="Load" style="vertical-align:top;" />
+			<img src="../resources/images/loading_blue.gif" id="load-json-spinner" style="height:24px;vertical-align:top;display:none">
+			<hr />
+		</div>
+		<div>
+			<p>or give a JSON-DB file
+				<a href="#" title="First line must contains fieldnames and values must be separated by ';'">URL</a>
+				<br>
+				<span style="font-size:0.8em;">
+					<span>
+			</p>
+			<input type="text" id="jsondbURL" class="filenameOrUrl"></input>&nbsp;
+			<input id="loadJsonDB" type="button" class="btn btn-md btn-default" value="Load" style="vertical-align:top;" />
+			<img src="../resources/images/loading_blue.gif" id="load-jsondb-spinner" style="height:24px;vertical-align:top;display:none">
+			<hr />
+		</div>
+		<div>
+			<p>or give a JSON-stat file
+				<a href="#" title="First line must contains fieldnames and values must be separated by ';'">URL</a>
+				<br>
+				<span style="font-size:0.8em;">
+					<span>
+			</p>
+			<input type="text" id="jsonstatURL" class="filenameOrUrl"></input>&nbsp;
+			<input id="loadJSONstat" type="button" class="btn btn-md btn-default" value="Load" style="vertical-align:top;" />
+			<img src="../resources/images/loading_blue.gif" id="load-jsonstat-spinner" style="height:24px;vertical-align:top;display:none">
+		</div>
+		</div>
+		<br>
+		<br>
+		<br>
+		<div>
+			<p>or simply paste your dataset into the text area and hit the 'Run' button.</p>
+			<textarea id=textInput style="height:150px;"></textarea>
+			<input id="run" type="button" value="Run" class="btn btn-md btn-default" />
+			<img src="../resources/images/loading_blue.gif" id="load-text-spinner" style="height:24px;vertical-align:top;display:none">
+		</div>
+		</section>
+	</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
+		<script>
+			$(document).ready(function () {
+
+				var fFTReady = false;
+
+				if (isAPIAvailable()) {
+					$('#fileSelect').bind('change', handleFileSelect);
+				}
+
+				$('#run').bind('click', doTextData);
+
+				//		$('#fusiontable-id').bind('change', doFTImport);
+				$('#importFT').bind('click', doFTImport);
+				$('#importFTNew').bind('click', doFTImportNew);
+
+				$('#loadData').bind('click', doDataUrl);
+				$('#loadFile').bind('click', doLoadFile);
+
+				$('#loadJSONstat').bind('click', doLoadJSONstat);
+				$('#loadJsonDB').bind('click', doLoadJsonDB);
+				$('#loadJSON').bind('click', doLoadJSON);
+				$('#loadGEOJSON').bind('click', doLoadGEOJSON);
+
+				var options = {
+					packages: ['corechart'],
+					callback: FTReady
+				};
+				//google.load('visualization', '1', options);
+
+				_LOG = function (text) {
+					console.log(text);
+				};
+
+			});
+
+			function FTReady() {
+				fFTReady = true;
+			}
+
+			/**
+			 * isAPIAvailable  
+			 * checks the browser support for the HTML5 File API
+			 * displays a warning if the browser doesn't support it
+			 * @type boolean
+			 * @return true,false
+			 */
+			function isAPIAvailable() {
+				// Check for the various File API support.
+				if (window.File && window.FileReader && window.FileList && window.Blob) {
+					// Great success! All the File APIs are supported.
+					return true;
+				} else {
+					alert(
+						"The browser you're using does not currently support\nthe HTML5 File API. As a result the file loading demo\nwon't work properly."
+					);
+					return false;
+				}
+			}
+			/**
+			 * handleFileSelect  
+			 * parses the textfield input into the map data source
+			 * @param evt the evemt handle
+			 * @type void
+			 */
+			function handleFileSelect(evt) {
+				$("load-file-spinner").show();
+				$("load-file-spinner").show();
+				var files = evt.target.files; // FileList object
+				for (var i = 0, len = files.length; i < len; i++) {
+					doFile(files[i], i);
+				}
+			}
+			/**
+			 * doFile  
+			 * reads the file and
+			 * parses the data into the map data source
+			 * @param file filename
+			 * @param i filenumber
+			 * @type void
+			 */
+			var actFile = null;
+
+			function doFile(file, i) {
+				$("#fileName").val(file.name);
+				actFile = file;
+				doLoadFile();
+			}
+			/**
+			 * doFile  
+			 * reads the file and
+			 * parses the data into the map data source
+			 * @param file filename
+			 * @param i filenumber
+			 * @type void
+			 */
+			function doLoadFile() {
+				$("#load-file-spinner").show();
+				$("#section-special-files").hide();
+				var reader = new FileReader();
+				reader.readAsText(actFile);
+				reader.onload = function (event) {
+					var csv = event.target.result;
+					if ( csv[0] == "{" ){
+						if (!processJSONData(csv, actFile.name)) {
+							$("#load-file-spinner").hide();
+							alert('Unable to read ' + actFile.name);
+						}
+					}else{
+						if (!processTextData(csv, actFile.name)) {
+							$("#load-file-spinner").hide();
+							alert('Unable to read ' + actFile.name);
+						}
+					}
+				};
+				reader.onerror = function () {
+					$("#load-file-spinner").hide();
+					alert('Unable to read ' + actFile.name);
+				};
+			}
+
+			/**
+			 * doDataUrl 
+			 * parses the textfield input into the map data source
+			 * @type void
+			 */
+			function doDataUrl() {
+				$("#load-url-spinner").show();
+				var szUrl = String($('#dataURL').val());
+				if (!szUrl.match(/http:/) && !szUrl.match(/https:/)) {
+					szUrl = ixmaps.embeddedApi.editor.szExternalDataPath + "csv/" + szUrl;
+				}
+				$.ajax({
+					type: "GET",
+					url: szUrl,
+					dataType: "text",
+					success: function (data) {
+						processTextData(data, szUrl);
+					},
+					error: function () {
+						$("#load-url-spinner").hide();
+						alert("\"" + szUrl + "\" could not be loaded!");
+					}
+				});
+			}
+
+			/**
+			 * doFTImport  
+			 * reads from Google Fusion Table 
+			 * parses the data into the map data source
+			 * @param file filename
+			 * @param i filenumber
+			 * @type void
+			 */
+			function doFTImport() {
+
+				$("#load-ft-spinner").show();
+
+				var ftId = $('#fusiontable-id').val();
+
+				// Construct query
+				var query = "SELECT * FROM " + ftId;
+				var queryText = encodeURIComponent(query);
+				var gvizQuery = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + queryText);
+
+				// Send query and draw table with data in response
+				gvizQuery.send(function (response) {
+
+					console.log(response);
+					var numRows = response.getDataTable().getNumberOfRows();
+					var numCols = response.getDataTable().getNumberOfColumns();
+
+					var newData = new Array();
+
+					var newRow = new Array();
+					for (var i = 0; i < numCols; i++) {
+						newRow.push(response.getDataTable().getColumnLabel(i));
+					}
+					newData.push(newRow);
+
+					for (var i = 0; i < numRows; i++) {
+						newRow = new Array();
+						for (var j = 0; j < numCols; j++) {
+							newRow.push(response.getDataTable().getValue(i, j));
+						}
+						newData.push(newRow);
+					}
+
+					createThemeDataObject(newData, "FT", ftId);
+				});
+			}
+
+			function doFTImportNew() {
+
+				var ftId = $('#fusiontable-id').val();
+				var szKey = "AIzaSyDu2i9dN3cXy-g-Y4rmhXyTLCTEadhL-BM";
+				var szFT = "https://www.googleapis.com/fusiontables/v1/query?";
+
+				// Construct query
+				var szUrl = szFT + "sql=SELECT * FROM " + ftId + "&key=" + szKey;
+
+				$.getJSON(szUrl, function (data, textStatus, jqxhr) {
+
+					console.log(data);
+					var newData = new Array();
+
+					newData.push(data.columns);
+					for (var i = 0; i < data.rows.length; i++) {
+						newData.push(data.rows[i]);
+					}
+					createThemeDataObject(newData, "FTV1", ftId);
+				});
+			}
+
+			/**
+			 * doLoadJSONstat  
+			 * reads from Google Fusion Table 
+			 * parses the data into the map data source
+			 * @param file filename
+			 * @param i filenumber
+			 * @type void
+			 */
+			function doLoadJSONstat() {
+
+				$("#load-jsonstat-spinner").show();
+
+				var szUrl = $('#jsonstatURL').val();
+				//szUrl = "http://json-stat.org/samples/oecd-canada.json";
+				//szUrl = "http://apistat.istat.it/?q=getdatajson&dataset=DICA_POPLEGALE&dim=0,0,3,182,1&lang=0&tr=&te=";
+				if (!szUrl.match(/http:/)) {
+					var szPathA = ixmaps.embeddedApi.editor.szExternalDataPath.split('/');
+					szPathA = szPathA.slice(1);
+					szUrl = szPathA.join('/') + "jsonstat/" + szUrl;
+				}
+				JSONstat(szUrl,
+					function () {
+						var dataA = new Array();
+
+						// number of dimensions
+						console.log(this.Dataset(0).length);
+						// array of dimension names
+						console.log(this.Dataset(0).id);
+
+						// here we must ask for what dimension to use 
+						// TBD
+
+						// for now we take dimension 0 and 1
+						// 0 for the y axis = first column
+						// 1 for the x axis = values columns
+
+						console.log(this.Dataset(0).Dimension(0).length);
+						console.log(this.Dataset(0).Dimension(1).length);
+
+						// first row = column names
+						//
+						var row = [this.Dataset(0).Dimension(0).label];
+						var index = this.Dataset(0).Dimension(1).id;
+						for (i = 0; i < index.length; i++) {
+							row.push(this.Dataset(0).Dimension(1).Category(index[i]).label);
+						}
+						console.log(row);
+						dataA.push(row);
+
+						// data rows
+						//
+						for (var i = 0; i < this.Dataset(0).Dimension(0).length; i++) {
+							var row = new Array();
+							row.push(this.Dataset(0).Dimension(0).Category(this.Dataset(0).Dimension(0).id[i]).label);
+							for (var ii = 0; ii < this.Dataset(0).Dimension(1).length; ii++) {
+								row.push(this.Dataset(0).Data([i, ii]).value);
+							}
+							console.log(row);
+							dataA.push(row);
+						}
+
+						// create jsonDB object for iXmaps
+						//
+						createThemeDataObject(dataA, "jsonstat", szUrl);
+					}
+				);
+			}
+
+			/**
+			 * doLoadJSON 
+			 * reads a simple JSON table 
+			 * parses the data into the map data source
+			 * @param file filename
+			 * @param i filenumber
+			 * @type void
+			 */
+			function doLoadJSON() {
+
+				$("#load-json-spinner").show();
+
+				var szUrl = $('#jsonURL').val();
+
+				if (!szUrl.match(/http:/) && !szUrl.match(/https:/)) {
+					var szPathA = ixmaps.embeddedApi.editor.szExternalDataPath.split('/');
+					szPathA = szPathA.slice(1);
+					szUrl = szPathA.join('/') + "json/" + szUrl;
+				}
+
+				$.get(szUrl,
+					function (data) {
+						__processJsonData(data, {});
+					}).error(function () {
+					alert("error");
+				});
+
+			}
+
+			/**
+			 * doLoadGEOJSON 
+			 * reads a simple JSON table 
+			 * parses the data into the map data source
+			 * @param file filename
+			 * @param i filenumber
+			 * @type void
+			 */
+			function doLoadGEOJSON() {
+
+				$("#load-json-spinner").show();
+
+				var szUrl = $('#geojsonURL').val();
+
+				if (!szUrl.match(/http:/) && !szUrl.match(/https:/)) {
+					var szPathA = ixmaps.embeddedApi.editor.szExternalDataPath.split('/');
+					szPathA = szPathA.slice(1);
+					szUrl = szPathA.join('/') + "json/" + szUrl;
+				}
+
+				$.get(szUrl,
+					function (data) {
+						processGeoJSONData(data, szUrl);
+					}).error(function () {
+					alert("error");
+				});
+
+			}
+
+			/**
+			 * doTextData  
+			 * parses the textfield input into the map data source
+			 * @type void
+			 */
+			function doTextData() {
+				processTextData($('#textInput').val(), "text");
+			}
+
+			function processTextData(csv, szSource) {
+
+				if ( csv.match(/created by dbf2xml/) ){
+					console.log(csv);
+					$("#load-text-spinner").hide();
+					__processJsonDBData(eval(csv), {name:szSource.split(".")[0]}); 
+					return true;
+				}
+
+				if ( csv.match(/{\"type\":\"FeatureCollection\"/) ){
+					console.log(csv);
+					$("#load-text-spinner").hide();
+					processGeoJSONData(csv,szSource); 
+					return true;
+				}
+
+				$("#load-text-spinner").show();
+
+				// GR 02.11.2015 nuovo csv parser Papa Parse by Matt Hold 
+				// GR 21.07.2016 if autodecet delimiter fails, try first ; and then ,   
+
+				var newData = Papa.parse(csv).data;
+				if (newData[0].length != newData[1].length) {
+					_LOG("csv parser: autodetect failed");
+					_LOG("csv parser: delimiter = ;");
+					newData = Papa.parse(csv, {
+						delimiter: ";"
+					}).data;
+					if (newData[0].length != newData[1].length) {
+						_LOG("csv parser: delimiter = ; failed");
+						_LOG("csv parser: delimiter = ,");
+						newData = Papa.parse(csv, {
+							delimiter: ","
+						}).data;
+						if (newData[0].length != newData[1].length) {
+							_LOG("csv parser: delimiter = , failed");
+							alert("csv parsing error");
+							return false;
+						}
+					}
+				}
+
+				// if csv ends with /n, last element is " ", so we must pop it 
+				//
+				if (newData[newData.length - 1].length != newData[0].length) {
+					newData.pop();
+				}
+
+				// if only the first line ends with delimiter, we get one more (empty!) column
+				// the parser gives the first row with different length; 
+				// we must correct this here, because iXMaps checks every row's length with the first ones length later 
+				// 
+				if ((newData[0].length - newData[1].length) == 1) {
+					if (newData[0][newData[0].length - 1] == " ") {
+						newData[0].pop();
+					}
+				}
+
+				createThemeDataObject(newData, "csv", szSource);
+				return true;
+			}
+
+
+			function processCSVData_old(csv, szSource) {
+
+				$("#load-text-spinner").show();
+
+				var c1 = null;
+				var c2 = null;
+				var newData1 = new Array(0);
+				var newData2 = new Array(0);
+
+				try {
+					var newData1 = $.csv.toArrays(csv, {
+						separator: ','
+					});
+					console.log(newData1);
+					var c1 = doCheckTable(newData1, szSource);
+				} catch (e) {}
+				try {
+					var newData2 = $.csv.toArrays(csv, {
+						separator: ';'
+					});
+					console.log(newData2);
+					var c2 = doCheckTable(newData2, szSource);
+				} catch (e) {}
+
+				if (c1 && (c1 > c2)) {
+					createThemeDataObject(newData1, "csv", szSource);
+					return true;
+				} else
+				if (c2 && (c2 > c1)) {
+					createThemeDataObject(newData2, "csv", szSource);
+					return true;
+				}
+				return false;
+			}
+
+			function doCheckTable(newData, szSource) {
+				for (i = 2; i < newData.length; i++) {
+					if (newData[i].length != newData[i - 1].length) {
+						ixmaps.error("'" + szSource + "' - error at line:" + i + "\n \n" + newData[i] + "\n" + newData[i - 1] +
+							"\n\have different record length!");
+						return false;
+					}
+				}
+				return newData[i - 1].length;
+			}
+
+
+			function processJSONData(data, szSource) {
+
+				if ( data.match(/FeatureCollection/) ){
+					$("#load-text-spinner").hide();
+					processGeoJSONData(data, szSource); 
+					return true;
+				}
+
+				$("#load-text-spinner").show();
+
+				return true;
+			}
+
+			function processGeoJSONData(data, szSource) {
+
+				var json = (typeof(data)=="string")?JSON.parse(data):data;
+
+				$("#load-text-spinner").show();
+
+				var newDataA = [];
+				var row = [];
+				for ( p in json.features[0].properties ){
+					row.push(p);
+				}
+				row.push("geometry");
+				newDataA.push(row);
+
+				for ( var i=0; i<json.features.length; i++ ){
+					row = [];
+					for ( p in json.features[i].properties ){
+						row.push(json.features[i].properties[p]);
+					}
+					row.push(JSON.stringify(json.features[i].geometry));
+					newDataA.push(row);
+				}
+
+				createThemeDataObject(newDataA, "geojson", szSource);
+
+				return true;
+			}
+
+			/**
+			 * createThemeDataObject  
+			 * take the loaded data and create a json object with the iXmaps data structure
+			 * @type void
+			 */
+			function createThemeDataObject(dataA, szDataType, szDataSource) {
+
+				var zValues = 0;
+				var nValues = 0;
+
+				// cerate data object
+				// ------------
+				var themeDataObj = new Object();
+
+				// first row of data => object.fields
+				// ------------
+				themeDataObj.fields = new Array();
+				for (var a in dataA[0]) {
+					themeDataObj.fields.push({
+						id: (dataA[0][a] || " "),
+						typ: 0,
+						width: 60,
+						decimals: 0
+					});
+				}
+
+				// following rows => object.ecords
+				// records array
+				// --------------
+				themeDataObj.records = new Array();
+
+				// get all values we want 
+				// loop over countries
+				for (i = 1; i < dataA.length; i++) {
+					// add one record
+					var valuesA = new Array();
+					for (var a in dataA[i]) {
+						valuesA.push(dataA[i][a]);
+					}
+					themeDataObj.records.push(valuesA);
+				}
+
+				// finish the data object by creating object.table
+				// -----------------------------------------------
+				themeDataObj.table = {
+					records: dataA.length - 1,
+					fields: dataA[0].length
+				};
+
+				// I. deploy the object into the map
+				// ---------------------------------
+				ixmaps.embeddedApi.embeddedSVG.window.themeDataObj = themeDataObj;
+
+				// II. deploy the object into the editor
+				// -------------------------------------
+				//ixmaps.embeddedApi.window.themeDataObj = themeDataObj;
+				//ixmaps.embeddedApi.window.szExternalDataTable = "themeDataObj" + " " + szDataType+ " url(" + szDataSource + ")";
+
+				// re-initialize the editor
+				// -------------------------------------
+				ixmaps.editor.dbtableUrl = szDataSource;
+				ixmaps.editor.dbtableType = szDataType;
+				ixmaps.editor.dbtable = themeDataObj;
+
+				ixmaps.editor.loadTheme();
+
+				ixmaps.hideStoryTool();
+
+			}
+
+
+
+			/**
+			 * doLoadJsonDBstat  
+			 * reads from Google Fusion Table 
+			 * parses the data into the map data source
+			 * @param file filename
+			 * @param i filenumber
+			 * @type void
+			 */
+			function doLoadJsonDB() {
+
+				$("#load-jsondb-spinner").show();
+
+				var szUrl = $('#jsondbURL').val();
+				if (!szUrl.match(/http:/)) {
+					var szPathA = ixmaps.embeddedApi.editor.szExternalDataPath.split('/');
+					szPathA = szPathA.slice(1);
+					szUrl = szPathA.join('/') + "jsondb/" + szUrl;
+				}
+				__doJsonDBImport(szUrl, {});
+			}
+			/**
+			 * doJsonDBImport 
+			 * reads JsonDB files from URL
+			 * JsonDB files are regural JavaScript files, the data object is parsed automatically on load 
+			 * @param file filename
+			 * @param i filenumber
+			 * @type void
+			 */
+			function __doJsonDBImport(szUrl, opt) {
+
+				_LOG("__doJsonDBImport: " + szUrl);
+
+				$.getScript(szUrl + ".gz")
+					.done(function (script, textStatus) {
+						__processJsonDBData(script, opt);
+					})
+					.fail(function (jqxhr, settings, exception) {
+						$.getScript(szUrl)
+							.done(function (script, textStatus) {
+								__processJsonDBData(script, opt);
+							})
+							.fail(function (jqxhr, settings, exception) {
+								alert("external data: '" + szUrl + "' could not be loaded !", 2000);
+							});
+					});
+			}
+
+			function __processJsonDBData(script, opt) {
+
+				_LOG("__processJsonDBData:");
+
+				// if there is an ext data processor defined, call it
+				// --------------------------------------------------
+				if (typeof (opt.ext) != "undefined") {
+					if (opt.ext.length) {
+						$.getScript(opt.ext)
+							.done(function (script, textStatus) {
+								__callThemeDataObjectExt(script, opt);
+							})
+							.fail(function (jqxhr, settings, exception) {
+								alert("external data provider: '" + opt.ext + "' could not be loaded !", 2000);
+							});
+					} else {
+						__callThemeDataObjectExt(script, opt);
+					}
+				} else {
+					__setJsonDBData(script, opt);
+				}
+
+			}
+
+			function __processJsonData(script, opt) {
+
+				_LOG("__processJsonData:");
+
+				// if there is an ext data processor defined, call it
+				// --------------------------------------------------
+				if (typeof (opt.ext) != "undefined") {
+					if (opt.ext.length) {
+						$.getScript(opt.ext)
+							.done(function (script, textStatus) {
+								__callThemeDataObjectExt(script, opt);
+							})
+							.fail(function (jqxhr, settings, exception) {
+								alert("external data provider: '" + opt.ext + "' could not be loaded !", 2000);
+							});
+					} else {
+						__callThemeDataObjectExt(script, opt);
+					}
+				} else {
+					__setGeoJsonData(script, opt);
+				}
+
+			}
+
+			function __callThemeDataObjectExt(script, opt) {
+				console.log("===========================");
+				console.log(opt);
+				console.log(ixmaps);
+				console.log("===========================");
+				_LOG("__callThemeDataObjectExt:");
+
+				var zValues = 0;
+				var nValues = 0;
+
+				// if there is an ext data processor defined, call it
+				// --------------------------------------------------
+				if (typeof (opt.ext) != "undefined") {
+					try {
+						console.log("ixmaps.parentApi.parentApi." + opt.name + "(script)");
+						eval("ixmaps.parentApi.parentApi." + opt.name + "(script)");
+					} catch (e) {
+						try {
+							console.log("ixmaps.parentApi." + opt.name + "(script)");
+							eval("ixmaps.parentApi." + opt.name + "(script)");
+						} catch (e) {
+							try {
+								console.log("ixmaps." + opt.name + "(script)");
+								eval("ixmaps." + opt.name + "(script)");
+							} catch (e) {}
+						}
+					}
+				}
+				__setJsonDBData(script, opt);
+			}
+
+			function __setJsonDBData(script, opt) {
+				//ixmaps.HTML_showLoadingArrayStop();
+				//ixmaps.HTML_showLoading("data loaded ...");
+				//setTimeout("ixmaps.HTML_hideLoading()", 1000);
+				eval("themeDataObj = " + opt.name);
+				ixmaps.embeddedApi.embeddedSVG.window.themeDataObj = themeDataObj;
+
+				console.log(themeDataObj);
+
+				// re-initialize the editor
+				// -------------------------------------
+				ixmaps.editor.dbtableUrl = "local file system";
+				ixmaps.editor.dbtableType = "jsonDB";
+				ixmaps.editor.dbtable = themeDataObj;
+
+				ixmaps.editor.loadTheme();
+
+				ixmaps.hideStoryTool();
+			}
+
+			function __setJsonData(script, opt) {
+
+				if (typeof (script) == "string") {
+					eval("var data = " + script);
+				} else {
+					var data = script;
+				}
+
+				var dataA = [];
+
+				var row = [];
+				for (a in data[0]) {
+					row.push(a);
+				}
+				dataA.push(row);
+
+				for (i = 1; i < data.length; i++) {
+					var row = [];
+					for (a in data[0]) {
+						row.push(data[i][a] || "");
+					}
+					dataA.push(row);
+				}
+				createThemeDataObject(dataA, "json", opt.szUrl);
+			}
+
+			function __setGeoJsonData(script, opt) {
+
+				if (typeof (script) == "string") {
+					eval("var data = " + script);
+				} else {
+					var data = script;
+				}
+
+				console.log(data);
+				/**
+				var dataA = [];
+
+				var row = [];
+				for (a in data[0]) {
+					row.push(a);
+				}
+				dataA.push(row);
+
+				for (i = 1; i < data.length; i++) {
+					var row = [];
+					for (a in data[0]) {
+						row.push(data[i][a] || "");
+					}
+					dataA.push(row);
+				}
+				createThemeDataObject(dataA, "json", opt.szUrl);
+				**/
+			}
+		
+			// ------------------------
+			// end of code 
+			// ------------------------
+		</script>
+
+</body>
+
+</html>

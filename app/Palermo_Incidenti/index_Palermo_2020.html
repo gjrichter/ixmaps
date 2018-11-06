@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="iso-8859-1">
+    <title>iXmaps 2020</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- styles -->
+    <link href="./assets/css/bootstrap.css" rel="stylesheet">
+    <link href="css/twentytwenty.css" rel="stylesheet" type="text/css" />
+
+    <link href = "../../ui/css/messagebox.css" rel="stylesheet" type="text/css" >
+    <link href = "../../ui/libs/DataTables-1.9.4/media/css/demo_table.css" rel="stylesheet" type="text/css" >
+  <style>
+    body { margin:0; padding:0;		}
+    #map1div { position:absolute; top:0px; bottom:0px; left:0px; width:100%; background:#fff; }
+    #map2div { position:absolute; top:0px; bottom:0px; left:0px; width:100%; background:#fff; }
+  </style>
+    <style type="text/css">
+      body {
+        padding:0;
+        margin:0;
+      }
+	  #dialog {
+		display:block;
+		background: #fff; 
+
+		-moz-box-shadow: 0px 1px 4px /*{global-box-shadow-size}*/ 			rgba(0,0,0,.3) /*{global-box-shadow-color}*/ ;
+		-webkit-box-shadow: 0px 1px 4px /*{global-box-shadow-size}*/ 		rgba(0,0,0,.3) /*{global-box-shadow-color}*/ ;
+		box-shadow: 0px 1px 4px /*{global-box-shadow-size}*/ 				rgba(0,0,0,.3) /*{global-box-shadow-color}*/ ;
+
+	  }
+	  #loadedmap{
+		color:#ddd;
+	  }
+
+    </style>
+    <link href="./assets/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="./assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="./assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="./assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="./assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="./assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body style="background:#FFFFFF">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+		  <div style="margin-left:12px;">
+			<a class="brand" href="#"><span style="color:#4D59F8">iX</span><span style="color:#3BA234">Maps</span></a>
+          </div>
+          <div class="nav-collapse">
+            <ul class="nav">
+			  <li class="dropdown">
+			  <a data-toggle="dropdown" class="dropdown-toggle" href="javascript:__killDialog();return false;">Tema a sinistra<b class="caret"></b></a>
+					  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+							<li><a href="javascript:ixmaps.newTheme('map1','Palermo Incidenti',num_totale,'clear');">
+							Incidenti</a></li>
+							<li><a href="javascript:ixmaps.newTheme('map1','Palermo Incidenti',num_totale_multibubble_center_glow,'clear');">
+							Incidenti aggregati</a></li>
+							<li><a href="javascript:ixmaps.newTheme('map1','Palermo Incidenti',num_totale_multibubble_center_linear_glow,'clear');">
+							Incidenti aggregati lineare</a></li>
+						<li role="separator" class="divider"></li>
+							<li><a href="javascript:ixmaps.newTheme('map1','Palermo Incidenti',test_feriti_monochrome,'clear');">
+							Incidentalità</a></li>
+							<li><a href="javascript:ixmaps.newTheme('map1','Palermo Incidenti',test_feriti_relativi_monochrome,'clear');">
+							Pericolosità</a></li>
+							<li><a href="javascript:ixmaps.newTheme('map1','Palermo Incidenti',test_fraction,'clear');">
+							Pericolosità -bicolore</a></li>
+						<li role="separator" class="divider"></li>
+							<li><a href="javascript:ixmaps.newTheme('map1','Palermo Incidenti',giorno_della_settimana_curve,'clear');">
+							Giorno della settimana</a></li>
+							<li><a href="javascript:ixmaps.newTheme('map1','Palermo Incidenti',fasce_orarie_curve,'clear');">
+							Fasce orarie</a></li>
+							<li><a href="javascript:ixmaps.newTheme('map1','Palermo Incidenti',test_fraction,'clear');">
+							Pericolosità -bicolore</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a href="javascript:ixmaps.updatePageHistory('map1',1,true);">Bookmark -&gt;browser url <i class="fa fa-bookmark"></i></a></li>
+					  </ul>
+			  </li>
+			  <li class="dropdown">
+			  <a data-toggle="dropdown" class="dropdown-toggle" href="javascript:__killDialog();return false;">Tema a destra<b class="caret"></b></a>
+					  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+							<li><a href="javascript:ixmaps.newTheme('map2','Palermo Incidenti',num_totale,'clear');">
+							Incidenti</a></li>
+							<li><a href="javascript:ixmaps.newTheme('map2','Palermo Incidenti',num_totale_multibubble_center_glow,'clear');">
+							Incidenti aggregati</a></li>
+							<li><a href="javascript:ixmaps.newTheme('map2','Palermo Incidenti',num_totale_multibubble_center_linear_glow,'clear');">
+							Incidenti aggregati lineare</a></li>
+						<li role="separator" class="divider"></li>
+							<li><a href="javascript:ixmaps.newTheme('map2','Palermo Incidenti',test_feriti_monochrome,'clear');">
+							Incidentalità</a></li>
+							<li><a href="javascript:ixmaps.newTheme('map2','Palermo Incidenti',test_feriti_relativi_monochrome,'clear');">
+							Pericolosità</a></li>
+							<li><a href="javascript:ixmaps.newTheme('map2','Palermo Incidenti',test_fraction,'clear');">
+							Pericolosità -bicolore</a></li>
+						<li role="separator" class="divider"></li>
+							<li><a href="javascript:ixmaps.newTheme('map2','Palermo Incidenti',giorno_della_settimana_curve,'clear');">
+							Giorno della settimana</a></li>
+							<li><a href="javascript:ixmaps.newTheme('map2','Palermo Incidenti',fasce_orarie_curve,'clear');">
+							Fasce orarie</a></li>
+							<li><a href="javascript:ixmaps.newTheme('map2','Palermo Incidenti',test_fraction,'clear');">
+							Pericolosità -bicolore</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a href="javascript:ixmaps.updatePageHistory('map2',1,true);">Bookmark -&gt;browser url <i class="fa fa-bookmark"></i></a></li>
+					  </ul>
+			  </li>
+					<li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle"><span>Mapa di fondo</a>
+					  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+	
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('white');">white</a></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('black');">black</a></li>
+
+						<li role="separator" class="divider"></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('OpenStreetMap - Osmarenderer');">OpenStreetMap - Osmarenderer</a></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('OpenStreetMap - roads');">OpenStreetMap - Roads</a></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('OpenStreetMap - FR');">OpenStreetMap - Humanitarian</a></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('OpenStreetMap - Transport');">OpenStreetMap - Transport</a></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('OpenStreetMap - wikipedia');">OpenStreetMap - Wikipedia</a></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('OpenStreetMap - gray');">OpenStreetMap - Gray</a></li>
+
+						<li role="separator" class="divider"></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('Stamen - toner-lite');">Stamen - toner-lite</a></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('Stamen - watercolor');">Stamen - watercolor</a></li>
+
+						<li role="separator" class="divider"></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('CartoDB - Positron');">CartoDB - Positron</a></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('CartoDB - Dark matter');">CartoDB - Dark matter</a></li>
+
+						<li role="separator" class="divider"></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('ArcGIS - Topo');">ArcGIS - Topo</a></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('ArcGIS - Light Gray Base');">ArcGIS - Light Gray Base</a></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('ArcGIS - Ocean Basemap');">ArcGIS - Ocean Basemap</a></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('ArcGIS - Hillshade');">ArcGIS - Hillshade</a></li>
+
+						<li role="separator" class="divider"></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('MapQuest - OSM (EU)');">MapQuest - OSM (EU)</a></li>
+						<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('ThunderForest - pioneer');">ThunderForest - pioneer</a></li>
+					  </ul>	
+                    </li>
+              <li><a href="javascript:__aboutDialog()">Info</a></li>
+              <li><a id="loadedmap" style="margin-left:10px" href="javascript:__mapDialog()"></a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+    </div>
+
+    <div style="margin-top:40px;">
+
+      <!-- Main hero unit for a primary marketing message or call to action -->
+
+		<div class="twentytwenty-container" style="height:800px;" >
+			<div id="map1div"  >
+				<iframe id="map1" style="height:800px;width:100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" class="shadow" src="" ></iframe>
+			</div>
+			<div id="map2div" >
+				<iframe id="map2" style="height:800px;width:100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" class="shadow" src="" ></iframe>
+			</div>
+		</div>
+
+		<div id="dialog-pos" style="position:absolute;top:40px;left:0px;width:90%;align:center;display:none;z-index:9999"  >
+			<div id="dialog" style="display:none">
+			</div>
+		</div>
+
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display:block">
+		  <div class="modal-dialog">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel">scegli nuova zona per la mappa ...</h4>
+			  </div>
+			  <div class="modal-body">
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./assets/js/jquery.js"></script>
+    <script src="./assets/js/bootstrap-transition.js"></script>
+    <script src="./assets/js/bootstrap-alert.js"></script>
+    <script src="./assets/js/bootstrap-modal.js"></script>
+    <script src="./assets/js/bootstrap-dropdown.js"></script>
+    <script src="./assets/js/bootstrap-scrollspy.js"></script>
+    <script src="./assets/js/bootstrap-tab.js"></script>
+    <script src="./assets/js/bootstrap-tooltip.js"></script>
+    <script src="./assets/js/bootstrap-popover.js"></script>
+    <script src="./assets/js/bootstrap-button.js"></script>
+    <script src="./assets/js/bootstrap-collapse.js"></script>
+    <script src="./assets/js/bootstrap-carousel.js"></script>
+    <script src="./assets/js/bootstrap-typeahead.js"></script>
+
+	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
+    <script src="js/jquery.event.move.js"></script>
+    <script src="js/jquery.twentytwenty.js"></script>
+
+    <script src="js/italia.js"></script>
+    <script src="js/province.js"></script>
+
+	<script type="text/javascript" src = "../../ui/libs/getUrlParam/js/jquery.getUrlParam.js"></script>
+	<script type="text/javascript" src = "../../ui/js/htmlgui_api.js"></script>
+	<script type="text/javascript" src = "../../ui/libs/messagebox.js"></script>
+
+    <script>
+	// ---------------------------------------------------------------------
+	// URL to embed the map 
+	// has been created using an iXMaps application of the 'censimento 2011'
+	// ---------------------------------------------------------------------
+	var __embedMap1 = 
+		"../../ui/dispatch.htm?ui=embed&name=map1&align=left&basemap=ll&maptype=CartoDB - Positron&minimal=1&toolbutton=1&child=1&svggis=../../maps/svg/maps/generic/mercator.svgz&story=../../app/Palermo_Incidenti/stories/2016/index_full.html&bookmark=map.Api.setScaleParam(%7B'normalSizeScale'%3A5000%7D)%3Bmap.Api.setMapFeatures('%3Aundefined%3Bfeaturescaling%3Adynamic%3Bobjectscaling%3Adynamic%3Bclipmap%3Atrue%3Bclipmapdynamic%3Atrue%3Bdynamiclabel%3ANOSIZE%3Blabelspace%3A2.0%3Bchecklabeloverlap%3ANOSQUEEZE%3Bdynamiclayer%3Atrue%3Bdynamictiles%3Atrue%3Bdiscardtiles%3Afalse%3Bloadmultitiles%3Atrue%3Bloadsilent%3Atrue%3Bloadexternaldata%3Atrue%3Bbuttonsize%3A15%3Bfastpan%3Afalse%3Bpanborder%3A0%3Bnortharrow%3Afalse%3Bsidebarbuttons%3Afalse%3Btooltipdelay%3A250%3Bpopupdelay%3A250%3Bpopupgridstyle%3Afirstright%7Cfirstitalic%7Cfirstbold%7Cfirstgray%7Cfirstsmall%7Cbackground%7Calternate%7Cfull%3Bpopupalignment%3ABOTTOM%7CLEFT%3Btransparentbackground%3Atrue%3Btoolmargintop%3A60%3BflushPaintShape%3A5000%3BflushChartDraw%3A5000%3Blabelscaling%3Adynamic%3B')%3Bmap.Api.doZoomMapToGeoBounds(38.11188912298931%2C13.325386047362144%2C38.13828943202836%2C13.384094238282387)%3Bmap.Api.doZoomMapToView(%5B38.125094050917305%2C13.354740142822266%5D%2C14)%3Bmap.Api.newMapTheme(%22generic%22%2C%22Incidenti%22%2C%22%22%2C%22type%3ACHART%7CBUBBLE%7CEXACT%3Bcolorscheme%3ARGB(77%2C184%2C73)%7CRGB(255%2C92%2C92)%7CRGB(3%2C3%2C3)%7CRGB(153%2C51%2C102)%3Bfillopacity%3A0.3%3Bshadow%3Afalse%3Bdbtable%3Atotale_incidenti_georef%3BdbtableUrl%3A..%2F..%2Fdata%2FPalermo%2F_20032017144826.csv%3BdbtableType%3Acsv%3BdbtableExt%3A..%2F..%2Fapp%2FPalermo_Incidenti%2Fstories%2F2016%2Fpreprocess.js%3Bdatacache%3Atrue%3Bitemfield%3Alat%7Clon%3Blookupfield%3Alat%7Clon%3Bvalues%3AC%7CF%7CM%7CR%3Blabel%3Acose%7Cferiti%7Cmortale%7Criserva%3Bunits%3A%3Bscale%3A1.5%3Baggregation%3Amean%3Bevidence%3Aisolate%3Btitle%3AIncidenti%20Palermo%202016%3B%22)%3B&attribution=Data%3A%20%3Ca%20href%3D%22https%3A%2F%2Fwww.comune.palermo.it%2Fopendata_dld.php%3Fid%3D523%22%20target%3D%22_blank%22%20style%3D%22color%3A%230E77B2%22%3EPolizia%20Municipale%20di%20Palermo%20-%20Open%20Data%20Palermo%20-%20CC%20BY%204.0%3C%2Fa%3E&date=Thu%20Jun%2022%202017%2018%3A11%3A54%20GMT%2B0200%20(ora%20legale%20Europa%20occidentale)&parent=http%3A%2F%2Flocalhost%2Fixmaps%2Fdeploy%2Fcdn%2Fixmaps%2Fapp%2FPalermo_Incidenti%2Findex_Palermo_2020.html";
+
+	var __embedMap2 = 
+		"../../ui/dispatch.htm?ui=embed&name=map2&basemap=ll&maptype=CartoDB - Positron&minimal=1&toolbutton=1&child=1&svggis=../../maps/svg/maps/generic/mercator.svgz&story=../../app/Palermo_Incidenti/stories/2016/index_full.html&bookmark=map.Api.setScaleParam(%7B'normalSizeScale'%3A5000%7D)%3Bmap.Api.setMapFeatures('%3Aundefined%3Bfeaturescaling%3Adynamic%3Bobjectscaling%3Adynamic%3Bclipmap%3Atrue%3Bclipmapdynamic%3Atrue%3Bdynamiclabel%3ANOSIZE%3Blabelspace%3A2.0%3Bchecklabeloverlap%3ANOSQUEEZE%3Bdynamiclayer%3Atrue%3Bdynamictiles%3Atrue%3Bdiscardtiles%3Afalse%3Bloadmultitiles%3Atrue%3Bloadsilent%3Atrue%3Bloadexternaldata%3Atrue%3Bbuttonsize%3A15%3Bfastpan%3Afalse%3Bpanborder%3A0%3Bnortharrow%3Afalse%3Bsidebarbuttons%3Afalse%3Btooltipdelay%3A250%3Bpopupdelay%3A250%3Bpopupgridstyle%3Afirstright%7Cfirstitalic%7Cfirstbold%7Cfirstgray%7Cfirstsmall%7Cbackground%7Calternate%7Cfull%3Bpopupalignment%3ABOTTOM%7CLEFT%3Btransparentbackground%3Atrue%3Btoolmargintop%3A60%3BflushPaintShape%3A5000%3BflushChartDraw%3A5000%3Blabelscaling%3Adynamic%3B')%3Bmap.Api.doZoomMapToGeoBounds(38.11188912298931%2C13.325386047362144%2C38.13828943202836%2C13.384094238282387)%3Bmap.Api.doZoomMapToView(%5B38.125094050917305%2C13.354740142822266%5D%2C14)%3Bmap.Api.newMapTheme(%22generic%22%2C%22Incidenti%22%2C%22%22%2C%22type%3ACHART%7CSYMBOL%7CGLOW%7CEXACT%7CSEQUENCE%7CCENTER%7CSORT%7CUP%7CLINEAR%7CRINGS%7CAGGREGATE%7CRECT%7CRELOCATE%7CSUM%7CSIZE%3Bcolorscheme%3ARGB(77%2C184%2C73)%7CRGB(255%2C92%2C92)%7CRGB(3%2C3%2C3)%7CRGB(153%2C51%2C102)%3Bopacity%3A0.66%3Bfillopacity%3A1%3Bshadow%3Afalse%3Bdbtable%3Atotale_incidenti_georef%3BdbtableUrl%3A..%2F..%2Fdata%2FPalermo%2F_20032017144826.csv%3BdbtableType%3Acsv%3BdbtableExt%3A..%2F..%2Fapp%2FPalermo_Incidenti%2Fstories%2F2016%2Fpreprocess.js%3Bdatacache%3Atrue%3Bitemfield%3Alat%7Clon%3Blookupfield%3Alat%7Clon%3Bsymbols%3Acircle%3Bvalues%3AC%7CF%7CM%7CR%3Blabel%3Acose%7Cferiti%7Cmortale%7Criserva%3Bunits%3A%3Bscale%3A0.9227446944279201%3Bsizefield%3Aaggregation%3Bcenterpart%3Amax%3Bgridwidth%3A10%3Baggregation%3Asum%3Bevidence%3Aisolate%3Btitle%3AIncidenti%20Palermo%202016%3Bdescription%3Alineare%20-%20il%20radius%20dei%20cerchi%20corrisponde%20al%20n%C2%B0%20di%20incidenti%3B%22)%3B&attribution=Data%3A%20%3Ca%20href%3D%22https%3A%2F%2Fwww.comune.palermo.it%2Fopendata_dld.php%3Fid%3D523%22%20target%3D%22_blank%22%20style%3D%22color%3A%230E77B2%22%3EPolizia%20Municipale%20di%20Palermo%20-%20Open%20Data%20Palermo%20-%20CC%20BY%204.0%3C%2Fa%3E&date=Thu%20Jun%2022%202017%2018%3A19%3A13%20GMT%2B0200%20(ora%20legale%20Europa%20occidentale)&parent=http%3A%2F%2Flocalhost%2Fixmaps%2Fdeploy%2Fcdn%2Fixmaps%2Fapp%2FPalermo_Incidenti%2Findex_Palermo_2020.html";
+
+	$(document).ready(function() {
+
+		var headerHeight = 40;
+
+        $(".twentytwenty-container").css("height",(window.innerHeight-headerHeight)+"px"); 
+        $("#map1").css("height",(window.innerHeight-headerHeight)+"px"); 
+        $("#map2").css("height",(window.innerHeight-headerHeight)+"px"); 
+		
+		setTimeout('$(".twentytwenty-container").twentytwenty({default_offset_pct: 0.5});',100);  
+	
+		// ===================
+		// embed the map !!!
+		// ===================
+
+		$("#map1").attr("src",__embedMap1);
+		$("#map2").attr("src",__embedMap2);
+
+		// ===================
+		// wait for the map 
+		// ===================
+
+		ixmaps.myMap1Ready = function(mapApi){
+			ixmaps.setSyncMultiMaps(true);
+			ixmaps.setLocalString("... actualize ...","");
+			//ixmaps.setView("map1",[51.49898731096802,-0.04669189453125003],10);
+		};
+		ixmaps.myMap2Ready = function(mapApi){
+			ixmaps.setSyncMultiMaps(true);
+			ixmaps.setLocalString("... actualize ...","");
+			//ixmaps.setView("map2",[51.49898731096802,-0.04669189453125003],10);
+		};
+
+		ixmaps.waitForMap("map1",ixmaps.myMap1Ready);
+		ixmaps.waitForMap("map2",ixmaps.myMap2Ready);
+
+		ixmaps.setSyncMultiMaps(true);
+	
+	});
+
+	// load themes script
+	$.getScript("./stories/2016/themes.js",function(){
+	});
+	$.getScript("./stories/2016/preprocess.js",function(){
+	});
+
+	var themesA = [];	
+		themesA["Densità1"]			= "Densità della Popolazione";
+		themesA["Densità2"]			= "Densità della Popolazione alpha";
+		themesA["Fasce"]			= "Eta superiore alla media dop density";
+		themesA["Fasce City"]		= "Eta superiore alla media dop densitycity";
+		themesA["0-4 cont"]			= "conteggio popolazione 0-4 anni chart";
+		themesA["0-4 devia"]		= "Eta 0-4 deviazione dalla media size";
+		themesA["Stranieri cont"]	= "Stranieri";
+		themesA["Stranieri devia"]	= "Stranieri (deviazione dalla media)";
+
+	var setTheme = function(n){
+		ixmaps.setTheme("map1",themesA[n]);
+		ixmaps.setTheme("map2",themesA[n]);
+	};
+
+
+		/**
+		 * open/close the data input dialog 
+		 * @param flag 'show' or 'hide'
+		 * @type void
+		 */
+		__openDialog = function(szUrl){
+
+			if ( $("#dialog").is(":visible") ){
+
+				$("#dialog").html("");
+				$("#dialog").hide();
+				$("#dialog-pos").hide();
+
+			}else{
+
+				$("#dialog").html("");
+				$("#dialog").show();
+				$("#dialog-pos").show();
+
+				$('#dialog').load(szUrl, function(response, status, xhr) {
+					  if (status == "error") {
+						var msg = "Sorry but there was an error: ";
+						alert(msg + xhr.status + "\n" + xhr.statusText);
+					  }
+					$("#dialog").css("width","75%");
+					$("#dialog").css("height","150%");
+					$("#dialog").css("position","relative");
+					$("#dialog").css("left","15%");
+
+					$("#dialog").append( "<div style=\"position:absolute;top:15px;left:87%;\"><a href=\"javascript:__killDialog()\">close</a></div>" );
+				});
+
+			}
+		};
+		/**
+		 * close the data input dialog 
+		 * @param flag 'show' or 'hide'
+		 * @type void
+		 */
+		__killDialog = function(){
+			$("#dialog").hide();
+			$("#dialog-pos").hide();
+		};
+
+		/**
+		 * open/close the map select dialog (menu like)  
+		 * @param flag 'show' or 'hide'
+		 * @type void
+		 */
+		__mapDialog = function(flag){
+			if (1){
+				$('.modal-body').load('./select_map.html', function(response, status, xhr) {
+				  if (status == "error") {
+					var msg = "Sorry but there was an error: ";
+					alert(msg + xhr.status + "\n" + xhr.statusText);
+				  }
+				  $('#myModalLabel').html("scegli nuova zona per la mappa ...");
+				  $('#myModal').modal({backdrop:false});
+				  init_map_dialog();
+				});
+			}else{
+				__openDialog('./main_censimento15.html');
+			}
+		};
+		/**
+		 * open/close the data input dialog 
+		 * @param flag 'show' or 'hide'
+		 * @type void
+		 */
+		__dataImportDialog = function(flag){
+			__openDialog('../sys/editor/en/import.html');
+		};
+		/**
+		 * open/close the data input dialog 
+		 * @param flag 'show' or 'hide'
+		 * @type void
+		 */
+		__dataViewDialog = function(flag){
+			__openDialog('../sys/editor/en/table.html');
+		};
+		/**
+		 * open/close the about dialog 
+		 * @param flag 'show' or 'hide'
+		 * @type void
+		 */
+		__aboutDialog = function(flag){
+			if (1){
+				$('.modal-body').load('./about.html', function(response, status, xhr) {
+				  if (status == "error") {
+					var msg = "Sorry but there was an error: ";
+					alert(msg + xhr.status + "\n" + xhr.statusText);
+				  }
+				  $('#myModalLabel').html("di questa mappa ...");
+				  $('#myModal').modal({backdrop:false});
+				});
+			}
+		};
+		/**
+		 * open/close the SVG export dialog 
+		 * @param flag 'show' or 'hide'
+		 * @type void
+		 */
+		__exportDialog = function(flag){
+			window.szMapTypeId = ixmaps.htmlgui_getMapTypeId();
+			window.DOMViewerObj = ixmaps.embeddedSVG.window.document;
+			__openDialog('../sys/editor/en/export.html');
+		};
+		/**
+		 * open/close the history dialog 
+		 * @param flag 'show' or 'hide'
+		 * @type void
+		 */
+		__historyDialog = function(flag){
+			__openDialog('../sys/editor/en/history.html');
+		};
+		/**
+		 * open/close the history dialog 
+		 * @param flag 'show' or 'hide'
+		 * @type void
+		 */
+		__bookmarkDialog = function(flag){
+			__openDialog('../sys/editor/en/bookmark.html');
+		};
+
+		/**
+		 * open/close the save dialog 
+		 * @param flag 'show' or 'hide'
+		 * @type void
+		 */
+		__saveDialog = function(flag){
+			__openDialog('../sys/editor/en/save.html');
+		};
+
+		/**
+		 * open/close the load dialog 
+		 * @param flag 'show' or 'hide'
+		 * @type void
+		 */
+		__loadDialog = function(flag){
+			__openDialog('../sys/editor/en/load.html');
+		};
+
+		ixmaps.error = function(szText){
+			try	{
+				MessageBox.show(MESSAGE_TYPE.Error, "iXmaps", szText.replace(/\n+/g,'<br>'), null, null);
+			}
+			catch (e){
+				alert(szText);
+			}
+		};
+		ixmaps.confirm = function(szText,callOk,callCancel){
+			try	{
+				MessageBox.show(MESSAGE_TYPE.Confirmation, "iXmaps", szText.replace(/\n+/g,'<br>'), callOk, callCancel);
+			}
+			catch (e){
+				if ( confirm("szText") ){
+					callOk();
+				}
+			}
+		};
+
+	</script>
+
+  </body>
+</html>

@@ -3,10 +3,18 @@
  * Code licensed under the Apache License v2.0.
  * For details, see http://www.apache.org/licenses/LICENSE-2.0.
  */
+	h3 {
+		margin:0;
+		padding:0;
+		margin-top: -0.3em;
+		font-weight: normal;
+	}
 
 	table.legend-color-scheme {
 		border-collapse: separate;
 		border-spacing: 2px;
+		margin-top: 0.4em;
+		margin-bottom: 0.2em;
 	}
 	table.theme-legend {
 		spacing: 1;
@@ -17,13 +25,14 @@
 		font-size: 14px;
 		-webkit-text-size-adjust: 100%;
 		-ms-text-size-adjust: 100%;
+		width: 30%;
 	}
 	.map-legend {
 		position:absolute;
-		top:15px;
-		right:50px;
+		top:13px;
+		right:4%;
 		opacity:0.95;
-		min-width:400px;
+		min-width:350px;
 		max-width:500px;
 	}
 	.map-legend-pane:before {
@@ -36,31 +45,60 @@
 		height: 100%;
 		z-index: 0;
 		background: white;
-		opacity: 0.9;
-		border: solid #dddddd 0.1px;
-		-webkit-box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
-		box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+		opacity: 0.7;
+		border: solid #cccccc 1px;
+	}
+	.map-legend-pane {
+		padding:0.5em;
 	}
 	.map-legend-pane .container {
 		width:100%;
 	}
+	#map-legend-body {
+		margin-top:1em;
+		margin-bottom:1em;
+	}
 	#map-legend-content {
 		margin-right:1em;
-		margin-bottom:-0.5em;
+		margin-bottom:1em;
 		width: 90%;
 	}
 	#map-legend-title {
 		font-size: 1.8em;	
 		font-weight: normal;
 		margin-top:0.2em;
-		margin-bottom:0.7em;
+		margin-bottom:0.5em;
 		width: 90%;
 	}
 	#map-legend-snippet {
 		font-size: 1.1em;	
 		font-weight: normal;
-		margin-top:-1em;
-		margin-bottom:0.7em;
+		margin-top:-0.5em;
+		margin-bottom:0.5em;
+	}
+	#map-legend-description {
+		font-size: 1.1em;	
+		font-weight: normal;
+		margin-top:1em;
+	}
+	#map-legend-footer {
+		margin-top: 1em;
+		margin-bottom: 1em;
+	}
+	#legend-pane-switch {
+		color:#888;
+		pointer-events:none;
+	}
+	#legend-type-switch {
+		position:absolute;
+		top:1em;
+		right:1em;
+		float:right;
+		z-index:1;
+		font-size:1em;
+		color:#888;
+		padding:0.3em 0.6em;
+		border:solid #ddd 1px;
 	}
 	.theme-legend-item-selected {
 		background: #DBE6F4;
@@ -72,6 +110,9 @@
 	.theme-tool-button {
 		padding:0.3em;
 		color:#666666;
+	}
+	.theme-legend-count {
+	    white-space: nowrap;
 	}
 	a.theme-tool-button, a.theme-tool-button:hover{
 		text-decoration:none;
@@ -85,13 +126,15 @@
 		line-height: 1.1em;
 	}
 	.legend-range-text {
-		vertical-align:bottom;
-		font-size:0.9em;
-		line-height:2em;
+		font-size: 1em;
 	}
 	.legend-filter-text {
+		padding: 0.5em;
 		margin-top:0em;
-		background:#ddd;
+		xxbackground:#ddd;
+	}
+	a {
+		color: #aaaaaa;
 	}
 	.fa:focus {
 	 outline: none;

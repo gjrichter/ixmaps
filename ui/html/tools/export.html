@@ -1,0 +1,536 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>iXmaps export</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="Description" content="">
+  <meta name="author" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+
+  <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+
+  <link href="../../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+  <link href="../../../ui/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+  <link href="../../css/popuptools.css" rel="stylesheet" type="text/css" >
+
+  <script src = "../../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+  <script src = "../../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+  <!-- share api -->
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+
+
+  <style type="text/css">
+	* {
+		font-family: arial, verdana, sans-serif
+		}
+	span.object {
+	  color: #0000ff;
+	  text-decoration: underline;
+	  cursor: pointer;
+	}
+	body {
+		background-color: #efefe9;
+		}
+	h1 {
+		font-size: 8pt;
+		margin-bottom:2px;
+		}
+	h2 {
+		font-size: 8pt;
+		margin-bottom:2px;
+		}
+	h3 {
+		font-size: 8pt;
+		font-weight: 500;
+		text-indent: 12px;
+		margin-bottom:2px;
+		}
+	li {
+	  white-space: nowrap;
+	  padding: 0px;
+	}
+	ul {
+	  list-style-type: square;
+	  margin-left: 0px;
+	  padding-left: 1.5em;
+	}
+	li li {
+	  list-style-type: disc;
+	  margin-left: 0px;
+	  padding-left: 1.5em;
+	}
+	li li li{
+	  list-style-type: circle;
+	  margin-left: 0px;
+	  padding-left: 1.5em;
+	}
+
+	li li li li li {
+	  list-style-type: square;
+	  margin-left: 0px;
+	  padding-left: 1.5em;
+	}
+	textarea {
+		overflow:auto;
+	}
+
+	.popup_messagebox {
+		background:#ffffff;
+		padding:10px;
+		-moz-box-shadow: 0px 0px 18px /*{global-box-shadow-size}*/ 			rgba(0,0,0,.6) /*{global-box-shadow-color}*/ ;
+		-webkit-box-shadow: 0px 0px 18px /*{global-box-shadow-size}*/ 		rgba(0,0,0,.6) /*{global-box-shadow-color}*/ ;
+		box-shadow: 0px 0px 18px /*{global-box-shadow-size}*/ 				rgba(0,0,0,.6) /*{global-box-shadow-color}*/ ;
+	}
+	.messagebox_container
+	{
+		width:100%;
+		height:100%;
+		overflow:auto;
+		background-color:white;
+		text-shadow: 0 0 0 #ddd;
+		padding-bottom:10px;
+		text-align:center;
+	}
+	 
+	.messagebox_header
+	{
+		font-size:24px;   
+		color:#ddd;
+		margin:10px 0px 10px 0px;
+		padding:0px 0px 0px 15px;
+		text-align:left;    
+	}
+	 
+	.messagebox_caption
+	{
+		color:White;
+		font-size:14px;
+		text-align:left;
+		margin:10px 0px 10px 15px;
+	}
+	 
+	.messagebox_content
+	{
+		color:#444;
+		min-height:10px;
+		text-align:left;
+		padding:0px 10px 10px 15px;    
+	}
+	.messagebox_error_content
+	{
+		color:#c66;
+		min-height:10px;
+		text-align:left;
+		padding:0px 10px 10px 15px;    
+	}
+	 
+	.ui-simpledialog-container
+	{
+		border:solid 2px white !important;
+		border-radius:.3em !important;
+		-webkit-border-radius:.3em !important;
+		background-color:#eee !important;        
+		
+	}
+	.popup_messagebox
+	{
+		position:fixed;
+		background-color:#eee !important;
+		padding:0 !important;
+		border:solid 2px white;
+		border-radius: .3em !important;
+		min-width:280px !important;
+		vertical-align:middle; 
+		z-index:100000000000;   
+	}
+	 
+	.cover_background
+	{
+		position:fixed;
+		top:0px;
+		left:0px;
+		width:10000px;
+		height:10000px;
+		opacity:0.5;
+		z-index:10000;
+		background-color:#888888;    
+	}
+  </style> 
+
+<script type="text/JavaScript"> 
+var isNS6 = (navigator.userAgent.indexOf("Gecko") > 0) ? 1 : 0;
+var isIE5 = (navigator.appVersion.indexOf("MSIE 5") > 0) ? 1 : 0;
+var OPERA = (navigator.userAgent.indexOf("Opera") > 0) ? true : false;
+// Array for tracking objects to expand or collapse.
+
+var objectList = new Array();
+var depth = 0;
+
+var Utf8 = {
+ 
+    // public method for url encoding
+    encode : function (string) {
+        string = string.replace(/\r\n/g,"\n");
+        var utftext = "";
+ 
+        for (var n = 0; n < string.length; n++) {
+ 
+            var c = string.charCodeAt(n);
+ 
+            if (c < 128) {
+				if ( string[n] == '&' || string[n] == '"' || string[n] == '<' || string[n] == '>'){
+					utftext += "&#";
+					utftext += String(c);
+					utftext += ";";
+				}else{
+	                utftext += String.fromCharCode(c);
+				}
+            }
+            else if((c > 127) && (c < 2048)) {
+				utftext += "&#";
+                utftext += String(c);
+                utftext += ";";
+            }
+            else {
+				utftext += "&#";
+                utftext += String(c);
+                utftext += ";";
+            }
+ 
+        }
+ 
+        return utftext;
+    },
+ 
+    // public method for url decoding
+    decode : function (utftext) {
+        var string = "";
+        var i = 0;
+        var c = c1 = c2 = 0;
+ 
+        while ( i < utftext.length ) {
+ 
+            c = utftext.charCodeAt(i);
+ 
+            if (c < 128) {
+                string += String.fromCharCode(c);
+                i++;
+            }
+            else if((c > 191) && (c < 224)) {
+                c2 = utftext.charCodeAt(i+1);
+                string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                i += 2;
+            }
+            else {
+                c2 = utftext.charCodeAt(i+1);
+                c3 = utftext.charCodeAt(i+2);
+                string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                i += 3;
+            }
+ 
+        }
+ 
+        return string;
+    }
+ 
+}
+
+$(document).ready(function() {
+	setTimeout("__createSVG()",100);
+});
+
+__createSVG = function() {
+
+	var wnd = window.DOMViewerObj?window:window.parent;
+		
+	var DOMViewerObj  = wnd.DOMViewerObj;
+	var DOMViewerName = wnd.DOMViewerName;
+
+	if (!DOMViewerObj) {
+	  DOMViewerObj = wnd.document;
+	  DOMViewerName = "document";
+	}
+
+	var szBackgroundColor = "white";
+	if ( wnd.szMapTypeId ){
+		if ( wnd.szMapTypeId.match(/dark/i) || wnd.szMapTypeId.match(/black/i) ){
+			szBackgroundColor = "#222222";
+		}else if ( wnd.szMapTypeId.match(/gray/i) ){
+			szBackgroundColor = "#E6E6E6";
+		}else if ( wnd.szMapTypeId.match(/grey/i) ){
+			szBackgroundColor = "#E6E6E6";
+		}
+	}
+	var bgRect = DOMViewerObj.getElementById("mapbackground:largeeventrect");
+	if ( bgRect ){
+		bgRect.style.setProperty("fill",szBackgroundColor);
+		bgRect.style.setProperty("opacity","1");
+	}
+
+	var szAll = "<?xml version='1.0' ?>\n";
+		szAll += listNodewithChilds(DOMViewerObj.getElementsByTagName("svg").item(0));
+
+	if ( bgRect ){
+		bgRect.style.setProperty("fill",szBackgroundColor);
+		bgRect.style.setProperty("opacity","0");
+	}
+
+	$("#status").html("SVG ready !");
+
+	try	{
+		ixmaps.confirm("Please confirm download",
+			function () {
+				saveTextAsFile(szAll);
+				__killDialog();
+			},
+			function () {
+				__killDialog();
+			});
+	}
+	catch (e){
+		saveTextAsFile(szAll);
+		__killDialog();
+	}
+};
+	
+
+function listOneNode(oneNode){
+
+	var htmla = new String(""); 
+	
+	var attrs = null;
+	if ( attrs = oneNode.attributes ){
+		for (i = 0; i < attrs.length; i++) {
+			var nAttr = attrs.item(i);
+			htmla += " "+nAttr.name+"=\""+Utf8.encode(nAttr.value)+"\""; 	 
+		}
+	}
+	if ( oneNode.nodeName == "#text" ) {
+		if ( oneNode.nodeValue.length && !(oneNode.nodeValue.charCodeAt(0) == 10)){
+			htmla += Utf8.encode(oneNode.nodeValue.replace(/\n\t+/g,'')); 	 
+		}else{
+			return "";
+		}
+    }
+	if ( oneNode.nodeName == "#cdata-section" ) {
+
+		if ( 1 || (oneNode.parentNode.nodeName == "style") ){
+			htmla += "<![CDATA[\n";
+			htmla += oneNode.nodeValue;
+			htmla += "]]>\n";
+			return htmla; 	
+		}
+		return "";
+    }
+	if ( oneNode.nodeName == "#text" ) {
+		return htmla;
+	}
+	return "<" + oneNode.nodeName + " " + htmla + " >\n"; 	
+}
+
+function listNodewithChilds(originalNode){
+
+	var szIndent = "  ";
+
+	var s = "";
+	if ( !originalNode.nodeName.match(/#/)) {
+		for (var i =0; i<depth; i++ ){
+			s += szIndent;
+		}
+	}
+
+	// resolve nested SVG
+	//
+	//if ( depth == 0 || !originalNode.nodeName.match(/svg/i) ){
+		s += listOneNode(originalNode);
+	//}
+
+    if ( originalNode.hasChildNodes() ){
+
+		depth++;
+
+		var collChilds = originalNode.childNodes;
+        for ( var c=0; c<collChilds.length; c++ ){
+			s += listNodewithChilds(collChilds.item(c));		
+		}
+		depth--;
+	}
+
+	if ( !originalNode.nodeName.match(/#/)) {
+		for (var i =0; i<depth; i++ ){
+			s += szIndent;
+		}
+		//if ( depth == 0 || !originalNode.nodeName.match(/svg/i) ){
+			s += "</"+originalNode.nodeName+">\n";
+		//}
+	}
+
+	return s;
+}	  
+
+function showProperties(obj, name) {
+
+  var i, s;
+  var propertyList, temp;
+  var property, value;
+  var lines;
+
+
+  if (!name && obj && obj.id)
+    name = obj.id;
+
+
+  // Netscape: Special handling for objects of type [object CSSStyleRule] due
+  // to browser bugs. Note that 'parentRule' is inaccessible and 'selectorText'
+  // always returns null.
+
+  if (isNS6 && String(obj) == "[object CSSStyleRule]") {
+    objectList[objectList.length] = obj.parentStyleSheet;
+    objectList[objectList.length] = obj.style;
+    return "<ul>"
+      + "<li>" + name + ".cssText = " + obj.cssText + "</li>"
+      + "<li>" + name + ".selectorText = " + obj.selectorText + "</li>"
+      + "<li>" + name + ".parentRule = <i>inaccessible</i></li>"
+      + "<li>" + name + ".parentStyleSheet = "
+      + makeLink(objectList.length - 2, name + ".parentStyleSheet",
+                 String(obj.parentStyleSheet)) + "</li>"
+      + "<li>" + name + ".style = "
+      + makeLink(objectList.length - 1, name + ".style",
+                 String(obj.style)) + "</li>"
+      + "<li>" + name + ".type = " + obj.type + "</li>"
+      + "</ul>";
+  }
+
+  // Create a list of the object's properties sorted alphabetically by name so
+  // they can be listed in an easy to read order.
+
+  propertyList = new Array;
+  for (property in obj)
+    propertyList[propertyList.length] = String(property);
+  propertyList.sort();
+
+
+  // Build a list of properties and values for this object as a string of
+  // HTML.
+
+  s = "<ul>";
+
+  for (i = 0; i < propertyList.length; i++) {
+    property = String(propertyList[i]);
+    value = String(obj[propertyList[i]]);
+
+    // If the object property is itself an object, create it as a link so it's
+    // properties can be expanded or collapsed.
+
+    if (value.indexOf("[object") >= 0) {
+      objectList[objectList.length] = obj[propertyList[i]];
+      value = makeLink(objectList.length - 1, name + "." + property, value);
+    }
+
+    // If the property text contains HTML, encode it for display.
+
+    if (property == "innerHTML" || property == "outerHTML") {
+      var lines = value.split("\n");
+      value = "";
+      for (j = 0; j < lines.length; j++) {
+        lines[j] = lines[j].replace(/(.?)<(.?)/g, "$1<$2");
+        lines[j] = lines[j].replace(/(.?)>(.?)/g, "$1>$2");
+        value += lines[j];
+      }
+    }
+
+    // Add property as a list item.
+
+    s += "<li>" + name + "." + property + " = " + value + "</li>";
+
+    // Netscape: Enumerate each element in an array property (note: IE provides
+    // individual array elements using the index number as the property name).
+
+    if (isNS6 && obj.propertyIsEnumerable(String(property)))
+      for (j = 0; j < parseInt(value, 10); j++) {
+        objectList[objectList.length] = obj[j];
+        temp = makeLink(objectList.length - 1, name + "[" + j + "]",
+                         String(obj[j]));
+        if (obj[j])
+          s += "<li>" + name + "[" + j + "] " + temp + "</li>";
+      }
+  }
+
+  s += "</ul>";
+  return s;
+}
+
+function makeLink(i, name, text) {
+
+  return '<span class="object" onclick="'
+       + 'if (!this.isExpanded)'
+       + 'createList(this,objectList[' + i + '],\'' + name + '\');'
+       + 'else destroyList(this);event.cancelBubble=true;return false;">'
+       + text + '</span>';
+}
+
+function createList(target, obj, name) {
+
+  var node;
+
+  // Generate property list and append it to document after the current node.
+
+  node = document.createElement("SPAN");
+  node.innerHTML = showProperties(obj, name);
+  target.parentNode.appendChild(node);
+  target.isExpanded = true;
+}
+
+function destroyList(target) {
+
+  // Remove a generated property list from the document.
+
+  target.parentNode.removeChild(target.parentNode.lastChild);
+  target.isExpanded = false;
+}
+
+function saveTextAsFile(szText)
+{
+	var textToWrite = szText;
+	var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
+	var fileNameToSaveAs = "test.svg";
+
+	var downloadLink = document.createElement("a");
+	downloadLink.download = fileNameToSaveAs;
+	downloadLink.innerHTML = "Download File";
+	if (window.webkitURL != null)
+	{
+		// Chrome allows the link to be clicked
+		// without actually adding it to the DOM.
+		downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+	}
+	else
+	{
+		// Firefox requires the link to be added to the DOM
+		// before it can be clicked.
+		downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+		downloadLink.onclick = destroyClickedElement;
+		downloadLink.style.display = "none";
+		document.body.appendChild(downloadLink);
+	}
+
+	downloadLink.click();
+}
+
+function destroyClickedElement(event)
+{
+	document.body.removeChild(event.target);
+}
+
+    </script>
+  </head>
+  <body id="DOMViewer" >
+
+	<H1 id="status" style="background:white"> generating S V G ... </H1>
+
+  </body>
+ </html> 
+
+	

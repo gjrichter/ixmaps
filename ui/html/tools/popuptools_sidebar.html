@@ -1,0 +1,607 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>iXMaps Tools</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+
+	<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+
+	<link href="../../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+	<link href="../../../ui/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+	<link href="../../../ui/css/popuptools.css" rel="stylesheet" type="text/css" >
+
+	<script src = "../../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+	<script src = "../../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+
+	<script type="text/javascript" src="../../js/htmlgui_query.js" > </script>
+	<script type="text/javascript" src="../../js/htmlgui_api.js" > </script>
+
+	<script type="text/javascript">
+		$(function() {
+			$( "#tabs" ).tabs({
+			   select: function(event, ui) { changeTool(ui.panel.id); }
+			});
+			$( "#aquery_execute" ).button();
+			$( "#aquery_clear" ).button();
+			$( "#query_search" ).button();
+			$( "#chart_go" ).button();
+			$( "#get_Bookmark" ).button();
+			$( "#popout" ).button();
+			$( "#ToolButton_coordinate" ).button();
+			$( "#ToolButton_measurement" ).button();
+			$( "#ToolButton_polyline" ).button();
+			$( "#ToolButton_polygon" ).button();
+			$( "#toolsgroup" ).buttonset();
+
+			setTimeout('$( "#tabs" ).css("visibility","visible")',50);
+
+		});
+	</script>
+	<script type="text/javascript">
+
+		var api = null;
+
+		/* ------------------------------------------------------------------ * 
+			Init functions
+		 * ------------------------------------------------------------------ */
+
+        function InitAll(){
+
+		var ixmaps = null;
+		if ( window.opener ){
+			ixmaps = window.opener.ixmaps;
+		}else
+		if ( parent ){
+			ixmaps = parent.window.ixmaps;
+		}
+		else{
+			alert("error: missing parent window for themes !");
+		}
+				api = ixmaps;
+
+				console.log(api);
+
+				window.document.body.topMargin = 0;
+				window.document.body.leftMargin = 0;
+
+				szSelectedTheme = ixmaps.doQueryActiveTheme();
+				ixmaps.InitNormalSearch();
+				ixmaps.InitAdvancedSearch(szSelectedTheme);
+				ixmaps.InitChart(szSelectedTheme);
+                var advancedDiv = window.document.getElementById("advancedsearch");
+                var normalDiv = window.document.getElementById("normalsearch");
+
+				fSearchMode = 'normal';
+			}
+
+        function changeTool(szTool){
+
+			switch (szTool){
+				case 'advancedsearch':
+					fSearchMode = 'advanced';
+					window.document.getElementById("searchresult").style["visibility"] = "visible";
+					break;
+				case 'charts':
+					fSearchMode = 'charts';
+					window.document.getElementById("searchresult").style["visibility"] = "visible";
+					break;
+				case 'info':
+					fSearchMode = 'bookmark';
+					window.document.getElementById("searchresult").style["visibility"] = "hidden";
+					htmlgui_getBookmark();
+					break;
+				case 'search':
+				default:
+					window.document.getElementById("searchresult").style["visibility"] = "visible";
+					fSearchMode = 'normal';
+					break;
+			}
+			window.document.getElementById("foundtotal").innerHTML = "";
+			window.document.getElementById("found").innerHTML = "";
+			window.document.getElementById("foundpaging").innerHTML = "";
+			}
+
+		function htmlgui_setActiveTheme(szTheme){
+				szSelectedTheme = szTheme;
+				InitAdvancedSearch(szSelectedTheme);
+				InitChart(szSelectedTheme);
+				}
+
+		function checkChartMethod(){
+			var selectObj = this.event.target;
+			var classesDiv = window.document.getElementById("chartThemeParam22");
+			classesDiv.style["visibility"] = (selectObj.value == 'EXACT')?"hidden":"visible";
+			classesDiv = window.document.getElementById("chartThemeParam22text");
+			classesDiv.style["visibility"] = (selectObj.value == 'EXACT')?"hidden":"visible";
+		}
+
+	var SyntaxHighlighterWindow = null;
+	var _prettyPrintContent = null;
+	function htmlgui_getBookmark(){
+
+			var szBookMarkJS = "";
+
+			var arrayPtLatLon = ixmaps.embeddedSVG.window.map.Api.getBoundsOfMapInGeoBounds();
+			arrayPtLatLon[0].x = Math.max(Math.min(arrayPtLatLon[0].x,180),-180);
+			arrayPtLatLon[0].y = Math.max(Math.min(arrayPtLatLon[0].y,80),-80);
+			arrayPtLatLon[1].x = Math.max(Math.min(arrayPtLatLon[1].x,180),-180);
+			arrayPtLatLon[1].y = Math.max(Math.min(arrayPtLatLon[1].y,80),-80);
+
+			var szEnvelope = "\t"   + String(arrayPtLatLon[0].y) + "," +
+							 "\n\t" + String(arrayPtLatLon[0].x) + "," +
+							 "\n\t" + String(arrayPtLatLon[1].y) + "," +
+							 "\n\t" + String(arrayPtLatLon[1].x);
+
+			// make executable SVG map API call
+			szBookMarkJS += "map.Api.doZoomMapToGeoBounds("+szEnvelope+");\n";
+
+			var nZoom = api.getZoom(); 
+			szBookMarkJS += "ixmaps.setView(["+((arrayPtLatLon[0].y+arrayPtLatLon[1].y)/2)+","+((arrayPtLatLon[0].x+arrayPtLatLon[1].x)/2)+"],"+nZoom+");\n";
+
+			var szThemesA	  = ixmaps.embeddedSVG.window.map.Api.getMapThemeDefinitionStrings();
+			for ( var i=0; i<szThemesA.length; i++){
+				szBookMarkJS += szThemesA[i] + "\n";
+			}
+			// window.document.getElementById("bookmarkprint").innerHTML = szBookMarkJS;
+
+			$("#bookmarkframe")[0].innerHTML = 
+				"<iframe src=\""+'../../js/syntaxhighlighter/listjson.html'+"\" width=\"100%\" height=\"75%\" frameborder=\"0\" marginwidth=\"0px\" style=\"border: 1px solid #eee;\" />";
+
+			_prettyPrintContent = szBookMarkJS.replace(/;/g,";\n").replace(/,\"/g,",\n\"").replace(/,\'/g,",\n\'").replace(/\(/g,"\(\n");
+			setTimeout("__prettyPrintXML(\"-> actual bookmark - javascript function call\")",1000);
+
+//		api.htmlgui_prettyPrintXML("test",szBookMarkJS);
+		}
+
+		__prettyPrintXML = function(_prettyPrintHeadline){
+
+			var arcxmlTitle = SyntaxHighlighterWindow.document.getElementById("headline");
+			arcxmlTitle.innerText = _prettyPrintHeadline ;
+
+			var arcxmlArea = SyntaxHighlighterWindow.document.getElementById("code");
+			arcxmlArea.innerText = "\n"+_prettyPrintContent+"\n" ;
+
+		setTimeout("SyntaxHighlighterWindow.dp.SyntaxHighlighter.HighlightAll('code',false)");
+		};
+
+		__popOutMap = function(){
+
+			var szMapUrl   = api.getMapUrl();
+			var szBookmark = api.getBookmarkString();
+
+			var url = "/ui/html/popout_sync_GoogleV3.html";
+			url += "?svggis=" + szMapUrl;
+			url += "&bookmark=" + szBookmark;
+
+			url = encodeURI(url).replace(/#/g,"%23");
+			api.openDialog(null,null,url,'','auto',400,450);
+			window.open (url,'map popout'+Math.random(), 'titlebar=no, toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=400, height=450');
+			};
+
+		__shareMap = function(){
+			api.shareMap();
+			};
+
+	</script>
+
+</head>
+
+
+<body style="margin:0px;font-size:14px;" onload="InitAll()" >
+
+	<div id="tabs" style="visibility:hidden;margin-top:50px">
+		<ul>
+			<li><a href="#general">style</a></li>
+			<li><a href="#search">search</a></li>
+			<li><a href="#advancedsearch">query</a></li>
+			<li><a href="#charts">chart</a></li>
+			<li><a href="#info">info</a></li>
+		</ul>
+		<div id="general" >
+		  <!-- general parameter -------------------------------------------------- -->
+			<br>
+			<table style="font-family:verdana;font-size:12;color:black;font-weight:bold;" cellspacing="0" cellpadding="0" >
+			<tr height="30"><td align="right">Layer</td><td width="18"></td><td>
+					<input type="image" src="../../resources/images/circle_minus_transparent.png" alt="opacity -" title="opacity -" height="18"
+							onclick="javascript:api.setSVGMapOpacity(-0.1,'relative');return false;" /></td><td >
+					<span class="midlink" 
+							onclick="javascript:api.toggleSVGMapOpacity();return false;" title="switch theme display">
+							<a href="" title="switch map display">opacity</a></span></td><td>
+					<input type="image" src="../../resources/images/circle_plus_transparent.png" alt="opacity +" title="opacity +" height="18"
+							onclick="javascript:api.setSVGMapOpacity(0.1,'relative');return false;" />
+			</td></tr>
+			<tr height="30"><td align="right">Themes</td><td></td><td>
+					<input type="image" src="../../resources/images/circle_minus_transparent.png" alt="opacity -" title="opacity -" height="18"
+							onclick="javascript:api.setSVGMapOpacity(-0.1,'relative');return false;" /></td><td>
+					<span class="midlink" 
+							onclick="javascript:api.toggleSVGMapOpacity();return false;">
+						<a href="" title="switch theme display">opacity</a>
+					</span></td><td>
+					<input type="image" src="../../resources/images/circle_plus_transparent.png" alt="opacity +" title="opacity +" height="18"
+							onclick="javascript:api.setSVGMapOpacity(0.1,'relative');return false;" /></td><td style="padding-left:20px;">
+					<input type="image" src="../../resources/images/circle_minus_transparent.png" alt="chartsize -" title="chartsize -" height="18"
+							onclick="javascript:api.changeObjectScaling(0.75);return false;" /></td><td style="padding-left:0px;">
+					<span class="midlink" 
+							onclick="javascript:api.changeObjectScaling(0);return false;">
+						<a href="" title="set default chart size">size</a></td><td>
+					</span>
+					<input type="image" src="../../resources/images/circle_plus_transparent.png" alt="chartsize +" title="chartsize +" height="18"
+							onclick="javascript:api.changeObjectScaling(1/0.75);return false;" />
+			</td></tr>
+			<tr height="30"><td align="right"></td><td></td><td></td><td></td><td></td><td style="padding-left:20px;">
+
+					<input type="image" src="../../resources/images/circle_minus_transparent.png" alt="chartsize -" title="chartsize -" height="18"
+							onclick="javascript:api.changeThemeStyle(null,'normalsizevalue:1.5;','factor');return false;" /></td><td style="padding-left:0px;">
+					<span class="midlink" 
+							onclick="javascript:return false;">
+						<a href="" title="set default chart size">height</a></td><td>
+					</span>
+					<input type="image" src="../../resources/images/circle_plus_transparent.png" alt="chartsize +" title="chartsize +" height="18"
+							onclick="javascript:api.changeThemeStyle(null,'normalsizevalue:0.66;','factor');return false;" />
+			</td></tr>
+			<tr height="30"><td align="right"></td><td></td><td>
+					<input type="image" src="../../resources/images/circle_minus_transparent.png" alt="opacity -" title="opacity -" height="18"
+							onclick="javascript:api.changeThemeStyle(null,'dopacitypow:0.66;','factor');
+									 javascript:api.changeThemeStyle(null,'dopacityscale:1.5;','pow');return false;" /></td><td>
+					<span class="midlink" 
+							onclick="javascript:return false;">
+						<a href="" title="switch theme display">smooth</a>
+					</span></td><td>
+					<input type="image" src="../../resources/images/circle_plus_transparent.png" alt="opacity +" title="opacity +" height="18"
+							onclick="javascript:api.changeThemeStyle(null,'dopacitypow:1.5;','factor');
+									 javascript:api.changeThemeStyle(null,'dopacityscale:0.66;','pow');return false;" /></td><td style="padding-left:20px;">
+
+					<input type="image" src="../../resources/images/circle_minus_transparent.png" alt="chartsize -" title="chartsize -" height="18"
+							onclick="javascript:api.changeThemeStyle(null,'dopacityscale:0.66;','factor');return false;" /></td><td style="padding-left:0px;">
+					<span class="midlink" 
+							onclick="javascript:return false;">
+						<a href="" title="set default chart size">intensity</a></td><td>
+					</span>
+					<input type="image" src="../../resources/images/circle_plus_transparent.png" alt="chartsize +" title="chartsize +" height="18"
+							onclick="javascript:api.changeThemeStyle(null,'dopacityscale:1.5;','factor');return false;" />
+			</td></tr>
+			<tr height="30"><td align="right">Text</td><td></td><td>
+					<input type="image" src="../../resources/images/circle_minus_transparent.png" alt="chartsize -" title="chartsize -" height="18"
+							onclick="javascript:api.changeLabelScaling(null,0.75);return false;" /></td><td>
+					<span class="midlink" 
+							onclick="javascript:api.changeLabelScaling(null,1);return false;">
+						<a href="" title="set default chart size">size</a>
+					</span></td><td>
+					<input type="image" src="../../resources/images/circle_plus_transparent.png" alt="chartsize +" title="chartsize +" height="18"
+							onclick="javascript:api.changeLabelScaling(null,1/0.75);return false;" />
+			</td></tr>
+			<tr height="30"><td align="right">Features</td><td></td><td>
+					<input type="image" src="../../resources/images/circle_minus_transparent.png" alt="chartsize -" title="chartsize -" height="18"
+							onclick="javascript:api.changeFeatureScaling(null,0.75);return false;" /></td><td>
+					<span class="midlink" 
+							onclick="javascript:api.changeFeatureScaling(null,1);return false;">
+						<a href="" title="set default chart size">size</a></td><td>
+					</span>
+					<input type="image" src="../../resources/images/circle_plus_transparent.png" alt="chartsize +" title="chartsize +" height="18"
+							onclick="javascript:api.changeFeatureScaling(null,1/0.75);return false;" />
+			</td></tr>
+			<tr height="10px"><td></td></tr>
+			<tr><td align="right">Measure</td><td COLSPAN=6 style="padding-left:13px;">
+					<span id="toolsgroup">
+					&nbsp;<input type="image" id="ToolButton_coordinate" src="../../resources/images/coord.png" alt="distance tool" title="coordinate tool"							onclick="javascript:api.mapTool('coord');return false;">
+					&nbsp;<input type="image" id="ToolButton_measurement" src="../../resources/images/measure.png" alt="distance tool" title="distance tool"							onclick="javascript:api.mapTool('measurement');return false;">
+					&nbsp;<input type="image" id="ToolButton_polyline" src="../../resources/images/polyline.png" alt="polyline tool" title="polyline tool"								onclick="javascript:api.mapTool('polyline');return false;">
+					&nbsp;<input type="image" id="ToolButton_polygon" src="../../resources/images/polygon.png" alt="polygon tool" title="polygon tool"									onclick="javascript:api.mapTool('polygon');return false;">
+					</span>
+			</td></tr>
+			</table>
+
+
+		</div>
+		<div id="search" >
+		  <!-- normal search ------------------------------------------------------ -->
+		  <div id="normalsearch" style="padding:0px;">
+			<form id="MapSearchForm" action="javascript:ixmaps.searchMap();" name="MapSearchForm">
+			  <table width="100%" cellspacing="1" cellpadding="1" height="150" summary="simple search" >
+				<tr>
+				  <td class="descrgrey" valign="bottom"><br>
+					select Field(s)
+					<div id="themeOptions">
+					  <select class="ifield" id="themeList" name="themeList" size="5">
+						<option value="all">
+						  (loading themes ...)&#160;&#160;
+						</option>
+					  </select>
+					</div>
+				  </td>
+				  <td class="ifield" valign="bottom" width="100%">
+					<input type="radio" name="searchmode" checked value="any">any&#160;part<br>
+					<input type="radio" name="searchmode" value="whole">whole&#160;field<br> 
+					<input type="radio" name="searchmode" value="begin">begins&#160;with
+				  </td>
+				</tr>
+
+				<tr height="10px"><td></td>
+				</tr>
+
+				<tr>
+				  <td class="descrgrey" valign="bottom" colspan="3" >
+					search Value<br>
+					<input class="ifield" id="query" type="text" size="40">
+					<input class="ifield" id="query_search" type="button" value="go" onclick="javascript:ixmaps.searchMap();">
+				  </td>
+				</tr>
+				<tr>
+				  <td class="descr_grey" width="50%" height="5" align="right" colspan="2">
+				  </td>
+				</tr>
+			  </table>
+			</form>
+		  </div>
+		</div>
+		<div id="advancedsearch" >
+		  <!-- advanced search ------------------------------------------------------ -->	
+		  <div id="advanced" style="padding:0px;">
+			<form id="MapAdvancedSearchForm" action="javascript:ixmaps.searchMap();" name="MapAdvancedSearchForm">
+			  <table cellspacing="1" cellpadding="1" summary="advanced search" >
+				<tr>
+				  <td class="descrgrey" valign="bottom"><br>
+					select a layer
+					<div id="advancedsearchThemeOptions">
+					  <select class="ifield" id="advancedsearchThemeList" name="advancedsearchThemeList" size="5" onchange="javascript:ixmaps.InitAdvancedSearchFields()" >
+						<option value="all">
+						  (loading themes ...)&#160;&#160;
+						</option>
+					  </select>
+					</div>
+				  </td>
+				</tr>
+				<tr>
+				  <td class="descrgrey" valign="top" bgcolor="#eeeef8">
+					select a field
+					<div id="fieldOptions">
+					  <select class="ifield" id="fieldList" name="fieldList" size="6" onchange="javascript:ixmaps.advancedSearchAddField()">
+						<option value="all">
+						  (no theme selected)&#160;&#160;
+						</option>
+					  </select>
+					</div>
+				  </td>
+
+				  <td valign="bottom" class="descrgrey" >
+					<table cellspacing="0" cellpadding="1" ><tr><td>
+					<input type="image" src="../../resources/images/query/lt.png" height="19" alt="less than"
+					title="less than" onclick="javascript:ixmaps.advancedSearchAddOperator('<');return false;"></td><td>
+					<input type="image" src="../../resources/images/query/equal.png" height="19" alt="equal"
+					title="equal" onclick="javascript:ixmaps.advancedSearchAddOperator('==');return false;"></td><td>
+					<input type="image" src="../../resources/images/query/gt.png" height="19" alt="greater than"
+					title="greater than" onclick="javascript:ixmaps.advancedSearchAddOperator('>');return false;"></td></tr><tr><td>
+					<input type="image" src="../../resources/images/query/le.png" height="19" alt="less equal"
+					title="less equal" onclick="javascript:ixmaps.advancedSearchAddOperator('<=');return false;"></td><td>
+					<input type="image" src="../../resources/images/query/notequal.png" height="19" alt="not equal"
+					title="not equal" onclick="javascript:ixmaps.advancedSearchAddOperator('<>');return false;"></td><td>
+					<input type="image" src="../../resources/images/query/ge.png" height="19" alt="greater equal"
+					title="greater equal" onclick="javascript:ixmaps.advancedSearchAddOperator('>=');return false;"></td></tr><tr><td>
+					<input type="image" src="../../resources/images/query/and.png" height="19" alt="and"
+					title="and" onclick="javascript:ixmaps.advancedSearchAddOperator('and');return false;"></td><td>
+					<input type="image" src="../../resources/images/query/or.png" height="19" alt="or"
+					title="or" onclick="javascript:ixmaps.advancedSearchAddOperator('or');return false;"></td><td>
+					<input type="image" src="../../resources/images/query/like.png" height="19" alt="like"
+					title="like" onclick="javascript:ixmaps.advancedSearchAddOperator('like');return false;">
+					</td></tr></table>
+					<center><a href="javascript:ixmaps.advancedSearchGetStatistics();" class="descr">statistics</a></center>
+				  </td>
+
+				  <td class="descrgrey" valign="top" align="left" >
+					sample values
+					<div id="valueOptions" style='width:120px;'>
+					  <select class="ifield" id="valueList" name="valueList" size="6" style='width:120px;'>
+						<option value="all">
+						  (no field selected)
+						</option>
+					  </select>
+					</div>  
+				  </td>
+				  <td class="descrgrey" valign="top" align="left" width="100%">
+				  </td>
+
+				<tr height="10px"><td></td>
+				</tr>
+
+				</tr>
+				<tr>
+				  <td colspan="10" style="font-size:11px;" >
+					<input class="ifield" id="aquery" type="text" size="38">
+					<input class="ifield" id="aquery_execute" type="button" value="execute" onclick="javascript:ixmaps.advancedSearchMap();">
+					<input class="ifield" id="aquery_clear" type="button" value="clear" onclick="javascript:ixmaps.advancedSearchClearQuery();">
+				  </td>
+				</tr>
+
+				<tr height="10px"><td></td>
+				</tr>
+
+				<tr>
+				 <td class="descrgrey" valign="top" align="left" colspan="5">
+					<div id="displayOptions">
+						Field
+						<select class="ifield" id="displayList" name="displayList" size="1">
+							<option value="all">
+								(not loaded)
+							</option>
+						</select>
+						all Fields
+						<input type='checkbox' name='allfields' onclick="ixmaps.advancedSearchChangeDisplay();" />
+					</div>  
+				  </td>
+				</tr>
+			  </table>
+			</form>
+		  </div>
+		</div>
+		<div id="charts" >
+		  <!-- charts ------------------------------------------------------ -->
+		  <div id="chart" style="display:visible;border-top:thin double #d8d8d8;">
+			<form id="MapChartForm" action="javascript:ixmaps.createChart();" name="MapChartForm">
+			  <table summary="advanced search" cellpadding="2" cellspacing="0" bgcolor="#ffffff">
+				<tr>
+				  <td class="descrgrey" width="50%" valign="bottom"><br>
+					select a chart layer
+					<div id="chartThemeOptions">
+					  <select class="ifield" id="chartThemeList" name="chartThemeList" size="5">
+						<option value="all">
+						  (loading themes ...)&#160;&#160;
+						</option>
+					  </select>
+					</div>
+				  </td>
+				</tr>
+				<!-- chart value field --> 
+				<tr>
+				  <td class="descrgrey" valign="top" bgcolor="#eeeef8">
+					select a field
+					<div id="chartFieldOptions">
+					  <select class="ifield" id="chartFieldList" name="chartFieldList" size="6" >
+						<option value="all">
+						  (no theme selected ...)&#160;&#160;
+						</option>
+					  </select>
+					</div>
+				  </td>
+				  <td class="descrgrey" valign="top" align="left" >
+					sample values
+					<div id="chartValueOptions">
+					  <select class="ifield" id="chartValueList" name="chartValueList" size="6">
+						<option value="all">
+						  (no field selected ...)&#160;&#160;
+						</option>
+					  </select>
+					</div>  
+				  </td>
+				</tr>
+				<tr height="5"><td></td></tr>
+				<!-- chart value 100% field --> 
+				<tr>
+				  <td class="descrgrey" align="right" bgcolor="#eeeef8">field for % analysis</td> 	
+				  <td class="descrgrey" bgcolor="#eeeef8">
+					<div id="chartField100Options">
+					  <select class="ifield" id="chartField100List" name="chartField100List" size="1" >
+						<option value="none">
+						  none&#160;&#160;
+						</option>
+					  </select>
+					</div>
+				  </td>
+				</tr>
+				<tr>
+				  <td class="descrgrey" align="right" bgcolor="#eeeef8">distribution type</td> 	
+				  <td class="descrgrey" width="50%" valign="bottom">
+					<div id="chartMethodParam">
+					  <select class="ifield" id="chartMethod" name="chartMethod" onchange="checkChartMethod();" >
+						<option value="EQUIDISTANT">Equidistant</option>
+						<option value="QUANTILE">Quantile</option>
+						<option value="EXACT">Exact</option>
+					  </select>
+					</div>
+				  
+					<div id="chartThemeParam22">
+					  <select class="ifield" id="chartThemeNrClasses" name="chartThemeNrClasses" >
+						<option value="3">3 classes</option>
+						<option value="4">4 classes</option>
+						<option selected="true" value="5">5 classes</option>
+						<option value="6">6 classes</option>
+						<option value="7">7 classes</option>
+						<option value="8">8 classes</option>
+					  </select>
+					</div>
+				  </td>
+					</td>
+				</tr>
+				<tr>
+				  <td class="descrgrey" align="right" bgcolor="#eeeef8">chart type</td> 	
+				  <td class="descrgrey" width="50%" valign="bottom">
+					<div id="chartTypeParam">
+					  <select class="ifield" id="chartThemeType" name="chartThemeType" >
+						<option value="CHLOROPLETHE">Colored Shapes</option>
+						<option value="CHART|BUBBLE">Bubbles</option>
+						<option value="CHART|BUBBLE|CENTER|EXACT">Bubbles (EXACT)</option>
+						<option value="CHART|BUBBLE|VALUES">Bubbles + Values</option>
+						<option value="CHART|BUBBLE|SURFACE">Bubbles </option>
+						<option value="CHART|BUBBLE|SURFACE|VALUES">Bubbles + Values</option>
+					  </select>
+					</div>
+				  </td>
+				</tr>
+				<tr>
+				<tr>
+				  <td class="descrgrey" align="right" bgcolor="#eeeef8">color scheme</td> 	
+				  <td class="descrgrey" width="50%" valign="bottom">
+					<div id="chartThemeParam2">
+					  <select class="ifield" id="chartThemeColors" name="chartThemeColors" >
+						<option value="monoblue">monochrome blue</option>
+						<option value="monored">monochrome red</option>
+						<option value="monogreen">monochrome green</option>
+						<option value="1">yellow</option>
+						<option value="2">red/green</option>
+						<option value="3">green/red</option>
+						<option value="4">spectrum</option>
+						<option value="5">office</option>
+						<option value="6">mineral</option>
+						<option value="7">harvest</option>
+					  </select>
+											</div>
+				  </td>
+					</td>
+				</tr>
+				<tr>
+				  <td class="descrgrey" align="right" bgcolor="#eeeef8">overwiew chart</td> 	
+				  <td class="descrgrey" width="50%" valign="bottom">
+					<div id="chartThemeParam">
+					  <select class="ifield" id="chartThemeOverviewType" name="chartThemeOverviewType" >
+						<option value="NONE">none</option>
+						<option value="PIE">Pie</option>
+						<option value="DONUT">Donut</option>
+					  </select>
+					</div>
+				  </td>
+				</tr>
+				<tr>
+				<tr>
+				  <td colspan="10" style="font-size:12px;">
+					<input class="ifield" id="chart_go" type="button" value="go ->" onclick="javascript:ixmaps.createChart();">
+				  </td>
+				</tr>
+			  </table>
+			</form>
+		  </div>
+		</div>
+		<div id="info" >
+			<input id="get_Bookmark" type="button" alt="get bookmark" title="get bookmark" height="22" value="get bookmark"
+					onclick="javascript:htmlgui_getBookmark();return false;" />
+			<br>
+			<div id="bookmarkframe" >
+			</div>
+		</div>
+	</div>
+
+	<!-- div to show search/query results -->
+	<div id="searchresult" >
+        <table>
+		  <tr height="100%"><td valign="top" align="center"><table bgcolor="#ffffff" cellpadding="0" width="98%" height="98" valign="top" >	
+			  <tr valign="top">
+				<td valign="top"><div id="foundtotal" ></div></td>
+			  </tr>
+			  <tr valign="top" width="100%">
+				<td valign="top"><div id="found" ></div></td>
+			  </tr>
+			  <tr valign="top">
+				<td valign="top"><div id="foundpaging" ></div></td>
+			  </tr>
+		  </table></td></tr>
+        </table>
+	</div>
+
+</body>
+
+<!-- tooltips =============================================================== -->
+<script language="JavaScript" src="../../js/tooltip.js" type="text/javascript" ></script>
+<!-- ========================================================================= -->
+</html>

@@ -7,7 +7,7 @@
 	// all theme types here 
 	// ---------------------------------------------------
 	var themeStylesA = new Array ();
-		themeStylesA['shape'] = "type:CHOROPLETHE|QUANTILE|FORCED;";
+		themeStylesA['shape'] = "type:CHOROPLETH|QUANTILE|FORCED;";
 		themeStylesA['circle'] = "type:CHART|BUBBLE|QUANTILE|VALUES|FORCED;";
 		themeStylesA['square'] = "type:CHART|SQUARE|QUANTILE|VALUES|FORCED;";
 		themeStylesA['trend'] = "type:CHART|BAR|POINTER|QUANTILE|RELATIVE|THIN|FORCED;";
@@ -19,8 +19,8 @@
 		themeStylesA['cube'] = "type:CHART|BAR|3D|VOLUME|QUANTILE;";
 		themeStylesA['stackedbar'] = "type:CHART|BAR|STACKED|3D;";
 		themeStylesA['pyramid'] = "type:CHART|BAR|HORZ|CENTER|UP;";
-		themeStylesA['dominant'] = "type:CHOROPLETHE|DOMINANT;";
-		themeStylesA['percentofmean'] = "type:CHOROPLETHE|DOMINANT|PERCENTOFMEAN;";
+		themeStylesA['dominant'] = "type:CHOROPLETH|DOMINANT;";
+		themeStylesA['percentofmean'] = "type:CHOROPLETH|DOMINANT|PERCENTOFMEAN;";
 	__getThemeTypeDef = function(szType){
 		return themeStylesA[szType];
 	};
@@ -47,6 +47,8 @@
 		colorSchemesA['density3']	= "#FFEDA0,#800026,3colors,#FC5E2A";
 		colorSchemesA['density4']	= "#D1EC6E,#F7C025,null,null";
 
+		colorSchemesA['filler1']		= "#ffffff,#ffffff,#ffffff,#ffffff";
+
 		colorSchemesA['heatmap']	= "blue,#ffcc77,3low,red";
 		colorSchemesA['heatmap0']	= "#eeffaa,#9944B5,3colors,#ff8800";
 		colorSchemesA['heatmap01']	= "#6E4AF6,#F9FA84,3colors,#F52926";
@@ -57,10 +59,14 @@
 		colorSchemesA['heatmap4']	= "RGB(74,74,255)|RGB(245,41,38)|dynamic";
 		colorSchemesA['heatmap5']	= "RGB(245,41,38)|RGB(74,74,255)|dynamic";;
 
+		colorSchemesA['filler2']		= "#ffffff,#ffffff,#ffffff,#ffffff";
+
 		colorSchemesA['green-red']	= "green,red,,warm";
 		colorSchemesA['red-green']	= "red,green,,warm";
 		colorSchemesA['green-red2'] = "#7CB832,#FF4800,auto,#F7FA7A";
 		colorSchemesA['red-green2'] = "#FF4800,#7CB832,auto,#F7FA7A";
+		colorSchemesA['green-red3'] = "#41826C,#EF5D52,3colors,#E1D495";
+		colorSchemesA['red-green3'] = "#EF5D52,#41826C,3colors,#E1D495";
 
 		colorSchemesA['blue-red']	= "blue,red,,warm";
 		colorSchemesA['red-blue']	= "red,blue,,warm";
@@ -78,6 +84,13 @@
 		colorSchemesA['red-blue7'] = "#FF6801|#62D2EA|3colors|#E0E4CB";
 		colorSchemesA['blue-red8'] = "#80AF9B|#FF3D62|3colors|#FBCDAB";
 		colorSchemesA['red-blue8'] = "#FF3D62|#80AF9B|3colors|#FBCDAB";
+		colorSchemesA['blue-red9'] = "#36A6B1|#794073|3colors|#DDA729";
+		colorSchemesA['red-blue9'] = "#794073|#36A6B1|3colors|#DDA729";
+		colorSchemesA['blue-redA'] = "#276E83|#AA0321|3colors|#FBF7B6";
+		colorSchemesA['red-blueA'] = "#AA0321|#276E83|3colors|#FBF7B6";
+		
+		colorSchemesA['green-red9'] = "#56A651|#794073|3colors|#DDA729";
+		colorSchemesA['red-green9'] = "#794073|#56A651|3colors|#DDA729";
 
 		colorSchemesA['green-brown']= "#828A4D,#CF926D,3colors,#FFFFFF";
 		colorSchemesA['brown-green']= "#CF926D,#828A4D,3colors,#FFFFFF";
@@ -106,15 +119,21 @@
 		colorSchemesA['viola-brown'] = "#8B79B9,#DB9151,3colors,#F9F9DF";
 		colorSchemesA['brown-blue4'] = "#CC8400,#3F3FFF,3colors,#FFE8BF";
 		colorSchemesA['blue4-brown'] = "#3F3FFF,#CC8400,3colors,#FFE8BF";
+		colorSchemesA['brown-blue5'] = "#ffaa88,#0044dd";
+		colorSchemesA['blue5-brown'] = "#0044dd,#ffaa88";
+
+		colorSchemesA['filler3']		= "#ffffff,#ffffff,#ffffff,#ffffff";
+
 		colorSchemesA['spectral']	= "spectrum,default,200,0";
 		colorSchemesA['rev-spec.']	= "spectrum,default,0,200";
+
+		colorSchemesA['filler4']		= "#ffffff,#ffffff,#ffffff,#ffffff";
+
 		colorSchemesA['office']		= "office,,,";
 		colorSchemesA['mineral']	= "mineral,,";
 		colorSchemesA['pastel']		= "pastel,,";
 		colorSchemesA['harvest']	= "harvest,,,";
 		colorSchemesA['fruit']		= "fruit,,,";
-		colorSchemesA['spectrum']	= "spectrum,default,0,200";
-		colorSchemesA['redgreen']	= "#A50026,#D73027,#F46D43,#FDAE61,#FEE08B,#FFFFBF,#D9EF8B,#A6D96A,#66BD63,#1A9850,#006837";
 
 	__getThemeColorDef = function(szColor){
 		return colorSchemesA[szColor];
@@ -192,7 +211,11 @@
 		}
 		var colorSchemeA = null;
 		if ( szFlag && (szFlag == "directly_defined_colors") ){
-			colorSchemeA = szColorScheme.match(/\|/)?szColorScheme.split('|'):szColorScheme.split(',');
+			if ( szColorScheme.match(/RGB/) ){
+				colorSchemeA = szColorScheme.split('|');
+			}else{
+				colorSchemeA = szColorScheme.match(/\|/)?szColorScheme.split('|'):szColorScheme.split(',');
+			}
 		}else{
 			var colorDefA = szColorScheme.match(/\|/)?szColorScheme.split('|'):szColorScheme.split(',');
 			colorSchemeA = String(_circ_createColorScheme(colorDefA[0],colorDefA[1],7,colorDefA[2],colorDefA[3])).split(",");

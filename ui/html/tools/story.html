@@ -1,0 +1,782 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>iXMaps story</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+
+	<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../assets/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../assets/css/main.css" rel="stylesheet">
+
+    <link href="../assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../assets/css/icomoon.css" rel="stylesheet" >
+
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
+
+	<style type="text/css">
+
+	.colorlist {
+		padding:0px;
+		margin:0px;
+		margin-left:-10px;
+		border:0;
+	}
+	.colorlistitem {
+		padding:1px;
+		margin:3px;
+		border:0;
+	}
+	.colorlistitem > a {
+		text-decoration: none;
+		padding:3px;
+		margin:3px;
+		border:0;
+	}
+	.colorlistitem > a:hover {
+		text-decoration: none;
+		background: #fd8;
+		xborder:#aaa solid 1px;
+	}
+	a.theme-button {
+		text-decoration: none;
+		font-size:1.2em;
+	}
+	span.theme-button {
+		color:#444444;
+		background:#ffffff;
+		padding:0.5em;
+	}
+	table.theme-legend {
+		font-size: 1em;
+		line-height:1em;
+		color:#888888;
+	}
+	td.theme-legend {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	td.theme-legend-count {
+		overflow: hidden;
+	}
+	tr.theme-legend-item-selected {
+    background: #F9F4C2;
+	}
+	#attribution a{
+		text-decoration:none;
+	}
+	p.legend-description {
+		margin-top:1em;
+		margin-bottom:0px;
+		font-size:0.6em;
+	}
+	a.theme-button:hover {
+		text-decoration:none;
+		color:#f8f8f8;
+	}
+	</style>
+
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../assets/js/modernizr.custom.js"></script>
+    
+  </head>
+
+  <body>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 col-lg-offset-2">
+				<div id="themeLegendDiv">
+				</div>
+			</div>
+		</div><!-- row -->
+	</div><!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="../assets/js/bootstrap.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+	<script src="../assets/js/masonry.pkgd.min.js"></script>
+	<script src="../assets/js/imagesloaded.js"></script>
+    <script src="../assets/js/classie.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="../../libs/tipr/tipr.css" />
+	<script type="text/javascript" src="../../libs/tipr/tipr.js"></script>
+
+	<!-- ixmaps iframe connect JavaScript
+    ================================================== -->
+	<script type="text/javascript">
+		var ixmaps = null;
+		if ( window.opener ){
+			ixmaps = window.opener.ixmaps;
+		}else
+		if ( parent ){
+			ixmaps = parent.window.ixmaps;
+		}
+		else{
+			alert("error: missing parent window for themes !");
+		}
+
+		/**
+		 * isAPIAvailable  
+		 * checks the browser support for the HTML5 File API
+		 * displays a warning if the browser doesn't support it
+		 * @type boolean
+		 * @return true,false
+		 */
+		function isAPIAvailable() {
+			// Check for the various File API support.
+			if (window.File && window.FileReader && window.FileList && window.Blob) {
+				  // Great success! All the File APIs are supported.
+				  return true;
+			} else {
+				  alert("The browser you're using does not currently support\nthe HTML5 File API. As a result the file loading demo\nwon't work properly.");
+				  return false;
+			}
+		}
+		/**
+		 * handleFileSelect  
+		 * parses the textfield input into the map data source
+		 * @param evt the evemt handle
+		 * @type void
+		 */
+		function handleFileSelect(evt) {
+			var files = evt.target.files; // FileList object
+			for(var i=0, len=files.length; i<len; i++) {
+				doFile(files[i], i);
+			}
+		}
+		/**
+		 * doFile  
+		 * reads the file and
+		 * parses the data into the map data source
+		 * @param file filename
+		 * @param i filenumber
+		 * @type void
+		 */
+		 var actFile = null;
+		function doFile(file, i) {
+			$("#fileName").val(file.name);
+			actFile = file;
+			console.log(file);
+			__loadMap(file.name);
+		}
+		/**
+		 * doFile  
+		 * reads the file and
+		 * parses the data into the map data source
+		 * @param file filename
+		 * @param i filenumber
+		 * @type void
+		 */
+		function doLoadFile() {
+			var reader = new FileReader();
+			reader.readAsText(actFile);
+			reader.onload = function(event){
+			  var csv = event.target.result;
+			  if ( !processCSVData(csv,actFile.name) ){
+				alert('Unable to read ' + actFile.name );
+			  }
+			};
+		reader.onerror = function(){ alert('Unable to read ' + actFile.name); };
+		}
+		
+		__makeLegendType = function(layer,name,type){
+
+			var szLegend = "";
+
+			if ( layer.categoryA && (layer.szType == type) ){
+
+				var sub = false;
+				for ( c in layer.categoryA ){
+					if ( layer.categoryA[c].legendname && layer.categoryA[c].legendname != "(null)" ){
+						sub = true;	
+					}
+				}
+				
+				if ( sub ){
+					szLegend += "<li style='margin-top:0.5em;'>"+a+"</li>";
+				}	
+
+				szLegend += sub?"<ul style='margin-bottom:0.5em;'>":"<ul>";
+
+				switch( layer.szType ){
+					case "point":
+						for ( c in layer.categoryA ){
+							var szCatogoryName = layer.categoryA[c].legendname;
+							szCatogoryName = (szCatogoryName!="(null)")?szCatogoryName:name;
+							szLegend += "<li>"+"<span style='vertical-align:-0.1em;font-size:1.5em;line-height:0.8em;color:"+layer.categoryA[c].fill+"'>&#8226;</span>&nbsp;&nbsp;"+szCatogoryName+"</li>";
+						}
+						break;
+					case "line":
+						for ( c in layer.categoryA ){
+							var szCatogoryName = layer.categoryA[c].legendname;
+							szCatogoryName = (szCatogoryName!="(null)")?szCatogoryName:name;
+							szLegend += "<li>"+"<span style='vertical-align:1.1em;font-size:0.2em;background:"+layer.categoryA[c].fill+"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;"+szCatogoryName+"</li>";
+						}
+						break;
+					case "polygon":
+						for ( c in layer.categoryA ){
+							var szCatogoryName = layer.categoryA[c].legendname;
+							szCatogoryName = (szCatogoryName!="(null)")?szCatogoryName:name;
+							szLegend += "<li>"+"<span style='font-size:0.8em;background:"+layer.categoryA[c].fill+"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;"+szCatogoryName+"</li>";
+						}
+						break;
+				}
+			szLegend += "</ul>";
+			}
+		return szLegend;
+		};
+
+		// ---------------------------------------------------
+		// format number display 
+		// ---------------------------------------------------
+
+		/**
+		 * convert a number into a formatted string; if the number > 1000 it will be formatted like 1.023.234 
+		 * @param nValue the number to format
+		 * @param nPrecision the wanted decimal points 
+		 * @param szFlag "CEIL" or "FLOOR" (round either up or down)
+		 */
+		ixmaps.__formatValue = function(nValue,nPrecision,szFlag){
+
+			nValue = Number(nValue);
+
+			if ( !isFinite(nValue) || !isFinite(nPrecision) ){
+				return String(nValue);
+			}
+			if ( nValue == 0 ){
+				return String(nValue);
+			}
+
+			if ( !nPrecision ){
+				nPrecision = 0;
+			}
+			nPrecision = Math.max(0,nPrecision);
+
+			// GR 02.12.2011 make that low values do not collapse to 0
+			if ( (nValue > 0.0000001) && (nPrecision > 0) ){
+				while ( nValue.toFixed(nPrecision-1) == 0 ){
+					nPrecision++;
+				}
+			}
+			
+			// GR 11.03.2009 fix precision before CEIL or FLOOR to avoid JS errors eg. 0.0000000000003
+			nValue = nValue.toFixed(nPrecision+1);
+
+			nClipDecimal = Math.pow(10,nPrecision);
+			if (szFlag && szFlag.match(/CEIL/)){
+				nValue = Math.ceil(nValue*nClipDecimal)/nClipDecimal;
+			}else
+			if (szFlag && szFlag.match(/FLOOR/)){
+				nValue = Math.floor(nValue*nClipDecimal)/nClipDecimal;
+			}
+			else{
+				nValue = Math.round(nValue*nClipDecimal)/nClipDecimal;
+			}
+			// format numbers > 1000
+			if ( 0 && (nValue < 1000) ){
+				return String(nValue);
+			}
+			else {
+				var szDecimals = String(nValue);
+				if (szDecimals.match(/\./) ){
+					szDecimals = szDecimals.split(".")[1];
+					while ( szDecimals.length < nPrecision ){
+						szDecimals += '0';
+					} 
+				}
+				else {
+					szDecimals = "";
+				}
+				var szReturn = nValue<0?"-":"";
+				var szLeading = "";
+
+				nValue = Math.floor(Math.abs(nValue));
+
+				// GR new flag
+				if ( !szFlag || !szFlag.match(/NOBREAKS/) ){
+					var nClip = 1000;
+					while (nValue > nClip){
+						nClip *= 1000;
+					}
+					nClip /= 1000;
+
+					var nPart = 0;
+					var szBreak   = " ";
+					while (nClip >= 1000){
+						nPart = Math.floor(nValue/nClip);
+						szReturn += __maptheme_formatpart(nPart,szLeading);
+						nValue = nValue%nClip;
+						nClip /= 1000;
+						if ( nPart ){
+							szLeading = "0";
+							if (szFlag && szFlag.match(/BLANK/)){
+								szBreak   = "&nbsp;";
+							}else{
+								szBreak   = ".";
+							}
+						}
+						szReturn += szBreak;
+					}
+				}
+
+				szReturn += __maptheme_formatpart(nValue,szLeading);
+
+				if ( !szReturn.length || (szReturn == "-") ){
+					szReturn += "0";
+				}
+
+				if ( szDecimals.length && szDecimals != "00" ){
+					szReturn += ((szFlag && szFlag.match(/BLANK/))?".":",") + szDecimals;
+				}
+			}
+			return	szReturn;
+		}
+		/**
+		 * helper to format a number from 0 to 999 into a string with leading character (sample 32 -> "032" )
+		 * @param nPart the number to format
+		 * @param szLeading the leading character to insert if necessary 
+		 */
+		function __maptheme_formatpart(nPart,szLeading){
+			if (!szLeading){
+				szLeading = "";
+			}
+			var szPart = "";
+			if (nPart<100){
+				szPart += szLeading;
+			}
+			if (nPart<10){
+				szPart += szLeading;
+			}
+			if (nPart==0){
+				szPart += szLeading;
+			}
+			else{
+				szPart += String(nPart);
+			}
+			return szPart;
+		};
+
+		// -------------
+		// little helper
+		// -------------
+
+		ixmaps.sortList = function(a,b){
+			if ( a.count < b.count){
+				return 1;
+			}
+			return -1;
+		};
+
+		// -------------
+		// make legend
+		// -------------
+
+		ixmaps.makeColorLegendHTML = function(szId,szLegendId){
+
+			szLegendId = szLegendId || "generic";
+
+			var themeObj = ixmaps.getThemeObj(szId);
+
+			var colorA  = themeObj.colorScheme;
+			var labelA  = themeObj.szLabelA;
+			var szUnit = themeObj.szLegendUnits || themeObj.szUnits || "";
+
+			if ( !labelA ){
+				labelA = new Array();
+				var len = Math.min(colorA.length,themeObj.partsA.length);
+				for ( var i=0; i<len; i++){
+					var szPart = parseFloat(themeObj.partsA[i].min).toFixed(2)+szUnit+" ... "+parseFloat(themeObj.partsA[i].max).toFixed(2)+szUnit;
+					labelA.push(szPart);
+				}
+			}
+
+			// color legend = table
+			var szHtml = "<table id='legend-classes"+szLegendId+"' class='theme-legend' >";
+
+			var max = Math.min(200,Math.min(colorA.length,labelA.length));
+
+			// get exact count from themeObj
+			var count = "";
+
+			sortA = [];
+			for ( var i=0; i<max; i++){
+				sortA.push({index:i,count:(themeObj.exactSizeA[i]||themeObj.exactCountA[i])});
+			}
+			if( themeObj.szFlag.match(/EXACT/) && !themeObj.szFlag.match(/NOSORT/) ){
+				sortA.sort(this.sortList);
+			}
+
+			// colorscheme
+			//
+			var fColorScheme = false; 
+			var fCountBars = false;
+			var nMaxCount = 0;
+
+			for ( var i=0; i<max; i++){
+				if ( colorA[0] !=  colorA[i] ){
+					fColorScheme = true; 
+				}
+				if ( sortA[i].count ){
+					nMaxCount = Math.max(nMaxCount,sortA[i].count);
+					fCountBars = true;
+				}
+			}
+			if ( fColorScheme &&
+				( ( themeObj.partsA.length > 2)		||
+					themeObj.szLabelA				||
+					themeObj.szFlag.match(/EXACT/)	||
+					themeObj.szRangesA.length ) ){
+
+				// get exact count from themeObj
+				var count = "";
+				for ( var i=0; i<max; i++){
+
+					if ( (fCountBars || themeObj.szFlag.match(/FILTER/) )&& !sortA[i].count ){
+						continue;
+					}
+					if ( themeObj.szShowParts ){
+						var fShow = false;
+						for ( p in themeObj.szShowPartsA ){
+							if ( themeObj.szShowPartsA[p] == i ){
+								fShow = true;
+							}
+						}
+						if ( !fShow ){
+							continue;
+						}
+					}
+
+					count = ixmaps.__formatValue(sortA[i].count,2,"BLANK"); //sortA[i].count?""+sortA[i].count+"":"";
+					if ( (typeof(themeObj.markedClass) != "undefined") && (themeObj.markedClass == sortA[i].index) ){
+						szHtml += "<tr valign='top' class='theme-legend-item-selected'>";
+					}else{
+						szHtml += "<tr valign='top' >";
+					}
+
+					szHtml += "<td><a class='theme-button' href='#' title='click to see'><span onclick='javascript:ixmaps.showOneClass(\""+szId+"\","+sortA[i].index+");event.stopPropagation();return false;' style='background:"+colorA[sortA[i].index]+";font-size:0.7em;'>";
+
+					if ( fCountBars ){
+						//for ( var w=0; w<Math.ceil(Math.pow(sortA[i].count,0.5)/10); w++ ){
+						for ( var w=0; w<Math.ceil(Math.pow(sortA[i].count,0.5)*(20/Math.pow(nMaxCount,0.5))); w++ ){
+							szHtml += "&nbsp;";
+						}
+					}else{
+						if ( themeObj.szFlag.match(/DOPACITY/) ){
+							szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+							szHtml += "</span><span onclick='javascript:ixmaps.showOneClass(\""+szId+"\","+sortA[i].index+");event.stopPropagation();return false;'  style='background:"+colorA[sortA[i].index]+";font-size:0.7em;opacity:0.75;'>"; 
+							szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+							szHtml += "</span><span onclick='javascript:ixmaps.showOneClass(\""+szId+"\","+sortA[i].index+");event.stopPropagation();return false;'  style='background:"+colorA[sortA[i].index]+";font-size:0.7em;opacity:0.5;'>"; 
+							szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+						}else{
+							szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+						}
+
+					}
+
+					var szLabel = labelA[sortA[i].index];
+					var szCount = sortA[i].count?("<td class='theme-legend-count' style='text-align:right;padding-left:1em;color:#444'>"+count+" "+szUnit+"</td>"):"";
+
+					szHtml += "</span></td><td class='theme-legend' style='max-width:"+(szCount.length?"200px":"300px")+"'><span title='"+szLabel+"'>"+szLabel+"</span></a></td>"+szCount+"</tr>";
+				}
+
+			}else if (0){
+				szHtml += "<tr valign='top'><td><span onclick='javascript:ixmaps.hideThemeClass(\""+szId+"\","+sortA[i].index+")'  style='background:"+colorA[0]+";font-size:0.7em;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td><span style='padding-left:5px'>"+labelA[0]+"</span></td><td> &nbsp;&nbsp;|</td><td><span style='padding-left:5px'>"+labelA[labelA.length-1]+"</span></td></tr>";
+			}else{
+				szHtml += "<tr valign='top'><td><span onclick='javascript:ixmaps.showOneClass(\""+szId+"\","+sortA[i].index+");event.stopPropagation();return false;'  style='background:"+colorA[0]+";font-size:0.7em;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td><span style='padding-left:5px'>"+ ixmaps.__formatValue((themeObj.nMinValue||themeObj.nMin),2,"BLANK")+"</span></td><td> &nbsp;...</td><td><span style='padding-left:5px'>"+ ixmaps.__formatValue((themeObj.nMaxValue||themeObj.nMax),2,"BLANK")+"</span></td></tr>";
+			}
+
+			szHtml += "</table>";
+
+			return szHtml;
+		};
+
+
+
+	ixmaps.showOneClass = function(szThemeId,nClassIndex){
+		ixmaps.markThemeClass(szThemeId,nClassIndex);
+	};
+
+	ixmaps.toggleValueDisplay = function(szThemeId){
+		var szThemeStyle = ixmaps.getThemeStyleString(szThemeId);
+		if ( szThemeStyle && szThemeStyle.match(/VALUES/) ){
+			ixmaps.changeThemeStyle(szThemeId,'type:VALUES;','remove');
+		}else{
+			ixmaps.changeThemeStyle(szThemeId,'type:VALUES;','add');
+			ixmaps.changeThemeStyle(szThemeId,'type:NOINLINETEXT;','add');
+			ixmaps.changeThemeStyle(szThemeId,'valueupper','remove');
+		}
+	};
+
+	ixmaps.changeThemeDynamic = function(szThemeId,szParameter,szFactor){
+
+		var szThemeStyle = ixmaps.getThemeStyleString(szThemeId);
+
+		if ( szThemeStyle.match(/CHOROPLETH/) ){
+			switch (szParameter) {
+				case "amplify":
+					ixmaps.changeThemeStyle(szThemeId,'dopacitypow:'+String(1/Number(szFactor)),'factor');
+					break;
+				case "scale":
+					ixmaps.changeThemeStyle(szThemeId,'dopacityscale:'+String(szFactor),'factor');
+					break;
+				case "opacity":
+					ixmaps.changeThemeStyle(szThemeId,'opacity:'+String(szFactor),'factor');
+					break;
+			}
+		}else{
+			switch (szParameter) {
+				case "amplify":
+					if ( szThemeStyle.match(/BAR/) ){
+						ixmaps.changeThemeStyle(szThemeId,'rangescale:'+String(szFactor),'factor');
+					}else{
+						ixmaps.changeThemeStyle(szThemeId,'normalsizevalue:'+String(1/Number(szFactor)),'factor');
+					}
+					break;
+				case "scale":
+					ixmaps.changeThemeStyle(szThemeId,'scale:'+String(szFactor),'factor');
+					break;
+				case "opacity":
+					ixmaps.changeThemeStyle(szThemeId,'fillopacity:'+String(szFactor),'factor');
+					break;
+				case "aggregation":
+					ixmaps.changeThemeStyle(szThemeId,'gridwidth:'+String(szFactor),'factor');
+					break;
+			}
+		}
+	};
+
+	ixmaps.makeLegendButtons = function(szId,szLegendId){
+
+			var themeObj = ixmaps.getThemeObj(szId);
+
+			var szHtml = "";
+
+			var id = szId.replace(/\./g,'');
+
+			szHtml += 		"<div style='margin-top:0.75em;margin-bottom:0.25em;' >";
+			szHtml += 		"<span id='legend-buttons"+szLegendId+"'>";
+				
+			szHtml += 		"<a id='highbutton"+id+"' class='theme-button' href='javascript:ixmaps.changeThemeDynamic(\""+szId+"\",\"amplify\",\"0.66\");' title='smooth chart' >";
+			szHtml += 			"<span class='icon icon-arrow-down theme-button' ></span>";
+			szHtml += 			"</a>&nbsp;";
+
+			szHtml += 		"<a id='lowbutton"+id+"' class='theme-button' href='javascript:ixmaps.changeThemeDynamic(\""+szId+"\",\"amplify\",\"1.5\");' title='amplify chart'>";
+			szHtml += 			"<span class='icon icon-arrow-up theme-button' ></span>";
+			szHtml += 			"</a>&nbsp;";
+
+			szHtml += 		"<a id='minusbutton"+id+"' class='theme-button' href='javascript:ixmaps.changeThemeDynamic(\""+szId+"\",\"scale\",\"0.66\");' title='smaller charts'>";
+			szHtml += 			"<span class='icon icon-minus theme-button' ></span>";
+			szHtml += 			"</a>&nbsp;";
+
+			szHtml += 		"<a id='plusbutton"+id+"' class='theme-button' href='javascript:ixmaps.changeThemeDynamic(\""+szId+"\",\"scale\",\"1.5\");' title='bigger charts'>";
+			szHtml += 			"<span class='icon icon-plus theme-button' ></span>";
+			szHtml += 			"</a>&nbsp;";
+
+			szHtml += 		"<a id='valuebutton"+id+"' class='theme-button' href='javascript:ixmaps.toggleValueDisplay(\""+szId+"\");' title='add/remove textual values'>";
+			szHtml += 			"<span class='icon icon-spell-check theme-button' ></span>";
+			szHtml += 			"</a>&nbsp;";
+
+			szHtml += 		"<a id='opminusbutton"+id+"' class='theme-button' href='javascript:ixmaps.changeThemeDynamic(\""+szId+"\",\"opacity\",\"0.66\");' title='more transparency'>";
+			szHtml += 			"<span class='icon icon-checkbox-unchecked theme-button' style='font-size:14px; color:#bbbbbb;background:#ffffff;padding:0.5em;'></span>";
+			szHtml += 			"</a>&nbsp;";
+
+			szHtml += 		"<a id='opplusbutton"+id+"' class='theme-button' href='javascript:ixmaps.changeThemeDynamic(\""+szId+"\",\"opacity\",\"1.5\");' title='less transparency'>";
+			szHtml += 			"<span class='icon icon-checkbox-partial theme-button' ></span>";
+			szHtml += 			"</a>&nbsp;";
+
+			szHtml += 		"<a id='deletebutton"+id+"' class='theme-button'  href='javascript:ixmaps.makeChartMenueHTML(\""+szId+"\");' title='chart menu'>";
+			szHtml += 			"<span class='icon icon-pie theme-button' ></span>";
+			szHtml += 			"</a>&nbsp;";
+
+			szHtml += 		"<a id='deletebutton"+id+"' class='theme-button'  href='javascript:ixmaps.removeTheme(\""+szId+"\");' title='remove theme'>";
+			szHtml += 			"<span class='icon icon-remove theme-button' ></span>";
+			szHtml += 			"</a>&nbsp;";
+
+
+			szHtml += 		"</ span>";
+			szHtml += 		"</ div>";
+
+			if( themeObj.szFlag.match(/CHART/) ) {	
+				szHtml += 	"	<div style=\"margin-top:0.5em;margin-bottom:0.5em;\">";
+				szHtml += 	"		limitare elementi dei grafici:";
+				szHtml += 	"		<a href=\"javascript:$('#info-limitare').toggle();\">";
+				szHtml += 	"		<span class=\"icon icon-info tip\" data-tip=\"più/<br>meno\" style=\"font-size:14px;color:#aaaaaa;margin-left:0.2em;\"></span></a>";
+				szHtml += 	"		<br>";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(null,\"clipparts:1\");' title=\"massimo 1 parte\" >1</a> |";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(null,\"clipparts:2\");' title=\"massimo 2 parti\" >2</a> |";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(null,\"clipparts:3\");' title=\"massimo 3 parti\" >3</a> |";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(null,\"clipparts:4\");' title=\"massimo 4 parti\" >4</a> |";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(null,\"clipparts:5\");' title=\"massimo 5 parti\" >5</a> |";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(null,\"clipparts:0\");' title=\"tutti parti\" >tutti</a> |";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(null,\"type:FADEIN\",\"toggle\");' title=\"trasparenza dinamica\" >dinamico</a> |";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(null,\"type:NONEGATIVE\",\"toggle\");' title=\"no valori negativi\" >solo valori positivi</a>";
+				szHtml += 	"	</div>";
+			}
+
+			if(0){	
+				szHtml += 	"	<div id=\"info-limitare\" style=\"display:none\">";
+				szHtml += 	"	<p>	<b>Limita</b> il numero di <b>elementi realizzati</b> per grafici con <b>più parti</b>,"; 
+				szHtml += 	"		come per esempio per colonnine con i risultati di più partiti.<br>";
+				szHtml += 	"		La differenza tra selezionare solo 3 partiti e questo metodo è la seguente:";
+				szHtml += 	"		siccome la sequenza dei partiti è decrescente, limitando su 3 parti ottengo una grafica che mostra per ogni comune i 3 partiti più votati.";
+				szHtml += 	"		<br><a href=\"javascript:$('#info-limitare').toggle();\">";
+				szHtml += 	"		[chiudi]</a><p>";
+				szHtml += 	"	</div>";
+			}
+
+			if( themeObj.nGridWidth ){	
+				szHtml += 	"	<div style=\"margin-top:0.5em;margin-bottom:0.5em;\">";
+				szHtml += 	"		griglia:";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(\""+szId+"\",\"gridwidth:1.5\",\"factor\")' title=\"meno punti\" >-</a> |";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(\""+szId+"\",\"gridwidth:0.33\",\"factor\")' title=\"piu punti\" >+</a>";
+				szHtml += 	"		punti";
+				szHtml += 	"	</div>";
+			}
+
+			if( themeObj.nChartSizeMin ){	
+				szHtml += 	"	<div style=\"margin-top:0.5em;margin-bottom:0.5em;\">";
+				szHtml += 	"		vedere ";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(\""+szId+"\",\"clipsize:1.50\",\"factor\")' title=\"meno punti\" >-</a> |";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(\""+szId+"\",\"clipsize:0.66\",\"factor\")' title=\"piu punti\" >+</a>";
+				szHtml += 	"		grafici";
+				szHtml += 	"	</div>";
+			}
+
+			if( themeObj.nValueSizeMin ){	
+				szHtml += 	"	<div style=\"margin-top:0.5em;margin-bottom:0.5em;\">";
+				szHtml += 	"		numero grafici visibili limitato: ";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(\""+szId+"\",\"minvaluesize:1.1\",\"factor\")' title=\"meno punti\" ><span class='icon icon-minus theme-button' ></span></a> |";
+				szHtml += 	"		<a href='javascript:ixmaps.changeThemeStyle(\""+szId+"\",\"minvaluesize:0.92\",\"factor\")' title=\"piu punti\" ><span class='icon icon-plus theme-button' ></span></a>";
+				szHtml += 	"		grafici";
+				szHtml += 	"	</div>";
+			}
+
+		return szHtml; 
+		};
+
+
+		// intercept theme creation, to mark active themes
+		ixmaps.htmlgui_onDrawTheme = function(szId){ 
+
+			var themeObj = ixmaps.getThemeObj(szId);
+			if ( !themeObj ) {
+				return;
+			}
+
+			// in case szId is not giveb, set it from themeObj
+			szId = szId || themeObj.szId;	
+			
+			var	szHtml = "";
+			szHtml += "<h2>"+themeObj.szTitle||"Color Legend"+"</h2>";
+			szHtml += "<h4>"+(themeObj.szSnippet||"")+"</h4>";
+
+			szHtml += "<br>";
+			szHtml += ixmaps.makeColorLegendHTML(szId,"generic");
+			szHtml += "<br>";
+			szHtml += ixmaps.makeLegendButtons(szId,"generic");
+			szHtml += "<br>";
+
+			if ( themeObj.szFlag.match(/SUBTHEME/) ){
+				szHtml += "<h3><a href='javascript:ixmaps.unmarkThemeClass(\""+szId+"\")' class='theme-button'><span class='icon icon-undo2 theme-button' ></span></a></h3>";
+			}
+
+			szHtml += "<h4>"+(themeObj.szDescription||"")+"</h4>";
+
+			$("#themeLegendDiv").html(szHtml);
+
+		};
+
+		// intercept theme deletion, to remove active themes mark
+		ixmaps.htmlgui_onRemoveTheme = function(szId){
+			if ( clickA[szId] ){
+				__setThemeButtonStyle(clickA[szId],false);
+				clickA[szId] = null;
+				lastClicked  = null;
+			}
+			$("#themeLegendDiv").html("");
+		};
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		if(isAPIAvailable()) {
+			$('#fileInput').bind('change', handleFileSelect);
+		}
+
+		// switch off layer with states names
+		ixmaps.switchLayer("province_2011",false);
+
+		$('#topic-tipo').change(function (){ixmaps.changeTopic($(this))});
+		$('#topic-dest').change(function (){ixmaps.changeTopic($(this))});
+		$('#type_dominant').change(function (){ixmaps.changeParam($(this))});
+		$('#type_deviant').change(function (){ixmaps.changeParam($(this))});
+		$('#type_value').change(function (){ixmaps.changeParam($(this))});
+		$('#type_plusminus').change(function (){ixmaps.changeParam($(this))});
+		$('#type_deviation').change(function (){ixmaps.changeParam($(this))});
+		$('#type_deviation2').change(function (){ixmaps.changeParam($(this))});
+		$('#type_chart').change(function (){ixmaps.changeParam($(this))});
+		$('#type_chart_percent').change(function (){ixmaps.changeParam($(this))});
+		$('#type_bubble').change(function (){ixmaps.changeParam($(this))});
+		$('#type_label').change(function (){ixmaps.changeParam($(this))});
+		$('#type_chart_p').change(function (){ixmaps.changeParam($(this))});
+		$('#type_bubble_1').change(function (){ixmaps.changeParam($(this))});
+		$('#type_bubble_2').change(function (){ixmaps.changeParam($(this))});
+		$('#type_bubble_3').change(function (){ixmaps.changeParam($(this))});
+		$('#type_bar').change(function (){ixmaps.changeParam($(this))});
+		$('#type_column').change(function (){ixmaps.changeParam($(this))});
+		$('#type_label_p').change(function (){ixmaps.changeParam($(this))});
+
+		$('[checked="checked"]').parent().addClass("active");
+	
+	
+		__loadMap = function(szNewMap,callback){
+			// GR 29.12.2013 important! if not, we have more than one SVG document! see export (below)
+			ixmaps.embeddedSVG = null;
+
+			ixmaps.loadMap(null,szNewMap);
+		}
+
+		ixmaps.htmlgui_onDrawTheme();
+
+	</script>
+
+
+
+  </body>
+</html>

@@ -1,0 +1,344 @@
+﻿<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+	<title>ixmaps editor/viewer</title>
+
+	<!--
+		This is the ixmaps editor/viewer main html page
+		Version 0.9
+	-->
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<meta http-equiv="Content-Language" content="it">
+
+	<link rel="shortcut icon" href="../../ui/resources/images/ixmaps_logo.png">
+	<link rel="bookmark" href="../../ui/resources/images/ixmaps_logo.png">
+
+	<meta name="smartaddon-verification" content="936e8d43184bc47ef34e25e426c508fe">
+	<meta name="keywords" content="ixmaps, demo, interactive, map, mappa, interattiva, svg, vector, grafic, html5 ">
+	<meta name="description" content="ixmaps vector grafic interactive info map demo">
+
+	<link rel="stylesheet" href="./assets/css/site.min.css">
+	<link rel="stylesheet" href="./assets/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../../ui/css/messagebox.css">
+
+	<style type="text/css">
+		#dialog {
+			background: white;
+			-moz-box-shadow: 0px 1px 3px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .3)/*{global-box-shadow-color}*/
+			;
+			-webkit-box-shadow: 0px 1px 3px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .3)/*{global-box-shadow-color}*/
+			;
+			box-shadow: 0px 1px 3px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .3)/*{global-box-shadow-color}*/
+			;
+			box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+		}
+
+		.navbar-fixed-top {
+			box-shadow: inset 0 5px 6px -3px rgba(0, 0, 0, 0.4);
+			min-height: 20px;
+			margin-bottom: 0px;
+			background-color: white;
+			border-bottom: solid #ddd 1px;
+		}
+
+		.navbar-inverse .navbar-nav>li>a,
+		.navbar-inverse .navbar-text {
+			color: #666;
+		}
+
+		.navbar-inverse .navbar-nav>.open>a,
+		.navbar-inverse .navbar-nav>.open>a:focus,
+		.navbar-inverse .navbar-nav>.open>a:hover {
+			color: #000;
+			background-color: #eee;
+		}
+
+		.dropdown-menu {
+			background-color: #f8f8f8;
+			border: solid #dddddd 1px;
+			webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0);
+			box-shadow: 0 6px 12px rgba(0, 0, 0, 0);
+		}
+
+		.dropdown-menu li a {
+			padding: 5px 20px;
+			color: #444;
+		}
+
+		.dropdown-menu>li>a {
+			display: block;
+			padding: 3px 20px;
+			clear: both;
+			font-weight: 400;
+			line-height: 1.42857143;
+			color: #333;
+			white-space: nowrap;
+		}
+
+		.btn-link.active {
+			xbackground: #f8f8f8;
+			border-radius: 5px;
+			border: solid #dddddd 1px;
+		}
+	</style>
+
+</head>
+
+<body style="background-color: #fff">
+
+	<div class="docs-header">
+		<!-- Fixed navbar -->
+		<div class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="javascript:window.scrollTo(0,window.innerHeight+200);">
+						<span style="color:#0079C6">iX</span>
+						<span style="color:#48A542">Maps</span> editor</a>
+				</div>
+				<div class="navbar-collapse collapse">
+					<ul class="nav navbar-nav navbar-right">
+
+						<li>
+							<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:__killDialog();return false;">Project
+								<b class="caret"></b>
+							</a>
+							<ul class="dropdown-menu">
+								<li>
+									<a href="javascript:ixmaps.__projectLoadDialog()">load project ...</a>
+								</li>
+								<li>
+									<a href="javascript:ixmaps.__projectSaveDialog()">save project ...</a>
+								</li>
+							</ul>
+						</li>
+
+						<!-- tbd - bookmarks must store svggis
+						<li><a href="javascript:ixmaps.loadSidebar('map1','history.html');">Segnalibri</a></li>
+						-->
+
+						<li>
+							<div id="editorbuttons" data-toggle="buttons" style="margin-top:8px">
+								<label class="btn btn-link" onclick="$('.btn').removeClass('active');ixmaps.loadSidebar('./tools/share_new.html');">Share
+									<i class="fa fa-share"></i>
+								</label>
+								<label class="btn btn-link" onclick="$('.btn').removeClass('active');ixmaps.loadSidebar('./tools/theme_editor.html');">Edit
+									<i class="fa fa-code"></i>
+								</label>
+								<label class="btn btn-link active" onclick="$('.btn').removeClass('active');ixmaps.loadSidebar('./tools/theme_configurator.html');">Config
+									<i class="fa fa-cogs"></i>
+								</label>
+								<label class="btn btn-link" onclick="$('.btn').removeClass('active');ixmaps.loadSidebar('./tools/theme_facets.html');">Analyze
+									<i class="fa fa-bar-chart"></i>
+								</label>
+								<label class="btn btn-link" onclick="$('.btn').removeClass('active');ixmaps.loadSidebar('./tools/story.html');">Legend
+									<i class="fa fa-list"></i>
+									</a>
+								</label>
+								<label class="btn btn-link" onclick="$('.btn').removeClass('active');window.scrollTo(0,window.innerHeight-200);">Info
+									<i class="fa fa-info-circle"></i>
+									</a>
+								</label>
+							</div>
+						</li>
+
+					</ul>
+
+				</div>
+				<!--/.nav-collapse -->
+			</div>
+		</div>
+
+		<!-- here goes the map -->
+		<div id="map_div" style="height:700px" background="#f8f8f8" onclick="event.stopPropagation();return false;">
+			<span lang="it">
+				<iframe id="map" width="100%" height="700px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="">
+				</iframe>
+			</span>
+		</div>
+
+		<!-- div to host dialog overlays -->
+		<div id="dialog-pos" style="position:absolute;top:40px;left:0px;width:90%;align:center;display:none">
+			<div id="dialog" style="display:none">
+			</div>
+		</div>
+
+</body>
+
+<!--[if lt IE 9]><script src="./assets/js/html5shiv.js"></script>
+      <script src="js/respond.min.js"></script><![endif]-->
+<script type="text/javascript" src="./assets/js/site.min.js"></script>
+<script type="text/javascript" src="../../ui/libs/messagebox.js"></script>
+<script type="text/javascript" src="../../ui/js/htmlgui_api.js"></script>
+<script type="text/javascript" src="../../ui/libs/getUrlParam/js/jquery.getUrlParam.js"></script>
+
+<script type="text/javascript">
+	// ---------------------------------------------------------------------
+	// URL to embed the map 
+	// ---------------------------------------------------------------------
+
+	var __embedMap =
+		"../../ui/html/main_sync_story_frame.html?basemap=leaflet&tools=1&sidebar=33%";
+
+	// ----------------------------------------------------------
+	// on document ready, load the map into the iframe   
+	// ----------------------------------------------------------
+
+	$(document).ready(function () {
+
+		document.title = "iXMaps editor";
+
+		// dimension the embedded map
+		// ----------------------------------------------------------
+
+		var __mapHeight = $(window).height() - $(".navbar-header").height() - 5;
+		$("#map_div").css("height", __mapHeight);
+		$("#map").attr("height", __mapHeight);
+
+		// get URL params if present
+		// ----------------------------------------------------------
+
+		var szMap = $(document).getUrlParam('svggis');
+		var szBookmark = $(document).getUrlParam('bookmark');
+		var szBasemap = $(document).getUrlParam('basemap');
+		var szMaptype = $(document).getUrlParam('maptype');
+		var szProject = $(document).getUrlParam('project');
+		var szData = $(document).getUrlParam('data');
+
+		// is there a bookmark within the URL, recreate embed URL
+		// ----------------------------------------------------------
+
+		if ((szMap || szBookmark)) {
+			// create new embed URL
+			__embedMap = "../../ui/html/main_sync_story_frame.html" +
+
+				"?basemap=" + (szBasemap || "leaflet	") +
+				"&maptype=" + (szMaptype || "Stamen - toner-lite") +
+				"&minimal=1&toolbutton=1&themelegend=0&sidebar=33%" +
+				"&svggis=" + (szMap || "") +
+				"&bookmark=" + (szBookmark || "") +
+				"&project=" + (szProject || "") +
+				"&data=" + (szData || "");
+		}
+
+		// ===================
+		// embed the map !!!
+		// ===================
+
+		$("#map").attr("src", __embedMap);
+
+		// ======================================
+		// wait for the map and initialize editor
+		// ======================================
+
+		ixmaps.waitForMap("map", function (mapApi) {
+			mapApi.setOptions({
+					"featurescaling": "dynamic",
+					"labelscaling": "dynamic",
+					"objectscaling": true,
+					"panHidden": true,
+					"flushChartDraw": "50000"
+				})
+				.loadSidebar('./tools/theme_configurator.html', '33');
+		});
+
+	});
+
+	// ----------------------------------------------------------
+	// d i a l o g s    
+	// ----------------------------------------------------------
+
+	/**
+	 * open/close the data input dialog 
+	 * @param flag 'show' or 'hide'
+	 * @type void
+	 */
+	__openDialog = function (szUrl) {
+
+		if ($("#dialog").is(":visible")) {
+
+			$("#dialog").html("");
+			$("#dialog").hide();
+			$("#dialog-pos").hide();
+
+		} else {
+
+			$("#dialog").html("");
+			$("#dialog").show();
+			$("#dialog-pos").show();
+
+			$('#dialog').load(szUrl, function (response, status, xhr) {
+				if (status == "error") {
+					var msg = "Sorry but there was an error: ";
+					alert(msg + xhr.status + "\n" + xhr.statusText);
+				}
+				$("#dialog").css("width", "50%");
+				$("#dialog").css("height", "150%");
+				$("#dialog").css("position", "relative");
+				$("#dialog").css("left", "15%");
+
+				$("#dialog").append(
+					"<div style=\"position:absolute;top:15px;left:87%;\"><a href=\"javascript:__killDialog()\">close</a></div>");
+			});
+
+		}
+	};
+
+	/**
+	 * close the data input dialog 
+	 * @param flag 'show' or 'hide'
+	 * @type void
+	 */
+	__killDialog = function () {
+		$("#dialog").hide();
+		$("#dialog-pos").hide();
+	};
+
+	/**
+	 * open/close the project load dialog 
+	 * @param flag 'show' or 'hide'
+	 * @type void
+	 */
+	ixmaps.__projectLoadDialog = function (flag) {
+		__openDialog('dialog_project_load.html');
+	};
+	/**
+	 * open/close the project save dialog 
+	 * @param flag 'show' or 'hide'
+	 * @type void
+	 */
+	ixmaps.__projectSaveDialog = function (flag) {
+		__openDialog('dialog_project_save.html');
+	};
+
+	/**
+	 * open/close the data load dialog 
+	 * @param flag 'show' or 'hide'
+	 * @type void
+	 */
+	ixmaps.__dataLoadDialog = function (flag) {
+		__openDialog('dialog_data_load.html');
+	};
+
+	// ===================
+	// end of code
+	// ===================
+</script>
+
+</html>

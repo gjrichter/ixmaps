@@ -28,7 +28,7 @@ window.ixmaps.totale_incidenti_georef = window.ixmaps.totale_incidenti_georef ||
 
 (function() {
 
-	ixmaps.totale_incidenti_georef.after = function(script) {
+	ixmaps.totale_incidenti_georef.after = function(totale_incidenti_georef) {
 
 		// get time index
 

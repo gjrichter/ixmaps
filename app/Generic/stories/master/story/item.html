@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+<meta http-equiv="Content-Language" content="en-us" />
+<meta name="copyright" content="Guenter Richter"/>
+<meta name="author" content="service@medienobjekte.de"/>
+<meta name="description" content="Interactive &amp; estensible maps in SVG"/>
+<meta name="revisit-after" content="30 days"/>
+<meta name="distribution" content="Global"/>
+
+<link rel="stylesheet" href="../../app/Generic/stories/master/story/index.css" type="text/css" />
+
+<style type="text/css">
+
+	body{
+		font-family: Lato,Raleway,Lato,arial,helvetica;
+		color: #444;
+		font-weight: 300;
+	}
+
+	td {
+		font-weight: 400;
+		font-size: 1.1em;
+		padding: 0.2em 0.3em;
+		vertical-align: top;
+	}
+	.label{
+		text-align: right;
+		font-size: 0.7em;
+		padding-top: 0.6em;
+		color: #aaa;
+	}
+	.value{
+		text-align: left;
+		color: #000;
+	}
+
+	a {
+		color: #4466ff;
+	}
+
+	object{
+		margin:0;
+		padding:0;
+		margin-right: -1em;
+		width:100%;
+		height:1000px;
+	}
+
+</style>
+
+</head>
+
+<body style="margin:0px;padding:0px;" onload="">
+
+	<!-- Container -->
+	<div id="container" style="margin-left:20px;margin-right:50px;vertical-align:middle;background:#fff" >
+
+
+		<div id="result-div" style="margin-top:2em;">
+			<div id="result" style="margin-right:-0.4em;overflow:auto">
+			</div>
+		<div>
+
+	</div>
+	
+
+	<script type="text/javascript">
+
+			var szId = ixmaps.szMapItemId;
+
+			if(szId.match(/theme/)){
+				var data = ixmaps.getData('map',szId);
+				var szTitle = data.nome || "data";
+
+				var szHtml = "";
+				szHtml += "<div style='overflow:auto'>";
+				szHtml += "<h3 style='margin-bottom:10px'>"+szTitle+"</h3>";
+				szHtml += "<table>"
+				for ( i in data ){
+					var value = data[i];
+					szHtml += "<tr><td style='vertical-align:top;text-align:left'>"+i+"&nbsp;&nbsp;&nbsp;</td><td style='width:70%'><b>"+value+suffix+"<b></td></tr>";
+				}
+				szHtml += "</table>";
+				szHtml += "</div>";
+			}
+			else{
+				var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szId);
+				var child = obj.childNodes.item(1);
+				var data = ixmaps.embeddedSVG.window.map.Api.getShapeMetadataArray(child||obj);
+
+				var maxHeight = ($("#result-div").innerHeight());
+				var szHtml = "";
+				szHtml += "<div style='margin-top:1.5em;height:"+(maxHeight-50)+"px;overflow:auto'>";
+				szHtml += "<table>"
+				for ( i in data ){
+					if ( i == "ART_CDU" ){
+						szHtml += "<tr><td>"+i+"</td><td><a href='../../data/Napoli/pdf/"+data[i]+"_PDFsam_parteII_schedecs_norm.pdf' target='_blank'>"+data[i]+"</a></td></tr>";
+					}else{
+						szHtml += "<tr><td class='label'>"+i+"</td><td class='value'>"+data[i]+"</td></tr>";
+					}
+				}
+				szHtml += "</table>";
+				szHtml += "</div>";
+
+				szHtml += "<div style='margin-top:1em'>";
+				szHtml += "<a href='../../data/Napoli/pdf/"+data["ART_CDU"]+"_PDFsam_parteII_schedecs_norm.pdf' target='_blank'><object data	='../../data/Napoli/pdf/"+data["ART_CDU"]+"_PDFsam_parteII_schedecs_norm.pdf'></a>";
+				szHtml += "</div>";
+			}
+
+			$("#result").html(szHtml);
+			$("#result-div").show();
+
+	</script>
+
+</body>
+</html>

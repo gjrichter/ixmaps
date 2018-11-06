@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+	<meta charset="utf-8">
+	<title>ixmaps</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link rel="shortcut icon" href="./resources/images/ixmaps_logo.png">
+
+</head>
+
+<body style="margin:0px;padding:0px;overflow:hidden">
+
+	<!-- Container -->
+	<div id="container" style="margin:0px;padding:0px;margin-left:auto;margin-right:auto;overflow:hidden">
+
+		<!-- Credits -->
+
+		<!-- Content -->
+		<div style="overflow:hidden;">
+			<iframe id="map" width="100%" height="840px" style="border:0;overflow:hidden" src=></iframe>
+		</div>
+		<!-- fine Content -->
+
+		<!-- Footer -->
+		<div id="footer" style="position:relative;">
+		</div>
+		<!-- fine Footer -->
+
+	</div>
+	<!-- fine Container -->
+
+	<script type="text/javascript" src="../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="../../ui/libs/getUrlParam/js/jquery.getUrlParam.js"></script>
+	<script type="text/javascript" src="../../ui/js/htmlgui_api.js"></script>
+
+	<script>
+		__ui = "../../ui/dispatch.htm?ui=story&basemap=ll&maptype=CartoDB - Positron";
+		__ui += "&name=map&minimal=1&options=1&tilemap=show&nolegend=1&layout=overlay&local=resources";
+		__map = "";
+		__story = "../../app/Viewer/stories/Master/index.html";
+		__bound = "";
+		__attribute = "powered by <a href='https://www.ixmaps.com' target='_blank' style='color:#0E77B2'>iXMaps</a>";
+
+		__resize = function () {
+			$("#map").attr("height", window.innerHeight + "px");
+			$("#map").attr("width", window.innerWidth + "px");
+		}
+		$(document).ready(function () {
+
+			__resize();
+
+			if ($(document).getUrlParam('project')) {
+				__story += ("?project=" + $(document).getUrlParam('project'));
+				ixmaps.project = $(document).getUrlParam('project');
+			}
+
+			// is there a bookmark to execute at load ?
+			if ($(document).getUrlParam('bookmark')) {
+				x = $(document).getUrlParam('bookmark');
+				__bound = decodeURIComponent(((typeof (x) != "string") ? x.join("") : x));
+			}
+			if ($(document).getUrlParam('maptype')) {
+				__maptype = $(document).getUrlParam('maptype');
+			}
+
+			var szMap = $(document).getUrlParam('svggis');
+			var szBookmark = $(document).getUrlParam('bookmark');
+			var szBasemap = $(document).getUrlParam('basemap');
+			var szMaptype = $(document).getUrlParam('maptype');
+
+			// ===================
+			// create new embed URL
+			// ===================
+
+			__embedMap = "../../ui/html/main_sync_story_frame.html" +
+
+				"?basemap=" + (szBasemap || "leaflet	") +
+				"&maptype=" + (szMaptype || "Stamen - toner-lite") +
+				"&minimal=1&name=map&sidebar=32%&layout=overlay&search=Italy" +
+
+				"&svggis=" + (szMap || "../../maps/svg/maps/generic/mercator.svgz") +
+
+				"&bookmark=" + (szBookmark || "") +
+
+				"&story=../../app/Viewer/stories/Master/index.html";
+
+			// ===================
+			// embed the map !!!
+			// ===================
+
+			ixmaps.waitForMap("map",function(map) {
+
+				ixmaps.setLocal('map',"... processing ...","...");
+				ixmaps.setLocal('map',"... actualize ..."," ... ");
+
+				if ( ixmaps.project ){
+					ixmaps.loadProject('map',ixmaps.project);
+				}
+
+			}); // end of ixmaps.onMapReady
+
+			$("#map").attr("src", __embedMap);
+
+		});
+		$(window).resize(function () {
+			__resize();
+		});
+	</script>
+
+</body>
+
+
+</html>

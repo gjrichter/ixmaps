@@ -154,7 +154,7 @@
 	};
 	themeHistory.prototype.addActualTheme = function(name,callback){
 		var themeDefObj = ixmaps.getThemeDefinitionObj();
-		var szEnvelope = ixmaps.htmlgui_getEnvelopeString(1);
+		var szEnvelope = ixmaps.getEnvelopeString(1);
 		var szCenter = ixmaps.htmlgui_getCenter();
 		var szZoom = ixmaps.htmlgui_getZoom();
 		this.add(name,themeDefObj,szEnvelope,szCenter,szZoom);
@@ -275,17 +275,6 @@
 		this.itemA = new Array();
 	};
 		
-
-	/* ---------------------------------------------------------------- */
-	/* P r o j e c t            										*/
-	/* ---------------------------------------------------------------- */
-
-	ixmaps.saveProject = function(){
-		alert("saveProject");
-	};
-	ixmaps.loadProject = function(){
-		alert("loadProject");
-	};
 
 	/* ---------------------------------------------------------------- */
 	/* I n i t i a l i z e              								*/

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<!--
+  Copyright 2011 Google Inc. All Rights Reserved.
+
+  Licensed under the Apache License; Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing; software
+  distributed under the License is distributed on an "AS IS" BASIS;
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND; either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html>
+  <head>
+    <meta charset="UTF-8">
+
+    <title>iXmaps Editor Table Viewer</title>
+
+
+	<script src = "../../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+	<script src = "../../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+
+	<style type="text/css" title="currentStyle">
+		@import "../../../ui/libs/DataTables-1.10.5/media/css/jquery.dataTables.css";
+	</style>
+    <link href="../../../ui/html/css/bootstrap.css" rel="stylesheet">
+    <link href="../../../ui/html/css/bootstrap-responsive.css" rel="stylesheet">
+
+	<script type="text/javascript" language="javascript" src="../../../ui/libs/DataTables-1.10.5/media/js/jquery.dataTables.min.js"></script>
+
+	<script type="text/javascript" src="../../js/htmlgui_api.js" > </script>
+	
+	<style type="text/css">
+		table {
+			width: 100%;
+		}
+		table.dataTable thead th{
+			border: #dddddd solid 1px;
+		}
+		table.dataTable tr.even{
+			background: #f8f8f8;
+		}
+		table.dataTable tr.odd{
+			background: #ffffff;
+		}
+		table.dataTable tr.even td.sorting_1 {
+			background-color: #ededed;
+		}
+		table.dataTable tr.odd td.sorting_1 {
+			background-color: #f8f8f8;
+		}
+		tfoot input.search_init {
+			font-size: 0.9em;
+		}
+		th {
+			text-align: left;
+			vertical-align: top;
+			border: #dddddd solid 1px;
+			border-bottom: #dddddd solid 1px;
+		}
+		td {
+			text-align: left;
+			border: #dddddd solid 1px;
+			border-bottom: #dddddd solid 1px;
+			white-space: nowrap;
+		}
+		body #ft-data {
+			font: 12px/16px Helvetica; Helvetica Neue; Arial;
+			color: #333333;
+			background:#fff;
+			overflow:auto;
+			width:100%;
+			height:100%;
+			padding: 1em;
+		}
+		textarea {
+			width:90%;
+			font-size: 9px;
+		}
+		.dataTables_wrapper .dataTables_filter input {
+			margin-left: 0.5em;
+			margin-bottom: 0.5em;
+			margin-right: 0.2em;
+		}
+		.dataTables_paginate {
+			margin-top: 0em;
+		}
+		.paginate_button {
+			padding: 0.5em
+		}
+		.ftdataname {
+			left: 10px;
+			top: 15px;
+			font: 18px/24px Helvetica; Helvetica Neue; Arial;
+		}
+		/* Track */
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.1); 
+			-webkit-border-radius: 0px;
+			border-radius: 0px;
+		}
+		/* Handle */
+		::-webkit-scrollbar-thumb {
+			-webkit-border-radius: 0px;
+			border-radius: 0px;
+			background: rgba(232,232,232,0.6); 
+			-webkit-box-shadow: inset 0 0 0px rgba(0,0,0,0.1); 
+		}
+		::-webkit-scrollbar-thumb:window-inactive {
+			background: rgba(222,222,222,0.4); 
+		}
+    </style>
+
+    <script type="text/javascript">
+	
+	$(document).ready(function() {
+
+		var themeObj =	ixmaps.parentApi.getThemeObj();
+		var tableObj = eval("ixmaps.parentApi.embeddedSVG.window."+(themeObj.coTable||"themeDataObj"));
+		var numRows = tableObj.records.length;
+		$('#ft-data-name').html(String(numRows)+" records <span style='font-size:smaller'>(please give me some time ...)</span>");
+
+		setTimeout("__doTable()",100);
+	});
+
+	__doTable = function() {
+
+	  var oTable = null;
+	  var nColCount = 0;
+	  var nColSkip = 0;
+
+		console.log("make table -----------------------------");
+
+		var themeObj =	ixmaps.parentApi.getThemeObj();
+
+		var szTable  = "test"; // ixmaps.embeddedApi.szExternalDataTable;
+		var tableObj = eval("ixmaps.parentApi.embeddedSVG.window."+(themeObj.coTable||"themeDataObj"));
+
+		console.log(themeObj);
+
+		var numRows = tableObj.records.length;
+		var numCols = tableObj.fields.length;
+		
+		$('#ft-data-name').html("");
+
+		$('#ft-data').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>' );
+
+		var columns = [];
+		for ( i=0; i<numCols; i++ ){
+			columns.push( {"title": tableObj.fields[i].id} );			
+		}
+
+		// GR 23.02.2018 show only rows which are on the map
+		// -------------------------------------------------
+		var records = [];
+		for ( i in themeObj.indexA ){
+			if ( themeObj.itemA[themeObj.indexA[i]].dbIndex ){
+				records.push(tableObj.records[themeObj.itemA[themeObj.indexA[i]].dbIndex]);
+			}
+			if ( themeObj.itemA[themeObj.indexA[i]].dbIndexA ){
+				for ( a in themeObj.itemA[themeObj.indexA[i]].dbIndexA ) {
+					records.push(tableObj.records[themeObj.itemA[themeObj.indexA[i]].dbIndexA[a]]);
+				}
+			}
+		}
+		window.parent.document.getElementById('ui-dialog-title-table-dialog').innerHTML += ' &nbsp; <button onclick="ixmaps.dumpThemeData();"><i class="shareIcon blackHover share_bitly icon-download" title="open theme code editor" tabindex="-1" style="color:#888888"></i> <span style="font-size:0.8em;vertical-align:10%">export</span></button>';
+		// make the table
+		// ---------------
+
+		var oTable = $('#example').dataTable( {
+			"data": records,
+			"columns": columns
+		} );   
+
+		$("tfoot input").keyup( function () {
+			/* Filter on the column (the index) of this element */
+			var nSkip = ($("tfoot input").index(this)>4)?nColSkip:0;
+			oTable.fnFilter( this.value, $("tfoot input").index(this) + nSkip );
+		} );
+			
+		/*
+		 * Support functions to provide a little bit of 'user friendlyness' to the textboxes in 
+		 * the footer
+		 */
+		$("tfoot input").each( function (i) {
+			asInitVals[i] = this.value;
+		} );
+		
+		$("tfoot input").focus( function () {
+			if ( this.className == "search_init" )
+			{
+				this.className = "";
+				this.value = "";
+			}
+		} );
+		
+		$("tfoot input").blur( function (i) {
+			if ( this.value == "" )
+			{
+				this.className = "search_init";
+				this.value = asInitVals[$("tfoot input").index(this)];
+			}
+		} );
+
+		var szSourceURL  = szTable.split(/url\(/)[1].split(/\)/)[0];
+		var szSourceTYPE = szTable.match(/ FT /)?" (Fusion Tables&trade;Id)":"";
+
+		document.getElementById('ft-data-name').innerHTML += '<div class="datasource" >'+szSourceURL+szSourceTYPE+'</div>';
+		
+	};
+
+	// end drawTable()
+
+
+	ixmaps.parentApi.dumpThemeData = function(){
+
+		var themeObj =	ixmaps.parentApi.getThemeObj();
+
+		var szTable  = "test"; // ixmaps.embeddedApi.szExternalDataTable;
+		var tableObj = eval("ixmaps.parentApi.embeddedSVG.window."+(themeObj.coTable||"themeDataObj"));
+
+		console.log(tableObj);
+
+		var numRows = tableObj.records.length;
+		var numCols = tableObj.fields.length;
+		
+		var columns = [];
+		for ( i=0; i<numCols; i++ ){
+			columns.push( {"title": tableObj.fields[i].id} );			
+		}
+
+		// GR 23.02.2018 show only rows which are on the map
+		// -------------------------------------------------
+		var records = [];
+		for ( i in themeObj.indexA ){
+			if ( themeObj.itemA[themeObj.indexA[i]].dbIndex ){
+				records.push(tableObj.records[themeObj.itemA[themeObj.indexA[i]].dbIndex]);
+			}
+			if ( themeObj.itemA[themeObj.indexA[i]].dbIndexA ){
+				for ( a in themeObj.itemA[themeObj.indexA[i]].dbIndexA ) {
+					records.push(tableObj.records[themeObj.itemA[themeObj.indexA[i]].dbIndexA[a]]);
+				}
+			}
+		}
+
+		var szText = "";
+		for ( i in columns ){
+			szText += (szText.length?";":"") + columns[i].title;	
+		}
+		szText += "\r\n";
+		for ( i in records ){
+			var szRow = "";
+			for ( ii in records[i] ){
+				szRow += (szRow.length?";":"") + records[i][ii];
+			}
+			szText += szRow;	
+			szText += "\r\n";
+		}
+
+		saveTextAsFile(szText);
+	}
+
+	function saveTextAsFile(szText)
+	{
+		var textToWrite = szText;
+		var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
+		var fileNameToSaveAs = "test.csv";
+
+		var downloadLink = document.createElement("a");
+		downloadLink.download = fileNameToSaveAs;
+		downloadLink.innerHTML = "Download File";
+		if (window.webkitURL != null)
+		{
+			// Chrome allows the link to be clicked
+			// without actually adding it to the DOM.
+			downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+		}
+		else
+		{
+			// Firefox requires the link to be added to the DOM
+			// before it can be clicked.
+			downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+			downloadLink.onclick = destroyClickedElement;
+			downloadLink.style.display = "none";
+			document.body.appendChild(downloadLink);
+		}
+
+		downloadLink.click();
+	}
+
+	function destroyClickedElement(event)
+	{
+		document.body.removeChild(event.target);
+	}
+
+
+
+    </script>
+  </head>
+  <body style="padding:0;margin:0;">
+    <div id="ft-data" style="margin:0px;padding:0px;overflow:auto">  L o a d i n g   . . . </div><div id="ft-data-name" class="ftdataname"></div>
+  </body>
+</html>
