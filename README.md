@@ -8,7 +8,7 @@ The iXmaps vector layer is usually displayed on top of a HTML Tile Map powered b
 
 iXMaps provides a **high-level** **visualization grammar** for thematic maps. It defines a concise **JSON syntax** for supporting rapid generation of visualizations from raw data.
 
-You can find more details here:  [theme grammar (JSON)](http://public.ixmaps.com/docs/ixmaps_doc_themes.html), [theme api (JavaScript)](http://public.ixmaps.com/docs/jsdocs/out/index.html), [examples](http://iXMaps.com/), [more examples](http://testrc.ixmaps.com.s3-website.eu-central-1.amazonaws.com/ixmaps/index/index.html) and GIST [tutorial](http://public.ixmaps.com/docs/gist/ixmaps_gist_viewer.html#3aff1217ef8070b55b1755da4e29ce5f).
+You can find more details here:  [theme grammar (JSON)](http://public.ixmaps.com/docs/ixmaps_doc_themes.html), [theme api (JavaScript)](http://public.ixmaps.com/docs/jsdocs/out/index.html), [site](http://iXMaps.com/), [examples](http://testrc.ixmaps.com.s3-website.eu-central-1.amazonaws.com/ixmaps/index/index.html) and GIST [tutorial](http://public.ixmaps.com/docs/gist/ixmaps_gist_viewer.html#3aff1217ef8070b55b1755da4e29ce5f).
 
 Try using iXmaps with your own data in the online [Theme Configurator](http://rc.ixmaps.com.s3-website-eu-west-1.amazonaws.com/ixmaps/ui/dispatch.htm?ui=edit).
 
