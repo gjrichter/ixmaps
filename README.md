@@ -12,3 +12,7 @@ You can find more details here:   [iXMaps page](http://iXMaps.com/), [Examples](
 
 Try using iXmaps with your own data in the online [Theme Configurator](http://rc.ixmaps.com.s3-website-eu-west-1.amazonaws.com/ixmaps/ui/dispatch.htm?ui=edit).
 
+If you need test data, you find some in a dedicated ripository gjrichter/data.
+To use this data you can define a raw url with https://raw.githubusercontent.com/gjrichter/data/master/ + dataname.csv
+
+sample: https://raw.githubusercontent.com/gjrichter/data/master/palermo_incidenti_20032017144826.csv
