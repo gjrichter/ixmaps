@@ -45,8 +45,8 @@
 .dontdraw{fill:none;stroke:none}
 .nodata{fill:#bbbbbb;stroke:black}
 .linetemplate{fill:none;}
-.World-countries-shp0s0{pointer-events:none;font-family:MS Shell Dlg 2;font-size:240px;font-weight:normal;font-style:normal;fill:#000000;stroke-width:0px;opacity:1.000000;text-anchor:middle;baseline-shift:-100;;pointer-events:none;display:inline;}
-.World-countries-shp0s1{fill:none;stroke:none;pointer-events:none;display:inline;}
+.World Mercator0s0{pointer-events:none;font-family:MS Shell Dlg 2;font-size:240px;font-weight:normal;font-style:normal;fill:#000000;stroke-width:0px;opacity:1.000000;text-anchor:middle;baseline-shift:-100;;pointer-events:none;display:inline;}
+.World Mercator0s1{fill:none;stroke:none;pointer-events:none;display:inline;}
    ]]>
   </style>
  </defs>
@@ -68,7 +68,7 @@
   <xmap:scaledependencies >
   </xmap:scaledependencies >
   <xmap:themes >
-    <xmap:theme name="World_countries_shp" legendname="World_countries_shp" type="polygon" items="238" renderer="4" rendererfield="" label="" flag="" info="" selection="FeatureId" filter="ID" filtervalue="none" highlightstyle="" display="inline" displaylabel="inline" >
+    <xmap:theme name="World Mercator" legendname="World Mercator" type="polygon" items="238" renderer="4" rendererfield="" label="" flag="" info="" selection="FeatureId" filter="ID" filtervalue="none" highlightstyle="" display="inline" displaylabel="inline" >
       <xmap:category type="single" fill="#d6cd68" stroke="#000000" />
     </xmap:theme>
   </xmap:themes>
@@ -92,11 +92,11 @@
   <rect id="mapbackground:eventrect" x="-12800" y="-9600" width="38400" height="28800" style="fill:white;stroke:none;opacity:0" />
 <g id="mapzoomandpan" transform="matrix(1 0 0 1 0 0)">
 <g id="maplayer" clip-path="url(#mapclippath2)">
-<g id='World_countries_shp' class='World-countries-shp0s1' pointer-events='none' >
-<g id='World_countries_shp::bbox'  minboundx="300000.0000000000"  maxboundx="-300000.0000000000"  minboundy="300000.0000000000"  maxboundy="-300000.0000000000" ></g>
+<g id='World Mercator' class='World Mercator0s1' pointer-events='none' >
+<g id='World Mercator::bbox'  minboundx="300000.0000000000"  maxboundx="-300000.0000000000"  minboundy="300000.0000000000"  maxboundy="-300000.0000000000" ></g>
 </g>
 <g id='mapobjects_below_label'></g>
-<g id='World_countries_shp:label' class='World-countries-shp0s0'  >
+<g id='World Mercator:label' class='World Mercator0s0'  >
 </g>
 </g>
 <g id='mapobjects'></g>
