@@ -58,7 +58,7 @@ $Log: htmlgui.js,v $
 		global variables
 	 * ------------------------------------------------------------------ */
 
-	ixmaps.szDefaultMap				= "../../maps/svg/maps/generic/mercator.svgz";
+	ixmaps.szDefaultMap				= "../../maps/svg/maps/generic/mercator.svg";
 
 	ixmaps.szUrlSVG					= null;
 	ixmaps.helpWindow				= null;
