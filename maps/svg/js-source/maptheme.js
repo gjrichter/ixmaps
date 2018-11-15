@@ -7398,6 +7398,10 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer) {
 			nValueSize = this.objTheme.dbRecords[j][this.objTheme.nSizeFieldIndex];
 			nValueSize = this.valueMap?this.valueMap[String(nValueSize)]||__scanValue(nValueSize):__scanValue(nValueSize);
 		}
+		var szTitle = null;
+		if (this.szTitleField) {
+			szTitle = this.objTheme.dbRecords[j][this.objTheme.nTitleFieldIndex];
+		}
 
 		// get the data item position
 		// ---------------------------
@@ -7415,6 +7419,11 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer) {
 			ptPos = map.Scale.getMapPositionOfLatLon(parseFloat(szMA[2]), parseFloat(szMA[1]));
 		}else{
 			szId = this.objTheme.dbRecords[j][this.objTheme.nFieldSelectionIndex];
+			if (this.nSelectionFieldDigits) {
+				szId = ("000000000000000" + szId).slice(-this.nSelectionFieldDigits);
+				console.log(szId);
+			}
+
 			ptPos = this.getNodePosition(szThemeLayer + "::" + szId);
 		}
 
@@ -7586,6 +7595,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer) {
 					nValueSum: 0,
 					nCount: 1
 				};
+				this.itemA[szId].szTitle = szTitle;
 				this.itemA[szId].szSelectionId = String(szSelectionId);
 				this.itemA[szId].nSize = nSize||(nValueSize||1);
 				this.nMin = this.nMinSize = Math.min(this.nMinSize, this.itemA[szId].nSize);
@@ -11733,28 +11743,28 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					// sum counts for sequenze parts
 					// and make value sum of visible charts for dynamic theme legends
 					// --------------------------------------------------------------
-					if (this.szFlag.match(/CHART/) && !this.szFlag.match(/EXACT/)) {
-						for (i = 0; i < this.partsA.length; i++) {
-							this.partsA[i].nCount++;
-							this.partsA[i].nSum += !isNaN(this.itemA[a].nValuesA[i]) ? this.itemA[a].nValuesA[i] : 0;
-						}
-					} else
 					if (this.szFlag.match(/CHART/)) {
-						if (this.itemA[a].nValuesA.length > 1) {
-							// multiple value charts like pies,stars, ...
+						if (this.szFlag.match(/EXACT/)) {
+							if ( this.nMaxA.length > 1) {
+								// multiple value charts like pies,stars, ...
+								for (i = 0; i < this.partsA.length; i++) {
+									this.partsA[i].nCount++;
+									this.partsA[i].nSum += (this.itemA[a].nValuesA[i]&&!isNaN(this.itemA[a].nValuesA[i])) ? this.itemA[a].nValuesA[i] : 0;
+								}
+							} else {
+								// single value charts like bubble, label, ...
+								if (this.partsA[this.itemA[a].nValuesA[0] - 1]) {
+									this.partsA[this.itemA[a].nValuesA[0] - 1].nCount++;
+									this.partsA[this.itemA[a].nValuesA[0] - 1].nSum += !isNaN(this.itemA[a].nSize) ? this.itemA[a].nSize : 1;
+								}
+							}
+						} else {
 							for (i = 0; i < this.partsA.length; i++) {
 								this.partsA[i].nCount++;
 								this.partsA[i].nSum += !isNaN(this.itemA[a].nValuesA[i]) ? this.itemA[a].nValuesA[i] : 0;
 							}
-						} else {
-							// single value charts like bubble, label, ...
-							if (this.partsA[this.itemA[a].nValuesA[0] - 1]) {
-								this.partsA[this.itemA[a].nValuesA[0] - 1].nCount++;
-								this.partsA[this.itemA[a].nValuesA[0] - 1].nSum += !isNaN(this.itemA[a].nSize) ? this.itemA[a].nSize : 1;
-							}
-						}
+						} 
 					}
-
 					nToDraw++;
 				}
 			}
@@ -14533,7 +14543,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					nMaxValue = this.nNormalSizeValue;
 					this.nMaxSize = this.nNormalSizeValue;
 				}
-				if (szFlag.match(/ZOOM/) && szFlag.match(/SEQUENCE/)) {
+				if (nChartMaxValue && szFlag.match(/ZOOM/) && szFlag.match(/SEQUENCE/)) {
 					nMaxValue = nChartMaxValue / 2 + nChartMaxValue / 2 * Math.pow(nMaxValue, 1 / 2) / Math.pow(nChartMaxValue, 1 / 2);
 				}
 				if (szFlag.match(/INVERTSIZE/)) {
@@ -15141,8 +15151,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							//	nMaxValue = Math.pow(10,Math.round(nPow));
 							//}
 
-							var nMaxValue = this.nMaxValue || nMaxValue;
-							var nMinValue = this.nMinValue || Math.min(this.nMin, nAllMinValue);
+							var nMaxValue = (typeof this.nMaxValue !== "undefined")?this.nMaxValue:nMaxValue;
+							var nMinValue = (typeof this.nMinValue !== "undefined")?this.nMinValue:Math.min(this.nMin, nAllMinValue);
 							var nScale = map.Scale.normalX(nChartSize) / (nMaxValue - nMinValue) * (this.nGridX || (nPartsA.length - 1)) * (this.nRangeScale || 1);
 
 							shapeOnTopGroup = shapeOnTopGroup || map.Dom.newGroup(chartGroup, this.szId + ":" + a + ":chartontop");
@@ -15728,7 +15738,6 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				nSizer = 1 / Math.pow((nRange), 1 / 3) * Math.pow(Math.abs(nValueSum), 1 / 3);
 			} else {
 				nSizer = 1 / Math.pow((nRange), 1 / 2) * Math.pow(Math.abs(nValueSum), 1 / 2);
-				console.log(nRange+','+nValueSum);
 			}
 		}
 		// ------------------------------------------------------------
