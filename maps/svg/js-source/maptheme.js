@@ -1560,6 +1560,9 @@ Map.Themes.prototype.activateTheme = function (evt, szId) {
 Map.Themes.prototype.removeTheme = function (evt, szId) {
 	var mapTheme = this.getTheme(szId.split(':')[0]);
 	if (mapTheme) {
+		if (mapTheme.szFlag.match(/LOCKED/)) {
+			return;
+		}
 		if (mapTheme.szFlag.match(/CHART/)) {
 			mapTheme.fToggle = true;
 		}
@@ -5523,6 +5526,8 @@ function MapTheme(szThemes, szFields, szField100, szFlag, colorScheme, szTitle, 
 	this.szOrigFlag = this.szFlag;
 	/** the scaling of the chart objects */
 	this.nScale = 1.0;
+	/** the scaling of the chart value labels */
+	this.nValueScale = 1.0;
 	/** a refresh timeout in seconds */
 	this.nRefreshTimeout = 0;
 	/** holds the (created) unique id of the theme */
@@ -11765,6 +11770,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 							}
 						} 
 					}
+
 					nToDraw++;
 				}
 			}
@@ -14916,7 +14922,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					var szTextColor = this.szTextColor || cColor.textColor;
 
 					var nFontSize = String(Math.min(nMaxRadius * 1, nMaxRadius * (((szSymbol == "hexagon") ? 2.7 : 3.2) / szMaxTextLength)));
-					nFontSize *= nRadius / nMaxRadius;
+					nFontSize *= nRadius / nMaxRadius * this.nValueScale;
 
 					if (szFlag.match(/ZOOM/) && szFlag.match(/LINES/) && ((this.nGridX == null) || (this.nGridX <= 1) || (szFlag.match(/STACKED/)))) {
 						szTextColor = "black";
