@@ -1419,6 +1419,7 @@
 						ixmaps.editor.themeObj.style.colorscheme[0] = "1";
 						ixmaps.editor.themeObj.style.gridwidth = null;
 						ixmaps.editor.themeObj.style.gridwidthpx = null;
+						ixmaps.editor.themeObj.style.sizefield = null;
 						console.log(ixmaps.editor.themeObj);	
 						ixmaps.embeddedSVG.window.map.Api.clearAll();
 						ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
@@ -1429,6 +1430,7 @@
 						ixmaps.editor.themeObj.style.colorscheme[0] = "1";
 						ixmaps.editor.themeObj.style.gridwidth = null;
 						ixmaps.editor.themeObj.style.gridwidthpx = null;
+						ixmaps.editor.themeObj.style.sizefield = null;
 						console.log(ixmaps.editor.themeObj);	
 						ixmaps.embeddedSVG.window.map.Api.clearAll();
 						ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
@@ -1438,6 +1440,7 @@
 						ixmaps.editor.themeObj.style.symbols = ["hexagon"];
 						ixmaps.editor.themeObj.style.gridwidth = "15px";
 						ixmaps.editor.themeObj.style.fillopacity = "0.7";
+						ixmaps.editor.themeObj.style.sizefield = null;
 						ixmaps.editor.themeObj.style.dopacitypow = "2";
 						ixmaps.editor.themeObj.style.dopacityscale = "2";
 						if (!szFlag.match(/EXACT/)){
@@ -1454,6 +1457,7 @@
 						ixmaps.editor.themeObj.style.symbols = ["hexagon"];
 						ixmaps.editor.themeObj.style.gridwidth = "15px";
 						ixmaps.editor.themeObj.style.fillopacity = "0.7";
+						ixmaps.editor.themeObj.style.sizefield = null;
 						if (!szFlag.match(/EXACT/)){
 							ixmaps.editor.themeObj.style.colorscheme[0] = "1";
 						}else{
@@ -1477,6 +1481,25 @@
 						ixmaps.embeddedSVG.window.map.Api.clearAll();
 						ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
 						break;
+					case "CHART|WAFFLE|GRIDSIZE|AGGREGATE|FAST|RECT|SUM":
+						ixmaps.editor.themeObj.style.type = szValue+szExact;
+						ixmaps.editor.themeObj.style.symbols = null;
+						ixmaps.editor.themeObj.style.gridwidth = "50px";
+						ixmaps.editor.themeObj.style.fillopacity = "1";
+						ixmaps.editor.themeObj.style.sizefield = "aggregation";
+						ixmaps.editor.themeObj.style.bordercolor = "black";
+						ixmaps.editor.themeObj.style.borderwidth = "1";
+						ixmaps.editor.themeObj.style.boxcolor = "none";
+						ixmaps.editor.themeObj.style.boxopacity = "0.01";
+						if (!szFlag.match(/EXACT/)){
+							ixmaps.editor.themeObj.style.colorscheme[0] = "1";
+						}else{
+							ixmaps.editor.themeObj.style.type += "";
+						}
+						ixmaps.embeddedSVG.window.map.Api.clearAll();
+						ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
+						break;
+
 					default:
 						break;
 				}
@@ -1762,7 +1785,7 @@
 							'data-alert', 'success');
 					} else {
 						ixmaps.editor.alert(
-							'<h3>Welcome to the iXMaps Theme Configurator !</h3><p>please define a <strong><a href="#" onclick="ixmaps.loadStoryTool(\'../../../app/Editor/dialog_data_load.html\')"><button type="button" class="btn btn-info btn-md" style="border-radius:1.5em;padding:0.1em 0.7em 0.4em 0.7em">data source</button></a></strong>  or <strong><a href="#" onclick="ixmaps.parentApi.parentApi.__projectLoadDialog()"><button type="button" class="btn btn-info btn-md" style="border-radius:1.5em;padding:0.1em 0.8em 0.4em 0.8em">load a project</button></a></strong></p>',
+							'<h3>Welcome to the iXMaps Theme Configurator !</h3><p>please define a <strong><a href="#" onclick="ixmaps.loadStoryTool(\'../../../app/Editor/dialog_data_load.html\')"><button type="button" class="btn btn-info btn-md" style="border-radius:1.5em;padding:0.1em 0.7em 0.4em 0.7em">data source</button></a></strong>  or <strong><a href="#" onclick="ixmaps.loadStoryTool(\'../../../app/Editor/dialog_project_load.html\')""><button type="button" class="btn btn-info btn-md" style="border-radius:1.5em;padding:0.1em 0.8em 0.4em 0.8em">load a project</button></a></strong></p>',
 							'data-alert', 'success');
 					}
 				} else {
@@ -1996,7 +2019,7 @@
 				szHtml += "<option value=\"CHART|SYMBOL|GRIDSIZE|FAST|AGGREGATE|SUM|DOPACITY\" >Hexbin - dynamic opacity<\/option>";
 				szHtml += "<option value=\"CHART|SYMBOL|AUTOSIZE|FAST|AGGREGATE|SUM\" >Hexbin - dynamic size<\/option>";
 				szHtml += "<option value=\"CHART|BUBBLE|SIZE|FAST|AGGREGATE|RELOCATE|SUM\" >Bubble Grid - dynamic size<\/option>";
-
+				szHtml += "<option value=\"CHART|WAFFLE|GRIDSIZE|AGGREGATE|FAST|RECT|SUM\" >Waffle chart<\/option>";
 				$("#theme-type-select").html(szHtml);
 				$("#theme-type-select").val(__removeTypeFlag(objTheme.style.type, "ZOOMTO"));
 

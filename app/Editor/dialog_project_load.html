@@ -4,6 +4,7 @@
 	<meta charset="utf-8" >
 	<title>iXmps - Editor - Dataimport</title>
 
+	<link href="../../app/Editor/assets/css/site.min.css" rel="stylesheet">
 	<style>
 		body #importdiv{
 			background:#fff;
@@ -45,6 +46,70 @@
 		cursor: pointer;
 	}
 
+	<style type="text/css">
+		#dialog {
+			background: white;
+			-moz-box-shadow: 0px 1px 3px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .3)/*{global-box-shadow-color}*/
+			;
+			-webkit-box-shadow: 0px 1px 3px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .3)/*{global-box-shadow-color}*/
+			;
+			box-shadow: 0px 1px 3px/*{global-box-shadow-size}*/
+			rgba(0, 0, 0, .3)/*{global-box-shadow-color}*/
+			;
+			box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+		}
+
+		.navbar-fixed-top {
+			box-shadow: inset 0 5px 6px -3px rgba(0, 0, 0, 0.4);
+			min-height: 20px;
+			margin-bottom: 0px;
+			background-color: white;
+			border-bottom: solid #ddd 1px;
+		}
+
+		.navbar-inverse .navbar-nav>li>a,
+		.navbar-inverse .navbar-text {
+			color: #666;
+		}
+
+		.navbar-inverse .navbar-nav>.open>a,
+		.navbar-inverse .navbar-nav>.open>a:focus,
+		.navbar-inverse .navbar-nav>.open>a:hover {
+			color: #000;
+			background-color: #eee;
+		}
+
+		.dropdown-menu {
+			background-color: #f8f8f8;
+			border: solid #dddddd 1px;
+			webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0);
+			box-shadow: 0 6px 12px rgba(0, 0, 0, 0);
+		}
+
+		.dropdown-menu li a {
+			padding: 5px 20px;
+			color: #444;
+		}
+
+		.dropdown-menu>li>a {
+			display: block;
+			padding: 3px 20px;
+			clear: both;
+			font-weight: 400;
+			line-height: 1.42857143;
+			color: #333;
+			white-space: nowrap;
+		}
+
+		.btn-link.active {
+			xbackground: #f8f8f8;
+			border-radius: 5px;
+			border: solid #dddddd 1px;
+		}
+	</style>
+
 	</style>
 </head>
 
@@ -61,13 +126,12 @@
 			</label>
 
 			<input type="text" id="fileName" style="width:80%;height:36px;font-size:1.1em"></input>&nbsp;<a href='#' id="loadFile" style="vertical-align:3px">
-				<button type="button" class="btn btn-md">
-				load project
+				<button type="button" class="btn btn-md btn-default">
+				load
 				</button>
 			</a>
 
-			<img src="../../ui/html/resources/images/loading_round.gif" id="load-file-spinner" style="height:24px;vertical-align:top;display:none">
-			<hr />
+			<img src="../resources/images/loading_blue.gif" id="load-file-spinner" style="height:24px;vertical-align:top;display:none">
 		</div>
 	</div>
 
@@ -151,6 +215,10 @@
 
 		reader.onload = function(event){
 			var project = null;
+
+			try{
+				ixmaps.hideStoryTool();
+			}catch (e){}
 
 			ixmaps.setProject("map",event.target.result);
 

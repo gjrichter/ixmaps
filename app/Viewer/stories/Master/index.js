@@ -434,7 +434,7 @@
 			$("#themeLegendDiv").css("background","#111");
 			$("#themeLegendDiv").css("border","none");
 			$("legend").css("color","#ddd");
-			$(".story-body").css("background-color","rgba(0,0,0,0.55)");
+			$(".story-body").css("background-color","rgba(0,0,0,0.35)");
 
 			changeCss("a.theme-button", "color:#888" );
 			changeCss(".theme-legend-item", "border-bottom:#222 solid 1px" );
@@ -460,10 +460,10 @@
 		}else{
 
 			$("#header").css("background","white");
-			$("#themeLegendDiv").css("background","rgba(255,255,255,0.5)");
+			$("#themeLegendDiv").css("background","rgba(255,255,255,0.8)");
 			$("#themeLegendDiv").css("border","none");
 			$("legend").css("color","#222");
-			$(".story-body").css("background-color","rgba(255,255,255,0.8)");
+			$(".story-body").css("background-color","rgba(255,255,255,0.3)");
 			changeCss(".theme-legend-item", "border-bottom:#eee solid 1px" );
 			changeCss("a.theme-legend-item", "border-bottom:#eee solid 1px" );
 		}
