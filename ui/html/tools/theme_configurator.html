@@ -465,6 +465,15 @@
 					</div>
 					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 						<div class="form-group">
+							<!-- help -->
+							<a href="#" onclick="$(this).siblings('.help').toggle();">
+							<span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></a>
+							<div class="help">
+								<p>- for single fields it is either a class distributon mode like EQUIDISTAND, QUANTILE or LOGARITHMIC or EXACT for discrete value like 'type' or 'year'</p>
+								<p>- for multiple field charts it can be 'by field' (for bar or pie charts) or 'dominant' or 'significant', if we have single value charts or shapes for the visualisation</p>
+								<p>('significant' is a value that is most above its own mean value; measured in standard deviation)</p>
+							</div>
+							<!------ -->
 							<label for="theme-distribution-select">distribution</label>
 							<select class="form-control" id="theme-distribution-select" onchange="ixmaps.editor.setDistribution()">
 								<optgroup label="distribution (numeric values only!)">
@@ -476,6 +485,11 @@
 								<optgroup label="discret values (text values allowed)">
 									<option value="EXACT">Exact</option>
 									<option value="EXACT">Exact + ignore case</option>
+								</optgroup>
+								<optgroup label="dominant values (of multiple data)">
+									<option value="">by data source</option>
+									<option value="DOMINANT">by dominant value</option>
+									<option value="DOMINANT|DEVIATION">by significant value</option>
 								</optgroup>
 							</select>
 							<select class="form-control" id="theme-classes-select" onchange="ixmaps.editor.setClasses()">
@@ -1512,6 +1526,8 @@
 				ixmaps.changeThemeStyle('map1', 'type:RANGE;', 'remove');
 				ixmaps.changeThemeStyle('map1', 'type:LOG;', 'remove');
 				ixmaps.changeThemeStyle('map1', 'type:LOGARITHMICAL;', 'remove');
+				ixmaps.changeThemeStyle('map1', 'type:DOMINANT;', 'remove');
+				ixmaps.changeThemeStyle('map1', 'type:DEVIATION;', 'remove');
 				ixmaps.changeThemeStyle('map1', 'type:' + szDistribution + ';', 'add');
 			};
 
@@ -2070,14 +2086,20 @@
 				} else
 				if (objTheme.style.type.match(/EXACT/)) {
 					$("#theme-distribution-select").val("EXACT");
+				} else
+				if (objTheme.style.type.match(/DEVIATION/)) {
+					$("#theme-distribution-select").val("DOMINANT|DEVIATION");
 				} else {
+				if (objTheme.style.type.match(/DOMINANT/)) {
+					$("#theme-distribution-select").val("DOMINANT");
+				} else
 					$("#theme-distribution-select").val("EQUIDISTANT");
 				}
 				$("#theme-classes-select").val(Number(objTheme.style.colorscheme[0]) || objTheme.style.colorscheme.length);
 
 				$("#theme-distribution-select").prev().css("color", color_selected);
 
-				if (objTheme.style.type.match(/EXACT/)) {
+				if (objTheme.style.type.match(/EXACT/) || objTheme.style.label ) {
 
 					$("#theme-classes-select").hide();
 

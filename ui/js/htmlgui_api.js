@@ -1106,6 +1106,33 @@ $Log: htmlgui_api.js,v $
 		this.dispatchToEmbeddedApi(szMap,"popupThemeEditor",[position]);
 	};
 	/**
+	 * show actual map in viewer
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {Array} position x,y screen position for the modal dialog
+	 * @void
+	 */
+	ixmaps.popOutMap = function(szMap,position){
+		this.dispatchToEmbeddedApi(szMap,"popOutMap",["window"]);
+	};
+	/**
+	 * show actual map in viewer
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {Array} position x,y screen position for the modal dialog
+	 * @void
+	 */
+	ixmaps.popOutView = function(szMap,position){
+		this.dispatchToEmbeddedApi(szMap,"popOutView",["window"]);
+	};
+	/**
+	 * show actual map in config
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {Array} position x,y screen position for the modal dialog
+	 * @void
+	 */
+	ixmaps.popOutEdit = function(szMap,position){
+		this.dispatchToEmbeddedApi(szMap,"popOutEdit",["window"]);
+	};
+	/**
 	 * get themes
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
 	 * @return {array} an array ot the theme ids

@@ -890,6 +890,13 @@
 				szBookmark = decodeURIComponent(((typeof (x) != "string") ? x.join("") : x));
 				ixmaps.execBookmark(szBookmark, false);
 			}
+
+			// is there a project to load at load ? 
+
+			if ($(document).getUrlParam('project')) {
+				szProjectUrl = $(document).getUrlParam('project');
+				ixmaps.loadProject(szProjectUrl, false);
+			}
 			// show/hide toolsbar elements
 			__switchBannerElements();
 			setTimeout("__switchBannerElements()", 5000);

@@ -310,6 +310,93 @@ $Log: htmlgui.js,v $
 		window.open(szUrl,'map fullscreen'+Math.random());
 	};
 
+	ixmaps.getShareUrl = function(szType){
+
+		var szAloneUrl = null;
+		var szEmbedUrl = null;
+		var szPopoutUrl = null;
+
+		// GR 30.04.2015 try to call explicit functions to get the share urls 
+		// ------------------------------------------------------------------
+		var szEditUrl   = ixmaps.getEditUrl  ?ixmaps.getEditUrl()  :null;
+		var szViewUrl   = ixmaps.getViewUrl  ?ixmaps.getViewUrl()  :null;
+		var szAloneUrl  = ixmaps.getLinkUrl  ?ixmaps.getLinkUrl()  :null;
+		var szEmbedUrl  = ixmaps.getEmbedUrl ?ixmaps.getEmbedUrl() :null;
+		var szPopoutUrl = ixmaps.getPopoutUrl?ixmaps.getPopoutUrl():null;
+		// ------------------------------------------------------------------
+
+		// GR 30.04.2015 get the last valid map name to query the bookmark from
+		// ------------------------------------------------------------------
+		szName = "map";
+		for ( i in ixmaps.embeddedApiA ){
+			szName = i;	
+		}
+
+		// GR 30.04.2015 go to the main window API, important for dispatch() 
+		// ------------------------------------------------------------------
+		while( ixmaps.embeddedApiA && ixmaps.embeddedApiA[szName] && (ixmaps.embeddedApiA[szName] != ixmaps) ){
+			ixmaps = ixmaps.embeddedApiA[szName];
+		}
+		
+		// GR 30.04.2015 dispatch() the url returned from the explicit function 
+		//				 szAloneUrl is already complete
+		// ------------------------------------------------------------------
+		szEmbedUrl  = szEmbedUrl ?ixmaps.dispatch(szEmbedUrl) :szEmbedUrl;
+		szPopoutUrl = szPopoutUrl?ixmaps.dispatch(szPopoutUrl):szPopoutUrl;
+
+		// make generic share urls from the internal map template 
+		// used only, if above defined explicit urls are null
+		// ------------------------------------------------------
+
+		// make url of the map template 
+		var szTemplateUrl = ixmaps.dispatch("ui/dispatch.htm?");
+		var szBasemap = ixmaps.getBaseMapParameter(ixmaps.szMapService);
+
+		var szTemplateEdit   = szTemplateUrl + "ui=edit"   + szBasemap;
+		var szTemplateView   = szTemplateUrl + "ui=view"   + szBasemap;
+		var szTemplateEmbed  = szTemplateUrl + "ui=embed"  + szBasemap;
+		var szTemplateMain   = szTemplateUrl + "ui=embed"  + szBasemap;
+		var szTemplatePopout = szTemplateUrl + "ui=popout" + szBasemap;
+
+		window.document.body.topMargin = 0;
+		window.document.body.leftMargin = 0;
+
+		var szMapType  = ixmaps.getMapTypeId();
+		var szMapUrl   = ixmaps.getMapUrl();
+		var szStoryUrl = ixmaps.getStoryUrl();
+		var szBookmark = ixmaps.getBookmarkString(2);
+		var szAttrib   = ixmaps.htmlgui_getAttributionString();
+
+		szQuery  = "&maptype=" + szMapType;
+		szQuery += "&minimal=1&toolbutton=1&logo=1&child=1";
+		szQuery += "&svggis=" + encodeURI(szMapUrl);
+		szQuery += "&story="  + encodeURI(szStoryUrl||"");
+		szQuery += "&bookmark=" + encodeURIComponent(szBookmark);
+		szQuery += "&attribution=" + encodeURIComponent(szAttrib);
+
+		szEmbedUrl  = szEmbedUrl || (szTemplateEmbed + szQuery);
+		szAloneUrl  = szAloneUrl || (szTemplateMain + szQuery);
+		szEditUrl   = szEditUrl  || (szTemplateEdit + szQuery);
+		szViewUrl   = szViewUrl  || (szTemplateView + szQuery);
+		szPopoutUrl = szTemplatePopout + szQuery;
+
+		switch(szType){
+			case "view":
+				return szViewUrl;
+			case "edit":
+				return szEditUrl;
+		}
+
+	};
+
+	ixmaps.popOutView = function(fFlag,szTemplateUrl){
+		window.open(ixmaps.getShareUrl("view"));
+	};
+
+	ixmaps.popOutEdit = function(fFlag,szTemplateUrl){
+		window.open(ixmaps.getShareUrl("edit"));
+	};
+
 	ixmaps.popOutMap = function(fFlag,szTemplateUrl){
 
 		var szMapService = this.szMapService;

@@ -2519,6 +2519,7 @@ Map.Themes.prototype.markClass = function (evt, szId, szClass, szStep) {
  * @param szId the id of the chart group 
  */
 Map.Themes.prototype.unmarkClass = function (evt, szId, szClass) {
+
 	var mapTheme = this.getTheme(szId.split(':')[0]);
 	if (mapTheme && mapTheme.isVisible && !mapTheme.showInfoMore) {
 		mapTheme.markedClass = null;
@@ -2534,7 +2535,7 @@ Map.Themes.prototype.unmarkClass = function (evt, szId, szClass) {
 			}
 			if (mapTheme.markedClassesA.length) {
 				displayMessage("...", 1000, true);
-				this.markTimeout = setTimeout("map.Themes.doMarkClass('" + szId + "','" + szClass + "',1)", 50);
+				this.markTimeout = setTimeout("map.Themes.doMarkClass('" + szId + "','" + mapTheme.markedClassesA[0] + "',1)", 50);
 				return;
 			}else{
 				delete mapTheme.markedClassesA;
@@ -10857,87 +10858,101 @@ MapTheme.prototype.createSubTheme = function (nClass) {
 	if (this.subTheme) {
 		this.removeSubTheme();
 	}
-	var szDbTable = "";
-	var szLookupField = "";
-	var szAlphaField = "";
-	var szAlphaField100 = "";
-	var szDopacityScale = "";
-	var szDopacityPow = "";
-	var szDopacity = "";
+
+	// collect attributes to keep from trhe original theme
+	//
 	var szAttributes = "";
 
 	if (this.coTable && (typeof (this.coTable) != "undefined")) {
-		szDbTable = "dbtable:" + this.coTable + ";";
+		szAttributes += "dbtable:" + this.coTable + ";";
 	}
 	if (this.szSelectionField && (typeof (this.szSelectionField) != "undefined")) {
-		szLookupField = "lookupfield:" + this.szSelectionField + ";";
+		szAttributes += "lookupfield:" + this.szSelectionField + ";";
 	}
 	if (this.szAlphaField && (typeof (this.szAlphaField) != "undefined")) {
-		szAlphaField = "alphafield:" + this.szAlphaField + ";";
+		szAttributes += "alphafield:" + this.szAlphaField + ";";
 	}
 	if (this.szAlphaField100 && (typeof (this.szAlphaField100) != "undefined")) {
-		szAlphaField100 = "alphafield100:" + this.szAlphaField100 + ";";
+		szAttributes += "alphafield100:" + this.szAlphaField100 + ";";
 	}
 	if (this.nDopacityScale && (typeof (this.nDopacityScale) != "undefined")) {
-		szDopacityScale = "dopacityscale:" + this.nDopacityScale + ";";
+		szAttributes += "dopacityscale:" + this.nDopacityScale + ";";
 	}
 	if (this.nDopacityPow && (typeof (this.nDopacityPow) != "undefined")) {
-		szDopacityPow = "dopacitypow:" + this.nDopacityPow + ";";
+		szAttributes += "dopacitypow:" + this.nDopacityPow + ";";
 	}
 
-	var szLookup = "lookuptoupper:" + (this.fSelectionFieldToUpper || "") + ";";
-	szLookup += "lookupsuffix:" + (this.szSelectionFieldSuffix || "") + ";";
-	szLookup += "lookupprefix:" + (this.szSelectionFieldPrefix || "") + ";";
-	szLookup += "lookupdigits:" + (Number(this.nSelectionFieldDigits) || "") + ";";
-	szLookup += "lookuptonumber:" + (this.fSelectionFieldToNumber || "") + ";";
-	szLookup += "lookuptoupper:" + (this.fSelectionFieldToUpper || "") + ";";
+	var szLookup = "lookuptoupper:" + (this.fSelectionFieldToUpper || null) + ";";
+		szLookup += "lookupsuffix:" + (this.szSelectionFieldSuffix || null) + ";";
+		szLookup += "lookupprefix:" + (this.szSelectionFieldPrefix || null) + ";";
+		szLookup += "lookupdigits:" + (Number(this.nSelectionFieldDigits) || null) + ";";
+		szLookup += "lookuptonumber:" + (this.fSelectionFieldToNumber || null) + ";";
+		szLookup += "lookuptoupper:" + (this.fSelectionFieldToUpper || null) + ";";
+	szAttributes += szLookup;
 
-	if (this.szFlag.match(/DOPACITY/)) {
-		szDopacity += "DOPACITYMAX|";
-	}
-	if (this.szFlag.match(/AGGREGATE/)) {
-		szDopacity += "AGGREGATE|";
-	}
-	if (this.szFlag.match(/GROUP/)) {
-		szDopacity += "GROUP|";
-	}
-	if (this.szFlag.match(/SUM/)) {
-		szDopacity += "SUM|";
-	}
-	if (this.szFlag.match(/ZEROISVALUE/)) {
-		szDopacity += "ZEROISVALUE|";
-	}
-	if (this.szFlag.match(/VALUES/)) {
-		szDopacity += "VALUES|";
-	}
 	if (this.szAggregationField && (typeof (this.szAggregationField) != "undefined")) {
 		szAttributes += "aggregationfield:" + this.szAggregationField + ";";
 	}
 	if (this.szUnits && (typeof (this.szUnits) != "undefined")) {
 		szAttributes += "units:" + this.szUnits + ";";
 	}
+
+	// collect style flags to keep from trhe original theme
+	//
+	var szFlag = "";
+
+	if (this.szFlag.match(/DOPACITY/)) {
+		szFlag += "DOPACITYMAX|";
+	}
+	if (this.szFlag.match(/AGGREGATE/)) {
+		szFlag += "AGGREGATE|";
+	}
+	if (this.szFlag.match(/GROUP/)) {
+		szFlag += "GROUP|";
+	}
+	if (this.szFlag.match(/SUM/)) {
+		szFlag += "SUM|";
+	}
+	if (this.szFlag.match(/ZEROISVALUE/)) {
+		szFlag += "ZEROISVALUE|";
+	}
+	if (this.szFlag.match(/VALUES/)) {
+		szFlag += "VALUES|";
+	}
+
+	// allow to paint the sub theme over the original one  
+	//
 	map.Themes.enableMultiChoropleth = true;
 
+	// make the subtheme 
+	//
 	if (this.markedClassesA && (this.markedClassesA.length > 1)) {
+
+		// subtheme with more than one class
+		//
 		var fieldsA = this.szFields.split("|");
 		var fields = "";
 		var colorScheme = "";
-
 		for (i = 0; i < this.markedClassesA.length; i++) {
 			fields += ((fields.length ? "|" : "") + fieldsA[this.markedClassesA[i]]);
 			colorScheme += ((colorScheme.length ? "|" : "") + this.colorScheme[this.markedClassesA[i]]);
 		}
-		var tempTheme =
-			map.Themes.newTheme(this.szThemes, fields, this.szField100, "type:" + this.szFlag + ";colorscheme:" + colorScheme + ";" + szDbTable + szLookupField + szAlphaField + szAlphaField100 + szDopacityScale + szDopacityPow + szLookup + szAttributes
-				// ,"type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|PERCENTOFMEAN|NOINFO|SUBTHEME;scale:1.2;colorscheme:7,white,"+this.colorScheme[nClass]+ ";" + szDbTable + szLookupField
+		this.subTheme =
+			map.Themes.newTheme(this.szThemes, fields, this.szField100, 
+				"type:" + this.szFlag + "|NOINFO" + ";colorscheme:" + colorScheme + ";" + szAttributes
 				, this.szLabelA[nClass], "");
-		this.subTheme = tempTheme;
+
 	} else {
-		var tempTheme =
-			map.Themes.newTheme(this.szThemes, this.szFields.split("|")[nClass], this.szField100, "type:CHOROPLETH|QUANTILE|NOINFO|SUBTHEME|" + szDopacity + ";colorscheme:7|white|" + this.colorScheme[nClass] + ";" + szDbTable + szLookupField + szAlphaField + szAlphaField100 + szDopacityScale + szDopacityPow + szLookup + szAttributes
-				// ,"type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|PERCENTOFMEAN|NOINFO|SUBTHEME;scale:1.2;colorscheme:7,white,"+this.colorScheme[nClass]+ ";" + szDbTable + szLookupField
+
+		nClass = this.markedClassesA[0] || nClass;
+
+		// subtheme with one class
+		//
+		this.subTheme = 
+			map.Themes.newTheme(this.szThemes, this.szFields.split("|")[nClass], this.szField100, 
+				"type:CHOROPLETH|QUANTILE|NOINFO|SUBTHEME|" + szFlag + ";colorscheme:7|white|" + this.colorScheme[nClass] + ";" + szAttributes
 				, this.szLabelA[nClass], "");
-		this.subTheme = tempTheme;
+	
 	}
 
 	map.Themes.subTheme = this;
