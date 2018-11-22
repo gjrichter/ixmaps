@@ -9,7 +9,7 @@
 		"created": "Thu Nov 22 2018 11:49:29 GMT+0100 (Ora standard dell’Europa centrale)"
 		},
 	"map": {
-		"map": "../../maps/svg/maps/generic/mercator.svgz",
+		"map": "../../maps/svg/maps/generic/mercator.svg",
 		"basemap": "CartoDB - Dark matter",
 		"scaleParam": {
 			"lineScaling": "0.5",
