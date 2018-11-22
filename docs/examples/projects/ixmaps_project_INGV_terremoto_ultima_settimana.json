@@ -1,0 +1,86 @@
+{
+	"metadata": {
+		"title": "Terremoti ultima settimana",
+		"snippet": "Visualizzazione degli terremoti della ultima settimana caricati da una fonte del INGV",
+		"descriptrion": "",
+		"thumbnail": "",
+		"about": "",
+		"description": "L'INGV pubblica i terremoti attraverso un'interfaccia applicativa API, ch permette e.g. di caricare i terremoti della ultima settimana in un feed CSV con la licenza CC-BY-4.0. Questa visualizzazione usa il colore per indicare la profondità del evento sismico e la grandezza per rappresentare la magnitudine. ",
+		"created": "Thu Nov 22 2018 19:49:37 GMT+0100 (Ora standard dell’Europa centrale)"
+		},
+	"map": {
+		"map": "../../maps/svg/maps/generic/mercator.svg",
+		"basemap": "ArcGIS - Topo",
+		"scaleParam": {
+			"normalSizeScale": "10000000"
+			},
+		"options": {
+			"featurescaling": "dynamic",
+			"objectscaling": "dynamic",
+			"clipmap": "true",
+			"clipmapdynamic": "true",
+			"dynamiclabel": "NOSIZE",
+			"labelspace": "1.0",
+			"checklabeloverlap": "NOSQUEEZE",
+			"dynamiclayer": "true",
+			"dynamictiles": "true",
+			"discardtiles": "false",
+			"loadmultitiles": "true",
+			"loadsilent": "false",
+			"loadexternaldata": "true",
+			"buttonsize": "15",
+			"fastpan": "false",
+			"panborder": "0",
+			"northarrow": "false",
+			"sidebarbuttons": "false",
+			"tooltipdelay": "250",
+			"popupdelay": "250",
+			"popupgridstyle": "firstright|firstitalic|firstbold|firstgray|firstsmall|background|alternate|full",
+			"popupalignment": "BOTTOM|LEFT",
+			"transparentbackground": "true",
+			"labelscaling": "dynamic",
+			"flushChartDraw": "50000",
+			"mapopacity": "NaN"
+			},
+		"center": {
+			"lat": "40.98819156349393",
+			"lng": "16.391601562500004"
+			},
+		"zoom": "6"
+		},
+	"themes": [{
+			"layer": "World Mercator",
+			"field": "Depth/Km",
+			"field100": "",
+			"style": {
+				"type": "CHART|BUBBLE|QUANTILE|LINEAR|VALUES",
+				"colorscheme": [
+					"7",
+					"RGB(245,41,38)",
+					"RGB(74,74,255)",
+					"dynamic"],
+				"fillopacity": "0.7",
+				"shadow": "true",
+				"dbtable": "themeDataObj",
+				"dbtableUrl": "http://webservices.ingv.it/fdsnws/event/1/query?starttime=2018-11-15T00%3A00%3A00&endtime=2018-11-22T23%3A59%3A59&minmag=1&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000",
+				"dbtableType": "csv",
+				"datacache": "true",
+				"itemfield": "Latitude|Longitude",
+				"lookupfield": "Latitude|Longitude",
+				"child": "true",
+				"units": "",
+				"legendunits": "    km",
+				"normalsizevalue": "10",
+				"scale": "1.5",
+				"valuefield": "Magnitude",
+				"sizefield": "Magnitude",
+				"valuescale": "1",
+				"valuedecimals": "1",
+				"title": "INGV terremoto ultima settimana",
+				"snippet": "Il colore rappresenta la profondità mentra la grandezza la magnitudine",
+				"description": "Fonte: INGV Centro Nazionale Terremoti licenza cc-by-4.0"
+				}
+			}],
+	"layerMask": {
+		}
+	}
