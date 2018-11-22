@@ -5,7 +5,7 @@
 		"descriptrion": "",
 		"thumbnail": "",
 		"about": "",
-		"description": "L'INGV pubblica i terremoti attraverso un'interfaccia applicativa API, ch permette e.g. di caricare i terremoti della ultima settimana in un feed CSV con la licenza CC-BY-4.0. Questa visualizzazione usa il colore per indicare la profondità del evento sismico e la grandezza per rappresentare la magnitudine. ",
+		"description": "L'INGV pubblica i terremoti attraverso un'interfaccia applicativa (API), che permette e.g. di caricare i terremoti della ultima settimana in un feed CSV con la licenza CC-BY-4.0.<br>Questa visualizzazione usa il colore per indicare la profondità del evento sismico e la grandezza per rappresentare la magnitudine. ",
 		"created": "Thu Nov 22 2018 19:49:37 GMT+0100 (Ora standard dell’Europa centrale)"
 		},
 	"map": {
@@ -62,7 +62,7 @@
 				"fillopacity": "0.7",
 				"shadow": "true",
 				"dbtable": "themeDataObj",
-				"dbtableUrl": "http://webservices.ingv.it/fdsnws/event/1/query?starttime=2018-11-15T00%3A00%3A00&endtime=2018-11-22T23%3A59%3A59&minmag=1&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000",
+				"dbtableUrl": "https://webservices.ingv.it/fdsnws/event/1/query?starttime=2018-11-15T00%3A00%3A00&endtime=2018-11-22T23%3A59%3A59&minmag=1&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000",
 				"dbtableType": "csv",
 				"datacache": "true",
 				"itemfield": "Latitude|Longitude",
