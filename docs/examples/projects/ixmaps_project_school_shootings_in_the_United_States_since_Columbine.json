@@ -1,15 +1,15 @@
 {
 	"metadata": {
-		"title": "",
-		"snippet": "",
+		"title": "School shootings in the United States",
+		"snippet": "Victims of school shootings in the United States since Columbine",
 		"descriptrion": "",
 		"thumbnail": "",
 		"about": "",
-		"description": "",
-		"created": "Thu Nov 22 2018 11:49:29 GMT+0100 (Ora standard dell’Europa centrale)"
+		"description": "School shootings in the United States since Columbine. Visualization based on data of all victims of school shootings in the United States since Columbine. This database is maintained by the Washington Post and published under CC BY-NC-SA 4.0 license",
+		"created": "Thu Nov 22 2018 11:47:49 GMT+0100 (Ora standard dell’Europa centrale)"
 		},
 	"map": {
-		"map": "../../maps/svg/maps/generic/mercator.svg",
+		"map": "../../maps/svg/maps/generic/mercator.svgz",
 		"basemap": "CartoDB - Dark matter",
 		"scaleParam": {
 			"lineScaling": "0.5",
@@ -48,7 +48,7 @@
 			},
 		"zoom": "4"
 		},
-	"themes": [{
+		"themes": [{
 			"layer": "World_countries_shp",
 			"field": "killed|injured",
 			"field100": "",
