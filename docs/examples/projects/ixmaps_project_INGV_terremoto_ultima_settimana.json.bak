@@ -62,7 +62,7 @@
 				"fillopacity": "0.7",
 				"shadow": "true",
 				"dbtable": "themeDataObj",
-				"dbtableUrl": "http://webservices.ingv.it/fdsnws/event/1/query?starttime=2018-11-15T00%3A00%3A00&endtime=2018-11-22T23%3A59%3A59&minmag=1&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000",
+				"dbtableUrl": "https://webservices.ingv.it/fdsnws/event/1/query?starttime=2018-11-15T00%3A00%3A00&endtime=2018-11-22T23%3A59%3A59&minmag=1&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000",
 				"dbtableType": "csv",
 				"datacache": "true",
 				"itemfield": "Latitude|Longitude",
