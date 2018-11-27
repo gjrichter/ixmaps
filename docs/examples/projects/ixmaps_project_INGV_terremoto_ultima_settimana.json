@@ -77,7 +77,7 @@
 				"valuescale": "1",
 				"valuedecimals": "1",
 				"title": "INGV terremoto ultima settimana",
-				"snippet": "Il colore rappresenta la profondità mentra la grandezza la magnitudine",
+				"snippet": "Il colore rappresenta la profondità mentre la grandezza la magnitudine",
 				"description": "Fonte: INGV Centro Nazionale Terremoti licenza cc-by-4.0"
 				}
 			}],
