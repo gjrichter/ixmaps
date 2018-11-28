@@ -160,6 +160,46 @@
 			display:none;
 		}
 
+		.calendar {
+			color:black;
+			background-color: transparent;
+			padding:0;
+			border-radius:0;
+			border:0;
+			box-shadow:none;
+			margin-right: 10px;
+		}
+
+		.calendar .years .plus em,
+		.calendar .years .minus em {
+			font-size:1.1em;
+			user-select: none;
+			position: relative;
+			display: inline-block;
+			width: 32px;
+			height: 32px;
+			margin-top:2px;
+			padding-top:4px;
+			cursor: pointer;
+			color: #888;
+			border: 1px solid #aaa;
+			border-radius: 50%;
+			-webkit-border-radius: 50%;
+			-moz-border-radius: 50%;
+		}
+		.calendar .years .minus em {
+			font-size:1.3em;
+			padding-top:0px;
+		}
+
+		.calendar .years .plus em:active,
+		.calendar .years .plus em:hover,
+		.calendar .years .minus em:active,
+		.calendar .years .minus em:hover {
+			border-color: #e9573f
+		}
+
+
 	</style>
 </head>
 
@@ -623,6 +663,26 @@
 					</div>
 				</div>
 
+				<div class="row">
+					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+						<div class="form-group">
+							<label for="chartValueDecimalsList">value decimals</label>
+							<select class="form-control" id="chartValueDecimalsList" name="chartSortList">
+								<option value="0">#</option>
+								<option value="1">#.#</option>
+								<option value="2">#.##</option>
+								<option value="3">#.###</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+						<div class="form-group">
+							<label for="chartFillOpacity">opacity</label>
+							<input type="text" class="form-control" id="chartFillOpacity" placeholder="0.1 ... 1">
+						</div>
+					</div>
+				</div>
+
 			</div>
 
 			<!-- --------------------------------- -->
@@ -644,8 +704,14 @@
 				<div class="row">
 					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 						<div class="form-group">
-							<label for="chartScaleValue">scale</label>
-							<input class="form-control" type="text" id="chartScaleValue" placeholder="1 ... " onkeypress="setChartScale()">
+							<label id="chartSizeLabel" for="chartScaleValue">scale</label>
+							<div class="calendar">
+								<div class="years clearfix">
+									<div class="unit minus" onclick="changeChartScale(-1)"><em>-</em></div>
+									<div class="monyear" style="padding:0em 0em 0em 1.2em" ><input class="form-control" style="width:90%" type="text" id="chartScaleValue" placeholder="1 ... " onkeypress="setChartScale()"></div>
+									<div class="unit plus" onclick="changeChartScale(1)"><em>+</em></div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -732,7 +798,7 @@
 
 			<div class="container" style="background:#f8f6f8">
 
-				<h3 id="chartAlphaTitle" class="disabled">opacity
+				<h3 id="chartOpacityTitle" class="disabled">opacity
 					<span class="pull-right">
 						<a href='javascript:ixmaps.editor.applyChanges();'>
 							<button type="button" class="btn btn-link btn-md">
@@ -741,6 +807,21 @@
 						</a>
 					</span>
 				</h3>
+
+				<div class="row">
+					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+						<div class="form-group">
+							<label id="chartOpacityLabel" for="chartOpacityValue">opacity</label>
+							<div class="calendar">
+								<div class="years clearfix">
+									<div class="unit minus" onclick="changeChartOpacity(-1)"><em>-</em></div>
+									<div class="monyear" style="padding:0em 0em 0em 1.2em" ><input class="form-control" style="width:90%" type="text" id="chartOpacityValue" placeholder="1 ... " onkeypress="setChartOpacity()"></div>
+									<div class="unit plus" onclick="changeChartOpacity(1)"><em>+</em></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
 				<div class="row">
 					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
@@ -937,6 +1018,15 @@
 
 				<div class="row">
 					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+							<!-- help -->
+							<a href="#" onclick="$(this).siblings('.help').toggle();">
+							<span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></a>
+							<div class="help">
+								<p>Objects are the charts on the map</p>
+								<p>You can change the zoom behaviour of the charts here</p>
+								<p>Zoom in/out to see the effect</p>
+							</div>
+							<!------ -->
 						<div class="form-group">
 							<label for="mapObjectScaling">object scaling</label>
 							<select id="mapObjectScaling" class="form-control" name="mapObjectScaling" onchange="ixmaps.editor.setMapObjectScaling()">
@@ -947,10 +1037,36 @@
 						</div>
 					</div>
 					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+							<!-- help -->
+							<a href="#" onclick="$(this).siblings('.help').toggle();">
+							<span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></a>
+							<div class="help">
+								<p>Is the map scale where the chart objects have a 'normal' size when dynamic object scaling is selected</p>
+								<p>Is set automatically to the actual map scale when you change the object scaling</p>
+							</div>
+							<!------ -->
 						<div class="form-group">
 							<label for="mapNormalsizeScale">normal size scale</label>
 							<input type="text" id="mapNormalsizeScale" class="form-control" placeholder="1:1000000"
 							onchange="ixmaps.editor.setMapNormalSizeScale()" >
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+							<!-- help -->
+							<a href="#" onclick="$(this).siblings('.help').toggle();">
+							<span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></a>
+							<div class="help">
+								<p>Actualize display every n charts generated</p>
+								<p>Changes user experience</p>
+							</div>
+							<!------ -->
+						<div class="form-group">
+							<label for="mapObjectScaling">render rate</label>
+							<input type="text" id="mapRenderRate" class="form-control" placeholder="1:1000000"
+							onchange="ixmaps.editor.setMapRenderRate()" >
 						</div>
 					</div>
 				</div>
@@ -978,7 +1094,8 @@
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="generating-on-bottom">
 				</div>
 			</div>
-
+			
+			<!--
 			<div class="row" id="apply-on-bottom" style="display:none">
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<a href='javascript:ixmaps.editor.applyChanges();'>
@@ -988,7 +1105,7 @@
 					</a>
 				</div>
 			</div>
-
+			-->
 			<br>
 			<br>
 
@@ -1246,7 +1363,7 @@
 				ixmaps.map().theme().changeStyle('showdata:toggle');
 			}
 
-			function setChartScale() {
+			function setChartScale(nDelta) {
 				if ( event.keyCode == 13 ){
 					var newScale = Number($("#chartScaleValue").val());
 					if ( !isNaN(newScale) ){
@@ -1255,6 +1372,37 @@
 						alert("Input type error: only numbers allowed!");
 					}
 				}
+			}
+			function changeChartScale(nDelta) {
+				var nScale = Number($("#chartScaleValue").val());
+				if ( nDelta < 0 ){
+					nScale = (nScale/1.5).toPrecision(2);
+				}else{
+					nScale = (nScale*1.5).toPrecision(2);
+				}
+				$("#chartScaleValue").val(nScale)
+				ixmaps.map().theme().changeStyle('scale:'+String(nScale),'set');
+			}
+
+			function setChartOpacity() {
+				if ( event.keyCode == 13 ){
+					var newOpacity = Number($("#chartOpacityValue").val());
+					if ( !isNaN(newOpacity) ){
+						ixmaps.map().theme().changeStyle('fillopacity:'+String(newOpacity),'set');
+					}else{
+						alert("Input type error: only numbers allowed!");
+					}
+				}
+			}
+			function changeChartOpacity(nDelta) {
+				var nOpacity = Number($("#chartOpacityValue").val());
+				if ( nDelta < 0 ){
+					nOpacity = (nOpacity/1.5).toPrecision(2);
+				}else{
+					nOpacity = (nOpacity*1.5).toPrecision(2);
+				}
+				$("#chartScaleValue").val(nOpacity)
+				ixmaps.map().theme().changeStyle('fillopacity:'+String(nOpacity),'set');
 			}
 
 			function setChartRangeScale() {
@@ -1427,6 +1575,11 @@
 
 				var szValue = $("#theme-type-select").val();
 				switch(szValue){
+					case "CHOROPLETH":
+						ixmaps.editor.themeObj.style.type = szValue+szExact;
+						ixmaps.embeddedSVG.window.map.Api.clearAll();
+						ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
+						break;
 					case "CHART|DOT|RAW|FAST":
 						ixmaps.editor.themeObj.style.type = szValue+szExact;
 						ixmaps.editor.themeObj.style.fillopacity = "0.3";
@@ -1542,7 +1695,10 @@
 
 			ixmaps.editor.setMapObjectScaling = function () {
 				var szScaling = $("#mapObjectScaling").val();
+				var szScale = ixmaps.getMapScale();
+				$("#mapNormalsizeScale").val("1:"+szScale);
 				ixmaps.setOptions(JSON.parse('{"objectscaling":"' + szScaling +'"}'));
+				ixmaps.setOptions(JSON.parse('{"normalsizescale":"' + szScale +'"}'));
 			};
 
 			ixmaps.editor.setAggregationMode = function () {
@@ -1555,6 +1711,11 @@
 					szScale = szScale.split(/\:/)[1];
 				}
 				ixmaps.setOptions(JSON.parse('{"normalsizescale":"' + szScale +'"}'));
+			};
+
+			ixmaps.editor.setMapRenderRate = function () {
+				var szRate = $("#mapRenderRate").val();
+				ixmaps.setOptions(JSON.parse('{"flushChartDraw":"' + szRate +'"}'));
 			};
 
 			ixmaps.editor.alert = function (szAlert, szDestination, szFlag) {
@@ -2030,6 +2191,7 @@
 
 				szHtml = "";
 				szHtml += "<option value=\"\" >select basic chart type<\/option>";
+				szHtml += "<option value=\"CHOROPLETH\" >shapes<\/option>";
 				szHtml += "<option value=\"CHART|DOT|RAW|FAST\" >Dots<\/option>";
 				szHtml += "<option value=\"CHART|BUBBLE|SIZE\" >sized Bubbles<\/option>";
 				szHtml += "<option value=\"CHART|SYMBOL|GRIDSIZE|FAST|AGGREGATE|SUM|DOPACITY\" >Hexbin - dynamic opacity<\/option>";
@@ -2065,6 +2227,10 @@
 				}
 				$("#define-themetype-title").css("color", color_selected);
 
+				if (objTheme.style.valuedecimals) {
+					$("#chartValueDecimalsList").val(objTheme.style.valuedecimals);
+					$("#chartValueDecimalsList").prev().css("color", color_selected);
+				}
 				// ------------------------------
 				// 4. theme colors and classes
 				// ------------------------------
@@ -2213,11 +2379,12 @@
 
 				$("#chartScaleValue").val(objTheme.style.scale);
 				$("#chartSizeTitle").css("color", color_selected);
+				$("#chartSizeLabel").css("color", color_selected);
 
 				if (objTheme.style.type.match(/SIZE/)||objTheme.style.sizefield||objTheme.style.normalsizevalue) {
 					$("#chartSizeTitle").css("color", color_selected);
 					if (objTheme.style.sizefield) {
-						$("#chartSizeList").val("by field");
+						$("#chartSizeList").val("SIZE");
 						$("#chartSizeList").prev().css("color", color_selected);
 						$("#chartSizeFieldList").val(objTheme.style.sizefield);
 						$("#chartSizeFieldList").prev().css("color", color_selected);
@@ -2264,8 +2431,12 @@
 				// 8. dynamic alpha
 				// ------------------------------
 
+				$("#chartOpacityValue").val(objTheme.style.opacity||objTheme.style.fillopacity);
+				$("#chartOpacityTitle").css("color", color_selected);
+				$("#chartOpacityLabel").css("color", color_selected);
+
 				if (objTheme.style.type.match(/DOPACITY/)) {
-					$("#chartAlphaTitle").css("color", color_selected);
+					$("#chartOpacityTitle").css("color", color_selected);
 					if (objTheme.style.type.match(/DOPACITYBIPOLAR/)) {
 						$("#chartAlphaMode").val("DOPACITYBIPOLAR");
 					} else
@@ -2297,25 +2468,34 @@
 					}
 				}
 
+				if (objTheme.style.alphafield){
+					$("#chartAlphaFieldList").val(objTheme.style.alphafield);
+				}
+
 				var scaleParam	= ixmaps.getScaleParam();
 				var options		= ixmaps.getOptions();
-
-				var szHtml = "";
-				szHtml += "<table>";
-				for ( i in scaleParam ){
-					szHtml += "<tr><td>"+i+"</td><td>"+scaleParam[i]+"</td></tr>";
+				
+				if (0){
+					var szHtml = "";
+					szHtml += "<table>";
+					for ( i in scaleParam ){
+						szHtml += "<tr><td>"+i+"</td><td>"+scaleParam[i]+"</td></tr>";
+					}
+					for ( i in options ){
+						szHtml += "<tr><td>"+i+"</td><td>"+options[i]+"</td></tr>";
+					}
+					$("#map-configuration").html(szHtml);
 				}
-				for ( i in options ){
-					szHtml += "<tr><td>"+i+"</td><td>"+options[i]+"</td></tr>";
-				}
-
-				$("#map-configuration").html(szHtml);
 
 				if (scaleParam.normalSizeScale) {
 					$("#mapNormalsizeScale").val("1:"+scaleParam.normalSizeScale);
 				}
 				if (options.objectscaling) {
 					$("#mapObjectScaling").val(options.objectscaling);
+				}
+
+				if (options.flushChartDraw) {
+					$("#mapRenderRate").val(options.flushChartDraw);
 				}
 
 				console.log(ixmaps.editor.themeObj);	
@@ -2383,6 +2563,7 @@
 				objTheme.style.type = __removeTypeFlag(objTheme.style.type, "AGGREGATE");
 				objTheme.style.type = __removeTypeFlag(objTheme.style.type, "RECT");
 				objTheme.style.type = __removeTypeFlag(objTheme.style.type, "RELOCATE");
+				objTheme.style.type = __removeTypeFlag(objTheme.style.type, "VALUES");
 
 				if (fValues) {
 					objTheme.style.type += "|VALUES";
@@ -2420,6 +2601,8 @@
 				if ($("#theme-aura-checkbox").attr("checked") == "checked") {
 					objTheme.style.type += "|AURA";
 				}
+
+				objTheme.style.valuedecimals = $("#chartValueDecimalsList").val();
 
 				if ($("#chartAggregationMode").val().match(/AGGREGATE/)) {
 
@@ -2473,6 +2656,10 @@
 
 					objTheme.style.dopacitypow = $("#chartAlphaSpread").val();
 					objTheme.style.dopacityscale = $("#chartAlphaIntensity").val();
+				}
+
+				if ($("#chartAlphaFieldList").val() != "" ) {
+					objTheme.style.alphafield = $("#chartAlphaFieldList").val();
 				}
 
 				objTheme.style.editor = true;

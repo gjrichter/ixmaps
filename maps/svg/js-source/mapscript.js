@@ -241,6 +241,9 @@ Map = function(){
 	/** holds the subclass for map api methods */
 	this.Api = null; 
 
+	/** holds the URL root of a loaded map, "" if no additional map has been loaded */
+	this.mapRoot = ""; 
+
 	/** holds a SVG loader object, created on init() */
 	this.Loader = new SVGLoader(); 
 	/** holds the pushed init actions (see {@link #pushInitAction}) @type array */
@@ -538,6 +541,9 @@ Map.prototype.setFeatures = function(szFeatures){
 				break;
 			case "flushChartDraw":
 				this.Themes.nflushChartDraw = Number(szAttA[1]);
+				if ( this.Themes.activeTheme ){
+					this.Themes.activeTheme.nflushChartDraw = Number(szAttA[1]);
+				}
 				break;
 			case "flushLabelDraw":
 				this.Label.nflushLabelDraw = Number(szAttA[1]);
@@ -566,7 +572,7 @@ Map.prototype.setFeatures = function(szFeatures){
  */
 Map.prototype.getFeatures = function(){
 	var szFeatures = this.szFeatures;
-	this.szFeatures += ";mapopacity:"+this.nOpacity;
+	this.szFeatures += ";mapopacity:"+String(this.nOpacity||1);
 	return this.szFeatures;
 };
 /**
@@ -574,7 +580,11 @@ Map.prototype.getFeatures = function(){
  * @return true or false
  */
 Map.prototype.isLoading = function(){
-	if ( this.Loader.isWaiting() || (map.Tiles && map.Tiles.isLoading()) || scriptLoaderPool.isLoading() ){
+	if ( (this.Loader    && this.Loader.isWaiting())    ||
+		 (this.mapLoader && this.mapLoader.isWaiting()) || 
+		 (map.Tiles      && map.Tiles.isLoading())      || 
+		  scriptLoaderPool.isLoading() )
+		{
 		return true;
 	}
 	return false;
@@ -852,6 +862,27 @@ Map.prototype.clearAll = function(){
 	this.Themes.removeAll();
 	setMapTool("");	
 	this.Scale.nObjectScaling  = 1.0;
+};
+
+/**
+ * load a new map
+ * @param szUrl the map Url
+ * @type void
+ */
+Map.prototype.loadMap = function(szUrl){
+	if (!this.mapLoader){
+		this.mapLoader = new SVGLoaderMap();
+	}
+	if (this.mapLoader.importSVGFile(szUrl,SVGDocument)){
+		if ( szUrl.match(/http/)){
+			szUrlA = szUrl.split(/\//);
+			szUrlA.splice(-1);
+			szUrl = szUrlA.join("/");
+			this.mapRoot = szUrl + "/";
+		}else{
+			this.mapRoot = "";
+		}
+	}
 };
 
 // create instance here 
@@ -5238,24 +5269,10 @@ function SVGLoader(){
         function CallbackHandler(parent){
 			this.parent = parent;
         }
-        CallbackHandler.prototype.operationComplete = function (status){
+        CallbackHandler.prototype.operationComplete = function (status,xmlObject,szText){
 			this.parent.nPending--;
 			this.parent.pop();
-			if (status.success){
-				var svgSrc = status.content;
-			   
-				var d =  parseXML(svgSrc,svgDocument);
-
-				this.processImported(d);
-				_LOG("SVGLoader: "+szUrl+" (loaded)");
-			}
-			else{
-			}
-        };
-        CallbackHandler.prototype.operationComplete2 = function (status,xmlObject,szText){
-			this.parent.nPending--;
-			this.parent.pop();
-			_TRACE("SVGLoader: "+szUrl+" (operationComplete2) status="+status);
+			_TRACE("SVGLoader: "+szUrl+" (operationComplete) status="+status);
 			if ( xmlObject && status == 200 ){
 				this.processImported(xmlObject.documentElement);
 				_LOG("SVGLoader: "+szUrl+" (loaded)");
@@ -5487,6 +5504,9 @@ function SVGLoaderTiles(){
 	 * @param  callback optional function to be called on succeed
 	 */
     this.importSVGFile = function(szUrl, svgDocument, targetGroup, callback){
+
+		szUrl = (map.mapRoot||"") + szUrl;
+
 		if (this.szUrlA[szUrl] == targetGroup){
 			return false;
 		}
@@ -5580,25 +5600,7 @@ function SVGLoaderTiles(){
         function CallbackHandler(parent){
 			this.parent = parent;
         }
-        CallbackHandler.prototype.operationComplete = function (status){
-			this.parent.szUrlA[szUrl] = null;
-			this.parent.nPending--;
-			this.parent.nRequest--;
-			if (status.success){
-				_TRACE("SVGTilesL: "+szUrl);
-				var svgSrc = status.content;
-			   
-				var d =  parseXML(svgSrc,svgDocument);
-
-				this.processImported(d);
-				_TRACE("SVGTilesL: "+szUrl+" (loaded - "+this.parent.nPending+" pending)");
-			}
-			else{
-//				_TRACE("'"+szUrl+"' not loaded");
-			}
-			this.parent.pop();
-        };
-        CallbackHandler.prototype.operationComplete2 = function (status,xmlObject,szText){
+        CallbackHandler.prototype.operationComplete = function (status,xmlObject,szText){
 			this.parent.szUrlA[szUrl] = null;
 			this.parent.nPending--;
 			this.parent.nRequest--;
@@ -5694,6 +5696,235 @@ function SVGLoaderTiles(){
 			}
         };
 		_TRACE("SVGTilesL: "+szUrl+" ... ");
+		if (szUrl.length > 0){
+			getData(szUrl, new CallbackHandler(this));
+			return true;
+		}
+		return false;
+    };
+	/**
+	 * tell the number of pending tiles (svg fragments)  
+	 * @return number of asynchronous data loads still pending
+	 */
+    this.isWaiting = function(){
+		return this.nPending;
+	};
+	/**
+	 * tell the number of pending tiles (svg fragments)  
+	 * @return number of asynchronous data loads still pending
+	 */
+    this.isLoading = function(){
+		return ( this.nPending |  this.isAnyStacked() ) ;
+	};
+}
+/*
+@ -----------------------------------------------------------------------------
+@ M A P   l o a d i n g
+@ -----------------------------------------------------------------------------
+*/
+/**
+ * Create a new SVGLoaderMap instance.  
+ * @class A loader to import complete SVG maps into the current SVG document
+ * @constructor
+ * @throws 
+ * @return A new SVGLoaderMap
+ */
+var __svgLoaderMap = null;
+function SVGLoaderMap(){
+	this.szUrlA = new Array(0);
+	this.stackA = new Array(0);
+	this.nPending  = 0;
+	this.nRequest  = 0;
+	this.nToLoad  = 0;
+	__svgLoaderMap = this;
+
+	/**
+	 * Import a SVG file containing a map tile to a specified group of the given document<br>  
+	 * Stacks the import, is fLoadTilesMulti is false
+	 * @param  szUrl the URL of the SVG file
+	 * @param  svgDocument the target SVG document
+	 * @param  targetGroup the target SVG group; content of the loaded document will be added as a new child to this group
+	 * @param  callback optional function to be called on succeed
+	 */
+    this.importSVGFile = function(szUrl, svgDocument, targetGroup, callback){
+
+		if ( targetGroup && (this.szUrlA[szUrl] == targetGroup)){
+			return false;
+		}
+		this.nRequest++;
+		this.nToLoad++;
+		// silent
+		if ( fLoadingSilent ){
+			this.doImportSVGFile(szUrl, svgDocument, targetGroup, callback);
+		}
+		// show progress bar
+		else
+		if ( !fLoadMultiTiles && this.isWaiting() ){
+			this.push(szUrl, svgDocument, targetGroup, callback);
+		}
+		else{
+			displayMessage(map.Dictionary.getLocalText("loading map"));
+			displayProgressBar(0,1,map.Dictionary.getLocalText("loading map"));
+			this.push(szUrl, svgDocument, targetGroup, callback);
+			setTimeout("__svgLoaderMap.pop()",10);
+		}
+		return true;
+	};
+	/**
+	 * stack one tile import information (called when no multi import allowed)
+	 * @param  szUrl the URL of the SVG file
+	 * @param  svgDocument the target SVG document
+	 * @param  targetGroup the target SVG group; content of the loaded document will be added as a new child to this group
+	 * @param  callback optional function to be called on succeed
+	 */
+    this.push = function(szUrl, svgDocument, targetGroup, callback){
+		if ( !this.isStacked(szUrl, svgDocument, targetGroup)){
+			this.stackA.push({szUrl:szUrl,svgDocument:svgDocument,targetGroup:targetGroup,callback:callback});	
+		}
+	};
+	/**
+	 * unstack one tile import information<br>
+	 * calls .doImportSVGFile(...) method if there is a stacked tile to import
+	 */
+    this.pop = function(){
+		if ( !this.isWaiting() ){
+			var nextTile = this.stackA.shift();
+			if (nextTile){
+				displayProgressBar(this.nToLoad-this.nPending-this.stackA.length,this.nToLoad,map.Dictionary.getLocalText("loading map elements"));
+				this.doImportSVGFile(nextTile.szUrl, nextTile.svgDocument, nextTile.targetGroup, nextTile.callback);
+			}
+			else{
+				this.nRequest = 0;
+				this.nToLoad = 0;
+				clearMessage();
+			}
+		}
+	};
+	/**
+	 * check if szUrl is waiting in stack
+	 * @param  szUrl the URL of the SVG file
+	 * @param  svgDocument the target SVG document
+	 * @param  targetGroup the target SVG group; content of the loaded document will be added as a new child to this group
+	 */
+    this.isStacked = function(szUrl, svgDocument, targetGroup){
+		for ( i=0; i<this.stackA.length; i++ ){
+			if (this.stackA[i].szUrl == szUrl ){
+				if ( this.stackA[i].svgDocument == svgDocument &&
+					 this.stackA[i].targetGroup == targetGroup ) {
+					return true;
+				}
+			}
+		}
+		return false;
+	};
+	/**
+	 * check if any URL is waiting in stack
+	 */
+    this.isAnyStacked = function(){
+		return (this.stackA.length);
+	};
+	/**
+	 * executes the Import a SVG file containing a map   
+	 * @param  szUrl the URL of the SVG file
+	 * @param  svgDocument the target SVG document
+	 * @param  targetGroup the target SVG group; content of the loaded document will be added as a new child to this group
+	 * @param  callback optional function to be called on succeed
+	 */
+    this.doImportSVGFile = function(szUrl, svgDocument, targetGroup, callback){
+
+		// check if loading in process
+		if ( targetGroup && (this.szUrlA[szUrl] == targetGroup)){
+			return false;
+		}
+		this.szUrlA[szUrl] = targetGroup;
+		this.nPending++;
+		
+        function CallbackHandler(parent){
+			this.parent = parent;
+        }
+        CallbackHandler.prototype.operationComplete = function (status,xmlObject,szText){
+
+			this.parent.szUrlA[szUrl] = null;
+			this.parent.nPending--;
+			this.parent.nRequest--;
+			if ( xmlObject && (status == 200) ){
+				this.processImported(xmlObject.documentElement);
+				_TRACE("SVGTilesL: "+szUrl+" (loaded)");
+			}else{
+				displayMessage("error loading map");
+			}
+			this.parent.pop();
+		};
+        CallbackHandler.prototype.processImported = function (d){
+
+			d = SVGDocument.importNode(d, true);
+			console.log(d);
+
+			// replace metadata with data from new map
+			var oldMetadata = SVGDocument.getElementsByTagName("metadata")[2];
+			var newMetadata = d.getElementsByTagName("metadata")[0];
+			oldMetadata.parentNode.insertBefore(newMetadata,oldMetadata);
+			oldMetadata.parentNode.removeChild(oldMetadata);
+
+			// replace maplayer with those of the new map
+			var oldLayer = SVGDocument.getElementById("maplayer");
+			var newLayer = d.getElementById("maplayer");
+			oldLayer.parentNode.insertBefore(newLayer,oldLayer);
+			oldLayer.parentNode.removeChild(oldLayer);
+
+			// change extension to new map
+			var oldExtension = SVGDocument.getElementById("extension");
+			var newExtension = d.getElementById("extension");
+			oldExtension.parentNode.insertBefore(newExtension,oldExtension);
+			oldExtension.parentNode.removeChild(oldExtension);
+
+			// add pattern defs for the new map
+			var patternA = d.getElementsByTagName("pattern");
+			if ( patternA && patternA[0]){
+				var defsB = d.getElementsByTagName("pattern")[0].parentNode;
+				SVGRootElement.appendChild(defsB);
+			}
+
+			// copy styles of new map, if defined 
+			var oldStyles = SVGDocument.getElementById("mapstyles");
+			var newStyles = d.getElementById("mapstyles");
+			if (newStyles && oldStyles){
+				oldStyles.parentNode.insertBefore(newStyles,oldStyles);
+				oldStyles.parentNode.removeChild(oldStyles);
+			}else
+			if (newStyles){
+				SVGRootElement.appendChil(newStyles);
+			}
+
+			// reset/recreate the map handling
+			map.Scale = new Map.Scale(null);
+			map.Scale.superclass = map;
+
+			map.Scale.createWidgetStyles();
+			map.Scale.normalizeSymbols(SVGDocument.getElementById("symbolstore"));
+			map.Scale.normalizeButtons(SVGDocument.getElementById("widgetstore"));
+
+			map.Layer = new Map.Layer(null);
+
+			map.Layer.initPatternScaling(null,null);
+
+			map.Zoom  = new Map.Zoom(map.Scale.initScale);
+			map.Tiles = new Map.Tiles();
+			map.Label = new Map.Label();
+			map.Viewport = new Map.Viewport();
+
+			map.Query = new Map.Query();
+
+			map.Event.doDefaultZoom();
+
+			map.Layer.switchScaleDependentLayer();
+			map.Scale.refreshCSSStyles();
+
+			HTMLWindow.ixmaps.htmlgui_onMapReady(window);
+
+			return;
+        };
+		_TRACE("SVGMapL: "+szUrl+" ... ");
 		if (szUrl.length > 0){
 			getData(szUrl, new CallbackHandler(this));
 			return true;
@@ -5935,35 +6166,13 @@ JSLoader.prototype.loadScript = function(szUrl,fRefresh){
 	}
 };
 /**
- * callback function to terminate the data request
- * checks the error state and in case of success, activates the loaded content
- * @param  s the result of the loading process
- */
-JSLoader.prototype.operationComplete= function(s){
-	if ( !s.content || s.content.length == 0 || s.content.substr(0,5) == "Error" ){
-		_TRACE('JS-Loader: "'+this.szUrl+'" not loaded ! ERROR:'+s.content);
-		this.pool.setScriptError(this.szUrl);
-		if(this.errorCallback){
-			this.finishedCallback = null;
-			eval(this.errorCallback);
-		}
-	}else{
-		_TRACE('JS-Loader: '+this.szUrl+' (loaded)');
-		this.loadedScripts.push(s.content);
-	}
-	this.reqCnt--;
-	if(this.reqCnt <= 0){
-		this.evalScripts();
-	}
-};
-/**
  * callback function to terminate the data request from XMLHTTPRequest
  * checks the error state and in case of success, activates the loaded content
  * @param  status 
  * @param  xmlObject
  * @param  szText 
  */
-JSLoader.prototype.operationComplete2= function(status,xmlObject,szText){
+JSLoader.prototype.operationComplete= function(status,xmlObject,szText){
 	if ( status != 200 || (!xmlObject && !szText) ){
 		_TRACE('JS-Loader: "'+this.szUrl+'" not loaded ! ERROR:'+status);
 		this.pool.setScriptError(this.szUrl);
@@ -6021,6 +6230,7 @@ JSLoader.prototype.isLoading = function(){
  * @param  getDataCallback the callback function to process the imported data
  */
 function getData(szUrl,getDataCallback) { 
+
 	// call getURL() if available, case ASV3, ASV6 and Batik
 	if (window.getURL) {
 		getURL(szUrl,getDataCallback);
@@ -6033,7 +6243,7 @@ function getData(szUrl,getDataCallback) {
         function XMLHttpRequestCallback() {
             // we are only interested in the complete transaction (readyState 4)
 			if (xmlRequest.readyState == 4) {
-				getDataCallback.operationComplete2(xmlRequest.status,xmlRequest.responseXML,xmlRequest.responseText);
+				getDataCallback.operationComplete(xmlRequest.status,xmlRequest.responseXML,xmlRequest.responseText);
             }
         }
 		try{

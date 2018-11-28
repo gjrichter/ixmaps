@@ -30,6 +30,10 @@ window.ixmaps.totale_incidenti_georef = window.ixmaps.totale_incidenti_georef ||
 
 	ixmaps.totale_incidenti_georef.after = function(totale_incidenti_georef) {
 
+		totale_incidenti_georef.column("ORA").map(value => {
+			return parseInt(value);
+		});
+
 		// get time index
 
 		var indexOra = 0;

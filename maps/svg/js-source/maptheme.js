@@ -1401,7 +1401,6 @@ Map.Themes.prototype.loadExternalData = function (szData, fRefresh, themeObj) {
 	if (!this.coTableExt) {
 		this.coTableExt = [];
 	}
-
 	_TRACE("... load external data ...:" + szData);
 	if (szData) {
 		var szMessage = map.Dictionary.getLocalText("... creating theme ...");
@@ -1521,7 +1520,7 @@ Map.Themes.prototype.loadExternalDataZipped = function (szData, fRefresh, szMess
 	jsLoader.finishedCallback = "map.Themes.loadExternalDataFinish('" + szMessage + "')";
 	jsLoader.errorCallback = "map.Themes.loadExternalDataDefault('" + szData + "'," + fRefresh + ",'" + szMessage + "')";
 	jsLoader.szMessage = map.Dictionary.getLocalText("... loading data ...");
-	jsLoader.loadScript(szData + ".js.gz", fRefresh);
+	jsLoader.loadScript(map.mapRoot+szData + ".js.gz", fRefresh);
 };
 Map.Themes.prototype.loadExternalDataDefault = function (szData, fRefresh, szMessage) {
 	this.fWaitingforData = true;
@@ -1532,7 +1531,7 @@ Map.Themes.prototype.loadExternalDataDefault = function (szData, fRefresh, szMes
 	jsLoader.errorCallback = "map.Themes.loadExternalDataFinish('" + szMessage + "')";
 	//	jsLoader.errorCallback = "displayMessage('Error on loading data',1000)"; 
 	jsLoader.szMessage = map.Dictionary.getLocalText("... loading data ...");
-	jsLoader.loadScript(szData + ".js", fRefresh);
+	jsLoader.loadScript(map.mapRoot+szData + ".js", fRefresh);
 };
 Map.Themes.prototype.loadExternalDataFinish = function (szMessage) {
 	this.fWaitingforData = false;
@@ -13507,13 +13506,13 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		if (szFlag.match(/VALUES/) &&
 			(szFlag.match(/ZOOM/) || !this.szValueUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nValueUpper))) {
 			// GR check possible fontsize here, if to small, don't create inline text
-			var nFontSize = Math.min(nSize * 0.8, nSize * (3.4 / donut.partsA[0].szText.length));
+			var nFontSize = Math.min(nSize * 0.8, nSize * (3.4 / (donut.partsA[0]?donut.partsA[0].szText.length:1)));
 			if ((nPartsA.length > 1) || szFlag.match(/NOINLINETEXT/) ||
 				(szFlag.match(/ZOOM/) && (nFontSize < 6))
 			) {
 				this.drawDonutText(donut, map.Scale.normalX(11) / ((szFlag.match(/ZOOM/) || szFlag.match(/NORMSIZE/)) ? 1.6 : 2));
 			} else {
-				var szText = donut.partsA[0].szText; // this.formatValue(nValue,1)+(this.szUnit.length<=5?this.szUnit:"");
+				var szText = donut.partsA[0]?donut.partsA[0].szText:""; // this.formatValue(nValue,1)+(this.szUnit.length<=5?this.szUnit:"");
 				var cColor = __maptheme_getChartColors(szColor);
 				var szTextColor = this.szTextColor || cColor.textColor;
 				var nRadius = map.Scale.normalX(nSize);
@@ -13562,16 +13561,21 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 		// GR 17.08.2015 for mark/unmark class
 		//
+
 		if ((nPartsA.length == 1) && szFlag.match(/EXACT/)) {
-			donut.donutPartsA[0].objNode.setAttributeNS(szMapNs, "class", chartGroup.getAttributeNS(szMapNs, "class"));
-			if (donut.donutPartsA[0].textNode) {
-				donut.donutPartsA[0].textNode.setAttributeNS(szMapNs, "class", chartGroup.getAttributeNS(szMapNs, "class"));
+			if (donut.donutPartsA[0]){
+				donut.donutPartsA[0].objNode.setAttributeNS(szMapNs, "class", chartGroup.getAttributeNS(szMapNs, "class"));
+				if (donut.donutPartsA[0].textNode) {
+					donut.donutPartsA[0].textNode.setAttributeNS(szMapNs, "class", chartGroup.getAttributeNS(szMapNs, "class"));
+				}
 			}
 		} else
 		for (var i = 0; i < donut.donutPartsA.length; i++) {
-			donut.donutPartsA[i].objNode.setAttributeNS(szMapNs, "class", String(donut.partsA[i].nClass));
-			if (donut.donutPartsA[i].textNode) {
-				donut.donutPartsA[i].textNode.setAttributeNS(szMapNs, "class", String(donut.partsA[i].nClass));
+			if (donut.donutPartsA[i]){
+				donut.donutPartsA[i].objNode.setAttributeNS(szMapNs, "class", String(donut.partsA[i].nClass));
+				if (donut.donutPartsA[i].textNode) {
+					donut.donutPartsA[i].textNode.setAttributeNS(szMapNs, "class", String(donut.partsA[i].nClass));
+				}
 			}
 		}
 
@@ -13727,6 +13731,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		// GR 03.09.2007 explicit size field
 		var nSizeValue = (a && this.itemA[a] && this.szSizeField) ? (this.itemA[a].nSize || 0) : nValue;
 		var nSizeMax = (a && this.itemA[a] && this.szSizeField) ? this.nMaxSize : nMaxValue;
+
+		if ( nSizeValue <= 0 ){
+			return null;
+		}
 
 		if (szFlag.match(/MENUSIZE/)) {
 			nRadius = map.Scale.normalX(nChartSize / 2.5);
@@ -17272,7 +17280,7 @@ MapTheme.prototype.drawTextforOneQuadrant = function (donut, quadA, nFontSize, s
 		map.Dom.newShape('line', lineGroup, startX, endY, endX, endY, "stroke:" + szLColor + ";stroke-width:" + map.Scale.normalX(0.5) + ";opacity:1;");
 		endX += map.Scale.normalX(1.5) * xDir;
 
-		szText = donut.partsA[quadA[i].index].szText ? donut.partsA[quadA[i].index].szText : null;
+		szText = (donut.partsA[quadA[i].index]&&donut.partsA[quadA[i].index].szText) ? donut.partsA[quadA[i].index].szText : null;
 		if (!szText) {
 			szText = donut.partsA[quadA[i].index].szInfo ? donut.partsA[quadA[i].index].szInfo : Math.round(donut.partsA[quadA[i].index].nInfoValue * 10) / 10 + " % ";
 		}

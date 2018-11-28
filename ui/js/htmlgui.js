@@ -429,7 +429,13 @@ $Log: htmlgui.js,v $
 
 		this.showLoading();
 		if (ixmaps.embeddedSVG){
-			this.mapTool("");
+			if (szUrl.match(/http/)){
+				this.loadedMap = szUrl;
+				ixmaps.embeddedSVG.window.map.Api.loadMap(szUrl);
+				return;
+			}else{
+				this.mapTool("");
+			}
 		}
 
 		if ( this.szUrlSVG == szUrl ){
@@ -1579,6 +1585,9 @@ $Log: htmlgui.js,v $
 		if ( szMessage && (szMessage.length > 25) ){
 			szMessage = szMessage.slice(0,25)+" ...";
 		}
+		if ( szMessage.match("error") ){
+			szMessage = "<span style='color:red'>"+szMessage+"</span>";
+		}
 		$("#loading-text").empty();
 		$("#loading-text").append(szMessage);
 		ixmaps.showLoading();
@@ -1807,7 +1816,7 @@ $Log: htmlgui.js,v $
 		var result = {};
 		for ( i=0; i<szFeaturesA.length; i++ ){
 			var xA = szFeaturesA[i].split(":");
-			result[xA[0]] = xA[1];
+			result[xA[0]] = String(xA[1]);
 		}
 		return result;
 	};
@@ -1868,6 +1877,9 @@ $Log: htmlgui.js,v $
 		}
 
 		var szBookMarkJS = "";
+
+		// GR 24.11.2018 get loaded Map String 
+		szBookMarkJS += ixmaps.getLoadedMapString();
 
 		szBookMarkJS += ixmaps.htmlgui_getParamString().replace(/\"/gi,"'");
 		szBookMarkJS += ixmaps.htmlgui_getFeaturesString().replace(/\"/gi,"'");
@@ -2069,6 +2081,16 @@ $Log: htmlgui.js,v $
 	ixmaps.getBoundingBox = function(){
 		return ixmaps.htmlgui_getBoundingBox();
 	};
+	/**
+	 * getMapScale
+	 * @param void
+	 * @return Number
+	 */
+	ixmaps.getMapScale = function(){
+		return ixmaps.embeddedSVG.window.map.Api.getMapScale();
+	};
+
+
 
 	// -----------------------------------------------------------
 	// map layer handling
@@ -2121,6 +2143,18 @@ $Log: htmlgui.js,v $
 		catch (e){}
 	};
 
+	/**
+	 * set map layer ON/OFF
+	 * @param layerObject JSON object tha defines which layer to switch ON or OFF
+	 * @return void
+	 */
+	ixmaps.setMapLayer = function(layerObject){
+
+		try {
+			ixmaps.embeddedSVG.window.map.Api.setMapLayer(JSON.stringify(layerObject));
+		}
+		catch (e){}
+	};
 
 	// -----------------------------
 	// helper
@@ -2281,9 +2315,21 @@ $Log: htmlgui.js,v $
 							alert("'"+options.ext+"' could not be loaded !");
 						});
 
-					// no processor defined, set data
-					// --------------------------------------------------
+					// no external processor file defined, so try to call internal processor and set data
+					// -----------------------------------------------------------------------------------
 					}else{
+						try {
+							eval("themeDataObj = ixmaps."+options.name+".process(themeDataObj) || themeDataObj");
+						} catch (e){
+							try {
+								eval("themeDataObj = ixmaps.parentApi."+options.name+".process(themeDataObj) || themeDataObj");
+							}catch (e){
+								try {
+									eval("themeDataObj = ixmaps.parentApi.parentApi."+options.name+".process(themeDataObj) || themeDataObj");
+								}catch (e){
+								}
+							}
+						}
 						ixmaps.embeddedSVG.window.map.Api.setThemeExternalData(null,themeDataObj,options.name);
 					}
 				});
@@ -2434,6 +2480,7 @@ $Log: htmlgui.js,v $
 					ixmaps.setScaleParam(map.scaleParam);
 					ixmaps.setMapTypeId(map.basemap);
 					ixmaps.setLocalize(map.localize);
+					ixmaps.setMapLayer(project.layerMask);
 					}
 					catch (e)
 					{
@@ -2470,6 +2517,7 @@ $Log: htmlgui.js,v $
 					ixmaps.setScaleParam(project.scaleParam);
 					ixmaps.setMapTypeId(project.basemap);
 					ixmaps.setLocalize(project.localize);
+					ixmaps.setMapLayer(project.layerMask);
 					}
 					catch (e)
 					{
@@ -2573,7 +2621,7 @@ $Log: htmlgui.js,v $
 		// get definitions of actual map
 		//
 		var szMapType	= ixmaps.getMapTypeId();
-		var szMapUrl	= ixmaps.getMapUrl();
+		var szMapUrl	= ixmaps.loadedMap||ixmaps.getMapUrl();
 		var szStoryUrl	= ixmaps.getStoryUrl();
 		var center		= ixmaps.getCenter();
 		var zoom		= ixmaps.getZoom();

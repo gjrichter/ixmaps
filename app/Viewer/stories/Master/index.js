@@ -49,6 +49,9 @@
 	// intercept theme creation, to mark active themes
 	ixmaps.htmlgui_onNewTheme = function(szId){
 
+		if ( themeObj.szFlag.match(/NOLEGEND/) || themeObj.szFlag.match(/NOINFO/) ) {
+			return;
+		}
 		$("#themeLegendDiv").html("<p style='font-size:22px'>loading ... <div style='text-align:center;margin-bottom:-1em'><img src='../../../../ui/resources/images/loading_blue.gif' id='load-file-spinner' style='height:72px'></div></p>");
 		$("#themeLegendDiv").show();
 		$("#loadProject").hide();
@@ -67,7 +70,7 @@
 
 		var themeObj = ixmaps.getThemeObj(szId);
 		ixmaps.themeObj = themeObj;	
-		if ( themeObj.szFlag.match(/NOLEGEND/) ) {
+		if ( themeObj.szFlag.match(/NOLEGEND/) || themeObj.szFlag.match(/NOINFO/) ) {
 			try	{
 				old_onDrawTheme(szId); 
 			}catch (e){}
@@ -88,7 +91,7 @@
 		szHtml = "";
 		szHtml += "<h3>"+themeObj.szTitle+"</h3>";
 		if ( themeObj.szSnippet && typeof(themeObj.szSnippet)!="undefined"){
-			szHtml += "<div style=\"margin:0.5em 1.5em 0.5em 0;font-size:0.8em;\">"+themeObj.szSnippet+"</div>";
+			szHtml += "<div style=\"margin:0.5em 1.5em 0.5em 0;font-size:0.9em;\">"+themeObj.szSnippet+"</div>";
 		}
 
 		if ( ixmaps.legend.makeColorLegendHTML ){
@@ -248,7 +251,6 @@
 
 		$("#"+szLegendId).html(szHtml);
 
-		
 		// GR 12.11.2016 keep mouse and touch events inside the legend div
 		// ---------------------------------------------------------------
 		$("#themeLegendDiv").attr("onwheel","javascript:event.stopPropagation();");
@@ -257,22 +259,7 @@
 		$("#themeLegendDiv")[0].addEventListener("touchmove", function(event){event.stopPropagation();}, false);
 		// ---------------------------------------------------------------
 
-		$( "#lowbutton" ).button();
-		$( "#highbutton"  ).button();
-		$( "#minusbutton"  ).button();
-		$( "#plusbutton"  ).button();
-		$( "#valuebutton"  ).button();
-		$( "#opminusbutton"  ).button();
-		$( "#opplusbutton"  ).button();
-		$( "#deletebutton"  ).button();
-
-			//$("#histogram_target_1"+szId).empty();
-			//$("#histogram_target_2"+szId).empty();
-			//ixmaps.themeObj.getHistogram(null,$("#histogram_target_1"+szId)[0],"");
-			//setTimeout('ixmaps.themeObj.getHistogram(null,$("#histogram_target_2'+szId+'")[0],"DISTRIBUTION")',200);
-
-		__showFooter(clickA[szId]);
-
+		setTimeout("ixmaps.viewer_makeLayerLegend()",1000);
 
 		try	{
 			old_onDrawTheme(szId); 
@@ -454,8 +441,10 @@
 			changeCss(".nav-tabs>li.active>a:hover","color:#ddd" );
 			changeCss(".nav-tabs>li.active>a:focus","color:#ddd" );
 			changeCss(".nav-tabs>li.active>a","border: 1px solid #000" );;
-			changeCss(".nav-tabs>li.active>a:hover","border: 1px solid #000" );;
-			changeCss(".nav-tabs>li.active>a:focus","border: 1px solid #000" );;
+			changeCss(".nav-tabs>li.active>a:hover","border: 1px solid #000" );
+			changeCss(".nav-tabs>li.active>a:focus","border: 1px solid #000" );
+
+			changeCss(".list-group-item","background:#181818");
 
 		}else{
 
@@ -466,11 +455,36 @@
 			$(".story-body").css("background-color","rgba(255,255,255,0.3)");
 			changeCss(".theme-legend-item", "border-bottom:#eee solid 1px" );
 			changeCss("a.theme-legend-item", "border-bottom:#eee solid 1px" );
+
+			changeCss(".list-group-item","background:#ffffff");
 		}
 	};
 
 	// set story colors to basemap type
 
 	setTimeout("ixmaps.htmlgui_setMapTypeBG(ixmaps.getMapTypeId())",1);
+
+
+	ixmaps.viewer_makeLayerLegend = function(){ 
+
+		// append or replace legend div
+		// ---------------------------------------------------------------
+		var szLegendId = "map-legend";
+
+		if ( !$("#"+szLegendId)[0] ){
+			$("#themeLegendDiv").append('<div id="'+(szLegendId)+'" style="font-size:0.8em;line-height:1.5em"></div>');
+			tabDivA.push(szLegendId);
+
+			// if more than 1 panes, create new tab to switch legend panes
+			if ( ++nLegendTabs > 1 ){
+				$("#legendTabs").append('<li><a href="#" onclick="activateTab($(this))">Theme '+ (nLegendTabs) +'</a></li>');
+			}
+		}
+
+		ixmaps.makeLayerLegend(2000);
+		if ( nLegendTabs > 1 ){
+			$("#"+tabDivA[(nLegendTabs-1)]).hide();
+		}
+	};
 
 

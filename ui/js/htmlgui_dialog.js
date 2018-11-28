@@ -293,7 +293,7 @@ $Log: htmlgui.js,v $
 		// get all themes
 		var szThemesJS = this.getThemesString();
 		// compose bookmark
-		var szBookmark = "map.Api.doZoomMapToGeoBounds("+szEnvelope+");" + "map.Api.clearAll();" + szThemesJS;
+		var szBookmark = szLoadedMap + "map.Api.doZoomMapToGeoBounds("+szEnvelope+");" + "map.Api.clearAll();" + szThemesJS;
 
 		// make url of the map template 
 		if ( !szTemplateUrl ){
@@ -473,6 +473,13 @@ $Log: htmlgui.js,v $
 
 	ixmaps.getMapUrl = function(){
 		return decodeURI(ixmaps.szUrlSVG);
+	};
+	ixmaps.getLoadedMapString = function(){
+		if ( ixmaps.loadedMap ){
+			return "map.Api.loadMap('"+decodeURI(ixmaps.loadedMap)+"');";
+		}else{
+			return "";
+		}
 	};
 	ixmaps.getStoryUrl = function(){
 		return decodeURI( $(document).getUrlParam('story')					||
@@ -705,6 +712,9 @@ $Log: htmlgui.js,v $
 
 		var szBookMarkJS = "";
 
+		// GR 24.11.2018 get loaded Map String 
+		szBookMarkJS += ixmaps.getLoadedMapString();
+
 		szBookMarkJS += ixmaps.htmlgui_getParamString().replace(/\"/gi,"'");
 		szBookMarkJS += ixmaps.htmlgui_getFeaturesString().replace(/\"/gi,"'");
 
@@ -898,14 +908,28 @@ $Log: htmlgui.js,v $
 		});
 	};
 
+	ixmaps.copyThemeToClipboard = function(){
+		navigator.clipboard.writeText(JSON.stringify(ixmaps.getThemeDefinitionObj()))
+			.then(() => {
+				ixmaps.message("theme copied",100);
+			})
+			.catch(err => {
+				ixmaps.message("no theme to copy",100);
+				console.log('Something went wrong', err);
+			});
+	};
 
-
-
-
-
-
-
-
+	ixmaps.pasteThemeFromClipboard = function(){
+		navigator.clipboard.readText()
+			.then(text => {
+				this.embeddedSVG.window.map.Api.newMapThemeByObj(JSON.parse(text));
+			})
+			.catch(err => {
+				// maybe user didn't grant access to read from clipboard
+				ixmaps.message("no theme to paste",100);
+				console.log('Something went wrong', err);
+			});
+	};
 
 }( window.ixmaps = window.ixmaps || {}, jQuery ));
 

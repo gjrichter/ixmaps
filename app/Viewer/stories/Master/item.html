@@ -45,6 +45,11 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
+	.item-list{
+		margin-right:0em;
+		padding:1em 0.5em 1.5em 0.66em;
+		color:#aaa;
+	}
 	a {
 		color: #4466ff;
 	}
@@ -172,14 +177,18 @@
 
 			// make legend chart title from theme and item
 
+			var data = ixmaps.getData('map',szId);
+
 			var szTmp  = ixmaps.themeObj.szTitle || "";
 			var szTitle  = szTmp.length?"<span style='font-weight:bold'>"+szTmp+"</span><br>":"";
 
-				  szTmp  = ixmaps.themeObj.itemA[szIdA[1]+"::"+szIdA[3]].szTitle || ""; 
-				szTitle += szTmp.length?("<span style='font-size:0.9em'>"+szTmp+"</span><br>"):"";
-
 				  szTmp  = ixmaps.themeObj.szSnippet || "";
-				szTitle += szTmp.length?("<span style='font-size:0.9em'>"+szTmp+"</span><br>"):"";
+				szTitle += szTmp.length?("<span style='font-size:0.8em'>"+szTmp+"</span><br>"):"";
+
+				if ( data.length <= 1 ){
+					  szTmp  = ixmaps.themeObj.itemA[szIdA[1]+"::"+szIdA[3]].szTitle || ""; 
+					szTitle += szTmp.length?("<span style='font-weight:bold;font-size:1em'>"+szTmp+"</span><br>"):"";
+				}
 
 			$("#chart-title").html(szTitle);
 
@@ -214,7 +223,7 @@
 
 			for ( d=0; d<Math.min(50,data.length); d++ ){
 
-				szHtml += "</div><div style='margin-right:0em;padding:1em 0.5em 1.5em 1.5em;color:#aaa;background:"+((d%2)?"none":"rgba(0,0,0,0.04)")+"'>";
+				szHtml += "</div><div class='item-list' style='background:"+((d%2)?"none":"rgba(0,0,0,0.04)")+"'>";
 
 				szHtml += "<span style='border:solid #bbb 1px;border-radius:15px;padding:0.2em 0.5em'>"+(d+1)+"</span>"+"<table>"
 				var dataObject = data[d];

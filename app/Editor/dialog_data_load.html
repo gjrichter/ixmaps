@@ -127,12 +127,12 @@
 			</p>
 			<input type="text" id="dataURL" class="filenameOrUrl"></input>&nbsp;
 			<input id="loadData" type="button" class="btn btn-md btn-default" value="Load" style="vertical-align:top;" />
-			<img src="../resources/images/loading_blue.gif" id="load-url-spinner" style="height:24px;vertical-align:top;display:none">
+			<img src="../resources/images/loading_blue.gif" id="load-url-spinner" style="height:64px;vertical-align:top;display:none">
 		</div>
 
 		<!-- some public data URL's -->
-		<a href="#" onclick="$('#dataSamples').show()">try some public data ...</a>
-		<div id="dataSamples" style="display:none">
+		<div style="margin-top:0.5em"><a href="#" onclick="$('#dataSamples').show()">try some public data ...</a></div>
+		<div id="dataSamples" style="display:none;margin-top:1em;margin-left:-2em">
 			<ul>
 			<li>
 				<a href="#" 
@@ -152,6 +152,13 @@
 				global power plant database</a><br>
 				<span style="color:#888">(World Resource Institute, cc-by-4.0</span> -><a href="https://github.com/wri/global-power-plant-database" target="_blank"> GitHub</a>)
 			</li>
+			<li>
+				<a href="#" 
+				onclick="$('#dataURL').val('http://webservices.ingv.it/fdsnws/event/1/query?starttime=2018-11-15T00%3A00%3A00&endtime=2018-11-22T23%3A59%3A59&minmag=1&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000');" >
+				INGV terremoti ultima settimana - magnitudine > 1</a><br>
+				<span style="color:#888">INGV Centro Nazionale Terremoti, cc-by-4.0</span> -><a href="http://cnt.rm.ingv.it/" target="_blank"> sito web</a>)
+			</li>
+
 			</ul>
 		</div>
 

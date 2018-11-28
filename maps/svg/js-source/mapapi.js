@@ -114,7 +114,7 @@ Map.Api.prototype.setLocalString = function(szOrig,szLocal){
  * @param layerSwitchObject defines the layer and sublayer to switch
  */
 Map.Api.prototype.setMapLayer = function(szLayerObj){
-	if ( map.fInitializing ){
+	if ( map.fInitializing || map.isLoading() ){
 		this.map.pushAction("map.Api.setMapLayer(\""+szLayerObj+"\"");
 		return;
 	}
@@ -131,17 +131,28 @@ Map.Api.prototype.setMapLayer = function(szLayerObj){
 		if ( layerObj[l].on ){
 			var layerA = this.getLayer();
 			var categoryA = layerA[l].categoryA;
-			for ( x in categoryA ){
-				this.switchLayer(l+"::"+x,false);
-			}
-			for ( c in layerObj[l].on ){
-				if ( layerObj[l].on[c].length ){
-					this.switchLayer(l+"::"+layerObj[l].on[c],true);
+			if ( categoryA ){
+				for ( x in categoryA ){
+					this.switchLayer(l+"::"+x,false);
+				}
+				for ( c in layerObj[l].on ){
+					if ( layerObj[l].on[c].length ){
+						this.switchLayer(l+"::"+layerObj[l].on[c],true);
+					}
 				}
 			}
 		}
 	}
 };
+
+/**
+ * load a new map 
+ * @param szUrl the map url
+ */
+Map.Api.prototype.loadMap = function(szUrl){
+	this.map.loadMap(szUrl);
+};
+
 
 /*****************
  *  bookmark API
@@ -307,6 +318,14 @@ Map.Api.prototype.getCenterOfMapInGeoPosition = function(){
  */
 Map.Api.prototype.getBoundsOfMapInGeoBounds = function(){
 	return this.map.Zoom.getBoundsOfMapInGeoBounds();
+};
+/**
+ * gets the map bounds in geo coodinates 
+ * @type array
+ * @return an array of 2 points (SouthWest and NorthEast ) 
+ */
+Map.Api.prototype.getMapScale = function(){
+	return String(Math.floor(map.Scale.nTrueMapScale*map.Scale.nZoomScale));
 };
 /**
  * boolean is there a pending new bounds 

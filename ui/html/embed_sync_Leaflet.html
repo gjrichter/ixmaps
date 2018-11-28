@@ -584,21 +584,29 @@
 	<div id="projects" style="visibility:hidden;">
 	</div>
 
-	<div id="contextmenu" class="contextmenu" style="display:none;" onmouseover="__contextmenuOver($(this))" onmouseout="__contextmenuOut($(this))";>
-	  <ul class="dropdown-menu" style="display:inline">
+	<div id="contextmenu" class="contextmenu" style="display:none;" onmouseover="__contextmenuOver($(this))" onmouseout="__contextmenuOut($(this))" onclick="__contextmenuOut($(this))">
+	  <ul class="dropdown-menu" style="display:inline;padding-bottom:0px">
+		<li><a href="http://www.ixmaps.com" target="_blank" style="margin-top:0.2em;border:0;color:#ccc">iXmaps</a></li>
 		<li><a href="javascript:ixmaps.popupTools()">
 			<i class="icon icon-context icon-cog" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
 			&nbsp;open tools</a></li>
 		<li><a href="javascript:ixmaps.popupThemeEditor()">
 			<i class="icon icon-context icon-pencil" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
 			&nbsp;edit theme</a></li>
+		<ul class="dropdown-menu" style="display:inline;padding-top:0em;padding-bottom:0em">
+			<li><a href="javascript:ixmaps.copyThemeToClipboard()">
+				<i class="icon icon-context icon-scissors" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
+				&nbsp;copy theme</a></li>
+			<li><a href="javascript:ixmaps.pasteThemeFromClipboard()">
+				<i class="icon icon-context icon-paste" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
+				&nbsp;paste theme</a></li>
+		</ul>
 		<li><a href="javascript:ixmaps.popupShare()">
 			<i class="icon icon-context icon-share" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
 			&nbsp;share map</a></li>
 		<li><a href="javascript:ixmaps.popupProject()">
 			<i class="icon icon-context icon-download" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
 			&nbsp;save project</a></li>
-		<li><a href="http://www.ixmaps.com" target="_blank" style="margin-top:0.2em;border:0;color:#ccc">iXmaps</a></li>
 	  </ul>
 	  <a href="#" style="border:0">iXmaps context menu</a>
 	</div>

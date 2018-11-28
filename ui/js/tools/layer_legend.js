@@ -193,6 +193,7 @@ window.ixmaps = window.ixmaps || {};
 		ixmaps.__switchLayer = function(el,szLayer){
 			szLayer = szLayer.replace(/\'/g,"&#x27;");
 			ixmaps.switchLayer(szLayer,$(el).is(":checked"));
+			ixmaps.makeLayerLegend();
 		}
 		
 		/**
@@ -209,6 +210,7 @@ window.ixmaps = window.ixmaps || {};
 				$(subLayerList[i]).prop('checked',$(el).is(":checked"));
 				$(subLayerList[i]).trigger('change');
 			}
+			ixmaps.makeLayerLegend();
 		}
 
 		// --------------------------------
@@ -240,8 +242,10 @@ window.ixmaps = window.ixmaps || {};
 				}
 				
 				if ( sub ){
+					var szChecked = (layer.nState == false)?"":"checked=\"checked\"";
+
 					szLegend += "<li style='margin-top:1.5em;'>";
-					szLegend += '<input type="checkbox" class="check" checked="checked" onchange="javascript:ixmaps.__switchMasterLayer($(this),\''+name+'\');">';
+					szLegend += '<input type="checkbox" class="check" '+szChecked+' onchange="javascript:ixmaps.__switchMasterLayer($(this),\''+name+'\');">';
 					szLegend += '<span style="font-size:1.3em;line-height:0.8em;">&nbsp;'+layer.szLegendName+'</span>';
 				}	
 
@@ -291,6 +295,8 @@ window.ixmaps = window.ixmaps || {};
 							szLegend += "<div class='list-group-item-left'>";
 							if (szChecked.length){
 								szLegend += ixmaps.__getLayerLegendSVG(name,szCategory,layer.categoryA[c].fill,layer.categoryA[c].stroke);
+							}else{
+								szLegend += ixmaps.__getLayerLegendSVG(name,szCategory,"none","#aaaaaa");
 							}
 							szLegend += "</div><div class='list-group-item-right'>";
 							szLegend += "<span style='color:"+(szChecked.length?"inherit":"#bbb")+"'>"+szCatogoryName+"</span>";
@@ -322,9 +328,12 @@ window.ixmaps = window.ixmaps || {};
  		 * make the legend for all layer in the map 
 		 * @type void
 		 */
-		ixmaps.makeLayerLegend = function(){
+		ixmaps.makeLayerLegend = function(nMaxHeight){
 			var layerA = ixmaps.getLayer();
 			var szLegend = "";
+
+			nMaxHeight = nMaxHeight || ixmaps.__layerLegendHeight || 300;
+			ixmaps.__layerLegendHeight = nMaxHeight;
 
 			// try to get description from SVG legend
 			var description = ixmaps.embeddedSVG.window.SVGDocument.getElementById("legend:collapsable:documentinfo");
@@ -356,7 +365,7 @@ window.ixmaps = window.ixmaps || {};
 			szHtml += "</h3>";
 
 			szHtml += "<div id='map-legend-body'>";
-			szHtml += "<div style='max-height:300px;overflow:auto;padding-right:0.7em'>";
+			szHtml += "<div style='max-height:"+nMaxHeight+"px;overflow:auto;padding-right:0.7em'>";
 			szHtml += szLegend;
 			szHtml += "</div>";
 			szHtml += "</div>";

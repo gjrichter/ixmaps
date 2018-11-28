@@ -577,7 +577,22 @@ $Log: htmlgui_api.js,v $
 	ixmaps.loadSidebar = function(szMap,szUrlStory,nWidth){
 		this.dispatchToEmbeddedApi(szMap,"loadSidebar",[szUrlStory,nWidth]);
 	};
-
+	/**
+	 * show a new sidebar content
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @return void
+	 */
+	ixmaps.hideSidebar = function(szMap){
+		this.dispatchToEmbeddedApi(szMap,"hideSidebar",[]);
+	};
+	/**
+	 * show a new sidebar content
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @return void
+	 */
+	ixmaps.showSidebar = function(szMap){
+		this.dispatchToEmbeddedApi(szMap,"showSidebar",[]);
+	};
 	/**
 	 * set a new project (stringified json) into an embed context defined by a registered map name
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
@@ -656,6 +671,15 @@ $Log: htmlgui_api.js,v $
 	 */
 	ixmaps.getZoom = function(szMap){
 		return (ixmaps.embeddedApiA[szMap||'map']||ixmaps.embeddedApi).getZoom();
+	};
+	/**
+	 * get the actual scale of the map view
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @type Number
+	 * @return {Number} map-scale
+	 */
+	ixmaps.getMapScale = function(szMap){
+		return (ixmaps.embeddedApiA[szMap||'map']||ixmaps.embeddedApi).getMapScale();
 	};
 	/**
 	 * get the actual bounding box of the map view
@@ -2117,63 +2141,77 @@ $Log: htmlgui_api.js,v $
 	 * </html>
 	 */
 	ixmaps.embedMap = function(szTargetDiv,opt,callback){
-		var target = window.document.getElementById(szTargetDiv);
-		var szName = opt.mapName || "map";
-		var szBasemap = opt.mapService || "leaflet";
-		var szMapType = opt.mapType || "CartoDB - Positron";
-		
-		var szUrl = "/ui/dispatch.htm?ui=embed&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName;
+	
+		return new Promise((resolve, reject)=>{
 
-		var scripts = window.document.scripts;
-		for ( a in scripts ){
-			if ( scripts[a].src && scripts[a].src.match(/htmlgui_api/)){
-				opt.mapCdn = scripts[a].src.split("/ui")[0];
-			}
-		}
-		if ( opt.mapCdn ){
-			szUrl = opt.mapCdn+szUrl;
-		}else{
-			szUrl = "../.."+szUrl;
-		}
+			var target = window.document.getElementById(szTargetDiv);
+			var szName = opt.mapName || "map";
+			var szBasemap = opt.mapService || "leaflet";
+			var szMapType = opt.mapType || "CartoDB - Positron";
+			
+			var szUrl = "/ui/dispatch.htm?ui=embed&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName;
 
-		if ( opt.mapUrl ){
-			szUrl += "&svggis="+opt.mapUrl;
-		}
-		if ( opt.search ){
-			szUrl += "&search="+opt.search;
-		}
-		if ( opt.legend ){
-			szUrl += "&legend="+opt.legend;
-		}
-		if ( opt.themeLegend ){
-			szUrl += "&themelegend="+opt.themeLegend;
-		}
-		if ( opt.tools ){
-			szUrl += "&tools="+(opt.tools?"1":"0");
-		}
-		if ( opt.silent ){
-			szUrl += "&silent="+(opt.silent?"1":"0");
-		}
-		if ( opt.mapControl ){
-			for ( o in opt.mapControl )	{
-				szUrl += "&"+o+'='+opt.mapControl[o];
+			var scripts = window.document.scripts;
+			for ( a in scripts ){
+				if ( scripts[a].src && scripts[a].src.match(/htmlgui_api/)){
+					opt.mapCdn = scripts[a].src.split("/ui")[0];
+				}
 			}
-		}
-		if ( opt.mapOpt ){
-			for ( o in opt.mapOpt )	{
-				szUrl += "&"+o+'='+opt.mapOpt[o];
+			if ( opt.mapCdn ){
+				szUrl = opt.mapCdn+szUrl;
+			}else{
+				szUrl = "../.."+szUrl;
 			}
-		}
-		var szHeight = opt.height || "640px";
-		var szWidth  = opt.width  || "100%";
 
-		if ( target ){
-			target.innerHTML = "<iframe id=\""+szName+"\" style=\"border:0;width:"+szWidth+";height:"+szHeight+"\" src=\""+szUrl+"\" ></iframe>";
-		}
-		if ( callback )	{
-			ixmaps.waitForMap(szName,callback);
-		}
-	};
+			if ( opt.mapUrl ){
+				szUrl += "&svggis="+opt.mapUrl;
+			}
+			if ( opt.search ){
+				szUrl += "&search="+opt.search;
+			}
+			if ( opt.legend ){
+				szUrl += "&legend="+opt.legend;
+			}
+			if ( opt.themeLegend ){
+				szUrl += "&themelegend="+opt.themeLegend;
+			}
+			if ( opt.tools ){
+				szUrl += "&tools="+(opt.tools?"1":"0");
+			}
+			if ( opt.silent ){
+				szUrl += "&silent="+(opt.silent?"1":"0");
+			}
+			if ( opt.mapControl ){
+				for ( o in opt.mapControl )	{
+					szUrl += "&"+o+'='+opt.mapControl[o];
+				}
+			}
+			if ( opt.mapOpt ){
+				for ( o in opt.mapOpt )	{
+					szUrl += "&"+o+'='+opt.mapOpt[o];
+				}
+			}
+			var szHeight = opt.height || "640px";
+			var szWidth  = opt.width  || "100%";
+
+			if ( target ){
+				target.innerHTML = "<iframe id=\""+szName+"\" style=\"border:0;width:"+szWidth+";height:"+szHeight+"\" src=\""+szUrl+"\" ></iframe>";
+			}
+			if ( callback )	{
+				ixmaps.waitForMap(szName,callback);
+			}else{
+				ixmaps.waitForMap(szName,
+					(map) => {
+						if (map ){
+							resolve(map);
+						}else{
+							reject("error");
+						}
+					}
+				);
+			}
+		});
+	}
 
 
 }(window, document));

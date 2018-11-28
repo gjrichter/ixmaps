@@ -198,6 +198,18 @@
 			</div>
 		</div>
 
+		<div id="sidebarnav" style="position:absolute;left:0px;bottom:20px;opacity:0.9;width:100%;text-align:center;display:none" >
+			<div>
+				<span id="sidebarbuttons" data-toggle="buttons" style="padding:8px 16px 8px 18px;border:solid #ddd 1px;border-radius:2px;background-color:#ffffff;">
+					<label class="btn btn-link" onclick="$('.btn').removeClass('active');ixmaps.hideSidebar();">Map
+					</label>
+					&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+					<label class="btn btn-link" onclick="$('.btn').removeClass('active');ixmaps.showSidebar();">Legend
+					</label>
+				</span>
+				<!--/.nav-collapse -->
+			</div>
+		</div>
 		<!-- buttons -->
 
 		<div id="collaps" style="position:absolute;right:0px;top:12px;opacity:0.9;">
@@ -726,6 +738,12 @@
 		ixmaps.containerWidthPx = containerWidth;
 		ixmaps.mapWidthPx = $("#embed-cross").css("width");
 		ixmaps.sidebarLeftPx = $("#sidebar").css("left");
+
+		if ( containerWidth < 600 )	{
+			$("#sidebarnav").show();
+		}else{
+			$("#sidebarnav").hide();
+		}
 	};
 
 	ixmaps.setTitle = function(szTitle) {
@@ -779,6 +797,16 @@
 		}else{
 			ixmaps.nSidebar = ixmaps.nInitSidebar;
 			ixmaps.resize();
+		}
+	};
+	ixmaps.hideSidebar = function() {
+		if ( ixmaps.fSidebar ){
+			ixmaps.fullScreen();
+		}
+	};
+	ixmaps.showSidebar = function() {
+		if ( !ixmaps.fSidebar ){
+			ixmaps.fullScreen();
 		}
 	};
 

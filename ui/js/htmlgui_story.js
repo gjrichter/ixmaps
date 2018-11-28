@@ -350,6 +350,7 @@ $Log: htmlgui_story.js,v $
 		$('#story-board').show();
 		$('#story-tool').hide();
 		ixmaps.embeddedSVG.window.map.Api.clearHighlight();
+		ixmaps.embeddedSVG.window.map.Api.setMapTool("pan");
 	}
 
 	// -----------------------------------

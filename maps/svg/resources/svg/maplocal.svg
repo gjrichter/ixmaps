@@ -8,7 +8,7 @@
   <script type="text/ecmascript"><![CDATA[
 
 	szContainerTitle =	"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:18px;font-weight:normal;fill:#444444;pointer-events:none;";
-	szDescription =		"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:11px;fill:#555555;font-weight:bold;font-style:italic;pointer-events:none;";
+	szDescription =		"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:14px;fill:#555555;font-weight:bold;font-style:italic;pointer-events:none;";
 	szSummary =			"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:10px;fill:#666666;pointer-events:none;";
 	szNote =			"font-family:TitilliumText22LXMedium,helvetica,Gill Sans MT,verdana;font-size:11px;fill:darkgrey;font-style:italic;stroke:none;pointer-events:none;";
 try{
@@ -42,7 +42,7 @@ try{
 				 );
 
 	szChartTypeListSingleValue = new Array(
-		 "CHOROPLETHE"
+		 "CHOROPLETH"
 		,"CHART|BUBBLE"
 		,"CHART|SQUARE"
 		,"CHART|PIE|3D|SIZE"

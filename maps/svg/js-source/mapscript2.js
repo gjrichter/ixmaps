@@ -1682,6 +1682,12 @@ Map.Layer.prototype.switchLayer = function(evt,szLayer,szClassName,nState){
 	_TRACE("switchLayer "+szLayer+' Item='+layerItem+' Class='+szClassName);
 	if ( szLayer.split("::")[1] && layerItem.categoryA[szLayer.split("::")[1]] ) {
 		layerItem.categoryA[szLayer.split("::")[1]].display = szDisplay;
+	}else{
+		if (layerItem.categoryA[null]){
+			layerItem.categoryA[null].display = szDisplay;
+		}
+		layerItem.display = szDisplay;
+		layerItem.nState = (szDisplay=="none")?false:true;
 	}
 	
 	if (layerItem ){
