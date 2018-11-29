@@ -961,6 +961,8 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 	
 			changeCss("#legend-type-switch","background-color:#111");
 
+			changeCss(".loading-text","background-color:rgba(0,0,0,0.5)");
+
 		}
 	};
 
