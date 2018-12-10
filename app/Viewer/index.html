@@ -65,6 +65,7 @@
 			// is there a bookmark to execute at load ?
 			if ($(document).getUrlParam('bookmark')) {
 				x = $(document).getUrlParam('bookmark');
+				ixmaps.bookmark = x;
 				__bound = decodeURIComponent(((typeof (x) != "string") ? x.join("") : x));
 			}
 			if ($(document).getUrlParam('maptype')) {

@@ -150,6 +150,10 @@ Map.Api.prototype.setMapLayer = function(szLayerObj){
  * @param szUrl the map url
  */
 Map.Api.prototype.loadMap = function(szUrl){
+	if ( map.fInitializing || map.isLoading() ){
+		this.map.pushAction("map.Api.loadMap(\""+szUrl+"\"");
+		return;
+	}
 	this.map.loadMap(szUrl);
 };
 
@@ -824,7 +828,6 @@ Map.Api.prototype.showLegend = function(){
  * clear all map tools, highlights, themes, selections etc.
  */
 Map.Api.prototype.clearAll = function(){
-	this.map.Themes.fWaitingforData = true;
 	this.map.clearAll();
 };
 /**
@@ -1499,16 +1502,7 @@ Map.Api.prototype.getThemeId = function(themeNode){
  * @param szDataName the nane of the future data object
  */
 Map.Api.prototype.setThemeExternalData = function(szThemeId,dataObj,szDataName){
-	// create the data object with the desired name, must be identical to style ...
-	// export argument dataObj, necessary for javascript compressin by Google Code Compiler 
-	if ( dataObj ){
-		this._dataObj = dataObj;
-		eval(szDataName+" = this._dataObj");
-	}
-	// remove flag that bloks the theme execution (because we were wairting for the data)
-	this.map.Themes.fWaitingforData = false;
-	// retrigger theme execution
-	this.map.Themes.execute();
+	this.map.Themes.setExternalData(szThemeId,dataObj,szDataName);
 };
 
 /**

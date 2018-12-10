@@ -2058,8 +2058,8 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 
-		setLocal: function(szGlobal,szLogal){
-			ixmaps.setLocal(this.szMap,szGlobal,szLogal);
+		setLocal: function(szGlobal,szLocal){
+			ixmaps.setLocal(this.szMap,szGlobal,szLocal);
 			return this;
 		},
 

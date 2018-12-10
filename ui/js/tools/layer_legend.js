@@ -324,77 +324,6 @@ window.ixmaps = window.ixmaps || {};
 		};
 
 		/**
-		 * ixmaps.__makeLegend  
- 		 * make the legend for all layer in the map 
-		 * @type void
-		 */
-		ixmaps.makeLayerLegend = function(nMaxHeight){
-			var layerA = ixmaps.getLayer();
-			var szLegend = "";
-
-			nMaxHeight = nMaxHeight || ixmaps.__layerLegendHeight || 300;
-			ixmaps.__layerLegendHeight = nMaxHeight;
-
-			// try to get description from SVG legend
-			var description = ixmaps.embeddedSVG.window.SVGDocument.getElementById("legend:collapsable:documentinfo");
-			if ( description ){
-				var title = description.childNodes.item(1);
-				szLegend += "<h3>"+title.childNodes.item(1).nodeValue+"</h3>";
-			}
-
-			szLegend += "<ul>";
-
-			for ( a in layerA ){
-				szLegend += __makeLegendType(layerA[a],a,"polygon");
-			}
-			//szLegend += "<div style='height:0.7em;'></div>";
-			for ( a in layerA ){
-				szLegend += __makeLegendType(layerA[a],a,"line");
-			}
-			//szLegend += "<div style='height:0.7em;'></div>";
-			for ( a in layerA ){
-				szLegend += __makeLegendType(layerA[a],a,"point");
-			}
-
-			szLegend += "</ul>";
-
-			//szLegend += "<br>";
-
-			var	szHtml = "";
-			szHtml += "<h3 id='map-legend-title'>Map Layer";
-			szHtml += "</h3>";
-
-			szHtml += "<div id='map-legend-body'>";
-			szHtml += "<div style='max-height:"+nMaxHeight+"px;overflow:auto;padding-right:0.7em'>";
-			szHtml += szLegend;
-			szHtml += "</div>";
-			szHtml += "</div>";
-
-			var szLegendPane = "<div id='map-legend-pane' class='map-legend-pane'>"+
-							 "<a href='javascript:__toggleLegendPane(-1)'>"+
-							 "<div id='legend-type-switch'>"+
-							   "..."+
-							 "</div>"+
-							 "</a>"+ 
-							 "<div class='container'>"+
-							   "<div class='row'>"+
-								 "<div class='col-lg-12 col-md-12 col-xs-0'>"+
-								   "<div id='map-legend-content'>"+szHtml+"</div>"+
-								 "</div>"+
-							  "</div>"+
-							"</div>";
-			
-			
-			$("#map-legend").html(szLegendPane);
-			$("#map-legend").show();
-
-			$("div.list-group-item").css(list_group_item);
-			$("div.list-group-item-left").css(list_group_item_left);
-			$("div.list-group-item-right").css(list_group_item_right);
-			$("ul").css(ul_);
-		}
-
-		/**
 		 * ixmaps.__getLayerLegendSVG  
 		 * get a legend stroke/fill sprite (icon) in SVG 
 		 * tries to get the layer style from the SVG code inside the map
@@ -441,7 +370,12 @@ window.ixmaps = window.ixmaps || {};
 						szStyle = node.getAttributeNS(null,"style").replace(/\"/g,"");
 					}
 				}
-
+				if ( !szStyle.match(/fill:/) && !szStyle.match(/stroke:/) ){
+					szStyle += "fill:none;stroke:black";
+				}
+				if ( szFill && (szFill == "none") ) {
+					szStyle += "fill:none;stroke:black";
+				}
 				szHtml+=  '<span style="vertical-align:-4px"><svg width="25" height="25" viewBox="0 0 800 800">';
 				szHtml += '<defs>';
 				szHtml += szPattern;
@@ -465,15 +399,6 @@ window.ixmaps = window.ixmaps || {};
 
 		};
 
-		ixmaps.htmlgui_onZoomAndPan = function(nZoom){
-			if ( ixmaps.getThemeObj() ){
-				return;
-			}
-			var layerA = ixmaps.getLayer();
-			var depA = ixmaps.getLayerDependency();
-			ixmaps.makeLayerLegend();
-		};
-
 		 var list_group_item_left = {
 			"float":"left",
 			"padding":" 0px",
@@ -494,8 +419,15 @@ window.ixmaps = window.ixmaps || {};
 			"border-right": "0",
 			"border-bottom": "solid rgba(220,220,220,0.5) 0px",
 			"margin-bottom": "0",
+			"padding": "0.3em 0.5em 0.6em 0.5em",
 			"font-size": "1.5em", 
-			"line-height": "1em" 
+			"line-height": "1em",
+			"background-color":"rgba(255,255,255,0)"
+		};	
+		 var list_group = {
+			"border": "solid rgba(120,120,120,0.5) 0.5px",
+			"background-color":"rgba(255,255,255,0)",
+			"padding": "0.2em 0em"
 		};	
 
 		var ul_ = {
@@ -506,6 +438,114 @@ window.ixmaps = window.ixmaps || {};
 			"-webkit-margin-start": "0px",
 			"-webkit-margin-end": "0px",
 			"-webkit-padding-start": "0px" 
+		};
+
+		/**
+		 * ixmaps.__makeLegend  
+ 		 * make the legend for all layer in the map 
+		 * @type boolean
+		 */
+		ixmaps.makeLayerLegend = function(nMaxHeight){
+			var layerA = ixmaps.getLayer();
+
+			nMaxHeight = nMaxHeight || ixmaps.__layerLegendHeight || 300;
+			ixmaps.__layerLegendHeight = nMaxHeight;
+
+			if (!$("#map-legend")[0]){
+				return false;
+			}
+
+			var szLegend = "";
+
+			// try to get description from SVG legend
+			var description = ixmaps.embeddedSVG.window.SVGDocument.getElementById("legend:collapsable:documentinfo");
+			if ( description ){
+				var title = description.childNodes.item(1);
+				szLegend += "<h3>"+title.childNodes.item(1).nodeValue+"</h3>";
+			}
+
+			szLegend += "<ul>";
+
+			for ( a in layerA ){
+				szLegend += __makeLegendType(layerA[a],a,"polygon");
+			}
+			//szLegend += "<div style='height:0.7em;'></div>";
+			for ( a in layerA ){
+				szLegend += __makeLegendType(layerA[a],a,"line");
+			}
+			//szLegend += "<div style='height:0.7em;'></div>";
+			for ( a in layerA ){
+				szLegend += __makeLegendType(layerA[a],a,"point");
+			}
+
+			szLegend += "</ul>";
+
+			// no elements in legend 
+			// then exit
+			if ( szLegend == "<ul></ul>"){
+				return false;
+			}
+
+			// -------------------------------------------------
+			// show the legend
+			// -------------------------------------------------
+			
+			// if not yet present, create the hosting legend pane
+			//
+			if (!$("#map-legend-list")[0]){
+				var	szHtml = "";
+				szHtml += "<h3 id='map-legend-title'>Map Layer";
+				szHtml += "</h3>";
+
+				szHtml += "<div id='map-legend-body' style='max-height:"+nMaxHeight+"px;overflow:auto;padding-right:0.7em'>";
+				szHtml += "<div id='map-legend-list'>";
+				szHtml += "</div>";
+				szHtml += "</div>";
+
+				var szLegendPane = "<div id='map-legend-pane' class='map-legend-pane'>"+
+								 "<a href='javascript:__toggleLegendPane(-1)'>"+
+								 "<div id='legend-type-switch'>"+
+								   "..."+
+								 "</div>"+
+								 "</a>"+ 
+								 "<div class='container'>"+
+								   "<div class='row'>"+
+									 "<div class='col-lg-12 col-md-12 col-xs-0'>"+
+									   "<div id='map-legend-content'>"+szHtml+"</div>"+
+									 "</div>"+
+								  "</div>"+
+								"</div>";
+				$("#map-legend").html(szLegendPane);
+			}
+
+			// append the legend html
+			//
+			$("#map-legend-list").html(szLegend);
+			$("#map-legend").show();
+
+			// set some css styles
+			//
+			$("div.list-group").css(list_group);
+			$("div.list-group-item").css(list_group_item);
+			$("div.list-group-item-left").css(list_group_item_left);
+			$("div.list-group-item-right").css(list_group_item_right);
+			$("ul").css(ul_);
+
+			return true;
+		}
+
+		/**
+		 * listen on Zoom and Pan  
+ 		 * make the legend for all layer in the map 
+		 * @type void
+		 */
+		ixmaps.htmlgui_onZoomAndPan = function(nZoom){
+			if ( ixmaps.getThemeObj() ){
+				return;
+			}
+			var layerA = ixmaps.getLayer();
+			var depA = ixmaps.getLayerDependency();
+			ixmaps.makeLayerLegend(window.innerHeight*0.75);
 		};
 
 	/**

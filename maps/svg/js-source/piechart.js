@@ -286,6 +286,22 @@ DonutChart.prototype.realize = function(){
 			this.donutPartsA[i].nOpacity  = this.partsA[i].nOpacity;
 		}
 	}
+
+	// GR 02.12.2018 HALF angles are going from 270 to 90 
+	// those with endangle before 0 (270-360) must be drawn at last
+	if ( this.szStyle.match(/HALF/) ){
+		nLastPart = this.donutPartsA.length;
+		for ( i=0;i<nLastPart;i++ ){
+			if (this.donutPartsA[i].nEndAngle > 270){
+				this.donutPartsA.push(this.donutPartsA.splice(i,1)[0]);
+				this.partsA.push(this.partsA.splice(i,1)[0]);
+				nLastPart--;
+				i = -1;
+
+			}
+		}
+	}
+
 	// GR 16.08.2008 -> infodisplay this.frameGroup = _crc_constructNode('g',this.targetDocument,this.targetGroup,{id:"donutframe"+String(Math.random())});
 	this.frameGroup = _crc_constructNode('g',this.targetDocument,this.targetGroup,{});
 	for ( i=0;i<nLastPart;i++ ){

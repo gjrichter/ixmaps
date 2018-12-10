@@ -784,7 +784,7 @@ Map.prototype.showAll = function(){
 /**
  * hide all map shapes
  */
-Map.prototype.hideMap = function(){return;
+Map.prototype.hideMap = function(){
 	if ( this.fHidden){
 		return;
 	}
@@ -1176,7 +1176,7 @@ function doInitAll_2(evt){
 	}
 
 	// show all
-	setTimeout("map.showAll()",500);
+	setTimeout("map.showAll()",1500);
 
 	// init delayed to include all loaded parameter 
 	setTimeout("map.Zoom.init()",1000);
@@ -5857,26 +5857,46 @@ function SVGLoaderMap(){
 		};
         CallbackHandler.prototype.processImported = function (d){
 
+			// local helper
+			var __replace = function(oldNode,newNode) {
+				if (newNode && oldNode){
+					oldNode.parentNode.insertBefore(newNode,oldNode);
+					oldNode.parentNode.removeChild(oldNode);
+				}else
+				if (newNode){
+					SVGRootElement.appendChil(newNode);
+				}else
+				if (oldNode){
+					oldNode.parentNode.removeChild(oldNode);
+				}
+			};
+
+			// ------------------------------
+			// import new map SVG nodes
+			// ------------------------------
+
 			d = SVGDocument.importNode(d, true);
 			console.log(d);
 
 			// replace metadata with data from new map
-			var oldMetadata = SVGDocument.getElementsByTagName("metadata")[2];
-			var newMetadata = d.getElementsByTagName("metadata")[0];
-			oldMetadata.parentNode.insertBefore(newMetadata,oldMetadata);
-			oldMetadata.parentNode.removeChild(oldMetadata);
+			__replace(SVGDocument.getElementsByTagName("metadata")[2],
+								d.getElementsByTagName("metadata")[0]);
 
 			// replace maplayer with those of the new map
-			var oldLayer = SVGDocument.getElementById("maplayer");
-			var newLayer = d.getElementById("maplayer");
-			oldLayer.parentNode.insertBefore(newLayer,oldLayer);
-			oldLayer.parentNode.removeChild(oldLayer);
+			__replace(SVGDocument.getElementById("maplayer"),
+								d.getElementById("maplayer"));
 
 			// change extension to new map
-			var oldExtension = SVGDocument.getElementById("extension");
-			var newExtension = d.getElementById("extension");
-			oldExtension.parentNode.insertBefore(newExtension,oldExtension);
-			oldExtension.parentNode.removeChild(oldExtension);
+			__replace(SVGDocument.getElementById("extension"),
+								d.getElementById("extension"));
+
+			// change clipping to new map
+			__replace(SVGDocument.getElementById("mapclipdef"),
+								d.getElementById("mapclipdef"));
+
+			// copy styles of new map, if defined 
+			__replace(SVGDocument.getElementById("mapstyles"),
+								d.getElementById("mapstyles"));
 
 			// add pattern defs for the new map
 			var patternA = d.getElementsByTagName("pattern");
@@ -5885,18 +5905,10 @@ function SVGLoaderMap(){
 				SVGRootElement.appendChild(defsB);
 			}
 
-			// copy styles of new map, if defined 
-			var oldStyles = SVGDocument.getElementById("mapstyles");
-			var newStyles = d.getElementById("mapstyles");
-			if (newStyles && oldStyles){
-				oldStyles.parentNode.insertBefore(newStyles,oldStyles);
-				oldStyles.parentNode.removeChild(oldStyles);
-			}else
-			if (newStyles){
-				SVGRootElement.appendChil(newStyles);
-			}
-
+			// ------------------------------
 			// reset/recreate the map handling
+			// ------------------------------
+
 			map.Scale = new Map.Scale(null);
 			map.Scale.superclass = map;
 
@@ -5915,7 +5927,10 @@ function SVGLoaderMap(){
 
 			map.Query = new Map.Query();
 
-			map.Event.doDefaultZoom();
+			// magick !!!
+			var rectArea = map.Zoom.getBox();
+			var pt1 = map.Scale.getMapCoordinate(rectArea.x+rectArea.width/2,rectArea.y+rectArea.height/2);
+			map.Zoom.doSetCenterByParentMap(pt1.x,pt1.y);
 
 			map.Layer.switchScaleDependentLayer();
 			map.Scale.refreshCSSStyles();
@@ -5925,6 +5940,11 @@ function SVGLoaderMap(){
 			return;
         };
 		_TRACE("SVGMapL: "+szUrl+" ... ");
+
+		console.log("*** load new map ***");
+		console.log(szUrl);
+		console.log("********************");
+
 		if (szUrl.length > 0){
 			getData(szUrl, new CallbackHandler(this));
 			return true;

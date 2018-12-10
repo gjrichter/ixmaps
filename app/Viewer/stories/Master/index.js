@@ -1,6 +1,6 @@
 
 	/**
-		init sidebar	
+		init map viewer in sidebar	
 	**/
 
 	var nLegendTabs = 0;
@@ -46,7 +46,12 @@
 		$("#"+buttonObj.attr("id")+"_footer").hide();
 	};
 	
-	// intercept theme creation, to mark active themes
+	// --------------------------------------------------------------
+	// intercept theme creation, to create the theme legend 
+	// --------------------------------------------------------------
+	
+	// intercept new theme to prepare the legend
+	//
 	ixmaps.htmlgui_onNewTheme = function(szId){
 
 		if ( themeObj.szFlag.match(/NOLEGEND/) || themeObj.szFlag.match(/NOINFO/) ) {
@@ -63,9 +68,10 @@
 		ixmaps.htmlgui_setMapTypeBG(ixmaps.getMapTypeId());
 	};
 	
-	
 	var old_onDrawTheme = ixmaps.htmlgui_onDrawTheme;
-	// intercept theme creation, to mark active themes
+
+	// intercept theme creation done, and make the legend
+	//
 	ixmaps.htmlgui_onDrawTheme = function(szId){ 
 
 		var themeObj = ixmaps.getThemeObj(szId);
@@ -172,64 +178,11 @@
 
 				szHtml += 		"</ div>";
 
-				/**
-				szHtml +=	"<div style='margin-left:-5px;float-left;margin-top:2em' >";
-				if(ixmaps.themeObj.szFlag.match(/CHOROPLETH/) ){
-					if( !ixmaps.themeObj.szFlag.match(/EXACT/)  ){
-					    szHtml +=	"<button type='button' class='btn btn-default' style='padding:0.7em;margin:0.2em' onclick='javascript:ixmaps.changeThemeStyle(null,null,\"type:QUANTILE\",\"remove\");ixmaps.changeThemeStyle(null,null,\"type:LOG\",\"remove\");ixmaps.changeThemeStyle(null,null,\"type:EQUIDISTANT\",\"add\");'>equidistante</button>"; 
-						szHtml +=	"<button type='button' class='btn btn-default' style='padding:0.7em;margin:0.2em' onclick='javascript:ixmaps.changeThemeStyle(null,null,\"type:QUANTILE\",\"remove\");ixmaps.changeThemeStyle(null,null,\"type:EQUIDISTANT\",\"remove\");ixmaps.changeThemeStyle(null,null,\"type:LOG\",\"add\");'>logarithmico</button>";
-						szHtml +=	"<button type='button' class='btn btn-default' style='padding:0.7em;margin:0.2em' onclick='javascript:ixmaps.changeThemeStyle(null,null,\"type:QUANTILE\",\"add\");ixmaps.changeThemeStyle(null,null,\"type:LOG\",\"remove\");ixmaps.changeThemeStyle(null,null,\"type:EQUIDISTANT\",\"remove\");'>quantile</button> ";
-						szHtml +=	"<button type='button' class='btn btn-default' style='padding:0.7em;margin:0.2em' onclick='javascript:ixmaps.changeThemeStyle(null,null,\"type:QUANTILE\",\"add\");ixmaps.changeThemeStyle(null,null,\"type:LOG\",\"remove\");ixmaps.changeThemeStyle(null,null,\"type:DOPACITYMINMAX\",\"toggle\");'>enfatizza min/max</button> ";
-					}
-					szHtml +=	"<button type='button' class='btn btn-default' style='padding:0.7em;margin:0.2em' onclick='javascript:ixmaps.newTheme(null,null,tema_popolazione);'>aggiungi la popolazione</button>"; 
-				}else{
-					szHtml +=	"<button type='button' class='btn btn-default' style='padding:0.7em;margin:0.4em' onclick='javascript:ixmaps.changeThemeStyle(null,null,\"type:AGGREGATE\",\"toggle\");ixmaps.changeThemeStyle(null,null,\"type:RELOCATE\",\"toggle\");ixmaps.changeThemeStyle(null,\"type:SUM\",\"add\");ixmaps.changeThemeStyle(null,\"gridwidthpx:25\",\"set\");'>aggregated yes/no</button> ";
-				}
-				szHtml +=	"</div>";
-				**/		
-			
-			/**			
-			szHtml += "<div style='font-size:0.6em;margin-bottom:0.5em;overflow:hidden;'>Histogram:</div>";
-			szHtml += "<div id='histogram1Div' style='width:400px;height:100px;overflow:auto'><div><svg width='400' height='100' viewBox='-20 0 2000 500'><g id='histogram_target_1"+szId+"'></g></svg></div></div>";
-			szHtml += "<div style='font-size:0.6em;margin-bottom:0.5em'>Distribuzione:</div>";
-			szHtml += "<div id='histogram2Div' style='width:400px;height:100px;overflow:auto'><div><svg width='400' height='100' viewBox='-20 0 2000 500'><g id='histogram_target_2"+szId+"' style='fill-opacity:0.7;stroke-opacity:0.8;'></g></svg></div></div>";
-			**/			
-			
 			}
 		try	{
 			ixmaps.setTitle(String(themeObj.szTitle+"<div style='font-size:0.5em;line-height:1em;'>"+(themeObj.szSnippet||"")+"</div>"));
 		}catch (e){}
 
-		/** tbd non shure when sum ar mean !!!
-		// show sum
-		// ---------
-		nSum = themeObj.nSum/((themeObj.nMedianA[0] <= 100)?themeObj.nCount:1);
-		console.log(themeObj);
-		console.log(themeObj.nSum);
-		console.log(themeObj.nCount);
-		console.log(themeObj.nSum/themeObj.nCount);
-		if ( themeObj.szFlag.match(/EXACT/) ){
-			nSum = themeObj.nSumSize||themeObj.nCount;
-		}
-		if ( themeObj.szFlag.match(/AGGREGATE/) && !themeObj.szFlag.match(/SUM/) ){
-			nSum = (themeObj.nSum/themeObj.nCount).toFixed(2);
-		}
-		if ( themeObj.szFlag.match(/SUM/) || 
-			(themeObj.szFlag.match(/EXACT/) && !themeObj.szFlag.match(/SIZE/)) ){
-			if ( typeof(themeObj.partsA[0].nSum) != "undefined" ){
-				nSum = 0;
-				for ( i=0; i<themeObj.partsA.length; i++){
-					nSum += themeObj.partsA[i].nSum;
-				}
-			}
-		}
-		var szUnit = themeObj.szLegendUnits || themeObj.szUnits || "";
-
-		var szSum = "<h3 style='font-size:46px'><b>"+String(ixmaps.__formatValue(nSum,2,"BLANK"))+(themeObj.szLegendUnits || themeObj.szUnit||"")+"</b></h3>"
-
-		szHtml = szSum + szHtml;
-		**/
-		
 		$("#loadProject").hide();
 		$("#themeLegendDiv").show();
 
@@ -238,15 +191,7 @@
 		var szLegendId = szId.replace(/\./g,"_");
 
 		if ( !$("#"+szLegendId)[0] ){
-			$("#themeLegendDiv").append('<div id="'+(szLegendId)+'" ></div>');
-			tabDivA.push(szLegendId);
-			$("#themeLegendDiv").children().css("display","none");
-			$("#"+tabDivA[0]).show();
-
-			// if more than 1 panes, create new tab to switch legend panes
-			if ( ++nLegendTabs > 1 ){
-				$("#legendTabs").append('<li><a href="#" onclick="activateTab($(this))">Theme '+ (nLegendTabs) +'</a></li>');
-			}
+			createTab(szLegendId);
 		}
 
 		$("#"+szLegendId).html(szHtml);
@@ -259,7 +204,7 @@
 		$("#themeLegendDiv")[0].addEventListener("touchmove", function(event){event.stopPropagation();}, false);
 		// ---------------------------------------------------------------
 
-		setTimeout("ixmaps.viewer_makeLayerLegend()",1000);
+		//setTimeout("ixmaps.viewer_makeLayerLegend()",1000);
 
 		try	{
 			old_onDrawTheme(szId); 
@@ -268,6 +213,7 @@
 	};
 
 	// intercept theme deletion, to remove active themes mark
+	//
 	ixmaps.htmlgui_onRemoveTheme = function(szId){
 		if ( clickA[szId] ){
 			__setThemeButtonStyle(clickA[szId],false);
@@ -277,20 +223,17 @@
 
 		//remove theme div
 		var szLegendId = szId.replace(/\./g,"_");
-		$("#"+szLegendId).remove();
+		removeTab(szLegendId);
 
-		//remove theme legend tab
-		for ( i in tabDivA ){
-			if ( tabDivA[i] == szLegendId ){
-				console.log(tabDivA);
-				tabDivA.splice(i, 1);;
-			}
-		}
-		nLegendTabs--;
 		try	{
 			ixmaps.setTitle("");
 		}catch (e){}
 	};
+
+	// --------------------------------------------------------------
+	// helper
+	// --------------------------------------------------------------
+
 	ixmaps.toggle_values = function(szThemeId){
 		var szThemeStyle = ixmaps.getThemeStyleString();
 		if ( szThemeStyle && szThemeStyle.match(/VALUES/) ){
@@ -358,7 +301,7 @@
 		}
 	};
 
-	ixmaps.viewerSpinOut = function(){
+	ixmaps.viewerSpinOut = function(){ alert("cccccc");
 
 		// make url of the map template 
 		var szTemplateUrl = ixmaps.dispatch("ui/dispatch.htm?");
@@ -432,19 +375,27 @@
 			changeCss(".theme-legend-item-selected", "background-color:#222" );
 			changeCss("a.theme-legend-item-selected", "background-color:#222" );
 	
+			changeCss(".nav-tabs>li>a","background-color:#111" );
+			changeCss(".nav-tabs>li>a","color:#666" );
+			changeCss(".nav-tabs>li>a","border: 1px solid #000" );
 			changeCss(".nav-tabs>li>a:hover","background-color:#222" );
 			changeCss(".nav-tabs>li>a:hover","border: 1px solid #000" );
+			changeCss(".nav-tabs>li>a:focus","background-color:#222" );
+			changeCss(".nav-tabs>li>a:focus","border: 1px solid #000" );
 			changeCss(".nav-tabs>li.active>a","background-color:#222" );
 			changeCss(".nav-tabs>li.active>a:hover","background-color:#222" );
 			changeCss(".nav-tabs>li.active>a:focus","background-color:#222" );
 			changeCss(".nav-tabs>li.active>a","color:#dddd" );
 			changeCss(".nav-tabs>li.active>a:hover","color:#ddd" );
 			changeCss(".nav-tabs>li.active>a:focus","color:#ddd" );
-			changeCss(".nav-tabs>li.active>a","border: 1px solid #000" );;
-			changeCss(".nav-tabs>li.active>a:hover","border: 1px solid #000" );
-			changeCss(".nav-tabs>li.active>a:focus","border: 1px solid #000" );
+			changeCss(".nav-tabs>li.active>a","border: 1px solid #222" );;
+			changeCss(".nav-tabs>li.active>a:hover","border: 1px solid #444" );
+			changeCss(".nav-tabs>li.active>a:focus","border: 1px solid #222" );
 
 			changeCss(".list-group-item","background:#181818");
+
+			changeCss(".inline-legend","background-color:rgba(0,0,0,0.8)");
+			changeCss(".inline-legend","border-color:rgba(120,120,120,0)");
 
 		}else{
 
@@ -464,27 +415,86 @@
 
 	setTimeout("ixmaps.htmlgui_setMapTypeBG(ixmaps.getMapTypeId())",1);
 
+	// --------------------------------------------------------------
+	// legend tabs for more than 1 theme and the map layer
+	// --------------------------------------------------------------
 
-	ixmaps.viewer_makeLayerLegend = function(){ 
+	var tabDivA = [{"tabName":"Map Layer",
+					"tabId":"lastLegendTab",
+					"divId":"map-legend",
+					}];
 
-		// append or replace legend div
-		// ---------------------------------------------------------------
-		var szLegendId = "map-legend";
+	createTab = function(szLegendId){
 
-		if ( !$("#"+szLegendId)[0] ){
-			$("#themeLegendDiv").append('<div id="'+(szLegendId)+'" style="font-size:0.8em;line-height:1.5em"></div>');
-			tabDivA.push(szLegendId);
+		// create new tab to switch legend panes
+		++nLegendTabs;
 
-			// if more than 1 panes, create new tab to switch legend panes
-			if ( ++nLegendTabs > 1 ){
-				$("#legendTabs").append('<li><a href="#" onclick="activateTab($(this))">Theme '+ (nLegendTabs) +'</a></li>');
+		var tabName = 'Theme '+ (nLegendTabs);
+		var tabId =   'Theme'+ (nLegendTabs);
+	
+		tabDivA.push({	"tabName":tabName,
+						"tabId":tabId,
+						"divId":szLegendId	});
+
+		$("#themeLegendDiv").append('<div id="'+(szLegendId)+'" class="inline-legend" ></div>');
+
+		$("#lastLegendTab").parent().parent().find("li").removeClass("active");
+		$("#lastLegendTab").before('<li id="'+(tabId)+'" class="active"><a href="#" onclick="activateTab($(this))">'+ tabName +'</a></li>');
+
+		$("#themeLegendDiv").children().css("display","none");
+		$(".inline-legend").hide();
+		$("#"+tabDivA[nLegendTabs].divId).show();
+
+		$("#legendTabs").show();
+
+	}
+
+	activateTab = function(el){
+		el.parent().parent().find("li").removeClass("active");
+		el.parent().addClass("active");
+		$(".inline-legend").hide();
+		for ( i in tabDivA ){
+			if ( tabDivA[i].tabName == el.text() ){
+				$("#"+tabDivA[i].divId).show();
 			}
 		}
+	}
 
-		ixmaps.makeLayerLegend(2000);
-		if ( nLegendTabs > 1 ){
-			$("#"+tabDivA[(nLegendTabs-1)]).hide();
+	removeTab = function(szLegendId){
+		$("#"+szLegendId).remove();
+		//remove theme legend tab
+		for ( i in tabDivA ){
+			if ( tabDivA[i].divId == szLegendId ){
+				$("#legendTabs > .active").remove();
+				tabDivA.splice(i, 1);
+			}
 		}
+		nLegendTabs--;
+
+		$("#"+tabDivA[nLegendTabs].divId).show();
+		$("#"+tabDivA[nLegendTabs].tabId).addClass("active");
+
+		if ( nLegendTabs <= 0 ){
+			$("#legendTabs").hide();
+		}
+
+	}
+
+	ixmaps.viewer_makeLayerLegend = function(){
+		
+		szDisplay = nLegendTabs?$("#"+tabDivA[0].divId).css("display"):null;
+
+		if ( ixmaps.makeLayerLegend(2000) ){
+			$("#loadProject").hide();
+		}
+		
+		if ( szDisplay ){
+			$("#"+tabDivA[0].divId).css("display",szDisplay);
+		}
+
 	};
 
 
+// -----------------------------
+// EOF
+// -----------------------------

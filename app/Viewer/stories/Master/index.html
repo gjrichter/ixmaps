@@ -39,6 +39,8 @@
 	}
 	.inline-legend{
 		background-color: rgba(239,235,239,0.7);
+		background-color: rgba(255,255,255,0.7);
+
 	}
 	.title{
 		font-size: 2.5em;
@@ -124,6 +126,7 @@
 	
 	legend {
 		border: 0;
+		margin:0;
 	}
 
 	.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
@@ -133,6 +136,15 @@
 		border-bottom-color: transparent;
 		cursor: default;
 	}
+
+	.nav-tabs>li>a, .nav-tabs>li>a:hover, .nav-tabs>li>a:focus {
+		color: #555;
+		background-color: #eee;
+		border: 1px solid #ddd;
+		border-bottom-color: transparent;
+		cursor: default;
+	}
+
 
 	.fa {
 		vertical-align:2px;
@@ -206,9 +218,9 @@
 								<a href="javascript:$('#loadProject').hide();$('#loadProjectButton').show();$('#loadProjectHideButton').hide()" title="load project">[-]</a></span>
 							<span id="saveProjectButton" style="display:none"> 
 								<a href="javascript:ixmaps.popupProject()" title="save project">[->]</a></span>
-							</legend>
+						</legend>
 						<input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
-						<div id="loadProject" style="margin-top:-1em;background:rgba(0,0,0,0.1);">
+						<div id="loadProject" style="margin-top:0.5em;background:rgba(0,0,0,0.1);">
 							<input type="file" id="fileselect" name="fileselect[]" multiple="multiple" style="display:none"/>
 							<div id="filedrag" style="clear:both;height:10em;width:100%;border:dashed #dddddd 2px;">drop files here</div>
 							<label class="fileContainer" for="fileselect" style="position:relative;top:-6em;left:30%">or select project</label>
@@ -227,15 +239,15 @@
 		<div class="section" id="section2" style="margin-top:-2em"  >
 			<div class="intro up down">
 
-				<ul id="legendTabs" class="nav nav-tabs">
-					<li class="active"><a href="#" onclick="activateTab($(this))">Theme 1</a></li>
-<!--
-					<li><a href="#" onclick="activateTab($(this))">Theme 2</a></li>
-					<li><a href="#" onclick="activateTab($(this))">Theme 3</a></li>
--->
-				</ul>
+				<div id="legendTabs" style="display:none">
+					<ul id="legendTabsList" class="nav nav-tabs" >
+						<li id="lastLegendTab" ><a href="#" onclick="activateTab($(this))">Map Layer</a></li>
+					</ul>
+				</div>
 
-				<div id='themeLegendDiv' class='inline-legend' style="margin-top:-2.5em;clear:both;display:none"></div>
+				<div id='themeLegendDiv' style="margin-top:-2.5em;clear:both;display:none"></div>
+
+				<div id='map-legend' class='inline-legend' style="margin-top:-2.5em;clear:both;display:none;font-size:1em"></div>
 
 			</div>
 
@@ -317,7 +329,9 @@
 			if ( api.project ){
 				var project =  api.project;
 			}
-						
+			if ( api.bookmark || api.embeddedApi.bookmark || api.embeddedApi.embeddedApi.bookmark){
+				$("#loadProject").hide();
+			}
 			// -----------------------------------------------
 			// load themes script
 			// and initialize map if all loaded
@@ -332,6 +346,13 @@
 				})
 			).done(function(){
 				ixmaps.htmlgui_setMapTypeBG(api.getMapTypeId());
+				/*
+				 * listen on Zoom and Pan  
+				 * to make the mapo layer legend 
+				 */
+				ixmaps.htmlgui_onZoomAndPan = function(nZoom){
+					ixmaps.viewer_makeLayerLegend();
+				};
 
 			}).fail(function(){
 				alert("script loading "+arguments[2].toString());
@@ -373,26 +394,6 @@
 				return false;
 			}
 		};
-
-		var tabDivA = [];
-		activateTab = function(el){
-			el.parent().parent().find("li").removeClass("active");
-			el.parent().addClass("active");
-			$("#"+tabDivA[0]).hide();
-			$("#"+tabDivA[1]).hide();
-			$("#"+tabDivA[2]).hide();
-			for ( i=1; i<=3; i++ ){
-				if ( eval("el.text().match(/1/)") ){
-					$("#"+tabDivA[0]).show();
-				}else
-				if ( eval("el.text().match(/2/)") ){
-					$("#"+tabDivA[1]).show();
-				}else
-				if ( eval("el.text().match(/3/)") ){
-					$("#"+tabDivA[2]).show();
-				}
-			}
-		}
 
 	</script>
 

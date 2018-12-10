@@ -657,8 +657,35 @@
 					</div>
 					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 						<div class="form-group">
-							<label for="chartFillOpacity">opacity</label>
-							<input type="text" class="form-control" id="chartFillOpacity" placeholder="0.1 ... 1">
+							<label id="chartOpacityLabel" for="chartOpacityValue">fill opacity</label>
+							<div class="calendar">
+								<div class="years clearfix">
+									<div class="unit minus" onclick="changeChartOpacity(-1)"><em>-</em></div>
+									<div class="monyear" style="padding:0em 0em 0em 1.2em" ><input class="form-control" style="width:90%" type="text" id="chartOpacityValue" placeholder="1 ... " onkeypress="setChartOpacity()"></div>
+									<div class="unit plus" onclick="changeChartOpacity(1)"><em>+</em></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+						<div class="form-group">
+							<label for="chartLineColor">line color</label>
+							<input type="text" class="form-control" id="chartLineColor" placeholder="none" onkeypress="setLineColor()">
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+						<div class="form-group">
+							<label for="chart	">line width</label>
+							<div class="calendar">
+								<div class="years clearfix">
+									<div class="unit minus" onclick="changeLineWidth(-1)"><em>-</em></div>
+									<div class="monyear" style="padding:0em 0em 0em 1.2em" ><input class="form-control" style="width:90%" type="text" id="chartLineWidth" placeholder="1 ... " onkeypress="setLineWidth()"></div>
+									<div class="unit plus" onclick="changeLineWidth(1)"><em>+</em></div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -677,12 +704,17 @@
 					</div>
 					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 						<div class="form-group">
-							<label for="chartFillOpacity">opacity</label>
-							<input type="text" class="form-control" id="chartFillOpacity" placeholder="0.1 ... 1">
+							<label for="chartValueScale">value text size</label>
+							<div class="calendar">
+								<div class="years clearfix">
+									<div class="unit minus" onclick="changeValueScale(-1)"><em>-</em></div>
+									<div class="monyear" style="padding:0em 0em 0em 1.2em" ><input class="form-control" style="width:90%" type="text" id="chartValueScale" placeholder="1 ... " onkeypress="setValueScale()"></div>
+									<div class="unit plus" onclick="changeValueScale(1)"><em>+</em></div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
-
 			</div>
 
 			<!-- --------------------------------- -->
@@ -807,21 +839,6 @@
 						</a>
 					</span>
 				</h3>
-
-				<div class="row">
-					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-						<div class="form-group">
-							<label id="chartOpacityLabel" for="chartOpacityValue">opacity</label>
-							<div class="calendar">
-								<div class="years clearfix">
-									<div class="unit minus" onclick="changeChartOpacity(-1)"><em>-</em></div>
-									<div class="monyear" style="padding:0em 0em 0em 1.2em" ><input class="form-control" style="width:90%" type="text" id="chartOpacityValue" placeholder="1 ... " onkeypress="setChartOpacity()"></div>
-									<div class="unit plus" onclick="changeChartOpacity(1)"><em>+</em></div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
 
 				<div class="row">
 					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
@@ -1382,6 +1399,53 @@
 				}
 				$("#chartScaleValue").val(nScale)
 				ixmaps.map().theme().changeStyle('scale:'+String(nScale),'set');
+			}
+			function setLineColor() {
+				if ( event.keyCode == 13 ){
+					var newColor = String($("#chartLineColor").val());
+					ixmaps.map().theme().changeStyle('linecolor:'+newColor,'set');
+				}
+			}
+			function setLineWidth(nDelta) {
+				if ( event.keyCode == 13 ){
+					var newScale = Number($("#chartLineWidth").val());
+					if ( !isNaN(newScale) ){
+						ixmaps.map().theme().changeStyle('linewidth:'+String(newScale),'set');
+					}else{
+						alert("Input type error: only numbers allowed!");
+					}
+				}
+			}
+			function changeLineWidth(nDelta) {
+				var nScale = Number($("#chartLineWidth").val());
+				if ( nDelta < 0 ){
+					nScale = (nScale/1.5).toPrecision(2);
+				}else{
+					nScale = (nScale*1.5).toPrecision(2);
+				}
+				$("#chartLineWidth").val(nScale)
+				ixmaps.map().theme().changeStyle('linewidth:'+String(nScale),'set');
+			}
+
+			function setValueScale(nDelta) {
+				if ( event.keyCode == 13 ){
+					var newScale = Number($("#chartValueScale").val());
+					if ( !isNaN(newScale) ){
+						ixmaps.map().theme().changeStyle('valuescale:'+String(newScale),'set');
+					}else{
+						alert("Input type error: only numbers allowed!");
+					}
+				}
+			}
+			function changeValueScale(nDelta) {
+				var nScale = Number($("#chartValueScale").val());
+				if ( nDelta < 0 ){
+					nScale = (nScale/1.5).toPrecision(2);
+				}else{
+					nScale = (nScale*1.5).toPrecision(2);
+				}
+				$("#chartValueScale").val(nScale)
+				ixmaps.map().theme().changeStyle('valuescale:'+String(nScale),'set');
 			}
 
 			function setChartOpacity() {
@@ -2231,6 +2295,22 @@
 					$("#chartValueDecimalsList").val(objTheme.style.valuedecimals);
 					$("#chartValueDecimalsList").prev().css("color", color_selected);
 				}
+
+				if (objTheme.style.linecolor) {
+					$("#chartLineColor").val(objTheme.style.linecolor);
+					$("#chartLineColor").prev().css("color", color_selected);
+				}
+				if (objTheme.style.linewidth) {
+					$("#chartLineWidth").val(objTheme.style.linewidth);
+					$("#chartLineWidth").parent().prev().css("color", color_selected);
+				}
+				if (objTheme.style.valuescale) {
+					$("#chartValueScale").val(objTheme.style.valuescale);
+					$("#chartValueScale").parent().prev().css("color", color_selected);
+				}
+
+
+
 				// ------------------------------
 				// 4. theme colors and classes
 				// ------------------------------

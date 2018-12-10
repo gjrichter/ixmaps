@@ -224,7 +224,7 @@ $Log: htmlgui_story.js,v $
 		$('#story-tool').show();
 
 		var target = $('#story-tool');
-		target.html("<p>loading ...</p>");
+		//target.html("<p>loading ...</p>");
 
 		// set story board height (important for scrolling) 
 		// ------------------------------------------------

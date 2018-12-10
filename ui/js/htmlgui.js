@@ -1694,7 +1694,9 @@ $Log: htmlgui.js,v $
 	};
 
 	ixmaps.htmlgui_onZoomAndPan = function(nZoom){
-		ixmaps.updatePageHistory(nZoom);
+		try{
+			ixmaps.updatePageHistory();
+		}catch (e){}
 		if ( ixmaps.parentApi != ixmaps ){
 			try	{
 				ixmaps.parentApi.onMapZoom(nZoom);

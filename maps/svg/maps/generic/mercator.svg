@@ -68,7 +68,7 @@
   <xmap:scaledependencies >
   </xmap:scaledependencies >
   <xmap:themes >
-    <xmap:theme name="World Mercator" legendname="World Mercator" type="polygon" items="238" renderer="4" rendererfield="" label="" flag="" info="" selection="FeatureId" filter="ID" filtervalue="none" highlightstyle="" display="inline" displaylabel="inline" >
+    <xmap:theme name="World Mercator" legendname="World Mercator" type="none" items="0" renderer="0" rendererfield="" label="" flag="" info="" selection="FeatureId" filter="ID" filtervalue="none" highlightstyle="" display="none" displaylabel="none" >
       <xmap:category type="single" fill="#d6cd68" stroke="#000000" />
     </xmap:theme>
   </xmap:themes>

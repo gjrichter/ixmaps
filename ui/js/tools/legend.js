@@ -273,7 +273,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		// check whether to make compact (one line) legend 
 		// -----------------------------------------------
-		if ( ((themeObj.partsA.length == 1) || !themeObj.szAlphaField ) && themeObj.szFlag.match(/DOPACITY/) && !themeObj.szFlag.match(/EXACT/)){
+		if ( ((themeObj.partsA.length == 1) ) && themeObj.szFlag.match(/DOPACITY/) && !themeObj.szFlag.match(/EXACT/)){
 			return ixmaps.legend.makeColorLegendHTMLCompact(szId,szLegendId);
 		}
 		if ( fLegendCompact && !themeObj.szFlag.match(/EXACT/) && themeObj.partsA.length >= 5 && !( !(themeObj.szFlag.match(/SEQUENCE/) && !themeObj.szFlag.match(/SYMBOL/)) && themeObj.szLabelA && themeObj.szLabelA.length ) ){
@@ -302,7 +302,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		// compose the units suffix
 		// ---------------------------
-		var szUnit = themeObj.szLegendUnits || themeObj.szUnits || "     ";
+		var szUnit = themeObj.szLegendUnits || themeObj.szUnits || "";
 		szUnit = szUnit.replace(/ /g,'&nbsp;');
 
 		// if no labels or colors are defined, make value range texts as label
@@ -474,7 +474,14 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 				szHtml += "</a>";
 				szHtml += "</span>";
 
-				szHtml += sortA[i].count?("<span class='theme-legend-count' style='color:#888888;float:right'> "+count+" "+szUnit+"</span>"):"";
+				if ( sortA[i].count ){
+					szHtml += "<span class='theme-legend-count' style='color:#888888;float:right'> "+count+" "+szUnit+"</span>";
+				}else
+				if ( (typeof(themeObj.partsA[i].min) != "undefined") && (typeof(themeObj.partsA[i].max) != "undefined") ){
+					console.log(szUnit);
+					szHtml += "<span style='padding-left:5px'>"+ ixmaps.__formatValue(themeObj.partsA[i].min,2,"BLANK")+" "+szUnit+"</span>  ... <span style='padding-left:5px'>"+ ixmaps.__formatValue(themeObj.partsA[i].max,2,"BLANK")+" "+szUnit+"</span>";
+				}
+				//szHtml += sortA[i].count?("<span class='theme-legend-count' style='color:#888888;float:right'> "+count+" "+szUnit+"</span>"):"";
 
 				szHtml += "</div>";
 				szHtml += "</div>";
@@ -664,7 +671,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		var id = szId.replace(/\./g,'');
 
-		szHtml += 		"<div style='margin-left:-5px;margin-top:0.2em;margin-bottom:1em;line-height:2em; >";
+		szHtml += 		"<div style='position:relative;bottom:-2.1em;margin-left:-5px; >";
 		szHtml += 		"<span id='legend-buttons"+szId+"'>";
 			
 		szHtml += 		"<a id='highbutton"+id+"' class='theme-tool-button' href='javascript:ixmaps.changeThemeDynamic(\""+szId+"\",\"amplify\",\"0.66\");' title='smooth chart' >";
@@ -778,7 +785,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		szHtml += "<h4 id='map-legend-snippet'>"+(themeObj.szSnippet||"")+"</h4>";
 
 		szHtml += "<div id='map-legend-body'>";
-		szHtml += "<div style='max-height:300px;overflow:auto;margin-right:2em;'>";
+		szHtml += "<div style='max-height:300px;overflow:auto;margin-right:24px;padding-right:1em;'>";
 		szHtml += ixmaps.legend.makeColorLegendHTML(szId,"generic","compact");
 		szHtml += "</div>";
 		//szHtml += "<br>";
@@ -788,10 +795,14 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 	
 		szHtml += "</div>";
+	
 		if( themeObj.szDescription ){
 			szHtml += "<p id='map-legend-description'>"+(themeObj.szDescription||"")+"</p>";
-			}
-		szHtml += "<div id='map-legend-footer'>";
+		}else{
+			szHtml += "<div style='height:10px'></div>";
+		}
+
+		szHtml += "<div id='map-legend-footer' >";
 
 		szHtml += ixmaps.htmlgui_onLegendFooter ? ixmaps.htmlgui_onLegendFooter(szId,themeObj,ixmaps.getThemeDefinitionObj(szId)) : "";
 			
@@ -810,7 +821,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 						"</div>";
 
 		szLegendPane += "<a href='javascript:__toggleLegendPane(0);'>"+
-						 "<div style='position:absolute;bottom:1em;right:1em;float:right;z-index:1;font-size:1em;padding:0.3em 0.5em;border:solid #ddd 1px'>"+
+						 "<div style='position:relative;bottom:0.9em;right:2.6em;float:right;margin-top:0.2em;z-index:1;font-size:1em;padding:0.3em 0.5em;border:solid #ddd 1px'>"+
 						   "<i id='map-legend-pane-switch' class='icon shareIcon blackHover icon-arrow-down2' title='close' style='color:#888;pointer-events:none;' tabindex='-1'></i>"+
 						 "</div>"+
 						 "</a>";

@@ -619,7 +619,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 			var fActiveFacet = false;
 			var szActiveFilter = null;
-			var szSafeId = facetsA[i].id.replace(/ |:|\(|\)|\./g, "_");
+			var szSafeId = facetsA[i].id.replace(/ |:|\(|\)|\.|\#|\//g, "_");
 
 			__facetFilterA.forEach(function (szFilter, index) {
 				if (szFilter.split("\"")[1] == facetsA[i].id) {

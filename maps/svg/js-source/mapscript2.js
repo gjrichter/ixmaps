@@ -5214,6 +5214,8 @@ Map.Event.prototype.defaultMouseOver = function(evt){
 		if ( HTMLWindow.ixmaps.htmlgui_onItemClick(mapObject.szId) ){
 			__circleHighlight(evt,mapObject);
 			killTooltip();
+			// avoid subsequent onMouseOver
+			HTMLWindow.ixmaps.htmlgui_onSVGPointerIdle();
 			return null;
 		}
 	}
@@ -5366,21 +5368,6 @@ var __circleHighlight = function(evt,mapObject){
 	if ( !mapObject.objNode ){
 		return false;
 	}
-
-	if ( 0 ){
-		var highlightGroup = map.Dom.newGroup(map.Layer.objectGroup,":highlightgroup");
-		var itemNode = map.Dom.newGroup(highlightGroup);
-		var nRadius		 = map.Scale.normalX(50) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
-		var nStrokeWidth = map.Scale.normalX(10) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
-		map.Dom.newShape('circle',itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:black;stroke-width:"+(nStrokeWidth*1.1)+"px;pointer-events:none");
-		map.Dom.newShape('circle',itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:white;stroke-width:"+nStrokeWidth+"px;pointer-events:none");
-		itemNode.fu.setPosition(mapObject.objNode.parentNode.fu.getPosition().x,mapObject.objNode.parentNode.fu.getPosition().y);
-		return true;
-	}
-
-
-
-
 	if (highLightList && !highLightList.checkItem(mapObject.objNode)){
 		highLightList.unlock();
 		highLightList.removeAll();
@@ -5945,6 +5932,9 @@ Map.Event.prototype.doDefaultZoom = function(evt){
 	zoomAndPanHistory.newItem();
 
 	map.Scale.refreshCSSStyles();
+	
+	setTimeout("map.showAll()",10);
+
 
 
 	_TRACE("@ default zoom done: "+1/map.Scale.nZoomScale);

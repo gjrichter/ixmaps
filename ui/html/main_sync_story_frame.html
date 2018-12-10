@@ -529,57 +529,71 @@
 	ixmaps.sidebarLeftPx = null;
 	ixmaps.fSidebar = true;
 
+	ixmaps.showSidebar = function() {
+
+		setTimeout('$("#embed-cross").css("width","'+String(ixmaps.mapWidthPx)+'");',500);
+		setTimeout('$("#embed-cross").css("height","'+String(ixmaps.mapHeightPx)+'");',500);
+
+		// $("#sidebar").fadeIn( "slow" );
+		$("#sidebar").animate({
+			left: '-='+ixmaps.sidebarwidth,
+			width: ixmaps.sidebarwidth+'px'
+		});
+
+		$("#expand").css("visibility","hidden");
+		$("#collaps").css("visibility","visible");
+
+		$("#expandbutton").hide();
+		$("#collapsbutton").show();
+
+		ixmaps.mapWidthPx = null;
+		ixmaps.containerWidthPx = null;
+		ixmaps.sidebarLeftPx = null;
+
+		ixmaps.fSidebar = true;
+	};
+
+	ixmaps.hideSidebar = function() {
+
+		ixmaps.containerWidthPx = $("#container").css("width");
+		ixmaps.mapWidthPx = $("#embed-cross").css("width");
+		ixmaps.mapHeightPx = $("#embed-cross").css("height");
+		ixmaps.sidebarLeftPx = $("#sidebar").css("left");
+
+		setTimeout('$("#embed-cross").css("width","'+String(window.innerWidth)+'px");',500);
+		setTimeout('$("#embed-cross").css("height","'+String(window.innerHeight)+'px");',500);
+
+		$("#map").css('height',String(window.innerHeight)+'px');
+		$("#map").css('width',String(window.innerWidth)+'px');
+
+		//$("#sidebar").fadeOut( "slow" );
+		ixmaps.sidebarwidth = $("#sidebar").width();
+		$("#sidebar").animate({
+			left: '+='+ixmaps.sidebarwidth,
+			width: '0px'
+		});
+
+		setTimeout('$("#expand").css("visibility","visible")',1000);
+		$("#collaps").css("visibility","hidden");
+
+		$("#expandbutton").show();
+		$("#collapsbutton").hide();
+
+		ixmaps.fSidebar = false;
+	};
+
+	ixmaps.toggleSidebar = function() {
+		if ( !ixmaps.fSidebar ){
+			ixmaps.showSidebar();
+		}else{
+			ixmaps.hideSidebar();
+		}
+	};
+
 	ixmaps.fullScreen = function() {
 
-		if ( !ixmaps.fSidebar ){
+		ixmaps.toggleSidebar();
 
-			setTimeout('$("#embed-cross").css("width","'+String(ixmaps.mapWidthPx)+'");',500);
-			setTimeout('$("#embed-cross").css("height","'+String(ixmaps.mapHeightPx)+'");',500);
-
-			// $("#sidebar").fadeIn( "slow" );
-			$("#sidebar").animate({
-				left: '-='+ixmaps.sidebarwidth,
-				width: ixmaps.sidebarwidth+'px'
-			});
-
-			$("#expand").css("visibility","hidden");
-			$("#collaps").css("visibility","visible");
-
-			$("#expandbutton").hide();
-			$("#collapsbutton").show();
-
-			ixmaps.mapWidthPx = null;
-			ixmaps.containerWidthPx = null;
-			ixmaps.sidebarLeftPx = null;
-
-			ixmaps.fSidebar = true;
-		}else{
-			ixmaps.containerWidthPx = $("#container").css("width");
-			ixmaps.mapWidthPx = $("#embed-cross").css("width");
-			ixmaps.mapHeightPx = $("#embed-cross").css("height");
-			ixmaps.sidebarLeftPx = $("#sidebar").css("left");
-
-			setTimeout('$("#embed-cross").css("width","'+String(window.innerWidth)+'px");',500);
-			setTimeout('$("#embed-cross").css("height","'+String(window.innerHeight)+'px");',500);
-
-			$("#map").css('height',String(window.innerHeight)+'px');
-			$("#map").css('width',String(window.innerWidth)+'px');
-
-			//$("#sidebar").fadeOut( "slow" );
-			ixmaps.sidebarwidth = $("#sidebar").width();
-			$("#sidebar").animate({
-				left: '+='+ixmaps.sidebarwidth,
-				width: '0px'
-			});
-
-			setTimeout('$("#expand").css("visibility","visible")',1000);
-			$("#collaps").css("visibility","hidden");
-
-			$("#expandbutton").show();
-			$("#collapsbutton").hide();
-
-			ixmaps.fSidebar = false;
-		}
 		var szMapType = $(document).getUrlParam('maptype');
 		if ( szMapType ){
 			if ( (szMapType.match(/dark/i) || szMapType.match(/black/i)) ){
@@ -592,7 +606,15 @@
 				$( "#expandbutton" ).css("background-color","#ffffff");
 			}
 		}
+	};
 
+	ixmaps.sidebar = function(fShow) {
+		if ( fShow && !ixmaps.fSidebar ){
+			ixmaps.showSidebar();
+		}else
+		if ( !fShow && ixmaps.fSidebar ){
+			ixmaps.hideSidebar();
+		}
 	};
 
 	ixmaps.reset = function() {
@@ -656,7 +678,8 @@
 
 			mapWidth = containerWidth;
 			sidebarWidth = (containerWidth>500)?(Math.max((sidebarWidth),350)):containerWidth-5;
-			sidebarHeight = newHeight
+			sidebarHeight = newHeight;
+			sidebarHeight = newHeight-25;
 			$("#map").css("margin","0px");
 
 			$("#sidebar").removeClass("gradient-in");
@@ -797,16 +820,6 @@
 		}else{
 			ixmaps.nSidebar = ixmaps.nInitSidebar;
 			ixmaps.resize();
-		}
-	};
-	ixmaps.hideSidebar = function() {
-		if ( ixmaps.fSidebar ){
-			ixmaps.fullScreen();
-		}
-	};
-	ixmaps.showSidebar = function() {
-		if ( !ixmaps.fSidebar ){
-			ixmaps.fullScreen();
 		}
 	};
 

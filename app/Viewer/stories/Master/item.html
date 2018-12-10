@@ -108,6 +108,9 @@
 		// define local functions
 		// ===================================
 
+		// tooltips for SVG charts
+		// ------------------------
+
 		function showTooltip(evt, text) {
 		  if ( text && text.length )		  {
 			  var tooltip = document.getElementById("tooltip");
@@ -129,9 +132,13 @@
 			showTooltip(event,event.target.getAttribute("tooltip"));
 			showTooltip(event,event.target.parentNode.getAttribute("tooltip"));
 		}
+
 		ixmaps.onMouseOut = function(){
 			hideTooltip();
 		}
+
+		// make SVG chart for the item info
+		// ---------------------------------
 
 		ixmaps.makeChartHTML = function(szId){
 
@@ -200,7 +207,7 @@
 
 		var szId = ixmaps.szMapItemId;
 
-		if(szId.match(/theme/)){
+		if ( szId.match(/theme/) ){
 
 			// item is part of a theme, so show chart and data  
 			//
@@ -291,6 +298,8 @@
 
 		$("#result").html(szHtml);
 		$("#result-div").show();
+
+		ixmaps.sidebar(1);
 
 	</script>
 

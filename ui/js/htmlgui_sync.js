@@ -426,8 +426,6 @@ $Log: htmlgui_sync.js,v $
 
 	ixmaps.do_keydown = function (evt) {
 
-		console.log(evt.keyCode);
-
 		// evoke theme editor by key ctrl+alt+E
 		if (evt.keyCode == 69) {
 			if ((evt.ctrlKey == true) && (evt.altKey == true)) {

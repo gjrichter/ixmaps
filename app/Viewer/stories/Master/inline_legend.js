@@ -39,8 +39,6 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			ixmaps.changeThemeStyle(szThemeId,'type:VALUES;','remove');
 		}else{
 			ixmaps.changeThemeStyle(szThemeId,'type:VALUES;','add');
-			//ixmaps.changeThemeStyle(szThemeId,'type:NOINLINETEXT;','add');
-			//ixmaps.changeThemeStyle(szThemeId,'valueupper','remove');
 		}
 	};
 
@@ -264,7 +262,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		// check whether to make compact (one line) legend 
 		// -----------------------------------------------
-		if ( ((themeObj.partsA.length == 1) || !themeObj.szAlphaField ) && themeObj.szFlag.match(/DOPACITY/) && !themeObj.szFlag.match(/EXACT/) ){
+		if ( ((themeObj.partsA.length == 1)) && themeObj.szFlag.match(/DOPACITY/) && !themeObj.szFlag.match(/EXACT/) ){
 			return ixmaps.legend.makeColorLegendHTMLCompact(szId,szLegendId);
 		}
 		if ( fLegendCompact && !themeObj.szFlag.match(/EXACT/) && themeObj.partsA.length >= 5 && !( !(themeObj.szFlag.match(/SEQUENCE/) && !themeObj.szFlag.match(/SYMBOL/)) && themeObj.szLabelA && themeObj.szLabelA.length ) ){
@@ -293,7 +291,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		// compose the units suffix
 		// ---------------------------
-		var szUnit = themeObj.szLegendUnits || themeObj.szUnits || "     ";
+		var szUnit = themeObj.szLegendUnits || themeObj.szUnits || "";
 		szUnit = szUnit.replace(/ /g,'&nbsp;');
 
 		// if no labels or colors are defined, make value range texts as label
@@ -333,17 +331,16 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 				sortA.push({index:i,color:(i),count:(themeObj.exactSizeA[i]/themeObj.exactCountA[i])});
 			}
 		}
-		if( themeObj.szFlag.match(/EXACT/) && !themeObj.szFlag.match(/NOSORT/) ){
-			sortA.sort((a,b) => {
-				return b.count - a.count; 
-			});
-		}else
 		if( themeObj.szFlag.match(/AREA/) && themeObj.szFlag.match(/STACKED/) && !themeObj.szShowParts ){
 			sortA.sort((a,b) => {
 				return b.index - a.index;
 			});
+		}else
+		if( !themeObj.szFlag.match(/NOSORT/) ){
+			sortA.sort((a,b) => {
+				return b.count - a.count; 
+			});
 		}
-
 		// clip legend rows !!
 		nRows = Math.min(500,Math.min(colorA.length,labelA.length));
 
@@ -354,7 +351,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		var szHtml = "";
 
 		// show theme filter, if defined
-		if (themeObj.szFilter){
+		if (themeObj.szFilter && themeObj.szFilter.length > 5 ){
 			szHtml += "<p class='legend-filter' ><span class='icon icon-filter' style='float:left;padding:0.2em 0.5em;'></span><span class='legend-filter-text'>"+themeObj.szFilter+"</span><a href='javascript:ixmaps.changeThemeStyle(null,null,\"filter\",\"remove\");' title=\"remove\" ><span class='icon icon-cancel-circle' style='float:right;padding:0.2em 0.5em;'></span></a></p>";
 		}
 
@@ -473,7 +470,24 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 				szHtml += "</a>";
 				szHtml += "</span>";
 
-				szHtml += sortA[i].count?("<span class='theme-legend-count' style='color:#888888;float:right'> "+szCount+" "+szUnit+"</span>"):"";
+				if ( sortA[i].count ){
+					szHtml += "<span class='theme-legend-count' style='color:#888888;float:right'> "+szCount+" "+szUnit+"</span>";
+				}else
+				if ( (typeof(themeObj.nMinA[i]) != "undefined") && 
+					 (typeof(themeObj.nMaxA[i]) != "undefined") &&
+					 (themeObj.nMinA[i] < themeObj.nMaxA[i]) ){
+					szHtml += "<span style='padding-left:10px'>"+ ixmaps.__formatValue(themeObj.nMinA[i],2,"BLANK")+" "+szUnit+"</span>  ... <span style='padding-left:5px'>"+ ixmaps.__formatValue(themeObj.nMaxA[i],2,"BLANK")+" "+szUnit+"</span>";
+				}else
+				if ( (typeof(themeObj.nOrigMinA[i]) != "undefined") && 
+					 (typeof(themeObj.nOrigMaxA[i]) != "undefined") &&
+					 (themeObj.nOrigMinA[i] < themeObj.nOrigMaxA[i]) ){
+					szHtml += "<span style='padding-left:10px'>"+ ixmaps.__formatValue(themeObj.nOrigMinA[i],2,"BLANK")+" "+szUnit+"</span>  ... <span style='padding-left:5px'>"+ ixmaps.__formatValue(themeObj.nOrigMaxA[i],2,"BLANK")+" "+szUnit+"</span>";
+				}else
+				if ( (typeof(themeObj.partsA[i].min) != "undefined") && (typeof(themeObj.partsA[i].max) != "undefined") ){
+					szHtml += "<span style='padding-left:10px'>"+ ixmaps.__formatValue(themeObj.partsA[i].min,2,"BLANK")+" "+szUnit+"</span>  ... <span style='padding-left:5px'>"+ ixmaps.__formatValue(themeObj.partsA[i].max,2,"BLANK")+" "+szUnit+"</span>";
+				}else{
+					console.log(themeObj);
+				}
 
 				szHtml += "</div>";
 				szHtml += "</div>";
@@ -481,7 +495,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			}
 		}else{
 			if ( ((themeObj.nMinValue||themeObj.nMin) != 1) || ((themeObj.nMaxValue||themeObj.nMax) != 1) ){
-				szHtml += "<tr valign='top'><td><span onclick='javascript:ixmaps.hideThemeClass(\""+szId+"\","+0+")'  style='background:"+colorA[0]+";font-size:0.7em;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td><span style='padding-left:5px'>"+ ixmaps.__formatValue((themeObj.nMinValue||themeObj.nMin),2,"BLANK")+" "+szUnit+"</span></td><td> &nbsp;...</td><td><span style='padding-left:5px'>"+ ixmaps.__formatValue((themeObj.nMaxValue||themeObj.nMax),2,"BLANK")+" "+szUnit+"</span></td></tr>";
+				szHtml += "<tr valign='top'><td><span onclick='javascript:ixmaps.hideThemeClass(\""+szId+"\","+0+")'  style='background:"+colorA[0]+";font-size:0.7em;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td><span style='padding-left:5px'>"+ ixmaps.__formatValue((themeObj.nMinValue||themeObj.nMin),2,"BLANK")+" "+((szUnit.length<5)?szUnit:"")+"</span></td><td> ...</td><td><span style='padding-left:5px'>"+ ixmaps.__formatValue((themeObj.nMaxValue||themeObj.nMax),2,"BLANK")+" "+szUnit+"</span></td></tr>";
 			}else{
 				szHtml += "<tr valign='top'><td><span onclick='javascript:ixmaps.hideThemeClass(\""+szId+"\","+0+")'  style='background:"+colorA[0]+";font-size:0.7em;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td><span style='padding-left:5px'>"+ (themeObj.szLabelA || themeObj.szFields) +"</td></tr>";
 			}

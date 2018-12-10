@@ -42,8 +42,7 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 
 	}
 
-
-	// output file information
+	// file execution = load the project
 	function ParseFile(file) {
 
 		var reader = new FileReader();
@@ -51,9 +50,11 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 
 		reader.onload = function(event){
 			ixmaps.setProject(event.target.result);
+			$("#loadProject").hide();
+			$("#themeLegendDiv").show();
 		}
-	}
 
+	}
 
 	// initialize
 	function Init() {

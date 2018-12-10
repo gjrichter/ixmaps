@@ -135,12 +135,14 @@ window.ixmaps.data = window.ixmaps.data || {};
 	var __redrawFacets = function (szFilter) { 
 		$("#facets").html('<h2 style="padding:0.2em 0.5em;background:#dddddd;border-radius:5px;color:white">refresh facets ...<img src="resources/images/bg-spinner.gif" style="display:block;margin:1em auto;height:32px"></h2>');
 
-		setTimeout("ixmaps.data.makeFacets(null,'facetDiv')",100);
+		setTimeout("ixmaps.data.makeFacets('"+szFilter+"','facetDiv')",1000);
+		/**
 		if (szFilter) {
 			setTimeout("$('#btn-solo-attivi').click()", 100);
 		} else {
 			setTimeout("$('#btn-tutti').click()", 100);
 		}
+		**/
 		//alert($(".story-body").scrollTop());
 	};
 
@@ -605,18 +607,19 @@ window.ixmaps.data = window.ixmaps.data || {};
 				}
 			});
 		}
+		/**
 		// if yes, get the selected facet to the top of the list
 		nSelectA.forEach(function (nSelect) {
 			var toTop = facetsA.slice(nSelect, nSelect + 1);
 			facetsA.splice(nSelect, 1);
 			facetsA.splice(0, 0, toTop[0]);
 		});
-
+		**/
 		for (var i = 0; i < facetsA.length; i++) {
 
 			var fActiveFacet = false;
 			var szActiveFilter = null;
-			var szSafeId = facetsA[i].id.replace(/ |:|\(|\)|\./g, "_");
+			var szSafeId = facetsA[i].id.replace(/ |:|\(|\)|\.|\#|\//g, "_");
 
 			__facetFilterA.forEach(function (szFilter, index) {
 				if (szFilter.split("\"")[1] == facetsA[i].id) {
@@ -640,7 +643,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 			szHtml += "<div style='font-family:arial;font-size:1.1em;text-align:left;padding:0.5em 0.5em 0.5em 0.5em;margin:1em 0 0.4em 0;background:" + bgColor + ";border-radius:5px;color:white'>";
 			szHtml += facetsA[i].id;
 			szHtml += (typeof (facetsA[i].min) != "undefined") ? ((facetsA[i].min != facetsA[i].max) ? (": " + szMin + " - " + szMax) : (": " + szMin)) : "";
-			szHtml += fActiveFacet ? "<span style='float:right;margin-right:0em'><i class='shareIcon   share_bitly icon-cancel-circle' title='Share a short link' tabindex='-1'></i></span>" : "";
+			szHtml += fActiveFacet ? "<span style='float:right;margin-right:0em'><i class='icon shareIcon share_bitly icon-cancel-circle' title='Share a short link' tabindex='-1'></i></span>" : "";
 			szHtml += "</div>";
 			szHtml += fActiveFacet ? "</a>" : "";
 

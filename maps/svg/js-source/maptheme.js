@@ -1441,7 +1441,10 @@ Map.Themes.prototype.loadExternalData = function (szData, fRefresh, themeObj) {
 		// 
 
 		if ((this.__test && fCached && !(themeObj.fDataCache == false))) {
-			this.fWaitingforData = false;
+
+			this.fWaitforData = false;
+			themeObj.fWaitingforData = false;
+
 			_TRACE("data is already loaded, then make the theme");
 			// data is already loaded, then make the theme 
 			executeWithMessage('map.Themes.execute()', szMessage);
@@ -1465,7 +1468,9 @@ Map.Themes.prototype.loadExternalData = function (szData, fRefresh, themeObj) {
 						"coTableExt": themeObj.coTableExt
 					};
 
-					this.fWaitingforData = true;
+					this.fWaitforData = true;
+					themeObj.fWaitingforData = true;
+
 					SVGMessageGroup.fu.clear();
 					HTMLWindow.ixmaps.htmlgui_loadExternalData(themeObj.coTableUrl, {
 						"theme": themeObj,
@@ -1492,28 +1497,8 @@ Map.Themes.prototype.loadExternalData = function (szData, fRefresh, themeObj) {
 		}
 	}
 };
-Map.Themes.prototype.loadExternalDataUrlZipped = function (szData, szUrl, fRefresh, szMessage) {
-	this.fWaitingforData = true;
-	displayMessage(map.Dictionary.getLocalText("... loading data ..."));
-	_TRACE("... loading data ...");
-	var jsLoader = new JSLoader();
-	jsLoader.finishedCallback = "map.Themes.loadExternalDataFinish('" + szMessage + "')";
-	jsLoader.errorCallback = "map.Themes.loadExternalDataUrl('" + szData + "','" + szUrl + "'," + fRefresh + ",'" + szMessage + "')";
-	jsLoader.szMessage = map.Dictionary.getLocalText("... loading data ...");
-	jsLoader.loadScript(szUrl + ".gz", fRefresh);
-};
-Map.Themes.prototype.loadExternalDataUrl = function (szData, szUrl, fRefresh, szMessage) {
-	this.fWaitingforData = true;
-	displayMessage(map.Dictionary.getLocalText("... loading data ..."));
-	_TRACE("... loading data ...");
-	var jsLoader = new JSLoader();
-	jsLoader.finishedCallback = "map.Themes.loadExternalDataFinish('" + szMessage + "')";
-	jsLoader.errorCallback = "map.Themes.loadExternalDataDefault('" + szData + "'," + fRefresh + ",'" + szMessage + "')";
-	jsLoader.szMessage = map.Dictionary.getLocalText("... loading data ...");
-	jsLoader.loadScript(szUrl, fRefresh);
-};
 Map.Themes.prototype.loadExternalDataZipped = function (szData, fRefresh, szMessage) {
-	this.fWaitingforData = true;
+	this.fWaitforData = true;
 	displayMessage(map.Dictionary.getLocalText("... loading data ..."));
 	_TRACE("... loading data ...");
 	var jsLoader = new JSLoader();
@@ -1523,7 +1508,7 @@ Map.Themes.prototype.loadExternalDataZipped = function (szData, fRefresh, szMess
 	jsLoader.loadScript(map.mapRoot+szData + ".js.gz", fRefresh);
 };
 Map.Themes.prototype.loadExternalDataDefault = function (szData, fRefresh, szMessage) {
-	this.fWaitingforData = true;
+	this.fWaitforData = true;
 	displayMessage(map.Dictionary.getLocalText("... loading data ..."));
 	_TRACE("... loading data ...");
 	var jsLoader = new JSLoader();
@@ -1534,9 +1519,37 @@ Map.Themes.prototype.loadExternalDataDefault = function (szData, fRefresh, szMes
 	jsLoader.loadScript(map.mapRoot+szData + ".js", fRefresh);
 };
 Map.Themes.prototype.loadExternalDataFinish = function (szMessage) {
-	this.fWaitingforData = false;
+	this.fWaitforData = false;
 	executeWithMessage('map.Themes.execute()', szMessage);
 };
+
+/**
+ * set external data 
+ * create the data object (name given by szDataName) 
+ * unblock the theme that is waiting for this data name
+ * @parameter szThemeId the ID of the waiting theme (may be null)
+ * @parameter dataObj loadad data in an internal (jsonDB) data table format
+ * @parameter szDataName the name of the data object to create
+ */
+Map.Themes.prototype.setExternalData = function (szThemeId,dataObj,szDataName) {
+	// create the data object with the desired name, must be identical to style ...
+	// export argument dataObj, necessary for javascript compressin by Google Code Compiler 
+	if ( dataObj ){
+		this._dataObj = dataObj;
+		eval(szDataName+" = this._dataObj");
+	}
+	// remove flag that bloks the theme execution (because we were waiting for the data)
+	this.fWaitforData = false;
+	var themesA = this.getAllThemes();
+	for ( i in themesA ){
+		if ( themesA[i].coTable == szDataName ){
+			themesA[i].fWaitingforData = false;
+		}
+	}
+	// retrigger theme execution
+	this.execute();
+};
+
 /**
  * activate a MapTheme 
  * @parameter evt the event
@@ -1584,6 +1597,7 @@ Map.Themes.prototype.removeAll = function (evt) {
 		}
 	}
 	//executeWithMessage("map.Themes.execute()","... processing ...");
+	this.fWaitforData = true;
 	map.Themes.execute();
 	if (evt) {
 		evt.stopPropagation();
@@ -1601,6 +1615,7 @@ Map.Themes.prototype.removeAllCharts = function (evt) {
 		}
 	}
 	//executeWithMessage("map.Themes.execute()","... processing ...");
+	this.fWaitforData = true;
 	map.Themes.execute();
 	if (evt) {
 		evt.stopPropagation();
@@ -1617,6 +1632,7 @@ Map.Themes.prototype.removeAllChoropleth = function (evt) {
 			this.themesA[i].fRemove = !this.themesA[i].fRealize;;
 		}
 	}
+	this.fWaitforData = true;
 	executeWithMessage("map.Themes.execute()", "... processing ...");
 	if (evt) {
 		evt.stopPropagation();
@@ -1684,7 +1700,7 @@ Map.Themes.prototype.execute = function () {
 	var fDisable = false;
 	var i = 0;
 
-	if (this.fWaitingforData) {
+	if (this.fWaitforData) {
 		return;
 	}
 	if (map.Tiles.isLoading()) {
@@ -1731,6 +1747,11 @@ Map.Themes.prototype.execute = function () {
 	}
 	// execute projected methods
 	for (i = 0; i < this.themesA.length; i++) {
+
+		if (this.themesA[i].fWaitingforData) {
+			return;
+		}
+
 		if (this.themesA[i].fToggle) {
 			_TRACE("Toggle =====>");
 			this.themesA[i].toggle();
@@ -3243,6 +3264,18 @@ Map.Themes.prototype.doChangeThemeStyle = function (szId, szStyle, szFlag) {
 			if (__isdef(styleObj.valuedecimals)) {
 				mapTheme.szValueDecimals = styleObj.valuedecimals;
 				//				mapTheme.fRealize = true;
+				mapTheme.fRedraw = true;
+			}
+			if (__isdef(styleObj.valuescale)) {
+				mapTheme.nValueScale = __calcNewValue(mapTheme.nValueScale, Number(styleObj.valuescale), szFlag);
+				mapTheme.fRedraw = true;
+			}
+			if (__isdef(styleObj.linewidth)) {
+				mapTheme.nLineWidth = __calcNewValue(mapTheme.nLineWidth, Number(styleObj.linewidth), szFlag);
+				mapTheme.fRedraw = true;
+			}
+			if (__isdef(styleObj.linecolor)) {
+				mapTheme.szLineColor = String(styleObj.linecolor);
 				mapTheme.fRedraw = true;
 			}
 			// GR 21.03.2009 define scaledependency for value label 
@@ -4880,12 +4913,7 @@ Map.Themes.prototype.actualizeActiveTheme = function (nZoomChangeFactor) {
 					this.themesA[i].fRedraw = true;
 				}
 			} else {
-				if (0&&(this.themesA[i].szFlag.match(/AGGREGATE/) || this.themesA[i].szFlag.match(/GROUP/))) {
-					alert("bingo");
-					this.themesA[i].fRedraw = true;
-				} else {
-					this.themesA[i].fActualize = true;
-				}
+				this.themesA[i].fActualize = true;
 			}
 		} else if (this.themesA[i].isChecked && !this.themesA[i].fMarkClass) {
 			this.themesA[i].fRedraw = true;
@@ -7376,7 +7404,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer) {
 
 				if (this.__fExact) {
 					nValue = this.getStringValueIndex(String(nValue));
-					this.exactCountA[nValue - 1]++;
+					this.exactCountA[nValue - 1] = (this.exactCountA[nValue - 1]||0)+1;
 				} else
 				if (this.__fScanValue) {
 					// GR 17.01.2014 strip all blancs ( es. 12 345 456.34 --> 12345456.34 )
@@ -7675,9 +7703,8 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer) {
 		}
 	}
 
-	if ( aggregationCount ){
-		_TRACE("**aggregated.on.loading: " + aggregationCount + "**");
-	}
+	_TRACE("**aggregated.on.loading: " + aggregationCount + "**");
+
 	console.log(this);
 
 	_TRACE("coTable: " + this.nMissingLookupCount + " lookups missing");
@@ -8583,44 +8610,25 @@ MapTheme.prototype.aggregateValues = function () {
 			// ---------------------------
 			uniqueTopicA[t] = [];
 			var tItem = null;
-			if (1) {
-				for (a in itemA) {
-					if (tItem == null) {
-						tItem = uniqueTopicA[t][a] = itemA[a];
-						tItem.nCount = 1;
-						tItem.dbIndexA = tItem.dbIndexA || [];
-						tItem.nSize = (tItem.nSize || 1);
-						tItem.nAlpha = (tItem.nAlpha || 1);
-					} else {
-						for (var v = 0; v < itemA[a].nValuesA.length; v++) {
-							tItem.nValuesA[v] += (itemA[a].nValuesA[v] || 0);
-							tItem.nOrigValuesA[v] += (itemA[a].nOrigValuesA[v] || 0);
-						}
-						tItem.nCount += 1;
-						tItem.nValue100 += itemA[a].nValue100;
-						tItem.nSize += (itemA[a].nSize || 1);
-						tItem.nAlpha += (itemA[a].nAlpha || 1);
-						tItem.szValue = String(tItem.nSize);
-						tItem.szTitle = (this.formatValue(tItem.nCount, 0) + " " + map.Dictionary.getLocalText("items aggregated"));
-						tItem.dbIndexA.push(itemA[a].dbIndex);
+			for (a in itemA) {
+				if (tItem == null) {
+					tItem = uniqueTopicA[t][a] = itemA[a];
+					tItem.nCount = 1;
+					tItem.dbIndexA = tItem.dbIndexA || [];
+					tItem.nSize = (tItem.nSize || 1);
+					tItem.nAlpha = (tItem.nAlpha || 1);
+				} else {
+					for (var v = 0; v < itemA[a].nValuesA.length; v++) {
+						tItem.nValuesA[v] += (itemA[a].nValuesA[v] || 0);
+						tItem.nOrigValuesA[v] += (itemA[a].nOrigValuesA[v] || 0);
 					}
-				}
-			} else {
-				for (a in itemA) {
-					if (tItem == null) {
-						tItem = uniqueTopicA[t][a] = itemA[a];
-						tItem.nCount = 1;
-						tItem.dbIndexA = tItem.dbIndexA || [];
-						tItem.nSize = (tItem.nSize || 1);
-						tItem.nAlpha = (tItem.nAlpha || 1);
-					} else {
-						for (var v = 0; v < itemA[a].nValuesA.length; v++) {
-							tItem.nValuesA[v] += (itemA[a].nValuesA[v] || 0);
-							tItem.nOrigValuesA[v] += (itemA[a].nOrigValuesA[v] || 0);
-						}
-						tItem.nCount += 1;
-						//tItem.dbIndexA.push(itemA[a].dbIndex);
-					}
+					tItem.nCount += 1;
+					tItem.nValue100 += itemA[a].nValue100;
+					tItem.nSize += (itemA[a].nSize || 1);
+					tItem.nAlpha += (itemA[a].nAlpha || 1);
+					tItem.szValue = String(tItem.nSize);
+					tItem.szTitle = (this.formatValue(tItem.nCount, 0) + " " + map.Dictionary.getLocalText("items aggregated"));
+					tItem.dbIndexA.push(itemA[a].dbIndex);
 				}
 			}
 		}
@@ -9076,10 +9084,6 @@ MapTheme.prototype.distributeValues = function () {
 				}
 			}
 		}
-	}
-
-	if ( 0 && this.szFlag.match(/ZOOMTO/) ) {
-		this.zoomTo();
 	}
 
 	if (this.szFlag.match(/AGGREGATE/) || this.szFlag.match(/GROUP/)) {
@@ -10081,11 +10085,7 @@ MapTheme.prototype.unpaintMap = function () {
 			}
 
 			var szId = this.chartGroup.getAttributeNS(null, "id");
-			if (1 || this.szFlag.match(/CLIP/) || this.szFlag.match(/CLEAR/) || this.nGridWidthPx) {
-				map.Dom.removeElementById(szId);
-			} else {
-				executeWithMessage("map.Dom.removeElementById('" + szId + "');", "cleaning up ...");
-			}
+			map.Dom.removeElementById(szId);
 			this.chartGroup = null;
 		}
 		return;
@@ -10381,6 +10381,7 @@ MapTheme.prototype.markClass = function (nClass, nStep) {
 
 	var j;
 	var tilesNodesA = null;
+	var nIsolateGrayStrokeWidth = ((this.fShadow?5:10)/this.nScale);
 	if (this.szFlag.match(/CHART/)) {
 		var chartsA = this.chartGroup.childNodes;
 		var toTopA = [];
@@ -10410,19 +10411,6 @@ MapTheme.prototype.markClass = function (nClass, nStep) {
 
 							var value = Number(childNode.getAttributeNS(szMapNs, "class"));
 
-							if (0 && this.szFlag.match(/PIE/) && ((this.szFieldsA.length > 1) || (this.szFlag.match(/AGGREGATE/) && this.szFlag.match(/EXACT/)))) {
-								if ((this.markedClasses[value] == true)) {
-									if (this.szFlag.match(/VALUES/) || DonutCharts.partDrawOut(childNode)) {
-										childNode.style.setProperty("opacity", "1", "");
-									}
-									childNode.style.setProperty("display", "inline", "");
-								} else {
-									if (!DonutCharts.partDrawIn(childNode)) {
-										childNode.style.setProperty("display", "none", "");
-									}
-									//childNode.style.setProperty("opacity","0.2","");
-								}
-							} else
 							if (this.szFlag.match(/BAR/) && this.szFlag.match(/3D/) && !this.szFlag.match(/STACKED/) && ((this.szFieldsA.length > 1) || (this.szFlag.match(/AGGREGATE/) && this.szFlag.match(/EXACT/)))) {
 								if ((this.markedClasses[value] == true)) {
 									childNode.setAttributeNS(null, "transform", "matrix(1 0 0 1 -10 6.6)");
@@ -10450,9 +10438,11 @@ MapTheme.prototype.markClass = function (nClass, nStep) {
 								}
 							} else {
 								if (this.evidenceMode == "isolate_gray") {
+									if (!childNode.getAttributeNS(szMapNs, "save-style")) {
+										childNode.setAttributeNS(szMapNs, "save-style", childNode.getAttributeNS(null, "style"));
+									}
 									if (!childNode.getAttributeNS(szMapNs, "fill")) {
 										childNode.setAttributeNS(szMapNs, "fill", childNode.style.getPropertyValue("fill"));
-										childNode.setAttributeNS(szMapNs, "stroke", childNode.style.getPropertyValue("stroke"));
 										childNode.setAttributeNS(szMapNs, "fill-opacity", childNode.style.getPropertyValue("fill-opacity"));
 									}
 									childNode.style.setProperty("fill", "#bbbbbb", "");
@@ -10460,12 +10450,12 @@ MapTheme.prototype.markClass = function (nClass, nStep) {
 										childNode.style.setProperty("stroke", "#888888", "");
 									}
 									var fillopacity = childNode.getAttributeNS(szMapNs, "fill-opacity");
-									if (this.szFlag.match(/SEQUENCE/)) {
+									if (this.szFlag.match(/SEQUENCE/)||this.szFlag.match(/WAFFLE/)) {
 										childNode.style.setProperty("fill-opacity", "0", "");
 										childNode.style.setProperty("stroke-opacity", String(fillopacity*0.9), "");
-										childNode.style.setProperty("stroke-width", "20", "");
+										childNode.style.setProperty("stroke-width", String(nIsolateGrayStrokeWidth), "");
 									}else{
-										childNode.style.setProperty("fill-opacity", String(fillopacity*0.5), "");
+										childNode.style.setProperty("fill-opacity", String(0), "");
 									}
 								} else {
 									childNode.style.setProperty("display", "none", "");
@@ -10640,28 +10630,17 @@ MapTheme.prototype.unmarkClass = function (nClass) {
 									childNode.setAttributeNS(null, "transform", szTransform);
 								}
 							}
-
-							if (0 && this.szFlag.match(/PIE/)) {
-								DonutCharts.partDrawIn(childNode);
-								childNode.style.setProperty("opacity", "1", "");
-							}
 							if (this.szFlag.match(/BAR/) && this.szFlag.match(/3D/) && !this.szFlag.match(/STACKED/)) {
 								childNode.setAttributeNS(null, "transform", "matrix(1 0 0 1 0 0)");
 								childNode.style.setProperty("fill-opacity", "1", "");
 							}
 							if (childNode.style) {
 								childNode.style.setProperty("display", "inline", "");
-								if (value = childNode.getAttributeNS(szMapNs, "fill")) {
-									childNode.style.setProperty("fill", value, "");
+
+								if (childNode.getAttributeNS(szMapNs, "save-style")) {
+									childNode.setAttributeNS(null, "style", childNode.getAttributeNS(szMapNs, "save-style"));
 								}
-								if (value = childNode.getAttributeNS(szMapNs, "stroke")) {
-									childNode.style.setProperty("stroke", value, "");
-								}
-								if (value = childNode.getAttributeNS(szMapNs, "fill-opacity")) {
-									childNode.style.setProperty("fill-opacity", value, "");
-								} else if (value == "") {
-									childNode.style.setProperty("fill-opacity", "1", "");
-								}
+
 							}
 						}
 					}
@@ -12897,53 +12876,6 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			//newShape = map.Dom.newShape('circle',chartGroup,0,0,map.Scale.normalX(0.2),"fill:"+this.chart.szColor+";stroke:"+(this.szLineColor||this.chart.szLineColor)+";stroke-width:"+(this.szTextColor||this.chart.szLineColor)+";");
 			// GR test fast DOT
 			newShape = map.Dom.newShape('circle', chartGroup, 0, 0, map.Scale.normalX(3), "fill:" + this.chart.szColor + ";stroke:none;");
-			return new point(0, 0);
-
-
-			var nSize = 1;
-
-			var nValue = nPartsA[0];
-
-			// GR 26.06.2006 bubbles with colorscheme (classes)
-			if (szFlag.match(/EXACT/) || (this.colorScheme.length > 2) || (this.szRanges && this.szRanges.length)) {
-				fDoDraw = false;
-				for (i = 0; i < this.partsA.length; i++) {
-					if (nValue < this.partsA[i].max) {
-						this.chart.szColor = this.colorScheme[i];
-						var cColor = __maptheme_getChartColors(szColor);
-						if (szFlag.match(/NOLINES/)) {
-							this.chart.szLineColor = "none";
-						} else {
-							this.chart.szLineColor = cColor.textColor;
-						}
-						if (szFlag.match(/RANGE/) && !szFlag.match(/RANGES/)) {
-							nSize = map.Scale.normalX(2 + 5 * (i + 1) / this.partsA.length);
-						}
-						// value attributes are defined in child nodes
-						//chartGroup.setAttributeNS(szMapNs, "value", "seechilds");
-						nClass = i;
-						fDoDraw = true;
-						break;
-					}
-				}
-			}
-
-			var nLineWidth = map.Scale.normalX((this.nLineWidth || 0.1) / nChartSize * nSize);
-			if (szFlag.match(/OUTLINE/)) {
-				nLineWidth = map.Scale.normalX(Math.min(1, 1 / nChartSize * nSize));
-			}
-
-			var shapeGroup = map.Dom.newGroup(chartGroup, this.szId + ":" + a + (a ? ":chartgroup" : ":ochrtgroup"));
-			newShape = map.Dom.newShape('circle', shapeGroup, 0, 0, map.Scale.normalX(nSize), "fill:" + this.chart.szColor + ";stroke:" + (this.szLineColor || this.chart.szLineColor) + ";stroke-width:" + (this.szTextColor || this.chart.szLineColor) + ";");
-			if (newShape) {
-				newShape.setAttributeNS(szMapNs, "tooltip", this.formatValue(nPartsA[0], 2) + this.szUnit + " " + this.szTitle + "");
-				// define value and class, if set 
-				//
-				if (nClass != null) {
-					newShape.setAttributeNS(szMapNs, "value", String(nValue));
-					newShape.setAttributeNS(szMapNs, "class", String(nClass));
-				}
-			}
 
 			return new point(0, 0);
 
@@ -12962,17 +12894,18 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		// GR 26.08.2015 AGGREGATE|EXACT themes are like multiple field themes, but have fieldsA with length 1, so take colorscheme   
 		if (this.szOrigFlag.match(/AGGREGATE/) && this.szOrigFlag.match(/EXACT/)) {
 			for (var i = 0; i < this.colorScheme.length; i++) {
-				nPartsA[i] = this.nOrigSumA[i];
-				nMax = Math.max(nMax, this.nOrigSumA[i]);
+				nPartsA[i] = this.nOrigSumA[i] || this.exactCountA[i] || 1;
+				nMax = Math.max(nMax, this.nOrigSumA[i] || this.exactCountA[i] || 1);
 				nMySum += nPartsA[i];
 			}
 		} else {
 			for (var i = 0; i < this.szFieldsA.length; i++) {
-				nPartsA[i] = this.nOrigSumA[i];
-				nMax = Math.max(nMax, this.nOrigSumA[i]);
+				nPartsA[i] = this.nOrigSumA[i] || 1;
+				nMax = Math.max(nMax, this.nOrigSumA[i] || 1);
 				nMySum += nPartsA[i];
 			}
 		}
+
 		var nValue100 = this.nSum100;
 		if (nValue100) {
 			nMax = 0;
@@ -13491,8 +13424,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			var nRadius = Math.sqrt(Math.pow(map.Scale.normalX(nSize), 2) / 100 * this.nCenterSize);
 			var szColor = this.colorScheme[this.nCenter];
 			var circle = map.Dom.newShape('circle', shapeGroup, 0, 0, nRadius * 0.95, "fill:" + szColor + ";");
-			circle.setAttributeNS(szMapNs, "class", String(this.nCenter));
-			circle.setAttributeNS(szMapNs, "tooltip", this.szLabelA ? (this.szLabelA[this.nCenter] + ": " + nPartsA[this.nCenter] + this.szUnit + "") : (nPartsA[this.nCenter] + this.szUnit));
+			if (circle){
+				circle.setAttributeNS(szMapNs, "class", String(this.nCenter));
+				circle.setAttributeNS(szMapNs, "tooltip", this.szLabelA ? (this.szLabelA[this.nCenter] + ": " + nPartsA[this.nCenter] + this.szUnit + "") : (nPartsA[this.nCenter] + this.szUnit));
+			}
 			if (szFlag.match(/CENTERVALUE/) || szFlag.match(/ZOOM/) || (szFlag.match(/VALUES/) && !this.fHideValues)) {
 				var szText = this.formatValue(this.nCenterValue, this.szValueDecimals || (((this.nCenterSize < 1) || (nMaxValue < 10)) ? 0 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
 				var cColor = __maptheme_getChartColors(szColor);
@@ -14010,7 +13945,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							szText = "+" + szText;
 						}
 					}
-					var nFontSize = String(Math.min(nRadius * 0.8, nRadius * (3.3 / szText.length)));
+					var nFontSize = String(Math.min(nRadius * 0.8, nRadius * (3.3 / szText.length))) * this.nValueScale;
 
 					if (szFlag.match(/TEXTONLY/)) {
 						var cColor = __maptheme_getChartColors(szColor);
@@ -18163,7 +18098,6 @@ MapTheme.prototype.removeDefinition = function (szFlag, szDef) {
 	return szNewFlag;
 };
 
-9
 /**
  * add a size sign to the chart group
  * @param targetGroup the group where to create the sign
@@ -18312,6 +18246,9 @@ MapTheme.prototype.getChartTypeMenu = function (targetGroup, szType, nMaxWidth) 
 		if (merkFlag.match(/AGGREGATE/)) {
 			this.szFlag += "|AGGREGATE";
 		}
+		if (merkFlag.match(/FAST/)) {
+			this.szFlag += "|FAST";
+		}
 		if (merkFlag.match(/RELOCATE/)) {
 			this.szFlag += "|RELOCATE";
 		}
@@ -18373,7 +18310,18 @@ MapTheme.prototype.getChartTypeMenu = function (targetGroup, szType, nMaxWidth) 
 		var szTemp = this.szAggregation;
 		//		this.szAggregation = "mean";
 
+		var nTempClipParts = this.nClipParts;
+		this.nClipParts = 10;
+
+		// ----------------------------------------------------------
 		var ptNull = this.drawChart(donutGroup, null, nSwatch * 2 / 3);
+		// ----------------------------------------------------------
+
+		if ( typeof nTempClipParts === 'undefined' ){
+			delete this.nClipParts;
+		}else{
+			this.nClipParts = nTempClipParts;
+		}
 
 		this.szAggregation = szTemp;
 
@@ -18383,6 +18331,13 @@ MapTheme.prototype.getChartTypeMenu = function (targetGroup, szType, nMaxWidth) 
 			var nMargin = map.Scale.normalX(10);
 			ptNull.x -= map.Scale.normalX(nSwatch / nNewLine);
 			donutGroup.fu.setPosition(nMargin - ptNull.x + (i % nNewLine) * map.Scale.normalX(nSwatch), map.Scale.normalY(nSwatch * 2 / 3) + nMargin + ptNull.y + Math.floor(i / nNewLine) * map.Scale.normalY(nSwatch));
+
+			donutGroup.setAttributeNS(null,"clip-path","");
+			var nSize = Math.max(donutGroup.fu.getBox().width,donutGroup.fu.getBox().height);
+			nScale = 900/nSize;
+			if ( nScale < 1 ){
+				donutGroup.fu.scale(nScale,nScale);
+			}
 
 			var szOrigFlagKeep = "";
 			if (szOrigFlag.match(/UNDEFINEDISVALUE/)) {
@@ -18402,6 +18357,9 @@ MapTheme.prototype.getChartTypeMenu = function (targetGroup, szType, nMaxWidth) 
 			}
 			if (szOrigFlag.match(/AGGREGATE/)) {
 				szOrigFlagKeep += "|AGGREGATE";
+			}
+			if (szOrigFlag.match(/FAST/)) {
+				szOrigFlagKeep += "|FAST";
 			}
 			if (szOrigFlag.match(/RELOCATE/)) {
 				szOrigFlagKeep += "|RELOCATE";
@@ -18473,6 +18431,7 @@ MapTheme.prototype.getChartTypeMenu = function (targetGroup, szType, nMaxWidth) 
 			if (merkFlag.match(/SPACED/)) {
 				szOrigFlagKeep += "|SPACED";
 			}
+
 			aGroup.setAttributeNS(null, "onclick", "map.Themes.changeThemeStyle(evt,'" + this.szId + "','type:" + szTypeList[i] + szOrigFlagKeep + "')");
 
 			this.addChartTypeSign(donutGroup, szTypeList[i]);
