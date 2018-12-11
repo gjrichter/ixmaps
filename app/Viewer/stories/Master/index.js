@@ -97,7 +97,7 @@
 		szHtml = "";
 		szHtml += "<h3>"+themeObj.szTitle+"</h3>";
 		if ( themeObj.szSnippet && typeof(themeObj.szSnippet)!="undefined"){
-			szHtml += "<div style=\"margin:0.5em 1.5em 0.5em 0;font-size:0.9em;\">"+themeObj.szSnippet+"</div>";
+			szHtml += "<div style=\"margin:0.5em 1.5em 0.5em 0;font-size:1.1em;line-height:1.2em\">"+themeObj.szSnippet+"</div>";
 		}
 
 		if ( ixmaps.legend.makeColorLegendHTML ){
@@ -184,6 +184,7 @@
 		}catch (e){}
 
 		$("#loadProject").hide();
+		$("#loadProjectButton").show();
 		$("#themeLegendDiv").show();
 
 		// append or replace legend div
@@ -486,6 +487,7 @@
 
 		if ( ixmaps.makeLayerLegend(2000) ){
 			$("#loadProject").hide();
+			$("#loadProjectButton").show();
 		}
 		
 		if ( szDisplay ){

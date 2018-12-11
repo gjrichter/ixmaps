@@ -398,6 +398,8 @@ Map.Themes.prototype.newTheme = function (szThemes, szFields, szField100, szStyl
 	this.addTheme(mapTheme);
 	mapTheme.fRealize = true;
 
+	mapTheme.initValues();
+
 	if (1 || !fAllIncluded) {
 		if (mapTheme.coTable) {
 			this.loadExternalData(mapTheme.coTable, mapTheme.nRefreshTimeout, mapTheme);
@@ -5715,7 +5717,7 @@ MapTheme.prototype.initValues = function () {
 			this.szAggregation = "sum";
 		}
 	}
-	// GR 24.03.2016 new: aggregation by scale (different aggregation fields with acale lower range)
+	// GR 24.03.2016 new: aggregation by scale (different aggregation fields with scale lower range)
 	// GR 27.01.2017 may be suppressed by maptheme.changeThemeStyle() via this.fSuppressAggregationScale
 	// 
 	if (this.szAggregationFieldA && !this.fSuppressAggregationScale) {
@@ -5748,8 +5750,9 @@ MapTheme.prototype.initValues = function () {
 	// give it the name "genericTable" so we can distinguish it from 'real' external data 
 	// -----------------------------------------------------------------------------------
 	if (!this.coTable || (this.coTable == "genericTable")) {
-		genericTable = this.loadTableFromMap();
-		this.coTable = "genericTable";
+		if ( genericTable = this.loadTableFromMap() ){
+			this.coTable = "genericTable";
+		}
 	}
 };
 
@@ -7719,7 +7722,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer) {
  * load the values of the map theme from the map meta data
  * the meta data is stored in attributes of the items SVG element 
  * @type object
- * @return data table object
+ * @return data table object or null 
  */
 MapTheme.prototype.loadTableFromMap = function () {
 
@@ -10234,8 +10237,8 @@ MapTheme.prototype.zoomToClass = function (nClass, nStep) {
 		var chartsA = this.chartGroup.childNodes;
 		for (var i = 0; i < chartsA.length; i++) {
 			var chartNode = chartsA.item(i);
-			if (chartNode.getAttributeNS(szMapNs, "class") == null){
-			//if (chartNode.getAttributeNS(szMapNs, "value") == "seechilds") {
+			if ( (chartNode.getAttributeNS(szMapNs, "class") == null) ||
+				 (chartNode.getAttributeNS(szMapNs, "class") == "") ){
 				var childA = chartNode.firstChild.childNodes;
 				for (var ii = 0; ii < childA.length; ii++) {
 					var childNode = childA.item(ii);
@@ -10387,8 +10390,8 @@ MapTheme.prototype.markClass = function (nClass, nStep) {
 		var toTopA = [];
 		for (var i = 0; i < chartsA.length; i++) {
 			var chartNode = chartsA.item(i);
-			if ( chartNode.getAttributeNS(szMapNs, "class") == null ){
-			//if (chartNode.getAttributeNS(szMapNs, "value") == "seechilds") {
+			if ( (chartNode.getAttributeNS(szMapNs, "class") == null) ||
+				 (chartNode.getAttributeNS(szMapNs, "class") == "") ){
 
 				// go through all child groups and look for atribute classng
 				// switch on/off elements by class
@@ -10476,11 +10479,11 @@ MapTheme.prototype.markClass = function (nClass, nStep) {
 					}
 				} else {
 					if (this.evidenceMode == "isolate_gray") {
-						chartNode.setAttributeNS(szMapNs, "fill", childNode.style.getPropertyValue("fill"));
+						chartNode.setAttributeNS(szMapNs, "fill", chartNode.style.getPropertyValue("fill"));
 						chartNode.style.setProperty("fill", "#bbbbbb", "");
-						chartNode.setAttributeNS(szMapNs, "stroke", childNode.style.getPropertyValue("fill"));
+						chartNode.setAttributeNS(szMapNs, "stroke", chartNode.style.getPropertyValue("fill"));
 						chartNode.style.setProperty("stroke", "#888888", "");
-						chartNode.setAttributeNS(szMapNs, "fill-opacity", childNode.style.getPropertyValue("fill-opacity"));
+						chartNode.setAttributeNS(szMapNs, "fill-opacity", chartNode.style.getPropertyValue("fill-opacity"));
 						chartNode.style.setProperty("fill-opacity", "0.05", "");
 					} else {
 						chartNode.style.setProperty("display", "none", "");
@@ -10609,8 +10612,8 @@ MapTheme.prototype.unmarkClass = function (nClass) {
 		var chartsA = this.chartGroup.childNodes;
 		for (var i = 0; i < chartsA.length; i++) {
 			var chartNode = chartsA.item(i);
-			if (chartNode.getAttributeNS(szMapNs, "class") == null){
-			//if (chartNode.getAttributeNS(szMapNs, "value") == "seechilds") {
+			if ( (chartNode.getAttributeNS(szMapNs, "class") == null) ||
+				 (chartNode.getAttributeNS(szMapNs, "class") == "") ){
 
 				// go through all child groups
 				// switch on all elements with attribute class
@@ -10738,8 +10741,8 @@ MapTheme.prototype.showClass = function (nClass, nStep, fStatus) {
 		var chartsA = this.chartGroup.childNodes;
 		for (var i = 0; i < chartsA.length; i++) {
 			var chartNode = chartsA.item(i);
-			if (chartNode.getAttributeNS(szMapNs, "class") == null){
-			//if (chartNode.getAttributeNS(szMapNs, "value") == "seechilds") {
+			if ( (chartNode.getAttributeNS(szMapNs, "class") == null) ||
+				 (chartNode.getAttributeNS(szMapNs, "class") == "") ){
 				var childA = chartNode.firstChild.childNodes;
 				for (var ii = 0; ii < childA.length; ii++) {
 					var childNode = childA.item(ii);
