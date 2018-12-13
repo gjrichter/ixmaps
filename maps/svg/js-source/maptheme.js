@@ -13720,6 +13720,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		var newShapeBg2 = null;
 		var newText = null;
 		var newTextBg = null;
+		var newText2 = null;
+		var newText2Bg = null;
 
 		/** 
 			!!! try to do this only once in parent function !!!
@@ -14222,6 +14224,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 		var topShape = null;
 		var topText = null;
+		var topText2 = null;
 		var topGrid = null;
 
 		var nClass = 0;
@@ -14832,7 +14835,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						// set tooltip
 						// -----------
 						if ((szFlag.match(/ZOOM/) || szFlag.match(/NORMSIZE/)) && this.szLabelA) {
-							var szValue = this.formatValue(tValue, 2);
+							var szValue = this.formatValue(nValue, ((nValue<1)?2:0));
 							var szTooltip = szValue + this.szUnit;
 							szTooltip += " - " + this.szLabelA[nIndex % (this.nGridX || 10000000)];
 							if (this.szXaxisA && this.szXaxisA.length) {
@@ -14922,6 +14925,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								}
 							} else {
 								newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:arial;font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szText);
+								if ( this.szValueField ){
+									var nFontSize2 = Math.max(80,Math.min(nFontSize,120)) * ((szFlag.match(/ZOOM/))?2:1);
+									newText2 = map.Dom.newText(shapeGroup, 0, nFontSize2 * 0.33, "font-family:arial;font-size:" + nFontSize2 + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", nValue);
+								}
 							}
 						} else {
 							nFontSize = Math.max(nRadius * 0.8, 1);
@@ -14953,6 +14960,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								// STAR, on first element make star (inner) radius
 								topShape = newShape;
 								topText = newText;
+								topText2 = newText2;
 								nStarRadius = nRadius;
 								if (szFlag.match(/EXPAND/) && szFlag.match(/SORT/) && szFlag.match(/\|UP/)) {
 									if (szFlag.match(/LINEAR/) || szFlag.match(/SIZEP1/)) {
@@ -15051,6 +15059,13 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							}
 							if (newText) {
 								newText.fu.setPosition(pos.x, pos.y);
+							}
+							if (newText2) {
+								newText2.fu.setPosition(pos.x, pos.y+(nFontSize+nFontSize2)/2);
+							}
+						}else{
+							if (newText2) {
+								newText2.fu.setPosition(0, (nFontSize+nFontSize2)/2);
 							}
 						}
 
@@ -15535,6 +15550,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		// also the text !
 		if (topText) {
 			topText.parentNode.appendChild(topText);
+		}
+		if (topText2) {
+			topText2.parentNode.appendChild(topText2);
 		}
 		// also lines on top of the chart !
 		if (topGroup) {
