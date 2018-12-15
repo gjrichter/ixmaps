@@ -332,12 +332,12 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			}
 		}
 		if( themeObj.szFlag.match(/AREA/) && themeObj.szFlag.match(/STACKED/) && !themeObj.szShowParts ){
-			sortA.sort((a,b) => {
+			sortA.sort(function(a,b) {
 				return b.index - a.index;
 			});
 		}else
 		if( !themeObj.szFlag.match(/NOSORT/) ){
-			sortA.sort((a,b) => {
+			sortA.sort(function(a,b) {
 				return b.count - a.count; 
 			});
 		}

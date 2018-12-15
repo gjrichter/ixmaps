@@ -30,7 +30,7 @@ window.ixmaps.totale_incidenti_georef = window.ixmaps.totale_incidenti_georef ||
 
 	ixmaps.totale_incidenti_georef.after = function(dbtable) {
 
-		dbtable.column("ORA").map(value => {
+		dbtable.column("ORA").map(function(value) {
 			return parseInt(value);
 		});
 

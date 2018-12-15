@@ -2142,7 +2142,7 @@ $Log: htmlgui_api.js,v $
 	 */
 	ixmaps.embedMap = function(szTargetDiv,opt,callback){
 	
-		return new Promise((resolve, reject)=>{
+		//return new Promise(function(resolve, reject){
 
 			var target = window.document.getElementById(szTargetDiv);
 			var szName = opt.mapName || "map";
@@ -2201,7 +2201,7 @@ $Log: htmlgui_api.js,v $
 				ixmaps.waitForMap(szName,callback);
 			}else{
 				ixmaps.waitForMap(szName,
-					(map) => {
+					function(map) {
 						if (map ){
 							resolve(map);
 						}else{
@@ -2210,7 +2210,7 @@ $Log: htmlgui_api.js,v $
 					}
 				);
 			}
-		});
+		//});
 	}
 
 

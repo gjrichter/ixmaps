@@ -910,10 +910,10 @@ $Log: htmlgui.js,v $
 
 	ixmaps.copyThemeToClipboard = function(){
 		navigator.clipboard.writeText(JSON.stringify(ixmaps.getThemeDefinitionObj()))
-			.then(() => {
+			.then(function() {
 				ixmaps.message("theme copied",100);
 			})
-			.catch(err => {
+			.catch(function(err) {
 				ixmaps.message("no theme to copy",100);
 				console.log('Something went wrong', err);
 			});
@@ -921,10 +921,10 @@ $Log: htmlgui.js,v $
 
 	ixmaps.pasteThemeFromClipboard = function(){
 		navigator.clipboard.readText()
-			.then(text => {
+			.then(function(text) {
 				this.embeddedSVG.window.map.Api.newMapThemeByObj(JSON.parse(text));
 			})
-			.catch(err => {
+			.catch(function(err) {
 				// maybe user didn't grant access to read from clipboard
 				ixmaps.message("no theme to paste",100);
 				console.log('Something went wrong', err);

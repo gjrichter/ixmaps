@@ -7,7 +7,7 @@
 	ixmaps.totale_incidenti_georef = ixmaps.totale_incidenti_georef || {};
 	ixmaps.totale_incidenti_georef.process = function(dbTable){
 
-		dbTable.column("ORA").map(value => {
+		dbTable.column("ORA").map(function(value) {
 			return parseInt(value);
 		});
 

@@ -885,6 +885,16 @@
 					controls: szControls,
 					silent: decodeURIComponent($(document).getUrlParam('silent'))
 				});
+				var oldReady = ixmaps.onMapReady;
+				ixmaps.onMapReady = function () {
+					if ($(document).getUrlParam('project')) {
+						szProjectUrl = $(document).getUrlParam('project');
+						ixmaps.loadProject(szProjectUrl, false);
+					}
+					oldReady();
+				};
+
+
 			} else {
 				$("#divstart").css("visibility", "visible");
 				$("#divloading").css("visibility", "hidden");
@@ -917,12 +927,6 @@
 				ixmaps.execBookmark(szBookmark, false);
 			}
 
-			// is there a project to load at load ? 
-
-			if ($(document).getUrlParam('project')) {
-				szProjectUrl = $(document).getUrlParam('project');
-				ixmaps.loadProject(szProjectUrl, false);
-			}
 			// show/hide toolsbar elements
 			__switchBannerElements();
 			setTimeout("__switchBannerElements()", 5000);
