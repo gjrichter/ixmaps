@@ -477,6 +477,9 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 					 (typeof(themeObj.nMaxA[i]) != "undefined") &&
 					 (themeObj.nMinA[i] < themeObj.nMaxA[i]) ){
 					szHtml += "<span style='padding-left:10px'>"+ ixmaps.__formatValue(themeObj.nMinA[i],2,"BLANK")+" "+szUnit+"</span>  ... <span style='padding-left:5px'>"+ ixmaps.__formatValue(themeObj.nMaxA[i],2,"BLANK")+" "+szUnit+"</span>";
+					if ( themeObj.nMeanA[i] ){
+						szHtml += "<span style='padding-left:10px' title='mean value'>("+ ixmaps.__formatValue(themeObj.nMeanA[i],2,"BLANK")+")</span>";
+					}
 				}else
 				if ( (typeof(themeObj.nOrigMinA[i]) != "undefined") && 
 					 (typeof(themeObj.nOrigMaxA[i]) != "undefined") &&
@@ -669,7 +672,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		szHtml += "<tr class='legend-range-text' >";
 		szHtml += "<td colspan='"+(span)+"' >"+ixmaps.__formatValue(themeObj.nMin,2,"BLANK")+szUnit+"</td>";
-		szHtml += "<td colspan='"+(nColors - span)+"' align='right'>"+ixmaps.__formatValue(themeObj.nMax,2,"BLANK")+szUnit+"</td>";
+		szHtml += "<td colspan='"+(nColors - span)+"' align='right'> ... "+ixmaps.__formatValue(themeObj.nMax,2,"BLANK")+((szUnit.length<=3)?szUnit:"")+"</td>";
 		szHtml += "</tr>";
 
 		szHtml += "</table>";

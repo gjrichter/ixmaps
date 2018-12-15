@@ -477,11 +477,24 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 				if ( sortA[i].count ){
 					szHtml += "<span class='theme-legend-count' style='color:#888888;float:right'> "+count+" "+szUnit+"</span>";
 				}else
+				if ( (typeof(themeObj.nMinA[i]) != "undefined") && 
+					 (typeof(themeObj.nMaxA[i]) != "undefined") &&
+					 (themeObj.nMinA[i] < themeObj.nMaxA[i]) ){
+					szHtml += "<span style='padding-left:10px'>"+ ixmaps.__formatValue(themeObj.nMinA[i],2,"BLANK")+" "+szUnit+"</span>  ... <span style='padding-left:5px'>"+ ixmaps.__formatValue(themeObj.nMaxA[i],2,"BLANK")+" "+szUnit+"</span>";
+					if ( themeObj.nMeanA[i] ){
+						szHtml += "<span style='padding-left:10px' title='mean value'>("+ ixmaps.__formatValue(themeObj.nMeanA[i],2,"BLANK")+")</span>";
+					}
+				}else
+				if ( (typeof(themeObj.nOrigMinA[i]) != "undefined") && 
+					 (typeof(themeObj.nOrigMaxA[i]) != "undefined") &&
+					 (themeObj.nOrigMinA[i] < themeObj.nOrigMaxA[i]) ){
+					szHtml += "<span style='padding-left:10px'>"+ ixmaps.__formatValue(themeObj.nOrigMinA[i],2,"BLANK")+" "+szUnit+"</span>  ... <span style='padding-left:5px'>"+ ixmaps.__formatValue(themeObj.nOrigMaxA[i],2,"BLANK")+" "+szUnit+"</span>";
+				}else
 				if ( (typeof(themeObj.partsA[i].min) != "undefined") && (typeof(themeObj.partsA[i].max) != "undefined") ){
-					console.log(szUnit);
-					szHtml += "<span style='padding-left:5px'>"+ ixmaps.__formatValue(themeObj.partsA[i].min,2,"BLANK")+" "+szUnit+"</span>  ... <span style='padding-left:5px'>"+ ixmaps.__formatValue(themeObj.partsA[i].max,2,"BLANK")+" "+szUnit+"</span>";
+					szHtml += "<span style='padding-left:10px'>"+ ixmaps.__formatValue(themeObj.partsA[i].min,2,"BLANK")+" "+szUnit+"</span>  ... <span style='padding-left:5px'>"+ ixmaps.__formatValue(themeObj.partsA[i].max,2,"BLANK")+" "+szUnit+"</span>";
+				}else{
+					console.log(themeObj);
 				}
-				//szHtml += sortA[i].count?("<span class='theme-legend-count' style='color:#888888;float:right'> "+count+" "+szUnit+"</span>"):"";
 
 				szHtml += "</div>";
 				szHtml += "</div>";
