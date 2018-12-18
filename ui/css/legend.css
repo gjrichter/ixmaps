@@ -35,6 +35,7 @@
 		min-width:350px;
 		max-width:500px;
 	}
+
 	.map-legend-pane:before {
 		content: ' ';
 		display: block;
@@ -101,6 +102,33 @@
 		background-color:rgba(245,245,245,0.5);	
 		border:solid #ddd 1px;
 	}
+
+	.legend-item-list{
+		margin-top: 0.2em;
+		border-spacing:2px;
+		line-height:1.2em;
+	}
+
+	@media screen and (max-width: 640px) {
+		.map-legend{
+			font-size: 11px;
+		}
+		.map-legend {
+			min-width:250px;
+			max-width:500px;
+		}
+		.theme-legend-item td.theme-legend {
+			line-height: 0.5em;
+		}
+		.legend-item-list{
+			margin-top: 0.2em;
+			line-height:1.2em;
+		}
+		.theme-legend-item {
+			margin-bottom: -0.5em;
+		}
+	}
+
 	.theme-legend-item-selected {
 		background: #DBE6F4;
 	}

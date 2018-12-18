@@ -342,7 +342,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 				sortA.push({index:i,color:(i),count:(themeObj.exactSizeA[i]/themeObj.exactCountA[i])});
 			}
 		}
-		if( themeObj.szFlag.match(/EXACT/) && !themeObj.szFlag.match(/NOSORT/) ){
+		if( !themeObj.szFlag.match(/NOSORT/) ){
 			sortA.sort(this.sortList);
 		}else
 		if( themeObj.szFlag.match(/AREA/) && themeObj.szFlag.match(/STACKED/) && !themeObj.szShowParts ){
@@ -365,7 +365,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		// color legend = table
 		// ---------------------
-		szHtml += "<div id='legend-classes"+szLegendId+"' style='border-spacing:2px;line-height:1.25em;' >";
+		szHtml += "<div id='legend-classes"+szLegendId+"' class='legend-item-list' >";
 
 		var fColorScheme = false; 
 		var fCountBars = false;
@@ -455,7 +455,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 				}
 
 				if ( fCountBars ){
-					var nMaxBar = 200;
+					var nMaxBar = ($("#map-legend").width()-20)*0.5;
 					var nBar = Math.ceil(Math.pow(sortA[i].count,1)*(nMaxBar/Math.pow(nMaxCount,1)));
 					szHtml += "<span style='display:inline-block;width:"+nBar+"px;font-size:0.5em'>&nbsp;</span>";
 				}else{
@@ -774,6 +774,9 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 	// --------------------------------------------------
 
 	ixmaps.htmlgui_onDrawTheme = function(szId){
+
+		// GR 18.12.2018
+		ixmaps.htmlgui_setMapTypeBG(ixmaps.getMapTypeId());
 
 		var themeObj = ixmaps.getThemeObj(szId);
 		if ( !themeObj ) {
