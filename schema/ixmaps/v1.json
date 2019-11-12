@@ -1,0 +1,968 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "metadata",
+    "map",
+    "themes",
+    "layerMask"
+  ],
+  "properties": {
+    "metadata": {
+      "$id": "#/properties/metadata",
+      "type": "object",
+      "title": "The Metadata Schema",
+      "required": [
+        "title",
+        "snippet",
+        "description",
+        "thumbnail",
+        "about",
+        "created"
+      ],
+      "properties": {
+        "title": {
+          "$id": "#/properties/metadata/properties/title",
+          "type": "string",
+          "title": "The Title Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": "^(.*)$"
+        },
+        "snippet": {
+          "$id": "#/properties/metadata/properties/snippet",
+          "type": "string",
+          "title": "The Snippet Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": "^(.*)$"
+        },
+        "description": {
+          "$id": "#/properties/metadata/properties/description",
+          "type": "string",
+          "title": "The Description Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": "^(.*)$"
+        },
+        "thumbnail": {
+          "$id": "#/properties/metadata/properties/thumbnail",
+          "type": "string",
+          "title": "The Thumbnail Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": "^(.*)$"
+        },
+        "about": {
+          "$id": "#/properties/metadata/properties/about",
+          "type": "string",
+          "title": "The About Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": "^(.*)$"
+        },
+        "created": {
+          "$id": "#/properties/metadata/properties/created",
+          "type": "string",
+          "title": "The Created Schema",
+          "default": "",
+          "examples": [
+            "Mon Nov 11 2019 20:18:53 GMT+0100 (Ora standard dell’Europa centrale)"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "map": {
+      "$id": "#/properties/map",
+      "type": "object",
+      "title": "The Map Schema",
+      "required": [
+        "map",
+        "basemap",
+        "scaleParam",
+        "options",
+        "center",
+        "zoom"
+      ],
+      "properties": {
+        "map": {
+          "$id": "#/properties/map/properties/map",
+          "type": "string",
+          "title": "The Map Schema",
+          "default": "",
+          "examples": [
+            "../../maps/svg/maps/generic/mercator.svgz"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "basemap": {
+          "$id": "#/properties/map/properties/basemap",
+          "type": "string",
+          "title": "The Basemap Schema",
+          "default": "",
+          "examples": [
+            "CartoDB - Positron"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "scaleParam": {
+          "$id": "#/properties/map/properties/scaleParam",
+          "type": "object",
+          "title": "The Scaleparam Schema",
+          "required": [
+            "normalSizeScale"
+          ],
+          "properties": {
+            "normalSizeScale": {
+              "$id": "#/properties/map/properties/scaleParam/properties/normalSizeScale",
+              "type": "string",
+              "title": "The Normalsizescale Schema",
+              "default": "",
+              "examples": [
+                "70000"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "options": {
+          "$id": "#/properties/map/properties/options",
+          "type": "object",
+          "title": "The Options Schema",
+          "required": [
+            "featurescaling",
+            "objectscaling",
+            "clipmap",
+            "clipmapdynamic",
+            "dynamiclabel",
+            "labelspace",
+            "checklabeloverlap",
+            "dynamiclayer",
+            "dynamictiles",
+            "discardtiles",
+            "loadmultitiles",
+            "loadsilent",
+            "loadexternaldata",
+            "buttonsize",
+            "fastpan",
+            "panborder",
+            "northarrow",
+            "sidebarbuttons",
+            "tooltipdelay",
+            "popupdelay",
+            "popupgridstyle",
+            "popupalignment",
+            "transparentbackground",
+            "labelscaling",
+            "flushChartDraw",
+            "toolmargintop",
+            "flushPaintShape",
+            "mapopacity",
+            "basemapopacity"
+          ],
+          "properties": {
+            "featurescaling": {
+              "$id": "#/properties/map/properties/options/properties/featurescaling",
+              "type": "string",
+              "title": "The Featurescaling Schema",
+              "default": "",
+              "examples": [
+                "dynamic"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "objectscaling": {
+              "$id": "#/properties/map/properties/options/properties/objectscaling",
+              "type": "string",
+              "title": "The Objectscaling Schema",
+              "default": "",
+              "examples": [
+                "dynamic"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "clipmap": {
+              "$id": "#/properties/map/properties/options/properties/clipmap",
+              "type": "string",
+              "title": "The Clipmap Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "clipmapdynamic": {
+              "$id": "#/properties/map/properties/options/properties/clipmapdynamic",
+              "type": "string",
+              "title": "The Clipmapdynamic Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "dynamiclabel": {
+              "$id": "#/properties/map/properties/options/properties/dynamiclabel",
+              "type": "string",
+              "title": "The Dynamiclabel Schema",
+              "default": "",
+              "examples": [
+                "NOSIZE"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "labelspace": {
+              "$id": "#/properties/map/properties/options/properties/labelspace",
+              "type": "string",
+              "title": "The Labelspace Schema",
+              "default": "",
+              "examples": [
+                "2"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "checklabeloverlap": {
+              "$id": "#/properties/map/properties/options/properties/checklabeloverlap",
+              "type": "string",
+              "title": "The Checklabeloverlap Schema",
+              "default": "",
+              "examples": [
+                "NOSQUEEZE"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "dynamiclayer": {
+              "$id": "#/properties/map/properties/options/properties/dynamiclayer",
+              "type": "string",
+              "title": "The Dynamiclayer Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "dynamictiles": {
+              "$id": "#/properties/map/properties/options/properties/dynamictiles",
+              "type": "string",
+              "title": "The Dynamictiles Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "discardtiles": {
+              "$id": "#/properties/map/properties/options/properties/discardtiles",
+              "type": "string",
+              "title": "The Discardtiles Schema",
+              "default": "",
+              "examples": [
+                "false"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "loadmultitiles": {
+              "$id": "#/properties/map/properties/options/properties/loadmultitiles",
+              "type": "string",
+              "title": "The Loadmultitiles Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "loadsilent": {
+              "$id": "#/properties/map/properties/options/properties/loadsilent",
+              "type": "string",
+              "title": "The Loadsilent Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "loadexternaldata": {
+              "$id": "#/properties/map/properties/options/properties/loadexternaldata",
+              "type": "string",
+              "title": "The Loadexternaldata Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "buttonsize": {
+              "$id": "#/properties/map/properties/options/properties/buttonsize",
+              "type": "string",
+              "title": "The Buttonsize Schema",
+              "default": "",
+              "examples": [
+                "15"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "fastpan": {
+              "$id": "#/properties/map/properties/options/properties/fastpan",
+              "type": "string",
+              "title": "The Fastpan Schema",
+              "default": "",
+              "examples": [
+                "false"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "panborder": {
+              "$id": "#/properties/map/properties/options/properties/panborder",
+              "type": "string",
+              "title": "The Panborder Schema",
+              "default": "",
+              "examples": [
+                "0"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "northarrow": {
+              "$id": "#/properties/map/properties/options/properties/northarrow",
+              "type": "string",
+              "title": "The Northarrow Schema",
+              "default": "",
+              "examples": [
+                "false"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "sidebarbuttons": {
+              "$id": "#/properties/map/properties/options/properties/sidebarbuttons",
+              "type": "string",
+              "title": "The Sidebarbuttons Schema",
+              "default": "",
+              "examples": [
+                "false"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "tooltipdelay": {
+              "$id": "#/properties/map/properties/options/properties/tooltipdelay",
+              "type": "string",
+              "title": "The Tooltipdelay Schema",
+              "default": "",
+              "examples": [
+                "250"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "popupdelay": {
+              "$id": "#/properties/map/properties/options/properties/popupdelay",
+              "type": "string",
+              "title": "The Popupdelay Schema",
+              "default": "",
+              "examples": [
+                "250"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "popupgridstyle": {
+              "$id": "#/properties/map/properties/options/properties/popupgridstyle",
+              "type": "string",
+              "title": "The Popupgridstyle Schema",
+              "default": "",
+              "examples": [
+                "firstright|firstitalic|firstbold|firstgray|firstsmall|background|alternate|full"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "popupalignment": {
+              "$id": "#/properties/map/properties/options/properties/popupalignment",
+              "type": "string",
+              "title": "The Popupalignment Schema",
+              "default": "",
+              "examples": [
+                "BOTTOM|LEFT"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "transparentbackground": {
+              "$id": "#/properties/map/properties/options/properties/transparentbackground",
+              "type": "string",
+              "title": "The Transparentbackground Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "labelscaling": {
+              "$id": "#/properties/map/properties/options/properties/labelscaling",
+              "type": "string",
+              "title": "The Labelscaling Schema",
+              "default": "",
+              "examples": [
+                "dynamic"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "flushChartDraw": {
+              "$id": "#/properties/map/properties/options/properties/flushChartDraw",
+              "type": "string",
+              "title": "The Flushchartdraw Schema",
+              "default": "",
+              "examples": [
+                "5000"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "toolmargintop": {
+              "$id": "#/properties/map/properties/options/properties/toolmargintop",
+              "type": "string",
+              "title": "The Toolmargintop Schema",
+              "default": "",
+              "examples": [
+                "60"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "flushPaintShape": {
+              "$id": "#/properties/map/properties/options/properties/flushPaintShape",
+              "type": "string",
+              "title": "The Flushpaintshape Schema",
+              "default": "",
+              "examples": [
+                "5000"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "mapopacity": {
+              "$id": "#/properties/map/properties/options/properties/mapopacity",
+              "type": "string",
+              "title": "The Mapopacity Schema",
+              "default": "",
+              "examples": [
+                "1"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "basemapopacity": {
+              "$id": "#/properties/map/properties/options/properties/basemapopacity",
+              "type": "string",
+              "title": "The Basemapopacity Schema",
+              "default": "",
+              "examples": [
+                "1"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "center": {
+          "$id": "#/properties/map/properties/center",
+          "type": "object",
+          "title": "The Center Schema",
+          "required": [
+            "lat",
+            "lng"
+          ],
+          "properties": {
+            "lat": {
+              "$id": "#/properties/map/properties/center/properties/lat",
+              "type": "string",
+              "title": "The Lat Schema",
+              "default": "",
+              "examples": [
+                "40.72755146730012"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "lng": {
+              "$id": "#/properties/map/properties/center/properties/lng",
+              "type": "string",
+              "title": "The Lng Schema",
+              "default": "",
+              "examples": [
+                "-73.97210597991945"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "zoom": {
+          "$id": "#/properties/map/properties/zoom",
+          "type": "string",
+          "title": "The Zoom Schema",
+          "default": "",
+          "examples": [
+            "14"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "themes": {
+      "$id": "#/properties/themes",
+      "type": "array",
+      "title": "The Themes Schema",
+      "items": {
+        "$id": "#/properties/themes/items",
+        "type": "object",
+        "title": "The Items Schema",
+        "required": [
+          "layer",
+          "field",
+          "field100",
+          "data",
+          "style"
+        ],
+        "properties": {
+          "layer": {
+            "$id": "#/properties/themes/items/properties/layer",
+            "type": "string",
+            "title": "The Layer Schema",
+            "default": "",
+            "examples": [
+              "World_countries_shp"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "field": {
+            "$id": "#/properties/themes/items/properties/field",
+            "type": "string",
+            "title": "The Field Schema",
+            "default": "",
+            "examples": [
+              "complaint_type"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "field100": {
+            "$id": "#/properties/themes/items/properties/field100",
+            "type": "string",
+            "title": "The Field100 Schema",
+            "default": "",
+            "examples": [
+              ""
+            ],
+            "pattern": "^(.*)$"
+          },
+          "data": {
+            "$id": "#/properties/themes/items/properties/data",
+            "type": "object",
+            "title": "The Data Schema",
+            "required": [
+              "name",
+              "url",
+              "type",
+              "cache"
+            ],
+            "properties": {
+              "name": {
+                "$id": "#/properties/themes/items/properties/data/properties/name",
+                "type": "string",
+                "title": "The Name Schema",
+                "default": "",
+                "examples": [
+                  "themeDataObj"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "url": {
+                "$id": "#/properties/themes/items/properties/data/properties/url",
+                "type": "string",
+                "title": "The Url Schema",
+                "default": "",
+                "examples": [
+                  "https://data.cityofnewyork.us/resource/erm2-nwe9.csv?$limit=100000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "type": {
+                "$id": "#/properties/themes/items/properties/data/properties/type",
+                "type": "string",
+                "title": "The Type Schema",
+                "default": "",
+                "examples": [
+                  "csv"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "cache": {
+                "$id": "#/properties/themes/items/properties/data/properties/cache",
+                "type": "string",
+                "title": "The Cache Schema",
+                "default": "",
+                "examples": [
+                  "false"
+                ],
+                "pattern": "^(.*)$"
+              }
+            }
+          },
+          "style": {
+            "$id": "#/properties/themes/items/properties/style",
+            "type": "object",
+            "title": "The Style Schema",
+            "required": [
+              "type",
+              "colorscheme",
+              "fillopacity",
+              "shadow",
+              "lookupfield",
+              "child",
+              "symbols",
+              "values",
+              "units",
+              "refreshtimeout",
+              "normalsizevalue",
+              "scale",
+              "valuescale",
+              "gridwidthpx",
+              "title",
+              "snippet"
+            ],
+            "properties": {
+              "type": {
+                "$id": "#/properties/themes/items/properties/style/properties/type",
+                "type": "string",
+                "title": "The Type Schema",
+                "default": "",
+                "examples": [
+                  "CHART|SYMBOL|SEQUENCE|CENTER|SORT|DOWN|GLOW|CATEGORICAL|AGGREGATE|FAST|RELOCATE|SUM|SIZE|FORCE"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "colorscheme": {
+                "$id": "#/properties/themes/items/properties/style/properties/colorscheme",
+                "type": "array",
+                "title": "The Colorscheme Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/colorscheme/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "147",
+                    "mineral"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "fillopacity": {
+                "$id": "#/properties/themes/items/properties/style/properties/fillopacity",
+                "type": "string",
+                "title": "The Fillopacity Schema",
+                "default": "",
+                "examples": [
+                  "0.65"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "shadow": {
+                "$id": "#/properties/themes/items/properties/style/properties/shadow",
+                "type": "string",
+                "title": "The Shadow Schema",
+                "default": "",
+                "examples": [
+                  "false"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "lookupfield": {
+                "$id": "#/properties/themes/items/properties/style/properties/lookupfield",
+                "type": "string",
+                "title": "The Lookupfield Schema",
+                "default": "",
+                "examples": [
+                  "latitude|longitude"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "child": {
+                "$id": "#/properties/themes/items/properties/style/properties/child",
+                "type": "string",
+                "title": "The Child Schema",
+                "default": "",
+                "examples": [
+                  "true"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "symbols": {
+                "$id": "#/properties/themes/items/properties/style/properties/symbols",
+                "type": "array",
+                "title": "The Symbols Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/symbols/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "circle"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "values": {
+                "$id": "#/properties/themes/items/properties/style/properties/values",
+                "type": "array",
+                "title": "The Values Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/values/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "General Construction/Plumbing",
+                    "Graffiti",
+                    "GENERAL",
+                    "Elevator",
+                    "Sanitation Condition",
+                    "Street Condition",
+                    "Air Quality",
+                    "Noise - Commercial",
+                    "Rodent",
+                    "Dirty Conditions",
+                    "Noise - Street/Sidewalk",
+                    "Broken Muni Meter",
+                    "WATER LEAK",
+                    "Illegal Parking",
+                    "Drinking",
+                    "Noise",
+                    "Water System",
+                    "Fire Safety Director - F58",
+                    "EAP Inspection - F59",
+                    "Collection Truck Noise",
+                    "PAINT/PLASTER",
+                    "Special Projects Inspection Team (SPIT)",
+                    "Plumbing",
+                    "Non-Residential Heat",
+                    "PLUMBING",
+                    "Homeless Encampment",
+                    "Other Enforcement",
+                    "Lead",
+                    "Building/Use",
+                    "FLOORING/STAIRS",
+                    "Scaffold Safety",
+                    "New Tree Request",
+                    "UNSANITARY CONDITION",
+                    "HEAT/HOT WATER",
+                    "Noise - Vehicle",
+                    "Vending",
+                    "Taxi Complaint",
+                    "BEST/Site Safety",
+                    "Snow",
+                    "Water Conservation",
+                    "For Hire Vehicle Complaint",
+                    "DOF Property - Update Account",
+                    "Missed Collection (All Materials)",
+                    "Sewer",
+                    "Cranes and Derricks",
+                    "Street Sign - Damaged",
+                    "Panhandling",
+                    "Street Light Condition",
+                    "Traffic Signal Condition",
+                    "DOOR/WINDOW",
+                    "Derelict Vehicles",
+                    "Animal Abuse",
+                    "Hazardous Materials",
+                    "Electrical",
+                    "Investigations and Discipline (IAD)",
+                    "DOF Property - Reduction Issue",
+                    "Sidewalk Condition",
+                    "APPLIANCE",
+                    "Street Sign - Dangling",
+                    "ELECTRIC",
+                    "Consumer Complaint",
+                    "Homeless Person Assistance",
+                    "Animal in a Park",
+                    "Maintenance or Facility",
+                    "Food Establishment",
+                    "Highway Condition",
+                    "Blocked Driveway",
+                    "Litter Basket / Request",
+                    "City Vehicle Placard Complaint",
+                    "Taxi Report",
+                    "Indoor Air Quality",
+                    "Asbestos",
+                    "Derelict Bicycle",
+                    "Found Property",
+                    "Food Poisoning",
+                    "Boilers",
+                    "Noise - House of Worship",
+                    "Unsanitary Animal Pvt Property",
+                    "SAFETY",
+                    "OUTSIDE BUILDING",
+                    "Traffic",
+                    "Broken Parking Meter",
+                    "Noise - Park",
+                    "Curb Condition",
+                    "Dead/Dying Tree",
+                    "Derelict Vehicle",
+                    "Street Sign - Missing",
+                    "Smoking",
+                    "Public Payphone Complaint",
+                    "Water Quality",
+                    "Damaged Tree",
+                    "Industrial Waste",
+                    "ELEVATOR",
+                    "Sweeping/Missed",
+                    "Noise - Helicopter",
+                    "Indoor Sewage",
+                    "DOF Parking - Tax Exemption",
+                    "Fire Alarm - Modification",
+                    "Vacant Lot",
+                    "Overgrown Tree/Branches",
+                    "Unsanitary Animal Facility",
+                    "Illegal Tree Damage",
+                    "School Maintenance",
+                    "Overflowing Litter Baskets",
+                    "Recycling Enforcement",
+                    "For Hire Vehicle Report",
+                    "Bike Rack Condition",
+                    "Adopt-A-Basket",
+                    "Taxpayer Advocate Inquiry",
+                    "Unleashed Dog",
+                    "Emergency Response Team (ERT)",
+                    "Fire Alarm - New System",
+                    "Advocate-UBT",
+                    "Unsanitary Pigeon Condition",
+                    "DPR Internal",
+                    "Fire Alarm - Reinspection",
+                    "Root/Sewer/Sidewalk Condition",
+                    "Beach/Pool/Sauna Complaint",
+                    "Public Assembly - Temporary",
+                    "Urinating in Public",
+                    "Bridge Condition",
+                    "Miscellaneous Categories",
+                    "Violation of Park Rules",
+                    "Bike/Roller/Skate Chronic",
+                    "Drinking Water",
+                    "X-Ray Machine/Equipment",
+                    "Municipal Parking Facility",
+                    "Squeegee",
+                    "Senior Center Complaint",
+                    "Tattooing",
+                    "Special Enforcement",
+                    "Day Care",
+                    "Disorderly Youth",
+                    "Mold",
+                    "Dead Tree",
+                    "Literature Request",
+                    "Window Guard",
+                    "Open Flame Permit",
+                    "Animal Facility - No Permit",
+                    "Illegal Fireworks",
+                    "Calorie Labeling",
+                    "Advocate - Other",
+                    "Posting Advertisement",
+                    "Advocate-Prop Refunds/Credits",
+                    "Bus Stop Shelter Placement",
+                    "Illegal Animal Kept as Pet",
+                    "Sweeping/Inadequate"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "units": {
+                "$id": "#/properties/themes/items/properties/style/properties/units",
+                "type": "string",
+                "title": "The Units Schema",
+                "default": "",
+                "examples": [
+                  ""
+                ],
+                "pattern": "^(.*)$"
+              },
+              "refreshtimeout": {
+                "$id": "#/properties/themes/items/properties/style/properties/refreshtimeout",
+                "type": "string",
+                "title": "The Refreshtimeout Schema",
+                "default": "",
+                "examples": [
+                  "0"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "normalsizevalue": {
+                "$id": "#/properties/themes/items/properties/style/properties/normalsizevalue",
+                "type": "string",
+                "title": "The Normalsizevalue Schema",
+                "default": "",
+                "examples": [
+                  "100"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "scale": {
+                "$id": "#/properties/themes/items/properties/style/properties/scale",
+                "type": "string",
+                "title": "The Scale Schema",
+                "default": "",
+                "examples": [
+                  "0.7450580596923828"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "valuescale": {
+                "$id": "#/properties/themes/items/properties/style/properties/valuescale",
+                "type": "string",
+                "title": "The Valuescale Schema",
+                "default": "",
+                "examples": [
+                  "1"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "gridwidthpx": {
+                "$id": "#/properties/themes/items/properties/style/properties/gridwidthpx",
+                "type": "string",
+                "title": "The Gridwidthpx Schema",
+                "default": "",
+                "examples": [
+                  "2"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "title": {
+                "$id": "#/properties/themes/items/properties/style/properties/title",
+                "type": "string",
+                "title": "The Title Schema",
+                "default": "",
+                "examples": [
+                  "311 calls by complaint type"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "snippet": {
+                "$id": "#/properties/themes/items/properties/style/properties/snippet",
+                "type": "string",
+                "title": "The Snippet Schema",
+                "default": "",
+                "examples": [
+                  "February 2016"
+                ],
+                "pattern": "^(.*)$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "layerMask": {
+      "$id": "#/properties/layerMask",
+      "type": "object",
+      "title": "The Layermask Schema"
+    }
+  }
+}
