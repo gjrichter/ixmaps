@@ -1,0 +1,593 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+    <title>iXmaps Theme Charts</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+
+	<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../assets/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+	<link href="../../../ui/libs/jquery/ui/css/ixmaps/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+	<link href="../../../ui/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+	<link href="../../css/popuptools.css" rel="stylesheet" type="text/css" >
+
+	<style type="text/css" media="screen">
+		body {
+	overflow: hidden;
+	}
+	</style>
+</head>
+
+<body id="theme-charts" >
+
+	<div id="chartmenu-div"	style="max-height:500px;overflow:scroll">   
+	</div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+	<script src = "../../../ui/libs/jquery/jquery-1.7.1.min.js"></script>
+	<script src = "../../../ui/libs/jquery/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+    <script src = "../assets/js/bootstrap.min.js"></script>
+
+	<script src = "https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src = "https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js"></script>
+
+	<script type = "text/javascript">
+
+	var ixmaps = null;
+	if ( window.opener ){
+		ixmaps = window.opener.ixmaps;
+	}else
+	if ( parent ){
+		ixmaps = parent.window.ixmaps;
+	}
+	else{
+		alert("error: missing parent window for themes !");
+	}
+  
+	// ----------------------
+	// make chart type menu 
+	// ----------------------
+
+	var szChartMenuId = null;
+	var fChartMenuDialog = false;
+	var fChartMenuVisible = true;
+
+	ixmaps.makeChartMenueHTML = function(szId){
+
+		ixmaps.themeObj = ixmaps.themeObj || ixmaps.getThemeObj(szId);
+
+		// make <div> + <svg> to receive the chart menu (in svg)
+		var szHtml = "";
+		szHtml += "<div style='font-size:0.6em;margin-bottom:0.5em'>select chart type:</div>";
+		szHtml += "<div id='menuDiv' style='height:300px;width:260px;overflow:auto'><div><svg width='240' height='2000' viewBox='0 0 4800 40000'><g id='getchartmenutarget'></g></svg></div></div>";
+
+		$("#chartmenu-div").append(szHtml);
+
+		// call theme method to draw the charts
+		var szTypelistA = ixmaps.themeObj.getChartTypeMenu($("#getchartmenutarget")[0],null,240);
+
+		// create click map to select the chart for the theme
+		szHtml = "<div style='position:relative;top:-2010px;'>";
+		for ( i in szTypelistA ){
+			if ( i%4 == 0 ){
+				szHtml += "<div style='clear:both'>";
+			}
+			szHtml += "<a href=\"javascript:ixmaps.changeThemeStyle(null,'type:"+szTypelistA[i]+"','set');\"><div style='float:left;height:60px;width:60px;'></div></a>";
+		}
+		szHtml += "</div>";
+
+		$("#menuDiv").append(szHtml);
+	};
+
+
+	$(document).ready(function () {
+		ixmaps.makeChartMenueHTML();
+	});
+
+
+	szChartTypeList = [
+		"CHART|BAR"
+		,"CHART|BAR|3D"
+		,"CHART|BAR|3D|TRENDLINE"
+		,"CHART|BAR|3D|SORT"
+		,"CHART|BAR|HORZ|LEFT|UP"
+		,"CHART|BAR|HORZ|RIGHT|UP"
+		,"CHART|BAR|HORZ|LEFT|UP|COMPRESS"
+		,"CHART|BAR|HORZ|RIGHT|UP|COMPRESS"
+		,"CHART|BAR|HORZ|LEFT|UP|3D"
+		,"CHART|BAR|HORZ|RIGHT|UP|3D"
+		,"CHART|BAR|HORZ|RIGHT|3D"
+		,"CHART|BAR|HORZ|RIGHT|COMPRESS|3D"
+		,"CHART|BAR|HORZ|RIGHT|SORT|3D"
+		,"CHART|BAR|HORZ|RIGHT|SORT|COMPRESS|3D"
+		,"CHART|BAR|HORZ|RIGHT|SORT|UP|3D"
+		,"CHART|BAR|HORZ|LEFT|UP|COMPRESS|3D"
+		,"CHART|BAR|HORZ|RIGHT|UP|COMPRESS|3D"
+		,"CHART|BAR|HORZ|CENTER|UP"
+		,"CHART|BAR|STACKED"
+		,"CHART|BAR|STACKED|3D"
+		,"CHART|BAR|STACKED|3D"
+		,"CHART|BAR|COLUMNS|STACKED|3D"
+		,"CHART|BAR|COLUMNS|STACKED|3D|SIZE"
+		,"CHART|BAR|COLUMNS|STACKED|3D|SORT|SIZE"
+		,"CHART|BAR|HORZ|STACKED|SIZE"
+		,"CHART|BAR|HORZ|3D|STACKED|SIZE"
+		,"CHART|BAR|HORZ|COLUMNS|STACKED|SIZE"
+		,"CHART|PIE"
+		,"CHART|PIE|SIZE"
+		,"CHART|PIE|3D"
+		,"CHART|PIE|3D|SIZE"
+		,"CHART|PIE|3D|HEIGHT"
+		,"CHART|PIE|3D|VOLUME|SORT|BIGTOTOP"
+		,"CHART|PIE|3D|VOLUME|SORT|BIGTOTOP|SIZE"
+		,"CHART|PIE|3D|VOLUME|SORT|BIGTOTOP|SIZE|HEIGHT"
+		,"CHART|PIE|DONUT"
+		,"CHART|PIE|DONUT|SIZE"
+		,"CHART|PIE|DONUT|3D"
+		,"CHART|PIE|DONUT|3D|SIZE"
+		,"CHART|PIE|DONUT|3D|HEIGHT"
+		,"CHART|PIE|DONUT|3D|SIZE|HEIGHT"
+		,"CHART|PIE|DONUT|3D|VOLUME|SORT|BIGTOTOP"
+		,"CHART|PIE|STARBURST"
+		,"CHART|PIE|STARBURST|RAYS"
+		,"CHART|PIE|STARBURST|SRAYS"
+		,"CHART|PIE|STARBURST|SIZE"
+		,"CHART|PIE|STARBURST|RAYS|SIZE"
+		,"CHART|PIE|STARBURST|SRAYS|SIZE"
+		,"CHART|PIE|STARBURST|3D"
+		,"CHART|PIE|STARBURST|3D|SIZE"
+		,"CHART|PIE|STARBURST|3D|HEIGHT"
+		,"CHART|PIE|DONUT|STARBURST"
+		,"CHART|PIE|DONUT|STARBURST|SIZE"
+		,"CHART|PIE|DONUT|STARBURST|3D"
+		,"CHART|PIE|DONUT|STARBURST|3D|SIZE"
+		,"CHART|PIE|DONUT|STARBURST|3D|HEIGHT"
+		,"CHART|PIE|DONUT|STARBURST|3D|VOLUME"
+		,"CHART|PIE|DONUT|STARBURST|3D|VOLUME|SORT|BIGTOTOP"
+		,"CHART|PIE|CENTER|SIZE"
+		,"CHART|PIE|CENTERVALUE|SIZE"
+		,"CHART|PIE|CENTER|STARBURST|SIZE"
+		,"CHART|PIE|CENTERVALUE|STARBURST|SIZE"
+		,"CHART|PIE|CENTER|STARBURST|RAYS|SIZE"
+		,"CHART|PIE|CENTERVALUE|STARBURST|RAYS|SIZE"
+		,"CHART|PIE|HALF|CENTER|STARBURST|RAYS|SIZE"
+		,"CHART|PIE|HALF|CENTERVALUE|STARBURST|RAYS|SIZE"
+		,"CHART|PIE|DONUT|HALF|SIZE"
+		,"CHART|PIE|DONUT|HALF|STARBURST|SIZE"
+		,"CHART|PIE|DONUT|HALF|3D|SIZE"
+		,"CHART|PIE|DONUT|HALF|3D|HEIGHT|SIZE"
+		,"CHART|PIE|DONUT|HALF|3D|HEIGHT|VOLUME|SIZE"
+		,"CHART|WAFFLE|"
+		,"CHART|SYMBOL|SEQUENCE|CENTER"
+		,"CHART|SYMBOL|SEQUENCE|CENTER|SORT|UP"
+		,"CHART|SYMBOL|SEQUENCE|CENTER|SORT|DOWN"
+		,"CHART|SYMBOL|SEQUENCE|CENTER|RINGS"
+		,"CHART|SYMBOL|SEQUENCE|CENTER|SORT|UP|RINGS"
+		,"CHART|SYMBOL|SEQUENCE|CENTER|SORT|DOWN|RINGS"
+		,"CHART|SYMBOL|SEQUENCE|BOTTOM|SORT|DOWN"
+		,"CHART|SYMBOL|SEQUENCE|BOTTOM|SORT|UP|RINGS"
+		,"CHART|SYMBOL|SEQUENCE|TOP|SORT|UP|RINGS"
+		,"CHART|SYMBOL|SEQUENCE|BASE"
+		,"CHART|SYMBOL|SEQUENCE|BASE|SORT|DOWN"
+		,"CHART|SYMBOL|SEQUENCE|BASE|SORT|UP"
+		,"CHART|SYMBOL|SEQUENCE|STAR"
+		,"CHART|SYMBOL|SEQUENCE|STAR|SORT|UP|EXPAND"
+		,"CHART|SYMBOL|SEQUENCE|STAR|SORT|DOWN"
+		,"CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM"
+		,"CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM|DOPACITY"
+	];
+	szChartTypeListSingleValue_old = [
+		"CHART|BAR"
+		,"CHART|BAR|VALUES"
+		,"CHART|BAR|3D"
+		,"CHART|BAR|3D|VALUES"
+		,"CHART|BAR|3D|VOLUME"
+		,"CHART|BAR|3D|VOLUME|VALUES"
+		,"CHART|BAR|HORZ|RIGHT|UP"
+		,"CHART|BAR|HORZ|RIGHT|UP|VALUES"
+		,"CHART|BAR|HORZ|RIGHT|UP|3D"
+		,"CHART|BAR|HORZ|RIGHT|UP|VALUES|3D"
+		,"CHART|BAR|POINTER"
+		,"CHART|BAR|POINTER|VALUES"
+		,"CHART|BUBBLE|SURFACE"
+		,"CHART|BUBBLE|SURFACE|VALUES"
+		,"CHART|SQUARE|SURFACE"
+		,"CHART|SQUARE|SURFACE|VALUES"
+		];
+	szChartTypeListSingleValue = [
+		 "CHOROPLETH"
+		,"CHART|BUBBLE"
+		,"CHART|SQUARE"
+		,"CHART|PIE|3D|SIZE"
+		,"CHART|PIE|3D|HEIGHT"
+		,"CHART|PIE|3D|SIZE|HEIGHT"
+ 		,"CHART|BAR|3D|VOLUME"
+		,"CHART|BAR"
+		,"CHART|BAR|3D"
+		,"CHART|BAR|3D|SIZE"
+		,"CHART|BAR|HORZ|RIGHT|UP"
+		,"CHART|BAR|HORZ|RIGHT|UP|3D"
+		,"CHART|BAR|POINTER"
+		,"CHART|BAR|POINTER|SIZE"
+		,"CHART|BAR|HORZ|RIGHT|UP|POINTER"
+		,"CHART|LABEL"
+		];
+	szChartTypeListPLOT = [
+		 "CHART|SYMBOL|FIXSIZE|PLOT"
+		,"CHART|SYMBOL|FIXSIZE|PLOT|LOLLIPOP"
+		,"CHART|SYMBOL|FIXSIZE|PLOT|LINES"
+		,"CHART|SYMBOL|FIXSIZE|PLOT|LINES|AREA"
+		,"CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT"
+		,"CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT|LOLLIPOP"
+		,"CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT|LINES"
+		,"CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT|LINES|AREA"
+		,"CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT|LINES|AREA|STACKED"
+		,"CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOTVAR|LINES"
+		,"CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOTVAR|LINES|AREA"
+		];
+
+	/**
+	 * add definition to flag string
+	 * @param szDef the definition to remove (e.g. "3D" )
+	 * @type string
+	 * @return the new flag string without szDef
+	 */
+	_addDefinitionToFlag = function (szDef) {
+		return (this.szFlag = this.szFlag + "|" + szDef);
+	};
+
+	/**
+	 * remove definition from flag string
+	 * @param szDef the definition to remove (e.g. "3D" )
+	 * @type string
+	 * @return the new flag string without szDef
+	 */
+	_removeDefinitionFromFlag = function (szDef) {
+		var szNewFlag = "";
+		var szFlagA = this.szFlag.split('|');
+		for (var i = 0; i < szFlagA.length; i++) {
+			if (szFlagA[i] != szDef) {
+				szNewFlag += (szNewFlag.length ? "|" : "") + szFlagA[i];
+			}
+		}
+		return (this.szFlag = szNewFlag);
+	};
+
+	/**
+	 * remove definition from string
+	 * @param szFlag the definition string
+	 * @param szDef the definition to remove (e.g. "3D" )
+	 * @type string
+	 * @return the new flag string without szDef
+	 */
+	_removeDefinition = function (szFlag, szDef) {
+		var szNewFlag = "";
+		var szFlagA = szFlag.split('|');
+		for (var i = 0; i < szFlagA.length; i++) {
+			if (szFlagA[i] != szDef) {
+				szNewFlag += (szNewFlag.length ? "|" : "") + szFlagA[i];
+			}
+		}
+		return szNewFlag;
+	};
+
+
+	ixmaps.chartOver = function(){
+		console.log("over");
+	};
+	ixmaps.chartOut = function(){
+		console.log("out");
+	};
+	ixmaps.chartClick = function(szFlag){
+		ixmaps.message("set chart type ...");
+		console.log(szFlag);
+		ixmaps.changeThemeStyle(null,'type:'+szFlag,'set');
+	};
+
+
+
+	ixmaps.makeChartMenueHTML = function(szId){
+
+		var __themeObj = ixmaps.themeObj || ixmaps.getThemeObj(szId);
+
+		var szTypeList = szChartTypeListSingleValue;
+		if ((__themeObj.szFieldsA.length > 1) ||
+			(__themeObj.szFlag.match(/CATEGORICAL/) && __themeObj.szFlag.match(/AGGREGATE/))) {
+			szTypeList = szChartTypeList;
+		}
+		if (__themeObj.szFlag.match(/PLOT/)) {
+			szTypeList = szChartTypeListPLOT;
+		}
+
+		for (i = 0; i < szTypeList.length; i++) {
+			ixmaps.makeOneChartHTML(szId,szTypeList,i);
+		}
+
+
+	}
+
+	ixmaps.makeOneChartHTML = function(szId,szTypeList,index){
+
+		var szTargetDiv = "chartmenu-div";
+
+		var __themeObj = ixmaps.themeObj || ixmaps.getThemeObj(szId);
+
+		if ( !__themeObj ){
+			return;
+		}
+
+		var szMerkFlag = __themeObj.szFlag;
+
+		var szFlag = szTypeList[i] + "|NORMSIZE|SILENT|MENUSIZE";
+
+		if (szMerkFlag.match(/CATEGORICAL/)) {
+			szFlag += "|CATEGORICAL";
+		}
+		if (szMerkFlag.match(/GROUP/)) {
+			szFlag += "|GROUP";
+		}
+		if (szMerkFlag.match(/AGGREGATE/)) {
+			szFlag += "|AGGREGATE";
+		}
+		if (szMerkFlag.match(/FAST/)) {
+			szFlag += "|FAST";
+		}
+		if (szMerkFlag.match(/RELOCATE/)) {
+			szFlag += "|RELOCATE";
+		}
+		if (szMerkFlag.match(/DIFFERENCE/)) {
+			szFlag += "|DIFFERENCE";
+		}
+		if (szMerkFlag.match(/FRACTION/)) {
+			szFlag += "|FRACTION";
+		}
+		if (szMerkFlag.match(/INVERT/)) {
+			szFlag += "|INVERT";
+		}
+		if (szMerkFlag.match(/INVERTSIZE/)) {
+			szFlag += "|INVERTSIZE";
+		}
+		if (szMerkFlag.match(/RELATIVE/)) {
+			szFlag += "|RELATIVE";
+		}
+		if (szMerkFlag.match(/DENSITY/)) {
+			szFlag += "|DENSITY";
+		}
+		if (szMerkFlag.match(/DOPACITYMAX/)) {
+			szFlag += "|DOPACITYMAX";
+		} else
+		if (szMerkFlag.match(/DOPACITYLOGMAX/)) {
+			szFlag += "|DOPACITYLOGMAX";
+		} else
+		if (szMerkFlag.match(/DOPACITYPOWMAX/)) {
+			szFlag += "|DOPACITYPOWMAX";
+		} else
+		if (szMerkFlag.match(/DOPACITYMEAN/)) {
+			szFlag += "|DOPACITYMEAN";
+		} else
+		if (szMerkFlag.match(/DOPACITYLOGMEAN/)) {
+			szFlag += "|DOPACITYLOGMEAN";
+		} else
+		if (szMerkFlag.match(/DOPACITYPOWMEAN/)) {
+			szFlag += "|DOPACITYPOWMEAN";
+		} else
+		if (szMerkFlag.match(/DOPACITYLOG/)) {
+			szFlag += "|DOPACITYLOG";
+		} else
+		if (szMerkFlag.match(/DOPACITY/)) {
+			szFlag += "|DOPACITY";
+		}
+		if (szMerkFlag.match(/AUTO100/)) {
+			szFlag += "|AUTO100";
+		}
+		if (szMerkFlag.match(/AUTOCOMPLETE/)) {
+			szFlag += "|AUTOCOMPLETE";
+		}
+
+		if (0 && szFlag.match(/PLOT/)){
+			if (szMerkFlag.match(/BOX/)) {
+				szFlag += "|BOX";
+			}
+			if (szMerkFlag.match(/TITLE/)) {
+				szFlag += "|TITLE";
+			}
+			if (szMerkFlag.match(/\bGRID\b/)) {
+				szFlag += "|GRID";
+			}
+		}
+
+		__themeObj.szFlag = szFlag;
+
+		var nTempClipParts = __themeObj.nClipParts;
+		if (!szFlag.match(/PLOT/)){
+			__themeObj.nClipParts = 10;
+			if (szFlag.match(/STACKED/)){
+				__themeObj.szFlag += "|SORT|DOWN";
+			}
+			if (szFlag.match(/WAFFLE/)){
+				__themeObj.szFlag += "WAFFLE100";
+			}
+		}
+
+		var szOrigFlagKeep = "";
+		if (szMerkFlag.match(/UNDEFINEDISVALUE/)) {
+			szOrigFlagKeep += "|UNDEFINEDISVALUE";
+		}
+		if (szMerkFlag.match(/ZEROISVALUE/)) {
+			szOrigFlagKeep += "|ZEROISVALUE";
+		}
+		if (szMerkFlag.match(/NEGATIVEISVALUE/)) {
+			szOrigFlagKeep += "|NEGATIVEISVALUE";
+		}
+		if (szMerkFlag.match(/NONEGATIVE/)) {
+			szOrigFlagKeep += "|NEGATIVEISVALUE";
+		}
+		if (szMerkFlag.match(/GROUP/)) {
+			szOrigFlagKeep += "|GROUP";
+		}
+		if (szMerkFlag.match(/AGGREGATE/)) {
+			szOrigFlagKeep += "|AGGREGATE";
+		}
+		if (szMerkFlag.match(/FAST/)) {
+			szOrigFlagKeep += "|FAST";
+		}
+		if (szMerkFlag.match(/RECT/)) {
+			szOrigFlagKeep += "|RECT";
+		}
+		if (szMerkFlag.match(/HEX/)) {
+			szOrigFlagKeep += "|HEX";
+		}
+		if (szMerkFlag.match(/RELOCATE/)) {
+			szOrigFlagKeep += "|RELOCATE";
+		}
+		if (szMerkFlag.match(/CATEGORICAL/)) {
+			szOrigFlagKeep += "|CATEGORICAL";
+		}
+		if (szMerkFlag.match(/SUM/)) {
+			szOrigFlagKeep += "|SUM";
+		}
+		if (szMerkFlag.match(/MEAN/)) {
+			szOrigFlagKeep += "|MEAN";
+		}
+		if (szMerkFlag.match(/DIFFERENCE/)) {
+			szOrigFlagKeep += "|DIFFERENCE";
+		}
+		if (szMerkFlag.match(/RELATIVE/)) {
+			szOrigFlagKeep += "|RELATIVE";
+		}
+		if (szMerkFlag.match(/INVERT/)) {
+			szOrigFlagKeep += "|INVERT";
+		}
+		if (szMerkFlag.match(/INVERTSIZE/)) {
+			szOrigFlagKeep += "|INVERTSIZE";
+		}
+		if (szMerkFlag.match(/CALCMEAN/)) {
+			szOrigFlagKeep += "|CALCMEAN";
+		}
+		if (szMerkFlag.match(/CALC100/)) {
+			szOrigFlagKeep += "|CALC100";
+		}
+		if (szMerkFlag.match(/PRODUCT/)) {
+			szOrigFlagKeep += "|PRODUCT";
+		}
+		if (szMerkFlag.match(/AUTOCOMPLETE/)) {
+			szOrigFlagKeep += "|AUTOCOMPLETE";
+		}
+		if (szMerkFlag.match(/AUTO100/)) {
+			szOrigFlagKeep += "|AUTO100";
+		}
+		if (szMerkFlag.match(/QUANTILE/)) {
+			szOrigFlagKeep += "|QUANTILE";
+		}
+		if (szMerkFlag.match(/DENSITY/)) {
+			szOrigFlagKeep += "|DENSITY";
+		}
+		if (szMerkFlag.match(/DOPACITY/)) {
+			szOrigFlagKeep += "|DOPACITY";
+		}
+		if (szMerkFlag.match(/VALUES/)) {
+			szOrigFlagKeep += "|VALUES";
+		}
+		if (szMerkFlag.match(/VALUEBACKGROUND/)) {
+			szOrigFlagKeep += "|VALUEBACKGROUND";
+		}
+		// if new chart type has SIZE flag
+		// -------------------------------
+		if (szTypeList[i].match(/SIZE/)) {
+			if (szMerkFlag.match(/SIZELOG/)) {
+				szOrigFlagKeep += "|SIZELOG";
+			} else
+			if (szMerkFlag.match(/SIZEP4/)) {
+				szOrigFlagKeep += "|SIZEP4";
+			} else
+			if (szMerkFlag.match(/SIZEP3/)) {
+				szOrigFlagKeep += "|SIZEP3";
+			} else
+			if (szMerkFlag.match(/SIZE/)) {
+				szOrigFlagKeep += "|SIZE";
+			}
+		}
+		if (szMerkFlag.match(/SPACED/)) {
+			szOrigFlagKeep += "|SPACED";
+		}
+		if (szMerkFlag.match(/BOX/)) {
+			szOrigFlagKeep += "|BOX";
+		}
+		if (szMerkFlag.match(/TITLE/)) {
+			szOrigFlagKeep += "|TITLE";
+		}
+		if (szMerkFlag.match(/\bGRID\b/)) {
+			szOrigFlagKeep += "|GRID";
+		}
+		if (szMerkFlag.match(/\bGRIDSIZE\b/)) {
+			szOrigFlagKeep += "|GRIDSIZE";
+		}
+
+		// make <div> + <svg> to receive the chart (svg)
+
+		var szHtml = "";
+		szHtml += "<div class='col-lg-4 col-md-4 col-sm-6 col-xs-12' style='min-height:200px;border-bottom:solid #ddd 1px'>";
+		szHtml += "<div id='chart-title' style='font-size:0.8em;font-weight:300;padding:1em;margin-top:0.5em'>"+szTypeList[index];
+		szHtml += "</div>";
+		szHtml += "<a href='#'>";
+		szHtml += "<div title='"+szTypeList[index]+"' onclick='javascript:ixmaps.chartClick(\""+(szTypeList[index]+szOrigFlagKeep)+"\");' >";
+		szHtml += "<svg width='200' height='200' viewBox='-500 -3500 5000 5000'><g id='getchartmenutarget"+index+"' ></g></svg>"
+		szHtml += "</div>";
+		szHtml += "</a>";
+		szHtml += "</div>";
+
+		$("#"+szTargetDiv).append(szHtml);
+
+		// ------------------------------------------------------------------------------------
+
+		__themeObj.drawChart($("#getchartmenutarget"+index)[0], null, 30);
+
+		if (!szFlag.match(/PLOT/)){
+			__themeObj.addChartTypeSign($("#getchartmenutarget"+index)[0], szTypeList[index]);
+		}
+		// ------------------------------------------------------------------------------------
+
+		__themeObj.szFlag = szMerkFlag;
+		__themeObj.nClipParts = nTempClipParts;
+
+		// size the chart to div extent
+
+		var SVGBox = $("#getchartmenutarget"+index)[0].getBBox();
+		var scale = Math.max(1,200/SVGBox.width);
+		SVGBox.width *= scale;
+		SVGBox.height *= scale;
+		SVGBox.y -= 30;
+		SVGBox.height += 60;
+
+		var size = __themeObj.szFlag.match(/PLOT/)?200:150;
+		var width  = size;
+		var height = size/SVGBox.width*SVGBox.height;
+
+		while (height > width){
+			height*= 0.9;
+		}
+		if ( !isNaN(height) ){
+			$("#getchartmenutarget"+index)[0].parentNode.setAttribute("height",height);
+			$("#getchartmenutarget"+index)[0].parentNode.setAttribute("viewBox",SVGBox.x+' '+SVGBox.y+' '+SVGBox.width+' '+SVGBox.height);
+		}
+		
+	};
+
+
+
+    </script>
+
+ </body> 
+ </html> 
+
+	

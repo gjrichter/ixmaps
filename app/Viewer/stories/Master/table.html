@@ -6,7 +6,6 @@
 	<title>DataTables example - Row selection (multiple rows)</title>
 	<link rel="shortcut icon" type="image/png" href="/media/images/favicon.png">
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="http://www.datatables.net/rss.xml">
-	<link rel="stylesheet" type="text/css" href="/media/css/site-examples.css?_=6e5593ad4c5375eef5d919cfc10a0a54">
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
 	<style type="text/css" class="init">
 	<style type="text/css">
@@ -89,12 +88,40 @@
 		::-webkit-scrollbar-thumb:window-inactive {
 			background: rgba(222,222,222,0.4); 
 		}
-	
+		.fw-body {
+			background-color: white;
+		}
+
+		th {
+			padding:1em;
+		}
+		td {
+			padding:0.75em;
+		}
+		.even td {
+			background-color:#f8f8f8;
+		}
+		.odd td {
+			background-color:#f8f8f8;
+		}
+
 	</style>
-	<script type="text/javascript" src="/media/js/site.js?_=a25d93b0b2ef7712783f57407f987734">
-	</script>
-	<script type="text/javascript" src="/media/js/dynamic.php?comments-page=examples%2Fapi%2Fselect_row.html" async>
-	</script>
+</head>
+<body class="wide comments example" style="background:white;">
+
+	<a name="top" id="top"></a>
+	<div class="fw-container">
+		<div class="fw-body">
+			<div id="title" >
+			</div>
+			<div class="content" style="overflow:auto">
+				<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>
+			</div>
+			<div id="footer" >
+			</div>
+		</div>
+	</div>
+
 	<script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-1.12.4.js">
 	</script>
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js">
@@ -119,19 +146,31 @@
 		}
 
 		$(document).ready(function() {
-
-			var themeObj =	ixmaps.parentApi.getThemeObj();
+            
+  			var themeObj =	ixmaps.getThemeObj();
 
 			var szTable  = "test"; 
 			var tableObj = eval("ixmaps.embeddedSVG.window."+(themeObj.coTable||"themeDataObj"));
 
 			var numRows = tableObj.records.length;
 			var numCols = tableObj.fields.length;
+
+			$('#example').html("<h2 style='margin-left:1.5em;color:#ddd'> loading table data ("+numRows+" records) ...</h2>");
+
+			setTimeout("makeTable()",100);
+		} );
+
+		var makeTable = function() {
 			
-			var columns = [];
-			for ( i=0; i<numCols; i++ ){
-				columns.push( {"title": tableObj.fields[i].id} );			
-			}
+			$('#example').html("");
+ 
+            var themeObj =	ixmaps.getThemeObj();
+ 
+			var szTable  = "test"; 
+			var tableObj = eval("ixmaps.embeddedSVG.window."+(themeObj.coTable||"themeDataObj"));
+
+			var numRows = tableObj.records.length;
+			var numCols = tableObj.fields.length;
 
 			// GR 23.02.2018 show only rows which are on the map
 			// -------------------------------------------------
@@ -149,6 +188,41 @@
 					}
 				}
 			}
+			var columns = [];
+			for ( i=0; i<numCols; i++ ){
+				columns.push( {"title": tableObj.fields[i].id} );			
+			}
+
+			
+			if ( records.length > 1000 ){
+
+				// simple table
+				// -------------------------------------------------
+
+				var columns = "<tr>";
+				for ( i in tableObj.fields ){
+					columns += "<th>"+tableObj.fields[i].id+"&nbsp;&nbsp;&nbsp;&nbsp;</th>";
+				}
+				columns += "</tr>";
+
+				var maxrows = Math.min(records.length,17);
+				for ( r=0; r<= maxrows; r++ ){
+					columns += r%2?"<tr class='odd'>":"<tr class='even'>";
+					for ( i in tableObj.fields ){
+						columns += "<td nowrap>"+records[r][i]+"&nbsp;</td>";
+					}
+					columns += "</tr>";
+				}
+
+				$('#example').html(columns);
+
+				$('#footer').append("<div style='padding:0.5em'>1-17 of "+records.length+" records</div>");
+
+				return;
+			}
+
+			// use DataTable
+			// -------------------------------------------------
 
 			//var table = $('#example').DataTable();
 			table = $('#example').DataTable( {
@@ -192,19 +266,12 @@
 			} );
 
 
-		} );
+		};
 
 
 	</script>
-</head>
-<body class="wide comments example">
-	<a name="top" id="top"></a>
-	<div class="fw-container">
-		<div class="fw-body">
-			<div class="content" >
-				<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>
-			</div>
-		</div>
-	</div>
+
+
+
 </body>
 </html>

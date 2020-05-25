@@ -827,7 +827,7 @@ MapSelection.prototype.selectShapes = function(startIndex){
 							if ( activeThemeItem.nValue100 ){
 								this.nSum100 += activeThemeItem.nValue100;
 							}
-							if ( map.Themes.activeTheme.szFlag.match(/EXACT/) ){
+							if ( map.Themes.activeTheme.szFlag.match(/CATEGORICAL/) ){
 								for ( v=0;v<activeThemeItem.nValuesA.length;v++ ){
 									for ( p=0;p<this.partsA.length;p++ ){
 										if ( activeThemeItem.nValuesA[v] == this.partsA[p].min){
@@ -1084,9 +1084,9 @@ MapSelection.prototype.showInfo = function(fDone){
 			this.addItemValues("selection",tmpOrigValuesSumA,this.nSum100);
 			this.szFlag = szThisFlag;
 
-			// handle EXACT values 
+			// handle CATEGORICAL values 
 			//
-			if( this.activeTheme.szFlag.match(/EXACT/) ){
+			if( this.activeTheme.szFlag.match(/CATEGORICAL/) ){
 				var textA = new Array(  map.Dictionary.getLocalText("selected items")
 										,String(__formatValue(Number(this.nCount,2)))
 									);
@@ -1124,7 +1124,7 @@ MapSelection.prototype.showInfo = function(fDone){
 				chartsA.push(chartGroup);
 
 				var donut = DonutCharts.newChart(SVGDocument,chartGroup,map.Scale.normalX(55),map.Scale.normalY(55),0,0);
-				donut.setStyle("3D");
+				//donut.setStyle("3D");
 				donut.setRadInner(0);
 				donut.setRadOuter(map.Scale.normalX(55));
 				donut.setCenter(map.Scale.normalX(80),map.Scale.normalY(100));
@@ -1164,7 +1164,7 @@ MapSelection.prototype.showInfo = function(fDone){
 				/**
 				this.getOverviewChart = this.activeTheme.getOverviewChart;
 				this.szOverviewChart = this.activeTheme.szOverviewChart;
-				if ( this.activeTheme.szFlag.match(/EXACT/) || (!this.activeTheme.szFlag.match(/CHART/) && !this.activeTheme.szFlag.match(/DOMINANT/)) ){
+				if ( this.activeTheme.szFlag.match(/CATEGORICAL/) || (!this.activeTheme.szFlag.match(/CHART/) && !this.activeTheme.szFlag.match(/DOMINANT/)) ){
 					if ( this.nOrigSumA.length > 5 ){
 						this.szOverviewChart = "BAR";
 					}else{
@@ -1261,11 +1261,11 @@ MapSelection.prototype.showInfo = function(fDone){
 			this.getOverviewChart = this.activeTheme.getOverviewChart;
 			this.szOverviewChart = this.activeTheme.szOverviewChart;
 
-			if ( (this.activeTheme.colorScheme.length > 2 ) || this.activeTheme.szFlag.match(/EXACT/) || (!this.activeTheme.szFlag.match(/CHART/) && !this.activeTheme.szFlag.match(/DOMINANT/)) ){
+			if ( (this.activeTheme.colorScheme.length > 2 ) || this.activeTheme.szFlag.match(/CATEGORICAL/) || (!this.activeTheme.szFlag.match(/CHART/) && !this.activeTheme.szFlag.match(/DOMINANT/)) ){
 				if ( this.nOrigSumA.length > 5 ){
 					this.szOverviewChart = "BAR";
 				}else{
-					this.szOverviewChart = "PIE|3D";
+					this.szOverviewChart = "PIE";
 				}
 			}
 
@@ -1310,7 +1310,7 @@ MapSelection.prototype.showInfo = function(fDone){
 
 					var oldszFlag = this.szFlag;
 					this.szFlag = this.activeTheme.szFlag;
-					this.szOverviewChart += "|PERCENTOFVALUE|3D";
+					this.szOverviewChart += "|PERCENTOFVALUE";
 					chartGroup = map.Dom.newGroup(infoWorkspace,"");
 					chartsA.push(chartGroup);
 					this.getOverviewChart(chartGroup);
@@ -1331,8 +1331,8 @@ MapSelection.prototype.showInfo = function(fDone){
 		// ------------------------------------------------------
 		}else{
 			if ( this.activeTheme.szAggregation.match(/sum/) || this.activeTheme.szFlag.match(/SUM/) ){
-				var nSelectionTotal = this.nSum100?this.nSum100:(this.activeTheme.szFlag.match(/EXACT/)?this.nExactCount:this.nSum);
-				var nTotal			= this.activeTheme.nSum100?this.activeTheme.nSum100:(this.activeTheme.szFlag.match(/EXACT/)?this.activeTheme.nExactCount:this.activeTheme.nSum);
+				var nSelectionTotal = this.nSum100?this.nSum100:(this.activeTheme.szFlag.match(/CATEGORICAL/)?this.nExactCount:this.nSum);
+				var nTotal			= this.activeTheme.nSum100?this.activeTheme.nSum100:(this.activeTheme.szFlag.match(/CATEGORICAL/)?this.activeTheme.nExactCount:this.activeTheme.nSum);
 
 //				var textA = new Array(  "selection total",String(__formatValue(nSelectionTotal,2)) 
 //									);
@@ -1367,8 +1367,8 @@ MapSelection.prototype.showInfo = function(fDone){
 			this.getOverviewChart = this.activeTheme.getOverviewChart;
 			this.szOverviewChart = this.activeTheme.szOverviewChart;
 			if ( 1 || !this.szOverviewChart || !this.szOverviewChart.length ){
-				if ( this.activeTheme.szFlag.match(/EXACT/) || (!this.activeTheme.szFlag.match(/CHART/) && !this.activeTheme.szFlag.match(/DOMINANT/)) ){
-					this.szOverviewChart = "PIE|3D";
+				if ( this.activeTheme.szFlag.match(/CATEGORICAL/) || (!this.activeTheme.szFlag.match(/CHART/) && !this.activeTheme.szFlag.match(/DOMINANT/)) ){
+					this.szOverviewChart = "PIE";
 				}
 			}
 			this.nOrigSumA = this.nOrigValuesSumA;

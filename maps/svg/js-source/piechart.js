@@ -128,6 +128,13 @@ DonutChart.prototype.setLineWidth = function(nWidth){
 	this.nLineWidth = nWidth; 
 };
 /**
+ * method to set a max value for STARBURST charts
+ * @param nMax max value to draw a background nax value circle
+ */
+DonutChart.prototype.setMaxValue = function(nMax){
+	this.nMaxValue = nMax; 
+};
+/**
  * adds one part to the donut / pie object
  * @param nPercent size of the part in 1/100
  * @param nHeight  set individual part height, overrides global height
@@ -179,21 +186,36 @@ DonutChart.prototype.realize = function(){
 		_crc_newText(this.targetDocument,this.targetGroup,this.mX,this.mY,"fill:gray;font-size:"+this.nRadOuter/5+";text-anchor:middle;","Pie error: no values !");
 		return;
 	}
+	
 	// recalculate percentages for volume equation
+	//
 	var nSqrtSum = 0;
 	var nSum = 0;
+	var nMaxRadius = 0;
+	var nMaxRadius25 = 0;
+	var nMaxRadius50 = 0;
+	var nMaxRadius75 = 0;
+	var nMax = 0; 
+	
 	if ( this.szStyle.match(/VOLUME/) || this.szStyle.match(/STARBURST/) ){
 		for ( var i=0;i<this.partsA.length;i++ ){
 			nSum += this.partsA[i].nPercent;
+			nMax = Math.max(nMax,this.partsA[i].nPercent);
 			nSqrtSum += Math.sqrt(this.partsA[i].nPercent);
 		}
+		nSqrtSum = Math.sqrt(this.nMaxValue*this.partsA.length);
 		for ( var ii=0;ii<this.partsA.length;ii++ ){
-			this.partsA[ii].nPercent = Math.round(100/nSqrtSum*Math.sqrt(this.partsA[ii].nPercent));
+			this.partsA[ii].nPercent = (100/nSqrtSum*Math.sqrt(this.partsA[ii].nPercent));
 			if ( this.szStyle.match(/VOLUME/) ){
 				this.partsA[ii].nHeight  *= this.partsA[ii].nPercent/25;
 			}
 		}
+		nMaxRadius = (100/nSqrtSum*Math.sqrt(this.nMaxValue||100));
+		nMaxRadius25 = (100/nSqrtSum*Math.sqrt(this.nMaxValue/4||50));
+		nMaxRadius50 = (100/nSqrtSum*Math.sqrt(this.nMaxValue/2||50));
+		nMaxRadius75 = (100/nSqrtSum*Math.sqrt(this.nMaxValue/4*3||50));
 	}
+	
 	// recalculate percentages for pies
 	else {
 		for ( var i=0;i<this.partsA.length;i++ ){
@@ -239,35 +261,72 @@ DonutChart.prototype.realize = function(){
 
 	nMaxAngle = this.szStyle.match(/HALF/)?180:360;
 
-	this.nRadOuterMaxL = 0;
-	this.nRadOuterMaxR = 0;
-	for ( i=0;i<this.partsA.length;i++ ){
-		var nAngle = this.partsA[i].nPercent/100*nMaxAngle;
-		var nGapAngle = 0;
-		if ( this.szStyle.match(/STARBURST/) ){
-			nAngle = nMaxAngle/this.partsA.length;
-		}
+	var nAngle = 0;
+	var nGapAngle = 0;
+	
+	// STARBURST have radius as value measure an equal angle distribution
+	//
+	if ( this.szStyle.match(/STARBURST/) ){
+		nAngle = nMaxAngle/this.partsA.length;
+		this.nRadOuter += this.nRadInner/this.partsA.length*3;
+
+		if ( this.szStyle.match(/XLRAYS/) ){
+			nAngle = Math.min(nMaxAngle/4,nMaxAngle/this.partsA.length);
+			nGapAngle = nAngle*0.10*(this.szStyle.match(/HALF/)?0.5:1);
+			this.nRadInner = Math.max(35,this.nRadInner);
+		}else
+		if ( this.szStyle.match(/LRAYS/) ){
+			nAngle = Math.min(nMaxAngle/4,nMaxAngle/this.partsA.length);
+			nGapAngle = nAngle*0.20*(this.szStyle.match(/HALF/)?0.5:1);
+			this.nRadInner = Math.max(35,this.nRadInner);
+		}else
 		if ( this.szStyle.match(/XSRAYS/) ){
 			nAngle = Math.min(nMaxAngle/12,nMaxAngle/this.partsA.length);
-			nGapAngle = nAngle*0.40;
-			this.nRadInner = 35;
+			nGapAngle = nAngle*0.40*(this.szStyle.match(/HALF/)?0.5:1);
+			this.nRadInner = Math.max(35,this.nRadInner);
 		}else
 		if ( this.szStyle.match(/SRAYS/) ){
 			nAngle = Math.min(nMaxAngle/10,nMaxAngle/this.partsA.length);
-			nGapAngle = nAngle*0.33;
-			this.nRadInner = 35;
+			nGapAngle = nAngle*0.33*(this.szStyle.match(/HALF/)?0.5:1);
+			this.nRadInner = Math.max(35,this.nRadInner);
 		}else
 		if ( this.szStyle.match(/RAYS/) ){
-			nAngle = Math.min(nMaxAngle/8,nMaxAngle/this.partsA.length);
-			nGapAngle = nAngle*0.25;
-			this.nRadInner = 35;
+			nAngle = nMaxAngle/this.partsA.length; // Math.min(nMaxAngle/8,nMaxAngle/this.partsA.length);
+			nGapAngle = nAngle*0.35*(this.szStyle.match(/HALF/)?0.5:1);
+			this.nRadInner = Math.max(35,this.nRadInner);
 		}
+	}
+
+	this.nRadOuterMaxL = 0;
+	this.nRadOuterMaxR = 0;
+	
+	// --------------------------
+	// make the parts 
+	// --------------------------
+
+	for ( i=0;i<this.partsA.length;i++ ){
+		
+		// not! STARBURST have angle as value measure an equal radius
+		//
+		if ( !this.szStyle.match(/STARBURST/) ){
+			nAngle = this.partsA[i].nPercent/100*nMaxAngle;
+			nGapAngle = 0;
+		}
+		
 		nStartAngle = nEndAngle%360;
 		nEndAngle = nStartAngle + nAngle;
 		if ( nEndAngle > 360 ){
 			nEndAngle = nEndAngle%360;
 		}
-		this.donutPartsA[i] = {nStartAngle:nStartAngle+nGapAngle,nEndAngle:nEndAngle-nGapAngle,color:this.partsA[i].color,nHeight:this.partsA[i].nHeight,nOffset:this.partsA[i].nOffset};
+		if ( this.szStyle.match(/DIRECTION/) ){
+			if (this.partsA[i].nAngle){
+				this.donutPartsA[i] = {nStartAngle:this.partsA[i].nAngle-1,nEndAngle:this.partsA[i].nAngle+1,color:this.partsA[i].color,nHeight:this.partsA[i].nHeight,nOffset:this.partsA[i].nOffset};
+			}else{
+				this.donutPartsA[i] = {};
+			}
+		}else{
+			this.donutPartsA[i] = {nStartAngle:nStartAngle+nGapAngle,nEndAngle:nEndAngle-nGapAngle,color:this.partsA[i].color,nHeight:this.partsA[i].nHeight,nOffset:this.partsA[i].nOffset};
+		}
 		if ( !this.szStyle.match(/3D/) ){
 			this.donutPartsA[i].nHeight = 0;
 		}
@@ -285,6 +344,26 @@ DonutChart.prototype.realize = function(){
 		if ( this.partsA[i].nOpacity ){
 			this.donutPartsA[i].nOpacity  = this.partsA[i].nOpacity;
 		}
+	}
+	
+	// GR 14.02.2020 make background circle 
+	// 
+	if ( this.szStyle.match(/STARBURST/) && this.szStyle.match(/POLAR/) ) {
+		var radius = Math.max(1,this.nRadInner + nMaxRadius/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
+		var c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:white;fill-opacity:1;stroke:#dddddd;stroke-width:20px;"); 
+		c.setAttributeNS(null,"tooltip","75-100");
+		
+		var radius = Math.max(1,this.nRadInner + nMaxRadius75/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
+		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#dddddd;stroke-width:20px;stroke-dasharray:50 50"); 	
+		c.setAttributeNS(null,"tooltip","50-75");
+		
+		var radius = Math.max(1,this.nRadInner + nMaxRadius50/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
+		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#dddddd;stroke-width:10px;"); 		c.setAttributeNS(null,"tooltip","25-50");
+	
+		var radius = Math.max(1,this.nRadInner + nMaxRadius25/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
+		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#dddddd;stroke-width:20px;stroke-dasharray:50 50"); 
+		c.setAttributeNS(null,"tooltip","0-25");
+
 	}
 
 	// GR 02.12.2018 HALF angles are going from 270 to 90 
@@ -308,7 +387,7 @@ DonutChart.prototype.realize = function(){
 		donutPart = _crc_drawDonut(this.targetDocument,this.frameGroup,this.mX,this.mY,this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter,this.nRadInner,this.donutPartsA[i].nHeight,this.donutPartsA[i].nStartAngle,this.donutPartsA[i].nEndAngle,this.donutPartsA[i].color,null,null,this.szLine,this.nLineWidth,this.szStyle,this.donutPartsA[i].nOffset);
 //		donutPart.setAttributeNS(szMapNs,"tooltip",Math.round(this.partsA[i].nPercent*10)/10+" % of members "+Math.round(this.partsA[i].nHeight/20*10)/10+" % of value");
 		if ( !this.szStyle.match(/SILENT/) ){
-			donutPart.setAttributeNS(szMapNs,"tooltip",this.partsA[i].szInfo?this.partsA[i].szInfo:Math.round(this.partsA[i].nInfoValue*10)/10+" % ");
+			donutPart.setAttributeNS(szMapNs,"tooltip",this.partsA[i].szInfo?(this.partsA[i].szText+this.partsA[i].szInfo):Math.round(this.partsA[i].nInfoValue*10)/10+" % ");
 			if (this.partsA[i].szOver){	
 				donutPart.setAttributeNS(szMapNs,"onover",this.partsA[i].szOver);
 			}
@@ -326,7 +405,7 @@ DonutChart.prototype.realize = function(){
 		donutPart = _crc_drawDonut(this.targetDocument,this.frameGroup,this.mX,this.mY,this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter,this.nRadInner,this.donutPartsA[i].nHeight,this.donutPartsA[i].nStartAngle,this.donutPartsA[i].nEndAngle,this.donutPartsA[i].color,null,null,this.szLine,this.nLineWidth,this.szStyle,this.donutPartsA[i].nOffset);
 //		donutPart.setAttributeNS(szMapNs,"tooltip",Math.round(this.partsA[i].nPercent*10)/10+" % of members "+Math.round(this.partsA[i].nHeight/20*10)/10+" % of value");
 		if ( !this.szStyle.match(/SILENT/) ){
-			donutPart.setAttributeNS(szMapNs,"tooltip",this.partsA[i].szInfo?this.partsA[i].szInfo:Math.round(this.partsA[i].nInfoValue*10)/10+" % ");
+			donutPart.setAttributeNS(szMapNs,"tooltip",this.partsA[i].szInfo?(this.partsA[i].szText+this.partsA[i].szInfo):Math.round(this.partsA[i].nInfoValue*10)/10+" % ");
 			if (this.partsA[i].szOver){	
 				donutPart.setAttributeNS(szMapNs,"onover",this.partsA[i].szOver);
 			}
@@ -485,7 +564,7 @@ function _crc_drawDonut(targetDocument, targetGroup,mX, mY, nRadOuter, nRadInner
 	}
 
 	// GR 03.05.2007 must never be negative
-	if ( nStartAngle < 0 || nEndAngle < 0 ){
+	if ( nStartAngle < 0 || nEndAngle < 0 || (nStartAngle == nEndAngle) ){
 		return targetGroup;
 	}
 	_crc_constructNode('rect',targetDocument,targetGroup,{
@@ -660,7 +739,7 @@ function _crc_drawOuterWall(targetDocument, targetGroup,mX, mY, nRadOuter, nRadI
 function _crc_donutPartOver(evt){
 	var xOut = Number(evt.currentTarget.firstChild.getAttributeNS(null,'x')); 
 	var yOut = Number(evt.currentTarget.firstChild.getAttributeNS(null,'y'));
-	evt.currentTarget.setAttribute('transform','translate('+xOut/5+','+yOut/5+')');
+	evt.currentTarget.setAttribute('transform','translate('+xOut/25+','+yOut/25+')');
 	try{
 		eval(evt.currentTarget.getAttribute('onover'));
 	}

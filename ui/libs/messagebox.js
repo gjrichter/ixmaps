@@ -24,7 +24,7 @@ jQuery.fn.center = function (absolute) {
 
 
 var MESSAGE_TYPE = { "Information": 1, "Error": 2, "Confirmation": 3 };
- 
+var MESSAGE_STACK = []; 
 var MessageBox =
 {
     close: function () {
@@ -32,14 +32,33 @@ var MessageBox =
         MessageBox.cancelEvent = function () { MessageBox.close() }
         $(".popup_messagebox").remove();
         $(".cover_background").remove();
+
+		setTimeout("MessageBox.pop()",100);
     },
  
     successEvent: function () { MessageBox.close(); },
  
     cancelEvent: function () { MessageBox.close(); },
+
+	push: function (messageType, header, content, onSuccess, onCancel){
+		MESSAGE_STACK.push({"messageType":messageType, "header":header, "content":content, "onSuccess":onSuccess, "onCancel":onCancel});
+	},
+
+	pop: function (){
+		var message = MESSAGE_STACK.pop();
+		if ( message ){
+			this.show(message.messageType, message.header, message.content, message.onSuccess, message.onCancel);
+		}
+	},
  
     show: function (messageType, header, content, onSuccess, onCancel) {
-        var popupStr = "<div align='center' class='popup_messagebox ui-simpledialog-container ui-overlay-shadow ui-corner-all pop ui-body-b in'>"
+
+		if ( $(".popup_messagebox")[0] ){
+			this.push(messageType, header, content, onSuccess, onCancel);
+			return;
+		}
+
+        var popupStr = "<div class='popup_messagebox'>"
                     + getMessageContent(messageType, header, content) + "</div>";
 		$("body").append(popupStr);
         $(".popup_messagebox").center();
@@ -86,18 +105,18 @@ function getMessageContent(messagType, header, content) {
 
     if (messagType == MESSAGE_TYPE.Confirmation) {
         messageContent += ''
-        + '<a id="MsgOkButton" href="#" data-role="button"><div class="messagebox_button" >ok</div></a>'
+        + '<div style="float:right;margin:0em 1em 1.5em 1em">'
+        + '<a id="MsgOkButton" href="#" data-role="button"><span class="messagebox_button" >ok</span></a>'
         + ''
-        + '<div style="height:2px;background:white">'
-        + '</div>'
-        + ''
-        + '<a id="CancelButton" href="#" data-role="button"><div class="messagebox_button" >cancel</div></a>'
-        + '';
+         + ''
+        + '<a id="CancelButton" href="#" data-role="button"><span class="messagebox_button" style="color:red">cancel</span></a>'
+        + '</div>';
     }else
     if (messagType == MESSAGE_TYPE.Information || messagType == MESSAGE_TYPE.Error) {
         messageContent += ''
-        + '<a id="MsgOkButton" href="#" data-role="button" ><div class="messagebox_button" >ok</div></a>'
-        + '';
+        + '<div style="float:right;margin:0em 1em 1.5em 1em">'
+        + '<a id="MsgOkButton" href="#" data-role="button" ><span class="messagebox_button" >ok</span></a>'
+        + '</div>';
     }
 
 	return messageContent;

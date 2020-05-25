@@ -31,21 +31,21 @@ window.ixmaps.data = window.ixmaps.data || {};
 		var nCountMax = 0;
 		var dValue = 0;
 		var a;
-
+        
 		if (szFlag.match(/LOG/)) {
 			dValue = nMin ? 0 : 0.1;
 			nMin = Math.log(nMin + dValue);
 			nMax = Math.log(nMax + dValue);
 		}
 
-		var nPop = (nMax - nMin) / nTicks;
+		var nPop = (nMax - nMin ) / (nTicks-1);
 
 		var nPopA = [];
 		var nTickA = [];
 		var nTickVal = nMin;
 		for (var i = 0; i < nTicks + 1; i++) {
 			nPopA[i] = 0;
-			nTickA[i] = szFlag.match(/LOG/) ? (Math.exp(nTickVal)) : nTickVal;
+			nTickA[i] = Math.floor(szFlag.match(/LOG/) ? (Math.exp(nTickVal)) : nTickVal);
 			nTickVal += nPop
 
 		}
@@ -64,9 +64,22 @@ window.ixmaps.data = window.ixmaps.data || {};
 		return { min: nTickA, count: nPopA };
 	};
 
-	// get unique values array
+	// get unique values array via filter
 	var __onlyUnique = function (value, index, self) {
 		return self.indexOf(value) === index;
+	};
+
+	// get unique values array via named array
+	var __getUniqueValues = function(a) {
+		var u = [];
+		for ( var i in a ){
+			u[String(a[i])] = 1;
+		}
+		var retA = [];
+		for ( var v in u ){
+			retA.push(v);
+		}
+		return retA;
 	};
 
 	// get numbers from formatted values like 235 678.98 or 235.678,98
@@ -97,20 +110,18 @@ window.ixmaps.data = window.ixmaps.data || {};
 	// -----------------------------------------------
 	__setFacetFilter = function (szFilter) {
 
+		// if new filter given, add to filter array (delete existent filter of the same data column)
 		if (szFilter.length) {
 
-			// store filter without WHERE 
-			szfilter = szFilter.split(/WHERE /)[1];
+			// get filter without WHERE 
+			szFilter = szFilter.split(/WHERE /)[1];
 
 			// add, or remove filter, if exists  
-			var fDelete = false;
-			__facetFilterA = __facetFilterA.filter(function (value, index, self) {
-				fDelete = fDelete | (szfilter == value);
-				return !(szfilter == value);
+			__facetFilterA.filter(function (value, index, self) {
+				return !(szFilter.split(/"/)[1] == value.split(/"/)[1]);
 			});
-			if (!fDelete) {
-				__facetFilterA.push(szFilter.split(/WHERE /)[1]);
-			}
+
+			__facetFilterA.push(szFilter);
 		}
 
 		// make final filter from actual parts stored in __facetFilterA
@@ -121,30 +132,49 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 		// filter items on map
 		var objTheme = ixmaps.getThemeObj();
+		var objThemesA = ixmaps.getThemes();
+		for ( a in objThemesA ){
+			objTheme = objThemesA[a];
+			if ( !objTheme.szFlag.match(/FEATURE/) ){
+                if ( szFilter ){
+                    ixmaps.changeThemeStyle(objTheme.szId, "filter:" + (szFilter || " "), "set");
+                }else{
+                    ixmaps.changeThemeStyle(objTheme.szId, "filter", "remove");
+                }
+            }
+		}
+		/**
 		if ( szFilter ){
+			if ( !objTheme.szFlag.match(/CATEGORICAL/) ){
+				ixmaps.changeThemeStyle(null,objTheme.szId,"type:RANGES","add");
+			}
 			ixmaps.changeThemeStyle(objTheme.szId, "filter:" + (szFilter || " "), "set");
 		}else{
 			ixmaps.changeThemeStyle(objTheme.szId, "filter", "remove");
 		}
-
+		**/
 		// make new facets
-		__redrawFacets(szFilter);
+		//__redrawFacets(szFilter);
 
 	};
 
 	var __redrawFacets = function (szFilter) { 
-		$("#facets").html('<h2 style="padding:0.2em 0.5em;background:#dddddd;border-radius:5px;color:white">refresh facets ...<img src="resources/images/bg-spinner.gif" style="display:block;margin:1em auto;height:32px"></h2>');
 
-		setTimeout("ixmaps.data.makeFacets('"+szFilter+"','facetDiv')",1000);
-		/**
-		if (szFilter) {
-			setTimeout("$('#btn-solo-attivi').click()", 100);
-		} else {
-			setTimeout("$('#btn-tutti').click()", 100);
-		}
-		**/
-		//alert($(".story-body").scrollTop());
+		$("#facets").html('<h2 style="padding:0.2em 0.5em;background:#dddddd;border-radius:5px;color:white">refresh facets ...<img src="resources/images/bg-spinner.gif" style="display:block;margin:1em auto;height:32px"></h2>');
+		ixmaps.data.szFilter = szFilter;
+		//setTimeout("ixmaps.data.makeFacets('"+szFilter+"','facetDiv')",1000);
 	};
+
+	var old_onDrawTheme = ixmaps.htmlgui_onDrawTheme;
+	// intercept theme creation done, and make the legend
+	//
+	ixmaps.htmlgui_onDrawTheme = function(szId){
+		ixmaps.data.makeFacets(ixmaps.data.szFilter,'facetDiv');
+		old_onDrawTheme(szId);
+	}
+	ixmaps.htmlgui_onHideStoryTool = function(){
+		ixmaps.htmlgui_onDrawTheme = old_onDrawTheme;
+	}
 
 	// -------------------------------------------------------------------------
 	// set a range filter for a data field
@@ -158,20 +188,13 @@ window.ixmaps.data = window.ixmaps.data || {};
 			return !(value.split("\"")[1] == szField);
 		});
 		__setFacetFilter(szFilter);
-		/**
-		if ((rangeA[0] != min) || (rangeA[1] != max)) {
-			__setFacetFilter(szFilter);
-		} else {
-			__setFacetFilter("");
-		}
-		**/
 	};
 
 	// -------------------------------------------------------------------------
 	// set a input field filter
 	// --------------------------------------------------------------------------
 	__setFilter = function (szField, szFilter) {
-		szQuery = "WHERE \"" + szField + "\" is \"" + szFilter + "\"";
+		szQuery = "WHERE \"" + szField + "\" like \"" + szFilter + "\"";
 		// delete filter with same field
 		__facetFilterA = __facetFilterA.filter(function (value, index, self) {
 			return !(value.split("\"")[1] == szField);
@@ -214,8 +237,12 @@ window.ixmaps.data = window.ixmaps.data || {};
 			var min = __rangesA[facet.id].min;
 			var max = __rangesA[facet.id].max;
 			var sliderId = facet.id;
-			var nTicks = Math.min(40, (max - min));
+			var nTicks = Math.min(40, (max - min + 1));
 			nTicks = (nTicks >= 5) ? nTicks : 40;
+            var nStep = pop = (max - min) / nTicks;
+            if ( nStep > 1 && nStep < 2 ) {
+                nTicks = max - min +1;                     
+            }
 
 			var szScale = ((max - min) < 40) ? "" : "LOG";
 			var fDiscret = (nTicks == max-min);
@@ -234,6 +261,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 				var bMin = barA.min[b];
 				var bMax = fDiscret?barA.min[b]:barA.min[b + 1];
 				var color = ((bMax >= rangeA[0]) && (bMin <= rangeA[1])) ? "#888" : "#ddd";
+
 				if (fOnMap) {
 					//color = objTheme.partsA[0].color;
 					objTheme.partsA.forEach(function (part) {
@@ -245,7 +273,9 @@ window.ixmaps.data = window.ixmaps.data || {};
 				var szFilter = "ixmaps.filterThemeItems(null, null, '', { field: '"+facet.id+"', min: "+bMin+", max: "+bMax+" }";
 				var szHighlight = "$(this).css('background','#880000');"+szFilter;
 				var szClearHighlight = "$(this).css('background','');ixmaps.filterThemeItems(null,null,'','remove');"
-				szHtml += "<div style='display:inline-block;width:" + width + "px;background-color:" + color + ";height:" + (1 + (height * scale)) + "px;' data-toggle='tooltip' title='" + (bMin + '-' + bMax) + " onmouseover='" + szHighlight + "' onmouseout='" + szClearHighlight + "'></div>";
+                bMin = ixmaps.__formatValue(bMin, 2, "BLANK");
+			    bMax = ixmaps.__formatValue(bMax, 2, "BLANK");
+ 				szHtml += "<div style='display:inline-block;width:" + width + "px;background-color:" + color + ";height:" + (1 + (height * scale)) + "px;' data-toggle='tooltip' title='" + (bMin + ' - ' + bMax) + " onmouseover='" + szHighlight + "' onmouseout='" + szClearHighlight + "'></div>";
 			}
 			szHtml += "</div>";
 
@@ -263,13 +293,12 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 	__HighlightFacetItems = function (szField, szValue) { console.log("__HighlightFacetItems");
 		var objTheme = ixmaps.getThemeObj();
-		console.log(objTheme.szFilter);
 		__oldFilter = objTheme.szFilter;
 		if ( objTheme && ( objTheme.szFlag.match(/AGGREGATE/) || objTheme.szFlag.match(/MULTI/)) ){
 			if ( __oldFilter.match(/WHERE/) ){
-				ixmaps.filterThemeItems(null, null, __oldFilter + ' AND "'+szField+'" is "'+szValue+'"', 'set');
+				ixmaps.filterThemeItems(null, null, __oldFilter + ' AND "'+szField+'" = "'+szValue+'"', 'set');
 			}else{
-				ixmaps.filterThemeItems(null, null, 'WHERE "'+szField+'" is "'+szValue+'"', 'set');
+				ixmaps.filterThemeItems(null, null, 'WHERE "'+szField+'" = "'+szValue+'"', 'set');
 			}
 		}else{
 			ixmaps.filterThemeItems(null, null, "", { field: szField, txt: szValue });
@@ -318,275 +347,17 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 	// ===========================================
 	//
-	// create filter facets from theme data
+	// create the html facet list
 	//
 	// ===========================================
 
-	ixmaps.data.makeFacets = function (szFilter,szDiv) {
-
-		facetsA = [];
+	ixmaps.data.showFacets = function (szFilter,szDiv,facetsA) {
 
 		var fTest = true;
 		var sliderA = [];
 
-		console.log("=== make facets ===");
-
-		// theme
-		// ------------------------------------
-		var objThemeDefinition = ixmaps.getThemeDefinitionObj();
-		var objTheme = ixmaps.getThemeObj();
-
-		// theme data
-		// ------------------------------------
-		var szData = objThemeDefinition.style.dbtable;
-		var dataObj = eval("ixmaps.embeddedSVG.window." + (szData || "themeDataObj"));
-
-		// create data object from theme data
-		// ------------------------------------
-		var mydata = new Data.Table(dataObj);
-
-		// GR 23.02.2018 take only rows which are on the map
-		// -------------------------------------------------
-		records = [];
-		for ( i in objTheme.indexA ){
-			if ( objTheme.itemA[objTheme.indexA[i]].dbIndex ){
-				records.push(dataObj.records[objTheme.itemA[objTheme.indexA[i]].dbIndex]);
-			}
-			if ( objTheme.itemA[objTheme.indexA[i]].dbIndexA ){
-				for ( a in objTheme.itemA[objTheme.indexA[i]].dbIndexA ) {
-					records.push(dataObj.records[objTheme.itemA[objTheme.indexA[i]].dbIndexA[a]]);
-				}
-			}
-		}
-		mydata.records = records;
-
-		// if we have already a filter on the map,
-		// filter data before creating facets
-		// ------------------------------------
-		if (szFilter && szFilter.match(/WHERE/)) {
-			mydata = mydata.select(szFilter);
-
-			// get filter parts
-			// ----------------
-			var szPartsA = szFilter.split('WHERE ')[1].split('AND');
-			// test if BETWEEN x AND y and join two parts around AND
-			for ( i=0; i<szPartsA.length; i++ ){
-				if ( szPartsA[i].match(/BETWEEN/) ){
-					szPartsA[i] = szPartsA[i] + "AND" + szPartsA[i+1];
-					szPartsA.splice(i+1,1);
-				}
-			}
-			// set filter parts
-			// ----------------
-			szPartsA.forEach(function(x){
-				__facetFilterA.push(x);
-			});
-		}
-
-		// make facets from data fields
-		// ----------------------------
-
-		var a, u;
-		var fields = mydata.columnNames();
-
-		for (var i = 0; i < fields.length; i++) {
-
-			a = mydata.column(fields[i]).values();
-
-			console.log(fields[i]+"-------->");
-
-			// test for only numeric values
-			// ----------------------------
-			fNumeric = true;
-			a.forEach(function (x) {
-				if (isNaN(__scanValue(x))) {
-					fNumeric = false;
-				}
-			});
-			console.log("fNumeric: " + fNumeric);
-
-			// test if field already part of the active query 
-			// ------------------------------------------
-			var fActiveFacet = false;
-			__facetFilterA.forEach(function (szFilter, index) {
-				if ((szFilter.split("\"")[1] == fields[i]) && (szFilter.split("\"")[2] == " is ")) {
-					fActiveFacet = true;
-				}
-			});
-
-			// test for unique values 
-			// -----------------------
-
-			// first test maximal 250 values at the beginning 
-
-			a.length = Math.min(a.length, 250);
-			u = a.filter(__onlyUnique);
-
-			console.log(u.length);
-			console.log(a.length);
-
-			// if we have many unique values and they are numbers,
-			// make a numerique facet, if they are texts, skip field
-			// -----------------------------------------------------
-			if ((a.length >= 250) && (u.length >= (a.length / 5))) {
-
-				if (fNumeric) {
-
-					a = mydata.column(fields[i]).values();
-					a = a.map(function (x) {
-						return __scanValue(x);
-					});
-					a.sort(function (a, b) {
-						return ((a > b) ? 1 : -1);
-					});
-					var facet = {};
-					facet.id = fields[i];
-					facet.min = a[0];
-					facet.max = a[a.length - 1];
-					facet.values = a;
-					facet.data = a;
-					facetsA.push(facet);
-					console.log("...... numeric");
-
-				} else {
-					// make input field to define filter 
-					// ------------------------------------------
-					var facet = {};
-					facet.id = fields[i];
-					facet.type = "search";
-					facet.example = a[0];
-
-					if (fActiveFacet) {
-
-						// add value list in any case 
-						// ---------------------------
-						facet.values = a;
-						// count values
-						var valuesCount = {};
-						a.forEach(function (x) {
-							valuesCount[x] = (valuesCount[x] || 0) + 1;
-						});
-						facet.valuesCount = valuesCount;
-						facet.uniqueValues = a.length;
-					}
-
-					facetsA.push(facet);
-					console.log("...... filter");
-				}
-				continue;
-			};
-
-			// ok, data with many different values done
-			// lets get all! unique values
-			// -----------------------------------------
-
-			a = mydata.column(fields[i]).values();
-
-			// get unique values array
-			var u = a.filter(__onlyUnique);
-
-			// if less than 50 unique values, make text or number facet
-			// --------------------------------------------------------
-
-			if (u.length < 50 && !__rangesA[fields[i]] && !fNumeric) {
-
-				// count values
-				var valuesCount = {};
-				a.forEach(function (x) {
-					valuesCount[x] = (valuesCount[x] || 0) + 1;
-				});
-
-				if (fNumeric) {
-					u = u.map(function (x) {
-						return Number(x);
-					});
-					u.sort(function (a, b) {
-						return ((a > b) ? 1 : -1);
-					});
-				} else {
-					u.sort();
-					u.sort(function (a, b) {
-						return ((valuesCount[a] < valuesCount[b]) ? 1 : -1);
-					});
-				}
-
-				var facet = {};
-				facet.id = fields[i];
-				facet.values = u;
-				facet.valuesCount = valuesCount;
-				facet.uniqueValues = u.length;
-
-				if ((u.length > 10) || fActiveFacet) {
-					facet.type = "search";
-				}
-
-				facetsA.push(facet);
-
-				console.log("...... text");
-			}
-			else {
-
-				// more than 50 unique values
-
-				if (fNumeric) {
-
-					// if numeric data, make min/max range filter
-					// ------------------------------------------
-					a = mydata.column(fields[i]).values();
-					var min = null;
-					var max = null;
-					var fNaN = false
-					a = a.map(function (x) {
-						x = __scanValue(x);
-						min = Math.min(min || x, x);
-						max = Math.max(max || x, x);
-						return (x);
-					});
-					var facet = {};
-					facet.id = fields[i];
-					facet.min = min; //a[0];
-					facet.max = max; //a[a.length-1];
-					facet.data = a;
-					facet.uniqueValues = u.length;
-					facet.type = "numeric";
-					facetsA.push(facet);
-
-					console.log("...... numeric");
-
-				} else {
-
-					// if not numeric, make input field to define filter 
-					// ------------------------------------------
-					var facet = {};
-					facet.id = fields[i];
-					facet.type = "search";
-					if (u.length < 200) {
-						// add value list
-						// ---------------
-						facet.values = u;
-						var valuesCount = {};
-						a.forEach(function (x) {
-							valuesCount[x] = (valuesCount[x] || 0) + 1;
-						});
-						u.sort(function (a, b) {
-							return ((valuesCount[a] < valuesCount[b]) ? 1 : -1);
-						});
-						facet.valuesCount = valuesCount;
-						facet.uniqueValues = u.length;
-					}
-					facetsA.push(facet);
-					console.log("...... filter");
-				}
-			}
-		}
-
-		console.log("=== done ========");
-
-		// ===========================================
-		//
-		// create the html facet list
-		//
-		// ===========================================
+		var objThemeDefinition = ixmaps.data.objThemeDefinition;
+		var objTheme = ixmaps.data.objTheme;
 
 		var szHtml = "";
 		szHtml += "<div id='list-facets' class='list-group' style='width:100%;margin-bottom:5em;'>";
@@ -619,7 +390,9 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 			var fActiveFacet = false;
 			var szActiveFilter = null;
-			var szSafeId = facetsA[i].id.replace(/ |:|\(|\)|\.|\#|\//g, "_");
+            
+            // replace all non word characters with underscore
+			var szSafeId = facetsA[i].id.replace(/ |\W/g, "_");
 
 			__facetFilterA.forEach(function (szFilter, index) {
 				if (szFilter.split("\"")[1] == facetsA[i].id) {
@@ -642,7 +415,15 @@ window.ixmaps.data = window.ixmaps.data || {};
 			szHtml += fActiveFacet ? "<a href='javascript:__removeFacets(\"" + (facetsA[i].id) + "\");' style='color:white' >" : "";
 			szHtml += "<div style='font-family:arial;font-size:1.1em;text-align:left;padding:0.5em 0.5em 0.5em 0.5em;margin:1em 0 0.4em 0;background:" + bgColor + ";border-radius:5px;color:white'>";
 			szHtml += facetsA[i].id;
-			szHtml += (typeof (facetsA[i].min) != "undefined") ? ((facetsA[i].min != facetsA[i].max) ? (": " + szMin + " - " + szMax) : (": " + szMin)) : "";
+            
+			if(facetsA[i].data &&
+               facetsA[i].data.length &&
+               !isNaN(facetsA[i].min) &&
+               !isNaN(facetsA[i].max) &&
+               (facetsA[i].min < facetsA[i].max) ){
+ 				szHtml += (typeof (facetsA[i].min) != "undefined") ? ((facetsA[i].min != facetsA[i].max) ? (": " + szMin + " - " + szMax) : (": " + szMin)) : "";
+			}
+            
 			szHtml += fActiveFacet ? "<span style='float:right;margin-right:0em'><i class='icon shareIcon share_bitly icon-cancel-circle' title='Share a short link' tabindex='-1'></i></span>" : "";
 			szHtml += "</div>";
 			szHtml += fActiveFacet ? "</a>" : "";
@@ -657,7 +438,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 				szHtml += '<input id="' + (szSafeId + "query") + '" type="text" class="form-control" value="' + value + '" placeholder="' + placeholder + '"';
 				szHtml += 'onKeyUp="if(event.which == 13){var value = $(\'#' + (szSafeId + "query") + '\').val();__setFilter(\'' + facetsA[i].id + '\',value);}">';
 				szHtml += '<span class="input-group-btn">';
-				szHtml += '<button class="btn btn-search" type="button" onclick="var value = $(\'#' + (szSafeId + "query") + '\').val();__setFilter(\'' + facetsA[i].id + '\',value);"><i class="fa fa-search fa-fw"></i> filtra</button>';
+				szHtml += '<button class="btn btn-search" type="button" onclick="var value = $(\'#' + (szSafeId + "query") + '\').val();__setFilter(\'' + facetsA[i].id + '\',value);"><i class="fa fa-search fa-fw"></i> </button>';
 				szHtml += '</span></input>';
 				szHtml += '</div>'
 			}
@@ -666,7 +447,10 @@ window.ixmaps.data = window.ixmaps.data || {};
 			// facet content
 			// ---------------------------------
 
-			if (typeof (facetsA[i].min) != "undefined" && !isNaN(facetsA[i].min) && !isNaN(facetsA[i].max) && (facetsA[i].min != facetsA[i].max)) {
+			if (typeof (facetsA[i].min) != "undefined" && 
+				 !isNaN(facetsA[i].min)				   &&
+				 !isNaN(facetsA[i].max)				   &&
+				 (facetsA[i].min < facetsA[i].max)	   ){
 
 				// ---------------------------------
 				// continous value facet
@@ -697,8 +481,13 @@ window.ixmaps.data = window.ixmaps.data || {};
 					}
 
 					var sliderId = szSafeId;
-					var nTicks = Math.min(40, (max - min));
+					var nTicks = Math.min(40, (max - min + 1));
 					nTicks = (nTicks >= 5) ? nTicks : 40;
+                    
+                    var nStep = pop = (max - min) / nTicks;
+                    if ( nStep > 1 && nStep < 2 ) {
+                        nTicks = max - min;                     
+                    }
 
 					var szScale = ((max - min) < 40) ? "" : "LOG";
 
@@ -707,7 +496,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 					barA.count.forEach(function (height) {
 						maxHeight = Math.max(maxHeight, height);
 					});
-					var fDiscret = (nTicks == max-min);
+					var fDiscret = (nTicks == max-min+1);
 					var scale = 75 / maxHeight;
 					var width = 210 / nTicks;
 					szHtml += '<div style="background:#eeeeee;margin-top:0.4em;border-radius:5px;">'
@@ -730,7 +519,8 @@ window.ixmaps.data = window.ixmaps.data || {};
 							});
 						}
 
-						var szTooltip = fDiscret?String(bMin):String(bMin) + '-' + String(bMax);
+						var szTooltip = 
+                            fDiscret?String(bMin):ixmaps.__formatValue(bMin, 2, "BLANK") + ' - ' + ixmaps.__formatValue(bMax, 2, "BLANK");
 						var szFilter = "ixmaps.filterThemeItems(null, null, \"\", { field: \""+facetsA[i].id+"\", min: "+bMin+", max: "+bMax+" });";
 						var szHighlight = "__origBg=$(this).css(\"background\");$(this).css(\"background\",\"#880000\");";//+szFilter;
 						var szClearHighlight = "$(this).css(\"background\",__origBg);";//ixmaps.filterThemeItems(null,null,\"\",\"remove\");"
@@ -780,13 +570,14 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 							// how often is the value in the column
 							var nCount = facetsA[i].valuesCount ? facetsA[i].valuesCount[facetsA[i].values[ii]] : null;
-
+                            var nMaxCount = facetsA[i].nCount;
+                            
 							var bgColor = "#eeeeee";
 							var szCount = String(nCount || "");
 
 							if ((objThemeDefinition.field == facetsA[i].id)) {
 								bgColor = objTheme.colorScheme[objTheme.nStringToValueA[facetsA[i].values[ii]] - 1];
-								href = "javascript:ixmaps.markThemeClass('" + objTheme.szId + "'," + (objTheme.nStringToValueA[facetsA[i].values[ii]] - 1) + ");";
+								//href = "javascript:ixmaps.markThemeClass('" + objTheme.szId + "'," + (objTheme.nStringToValueA[facetsA[i].values[ii]] - 1) + ");";
 							}
 
 							// facet button with one unique value
@@ -800,13 +591,18 @@ window.ixmaps.data = window.ixmaps.data || {};
 							var szText = facetsA[i].values[ii];
 							if (facetsA[i].type == "search") {
 								if (fActiveFacet) {
-									value = szActiveFilter.split("\"")[3];
+									value = szActiveFilter.split("\"")[3].replace("\/","\\\/");
 									var szTextA = eval("szText.split(/"+value+"/i)");
 									szText = szTextA.join("<span style='background:#ffff00'>"+value+"</span>");
 								}
 							}
-
-							szHtml += '<button type="button" class="btn btn-block btn-secondary "><span style="margin-left:0.5em;float:left;white-space:normal;text-align:left">' + szText + '</span><span class="badge badge-primary badge-pill pull-right" style="top:0.1em;right:0.2em;" onmouseover="' + szHighlight + '" onmouseout="' + szClearHighlight + '">' + szCount + '</span></button>';
+							szHtml += '<button type="button" class="btn btn-block btn-secondary "><span style="margin-left:0.5em;float:left;white-space:normal;text-align:left">' + szText + '</span><span class="badge badge-primary badge-pill pull-right" style="top:0.1em;right:0.2em;" onmouseover=\'' + szHighlight + '\' onmouseout=\'' + szClearHighlight + '\'>' + szCount + '</span></button>';
+                            
+                            var nWidth = (100/nMaxCount*nCount);
+                            if ( !isNaN(nWidth) && (nWidth<100) && (facetsA[i].uniqueValues > 2) ) {
+                                szHtml += '<div style="position:relative;top:0.25em;left:0.1em;background:rgba(208,208,208,1);line-height:0.4em;width:'+nWidth+'%;border-radius:0 0.5em 0.5em 0">&nbsp;</div>';                               
+                                }
+                                
 							szHtml += '</div>';
 							szHtml += '</a>';
 						}
@@ -856,6 +652,320 @@ window.ixmaps.data = window.ixmaps.data || {};
 		});
 
 		$('[data-toggle="tooltip"]').tooltip();
+	};
+
+	// ===========================================
+	//
+	// create filter facets from theme data
+	//
+	// ===========================================
+
+	ixmaps.data.makeFacets = function (szFilter,szDiv) {
+
+		facetsA = [];
+
+		var fTest = true;
+		var sliderA = [];
+
+		console.log("=== make facets ===");
+		
+		var szThemeId = ixmaps.filterThemeId = null;
+	
+        if ( !szThemeId ){
+            var themesA = ixmaps.getThemes();
+            if (themesA.length > 1){
+                for ( i in themesA ){
+                    if ( !themesA[i].szFlag.match(/POSITION|FEATURE/) ){
+                        szThemeId = themesA[i].szId;
+                        break;
+                    }
+                }
+            }
+        }
+
+		// theme
+		// ------------------------------------
+		var objThemeDefinition = ixmaps.data.objThemeDefinition = ixmaps.getThemeDefinitionObj(szThemeId);
+		var objTheme = ixmaps.data.objTheme = ixmaps.getThemeObj(szThemeId);
+
+		// theme data
+		// ------------------------------------
+		var szData = objThemeDefinition.style.dbtable;
+		var dataObj = eval("ixmaps.embeddedSVG.window." + (szData || "themeDataObj"));
+
+		// create data object from theme data
+		// ------------------------------------
+		var mydata = new Data.Table(dataObj);
+
+		// GR 23.02.2018 take only rows which are on the map
+		// -------------------------------------------------
+		records = [];
+		try	{
+			for ( i in objTheme.indexA ){
+				if ( objTheme.itemA[objTheme.indexA[i]].dbIndex ){
+					records.push(dataObj.records[objTheme.itemA[objTheme.indexA[i]].dbIndex]);
+				}
+				if ( objTheme.itemA[objTheme.indexA[i]].dbIndexA ){
+					for ( a in objTheme.itemA[objTheme.indexA[i]].dbIndexA ) {
+						records.push(dataObj.records[objTheme.itemA[objTheme.indexA[i]].dbIndexA[a]]);
+					}
+				}
+			}
+		}
+		// maybe the data is not ready, then we repeat
+		catch (e){
+			setTimeout("ixmaps.data.makeFacets('"+szFilter+"','"+szDiv+"')",1000);
+			return;
+		}
+
+		mydata.records = records;
+
+		// if we have already a filter on the map,
+		// filter data before creating facets
+		// ------------------------------------
+		if (szFilter && szFilter.match(/WHERE/)) {
+			mydata = mydata.select(szFilter);
+
+			// get filter parts
+			// ----------------
+			var szPartsA = szFilter.split('WHERE ')[1].split('AND');
+			// test if BETWEEN x AND y and join two parts around AND
+			for ( i=0; i<szPartsA.length; i++ ){
+				if ( szPartsA[i].match(/BETWEEN/) ){
+					szPartsA[i] = szPartsA[i] + "AND" + szPartsA[i+1];
+					szPartsA.splice(i+1,1);
+				}
+			}
+			// set filter parts
+			// ----------------
+			__facetFilterA = [];
+			szPartsA.forEach(function(x){
+				__facetFilterA.push(x);
+			});
+		}
+		console.log(__facetFilterA);
+		// make facets from data fields
+		// ----------------------------
+
+		var a, u;
+		var fields = mydata.columnNames();
+
+		for (var i = 0; i < fields.length; i++) {
+
+			a = mydata.column(fields[i]).values();
+
+			console.log(fields[i]+"-------->");
+
+			// test for only numeric values
+			// ----------------------------
+			fNumeric = true;
+			a.every(function (x) {
+				if (x.length && isNaN(__scanValue(x))) {
+					console.log(x);
+					fNumeric = false;
+				}
+				return fNumeric;
+			});
+			console.log("fNumeric: " + fNumeric);
+
+			// test if field already part of the active query 
+			// ------------------------------------------
+			var fActiveFacet = false;
+			__facetFilterA.forEach(function (szFilter, index) {
+				if ((szFilter.split("\"")[1] == fields[i]) && ((szFilter.split("\"")[2] == " is ")||(szFilter.split("\"")[2] == " = "))) {
+					fActiveFacet = true;
+				}
+			});
+
+			// test for unique values 
+			// -----------------------
+
+			// first test maximal 250 values at the beginning 
+
+			a.length = Math.min(a.length, 250);
+			u = a.filter(__onlyUnique);
+
+			console.log(u.length);
+			console.log(a.length);
+
+			// if we have many unique values and they are numbers,
+			// make a numerique facet, if they are texts, skip field
+			// -----------------------------------------------------
+			if ((a.length >= 250) && (u.length >= (a.length / 5))) {
+
+				console.log("many unique values");
+
+				if (fNumeric) {
+
+					a = mydata.column(fields[i]).values();
+					a = a.map(function (x) {
+						return __scanValue(x);
+					});
+					a.sort(function (a, b) {
+						return ((a > b) ? 1 : -1);
+					});
+					var facet = {};
+					facet.id = fields[i];
+					facet.min = a[0];
+					facet.max = a[a.length - 1];
+					facet.values = a;
+					facet.data = a;
+					facetsA.push(facet);
+					console.log("...... numeric");
+
+				} else {
+					// make input field to define filter 
+					// ------------------------------------------
+					var facet = {};
+					facet.id = fields[i];
+					facet.type = "search";
+					facet.example = a[0];
+
+					if (fActiveFacet) {
+
+						// add value list in any case 
+						// ---------------------------
+						facet.values = a;
+						// count values
+						var valuesCount = {};
+						var nCount = {};
+						a.forEach(function (x) {
+							valuesCount[x] = (valuesCount[x] || 0) + 1;
+                            nCount++;
+						});
+						facet.nCount = nCount;
+						facet.valuesCount = valuesCount;
+						facet.uniqueValues = a.length;
+					}
+
+					facetsA.push(facet);
+					console.log("...... filter");
+				}
+				continue;
+			};
+
+			// ok, data with many different values done
+			// lets get all! unique values
+			// -----------------------------------------
+
+			console.log("get all values");
+			a = mydata.column(fields[i]).values();
+
+			// get unique values array
+			console.log("get unique values");
+
+			u = __getUniqueValues(a);
+			//console.log(u);
+			//u = a.filter(__onlyUnique);
+			console.log("-- done --");
+
+			// if less than 50 unique values, make text or number facet
+			// --------------------------------------------------------
+
+			if (u.length < 50 && !__rangesA[fields[i]] && !fNumeric) {
+
+				console.log("less than 50 values");
+
+
+				// count values
+				var valuesCount = {};
+				var nCount = 0;
+				a.forEach(function (x) {
+					valuesCount[x] = (valuesCount[x] || 0) + 1;
+                    nCount++;
+				});
+
+				if (fNumeric) {
+					u = u.map(function (x) {
+						return Number(x);
+					});
+					u.sort(function (a, b) {
+						return ((a > b) ? 1 : -1);
+					});
+				} else {
+					u.sort();
+					u.sort(function (a, b) {
+						return ((valuesCount[a] < valuesCount[b]) ? 1 : -1);
+					});
+				}
+
+				var facet = {};
+				facet.id = fields[i];
+				facet.values = u;
+				facet.nCount = nCount;
+				facet.valuesCount = valuesCount;
+				facet.uniqueValues = u.length;
+
+				if ((u.length >= 1) || fActiveFacet) {
+					facet.type = "search";
+				}
+
+				facetsA.push(facet);
+
+				console.log("...... text");
+			}
+			else {
+
+				// more than 50 unique values
+
+				if (fNumeric) {
+
+					// if numeric data, make min/max range filter
+					// ------------------------------------------
+					a = mydata.column(fields[i]).values();
+					var min = Number.MAX_VALUE;
+					var max = (-Number.MAX_VALUE);
+					var fNaN = false
+					a = a.map(function (x) {
+						x = __scanValue(x);
+						min = Math.min(min, x);
+						max = Math.max(max, x);
+						return (x);
+					});
+					var facet = {};
+					facet.id = fields[i];
+					facet.min = min; //a[0];
+					facet.max = max; //a[a.length-1];
+					facet.data = a;
+					facet.uniqueValues = u.length;
+					facet.type = "numeric";
+					facetsA.push(facet);
+
+					console.log("...... numeric");
+
+				} else {
+
+					// if not numeric, make input field to define filter 
+					// ------------------------------------------
+					var facet = {};
+					facet.id = fields[i];
+					facet.type = "search";
+					if (u.length < 200) {
+						// add value list
+						// ---------------
+						facet.values = u;
+						var valuesCount = {};
+						var nCount = 0;
+						a.forEach(function (x) {
+							valuesCount[x] = (valuesCount[x] || 0) + 1;
+                            nCount++;
+						});
+						u.sort(function (a, b) {
+							return ((valuesCount[a] < valuesCount[b]) ? 1 : -1);
+						});
+						facet.nCount = nCount;
+						facet.valuesCount = valuesCount;
+						facet.uniqueValues = u.length;
+					}
+					facetsA.push(facet);
+					console.log("...... filter");
+				}
+			}
+		}
+
+		ixmaps.data.showFacets(szFilter,szDiv,facetsA);
+
+		return;
 	};
 
 

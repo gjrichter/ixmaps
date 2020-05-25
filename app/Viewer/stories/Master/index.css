@@ -61,7 +61,7 @@ h1{
 	font-size: 6em;
 }
 p{
-	font-size: 2em;
+	font-size: 1.2em;
 }
 .intro p{
 	margin: 0 auto;
@@ -86,7 +86,7 @@ p{
 		font-size: 2em;
 		font-family: courier new,Raleway,arial,helvetica;
 		font-weight: 300;
-		margin:0em 0 -0.5em 0;
+		margin:0.5em 0 0em 0;
 		padding:0;
 		text-align:left;
 		margin-left: 0px;
@@ -103,7 +103,7 @@ p{
 		font-size: 1.5em;
 		font-family: courier new,Raleway,arial,helvetica;
 		font-weight: 300;
-		margin:0;
+		margin:0.5em 0 0em 0;
 		padding:0;
 		text-align:left;
 	}
@@ -132,9 +132,13 @@ p{
 		color: #666666;
 		font-size: 1.2em;
 		margin-top: 0em;
-		padding: 1em;
+		padding: 15px;
 		background: #f4f5f7;
 		border: solid #cccccc 0.1px;
+		border-radius: 0.5px;
+	}
+	#themeLegendDiv {
+		border-radius: 0.5px;
 	}
 	.legend-color-button{
 		color: #666666;
@@ -208,14 +212,23 @@ p{
 	.legend-filter,p.legend-filter {
 		border-radius: 0.2em;
 		font-size:1em;
-		border:solid black 0.5px;
 		padding: 0.4em;
-		color:#fff;
-		background:#888;
+		color:#888;
+		background:rgba(128,128,128,0.2);
 	}
 	p.legend-filter {
 		margin-bottom:1em;
 	}
+
+	.map-legend-footer p{
+		margin: 0 auto;
+		font-size: 1.2em;
+	}
+	.map-legend-footer p a{
+		color: #80a8df;
+	}
+
+
 
 	.list-group-item {
 		border-top: 0;
@@ -307,8 +320,26 @@ p{
 		  border-left: 20px solid transparent;
 		  border-bottom: 20px solid transparent;
 	}
-	::-webkit-scrollbar { 
-		xxdisplay: none; 
+
+	/* scrollbar */
+	/* width */
+	::-webkit-scrollbar {
+	  width: 10px;
+	}
+
+	/* Track */
+	::-webkit-scrollbar-track {
+	  background: rgba(0,0,0,0.02); 
+	}
+	 
+	/* Handle */
+	::-webkit-scrollbar-thumb {
+	  background: rgba(120,120,120,0.1); 
+	}
+
+	/* Handle on hover */
+	::-webkit-scrollbar-thumb:hover {
+	  background: #888; 
 	}
 
 	.footer {

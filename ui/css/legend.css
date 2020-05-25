@@ -6,7 +6,6 @@
 	h3 {
 		margin:0;
 		padding:0;
-		margin-top: -0.3em;
 		font-weight: normal;
 	}
 
@@ -32,7 +31,7 @@
 		top:13px;
 		right:4%;
 		opacity:0.95;
-		min-width:350px;
+		xxmin-width:350px;
 		max-width:500px;
 	}
 
@@ -46,29 +45,34 @@
 		height: 100%;
 		z-index: 0;
 		background: white;
-		opacity: 0.7;
+		opacity: 0.8;
 		border: solid #cccccc 1px;
+		border-radius: 1em;
 	}
 	.map-legend-pane {
-		padding:0.5em;
+		padding:0.5em 1em 1em 1.5em;
 	}
 	.map-legend-pane .container {
 		width:100%;
 	}
+	.map-legend-body {
+		color: #444;
+	}
+
 	#map-legend-body {
-		margin-top:1em;
-		margin-bottom:1em;
+		margin-top:0em;
+		margin-bottom:0em;
 	}
 	#map-legend-content {
-		margin-right:1em;
-		margin-bottom:1em;
+		margin-right:0em;
+		margin-bottom:0.5em;
 		width: 90%;
 	}
 	#map-legend-title {
 		font-size: 1.8em;	
 		font-weight: normal;
-		margin-top:0.2em;
-		margin-bottom:0.5em;
+		margin-top:0.15em;
+		margin-bottom:0.4em;
 		width: 90%;
 	}
 	#map-legend-snippet {
@@ -80,11 +84,13 @@
 	#map-legend-description {
 		font-size: 1.1em;	
 		font-weight: normal;
-		margin-top:1em;
+		margin-top:0.3em;
+		margin-bottom:0.7em;
+		margin-right:2em;
 	}
 	#map-legend-footer {
-		margin-top: 1em;
-		margin-bottom: 1em;
+		margin-top: 0em;
+		margin-bottom: 0em;
 	}
 	#legend-pane-switch {
 		color:#888;
@@ -102,7 +108,16 @@
 		background-color:rgba(245,245,245,0.5);	
 		border:solid #ddd 1px;
 	}
-
+	#legend-type-switch-bottom {
+		position:absolute;
+		bottom:0.9em;
+		right:1em;
+		float:right;
+		z-index:1;
+		font-size:1em;
+		padding:0.3em 0.5em;
+		border:solid #ddd 1px;
+	}
 	.legend-item-list{
 		margin-top: 0.2em;
 		border-spacing:2px;
@@ -112,6 +127,8 @@
 	@media screen and (max-width: 640px) {
 		.map-legend{
 			font-size: 11px;
+		    right:25%;
+            xxbackground: rgba(0,0,0,0.5);
 		}
 		.map-legend {
 			min-width:250px;
@@ -128,6 +145,29 @@
 			margin-bottom: -0.5em;
 		}
 	}
+
+	@media screen and (max-height: 640px) {
+		.map-legend{
+			font-size: 11px;
+		    right:25%;
+            xxbackground: rgba(0,0,0,0.5);
+		}
+		.map-legend {
+			min-width:250px;
+			max-width:500px;
+		}
+		.theme-legend-item td.theme-legend {
+			line-height: 0.5em;
+		}
+		.legend-item-list{
+			margin-top: 0.2em;
+			line-height:1.2em;
+		}
+		.theme-legend-item {
+			margin-bottom: -0.5em;
+		}
+	}
+
 
 	.theme-legend-item-selected {
 		background: #DBE6F4;
@@ -168,3 +208,97 @@
 	.fa:focus {
 	 outline: none;
 	}
+
+	.slider-handle {
+		position: absolute;
+		top: 0px;
+		width: 20px;
+		height: 20px;
+		background-color: #ddd;
+		background-image: none;
+		filter: none;
+		box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.05) 0px 1px 2px;
+		background-repeat: repeat-x;
+		border-width: 0px;
+		border-style: solid;
+		border-color: transparent;
+		border-image: initial;
+	}
+		
+	.slidecontainer {
+		width: 85%; /* Width of the outside container */
+		position: absolute;
+		left: 7em;
+		bottom: 1.5em;
+	}
+
+	/* The slider itself */
+	.slider {
+		-webkit-appearance: none;  /* Override default CSS styles */
+		appearance: none;
+		width: 100%; /* Full-width */
+		height: 25px; /* Specified height */
+		background: #d3d3d3; /* Grey background */
+		outline: none; /* Remove outline */
+		opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+		-webkit-transition: .2s; /* 0.2 seconds transition on hover */
+		transition: opacity .2s;
+	}
+
+	/* Mouse-over effects */
+	.slider:hover {
+		opacity: 1; /* Fully shown on mouse-over */
+	}
+
+	/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */ 
+	.slider::-webkit-slider-thumb {
+		-webkit-appearance: none; /* Override default look */
+		appearance: none;
+		width: 25px; /* Set a specific slider handle width */
+		height: 25px; /* Slider handle height */
+		background: #4CAF50; /* Green background */
+		cursor: pointer; /* Cursor on hover */
+	}
+
+	.slider::-moz-range-thumb {
+		width: 25px; /* Set a specific slider handle width */
+		height: 25px; /* Slider handle height */
+		background: #4CAF50; /* Green background */
+		cursor: pointer; /* Cursor on hover */
+	}
+	.slider {
+		-webkit-appearance: none;
+		width: 75%;
+		margin-left:0px;
+		height: 5px;
+		border-radius: 10px;   
+		background: rgba(155,155,155,0.3);
+		border: solid #888 0px;
+		outline: none;
+		opacity: 0.7;
+		-webkit-transition: .2s;
+		transition: opacity .2s;
+	}
+
+	.slider::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 14px;
+		height: 14px;
+		border-radius: 0.5em; 
+		background: #4CAF50;
+		cursor: pointer;
+	}
+
+	.slider::-moz-range-thumb {
+		width: 25px;
+		height: 25px;
+		border-radius: 50%;
+		background: #4CAF50;
+		cursor: pointer;
+	}
+	#slider-text {
+		color:white;
+	}
+		
+

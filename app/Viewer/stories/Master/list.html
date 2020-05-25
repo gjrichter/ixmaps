@@ -1,0 +1,167 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+<meta http-equiv="Content-Language" content="en-us" />
+<meta name="copyright" content="Guenter Richter"/>
+<meta name="author" content="service@medienobjekte.de"/>
+<meta name="description" content="Interactive &amp; estensible maps in SVG"/>
+<meta name="revisit-after" content="30 days"/>
+<meta name="distribution" content="Global"/>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.9.0/css/bootstrap-slider.min.css" />
+
+<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="assets/css/font-awesome.min.css" />
+<link rel="stylesheet" type="text/css" href="assets/css/icomoon.css"  />
+<style type="text/css">
+
+	h1,h2,h3,h4,h5,h6 {
+		font-family: arial,helvetica;
+		color: #888;
+		font-weight: 300;
+	}
+	p {
+		font-family: arial,helvetica;
+		color: #444;
+		font-weight: 300;
+	}
+	a {
+		font-family: arial,helvetica;
+		font-weight: 100;
+		color: black;
+		text-decoration:none;
+	}
+
+	a:hover {
+		color: #000088;
+		text-decoration:none;
+	}
+	.filter-input {
+		width: 275px;
+		margin: 0;
+		float: left;
+		outline: none;
+		font-size: 1.2em;
+		border: 0;
+		margin-left: 0.2em;
+		font-family: Raleway,Arial;
+		font-weight: 300;
+		color: #444;
+	}
+	.minvalue, .maxvalue {
+		margin-left: 1em;
+		margin-right: 1em;
+	}
+	.slider-handle {
+		position: absolute;
+		top: 0px;
+		width: 20px;
+		height: 20px;
+		background-color: #ddd;
+		background-image: none;
+		filter: none;
+		box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.05) 0px 1px 2px;
+		background-repeat: repeat-x;
+		border-width: 0px;
+		border-style: solid;
+		border-color: transparent;
+		border-image: initial;
+	}
+	.listitem {
+		padding:0.5em;
+	}
+
+</style>
+
+</head>
+
+<body style="margin:0px;padding:0px;font-size:2em" onload="">
+
+	<!-- Container -->
+	<div id="container" style="padding:2.5em 1em;vertical-align:middle;background-color:rgba(255,255,255,0.9);" >
+
+		<div id="facetDiv" style="margin-bottom:1em;width:100%">
+			<h2 style="padding:0.5em 0.5em;background:#dddddd;border-radius:5px;color:white">generating item list ...<img src='../../../../ui/resources/images/loading_blue.gif' style='display:block;margin:auto;height:72px'></h2>
+		</div>
+
+	</div>
+
+ 	<script type="text/javascript" src="assets/plugins/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="assets/js/main.js"></script>
+	<script type="text/javascript" src="assets/js/AnimOnScroll.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.9.0/bootstrap-slider.min.js"></script>
+	<script src="../../../../../data.js/data.js"></script>
+
+	<script src="filter.js"></script>
+
+	<script type="text/javascript">
+
+		// ===========================================
+		//
+		// !! get ixmaps api from story parent/opener
+		//
+		// ===========================================
+
+		var ixmaps = null;
+		if ( window.opener ){
+			ixmaps = window.opener.ixmaps;
+		}else
+		if ( parent ){
+			ixmaps = parent.window.ixmaps;
+		}
+		else{
+			alert("error: missing parent window for themes !");
+		}
+
+		ixmaps.initialized = true;
+
+		// -----------------------------------------------
+		// refresh theme on zoom and pan ! 
+		// defined here to be exportable with map sharing
+		// -----------------------------------------------
+
+		ixmaps.htmlgui_onZoomAndPan = function(nZoom){
+			setTimeout("ixmaps.data.makeItemList(null,'facetDiv')",10);
+		};
+
+		$.getScript("./list.js",function(){
+
+			var objTheme = ixmaps.getThemeObj();
+			if ( !objTheme.szFlag.match(/EXACT/) ){
+				//ixmaps.changeThemeStyle(null,objTheme.szId,"type:RANGES","add");
+			}
+
+			var objThemeDefinition = ixmaps.getThemeDefinitionObj();
+
+			if ( !objThemeDefinition ){
+				$("#facets").html("<h3>...nessun tema da filtrare!</h3>");
+				return;
+			}
+			// theme data
+			// ------------------------------------
+			var szFilter = objThemeDefinition.style.filter;
+
+			if ( (typeof(szFilter) != "undefined") && (szFilter.length > 5) ){
+
+				// show filter in input field
+				// --------------------------
+				$("#query").val(szFilter);
+				setTimeout("ixmaps.data.makeItemList('"+szFilter.replace(/\'/g,"\\'")+"','facetDiv')",10);
+				//setTimeout('$("#btn-solo-attivi").click();',10);
+
+			}else{
+				setTimeout("ixmaps.data.makeItemList(null,'facetDiv')",10);
+			}
+
+
+		});
+
+	</script>
+</body>
+</html>
+

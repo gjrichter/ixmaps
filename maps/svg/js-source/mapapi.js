@@ -1132,6 +1132,45 @@ Map.Api.prototype.getShapeCoordinates = function(objNode){
 	return null;
 };
 /**
+ * get a clone of a map shape given by ist id
+ * @param szId the id of the map shape
+ * @param targetGroup the SVG to clone the shape into
+ * @param szFlag possible modifier
+ * @return a string with the field name (or null)
+ */
+Map.Api.prototype.getShape = function(szId,targetGroup,szFlag){
+    // all possible tile nodes
+    var szTilesIdA  = []; //map.Tiles.getTileNodeIds(szId);
+    // ad id for untiled item
+    szTilesIdA.push(szId);
+    // look for shape elements
+    for ( var i in szTilesIdA){
+   	    var shapeNode = SVGDocument.getElementById(szTilesIdA[i]);
+        // if one found, clone it and scale it
+        if ( shapeNode) {
+            // get shape style from node or parent node
+            var style = null;
+            var styleNode = shapeNode;
+            while ( !(style = styleNode.getAttribute("style")) && styleNode.parentNode ) {
+                styleNode = styleNode.parentNode;
+            }
+            // clone node, set style and scale node
+            var cloneNode = shapeNode.cloneNode(1000);
+            cloneNode.setAttribute("style",style);
+            cloneNode.fu = new Methods(cloneNode);
+            shapeNode.fu = new Methods(shapeNode);
+            var box = shapeNode.fu.getBox();
+            var scale = Math.min(4000/box.width,4000/box.height)
+            cloneNode.fu.setPosition(-box.x*scale,-box.y*scale-3000);
+            cloneNode.fu.scale(scale,scale);
+            cloneNode.style.setProperty("stroke-width",20/scale+"px");
+            // append to target SVG group
+            targetGroup.appendChild(cloneNode);
+            return;
+        }
+    }
+};
+/**
  * calculate the surface of a map shape
  * @param objNode the map shape to calculate its surface 
  * @return the calculated surface
@@ -1258,7 +1297,7 @@ Map.Api.prototype.createTheme = function(szThemes,szFields,szField100,szFlag,col
  *   <tr><td>EQUIDISTANT</td><td>generate equidistant classes</td></tr>
  *   <tr><td>QUANTILE</td><td>generate classes with equal number of members</td></tr>
  *   <tr><td>BUFFER</td><td>extends CHOROPLETH on lines</td></tr>
- *   <tr><td>EXACT</td><td>select color by value </td></tr>
+ *   <tr><td>CATEGORICAL</td><td>select color by value </td></tr>
  *   <tr><td>RANGE</td><td>select color by given value ranges</td></tr>
  *   <tr><td>DOMINANT</td><td>select color by the greatest value</td></tr>
  *   <tr><td>PERCENTOFMEAN</td><td>select color by the value that is highest above the statistical mean</td></tr>
@@ -1355,7 +1394,6 @@ Map.Api.prototype.newMapThemeByObj = function(themeObj){
 	return this.map.Themes.newThemeByObj(themeObj);
 };
 
-
 Map.Api.prototype.refreshTheme = function(szId){
 	this.map.Themes.refreshTheme(szId);
 };
@@ -1407,6 +1445,9 @@ Map.Api.prototype.markThemeClass = function(szId,nIndex,nStep){
 Map.Api.prototype.unmarkThemeClass = function(szId,nIndex,nStep){
 	this.map.Themes.unmarkClass(null,szId,nIndex,nStep);
 };
+Map.Api.prototype.setThemeTimeFrame = function(szId,nUMin,nUMax){
+	this.map.Themes.setTimeFrame(null,szId,nUMin,nUMax);
+};
 Map.Api.prototype.filterThemeItems = function(szId,szFilter,mode){
 	this.map.Themes.filterItems(null,szId,szFilter,mode);
 };
@@ -1439,8 +1480,8 @@ Map.Api.prototype.setClipFrame = function(szId,n){
 Map.Api.prototype.pauseClip = function(szId){
 	this.map.Themes.pauseClip(szId);
 };
-Map.Api.prototype.startClip = function(szId){
-	this.map.Themes.startClip(szId);
+Map.Api.prototype.startClip = function(szId,n){
+	this.map.Themes.startClip(szId,n);
 };
 
 /**
@@ -1474,6 +1515,23 @@ Map.Api.prototype.getMapThemeDefinitionObj = function(szId){
 	return this.map.Themes.getMapThemeDefinitionObj(szId);
 };
 /**
+ * wrapper, to show one theme
+ */
+Map.Api.prototype.showTheme = function(szId){
+	this.map.Themes.showTheme(null,szId);
+};
+/**
+ * wrapper, to hide one theme
+ */
+Map.Api.prototype.hideTheme = function(szId){
+	this.map.Themes.hideTheme(null,szId);
+};
+/**
+ * wrapper, to toggle one theme
+ */
+Map.Api.prototype.toggleTheme = function(szId){
+	this.map.Themes.toggleTheme(null,szId);
+};/**
  * wrapper, to remove one theme
  */
 Map.Api.prototype.removeTheme = function(szId){
@@ -1578,9 +1636,28 @@ Map.Api.prototype.getShapeMetadataArray = function(objNode){
 
 Map.Api.prototype.highlightItem = function(szId){
 	var objNode = SVGDocument.getElementById(szId);
-	var shapeNodesA = map.Layer.getLayerItemNodes(objNode);
+
+	if ( szId.match(/:chart/)){
+		highLightList.unlock();
+		highLightList.removeAll();
+		highLightList.addItem(objNode,"circle");
+		highLightList.lock();
+		return;
+	}
+	/**
 	highLightList.unlock();
 	highLightList.removeAll();
+	for ( var i=0; i<shapeNodesA.length; i++ ){
+		highLightList.removeItem(shapeNodesA[i]);
+		highLightList.addItem(shapeNodesA[i],"circle");
+	}
+	highLightList.lock();
+	**/
+	
+	var shapeNodesA = map.Layer.getLayerItemNodes(objNode);
+	
+	highLightList.unlock();
+	//highLightList.removeAll();
 	for ( var i=0; i<shapeNodesA.length; i++ ){
 		highLightList.removeItem(shapeNodesA[i]);
 		highLightList.addItem(shapeNodesA[i]);

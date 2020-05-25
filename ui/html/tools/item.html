@@ -1,0 +1,549 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Language" content="en-us" />
+	<meta name="copyright" content="Guenter Richter" />
+	<meta name="author" content="service@medienobjekte.de" />
+	<meta name="description" content="Interactive &amp; estensible maps in SVG" />
+	<meta name="revisit-after" content="30 days" />
+	<meta name="distribution" content="Global" />
+
+	<link rel="stylesheet" href="../../../app/Viewer/stories/master/index.css" type="text/css" />
+
+	<style type="text/css">
+		body {
+			font-family: courier new, Raleway, Roboto Slab, monospace, Lato, arial, helvetica;
+			color: #444;
+			font-weight: 300;
+		}
+
+		td {
+			font-weight: 400;
+			font-size: 1.1em;
+			padding: 0.1em 0.5em;
+			vertical-align: top;
+		}
+
+		.label {
+			text-align: right;
+			font-size: 0.8em;
+			padding-top: 0.4em;
+			color: #888;
+			width: 33%;
+		}
+
+		.value {
+			text-align: left;
+			color: #000;
+			font-weight: 600;
+		}
+
+		.clip {
+			max-width: 100px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.item-list {
+			margin-right: 0em;
+			padding: 1em 0.5em 1.5em 0.66em;
+			color: #aaa;
+		}
+
+		a {
+			color: #4466ff;
+		}
+
+		object {
+			margin: 0;
+			padding: 0;
+			margin-right: -1em;
+			width: 100%;
+			height: 1000px;
+		}
+
+		#container {
+			margin-top: 0em;
+			margin-left: 0em;
+			margin-right: 0em;
+			vertical-align: middle;
+			background-color: rgba(239, 235, 239, 0.7);
+		}
+
+		#tooltip {
+			font-family: arial narrow, system;
+			background: white;
+			border: 0.5px solid black;
+			border-radius: 5px;
+			padding: 5px;
+			max-width: 80%;
+		}
+
+		th,
+		td {
+			border-bottom: 1px solid #ddd;
+		}
+
+	</style>
+
+</head>
+
+<body style="margin:0px;padding:0px;" onload="">
+
+	<!-- Container -->
+	<div id="container" style="background:#fff;">
+
+		<div id="chart-div" style="position:relative;top:0px">
+		</div>
+		<div id="chart-div2" style="position:relative;top:-420px;pointer-events:none;max-height:0px">
+		</div>
+
+		<div id="result-div" style="position:relative;">
+			<div id="result">
+			</div>
+		</div>
+	</div>
+
+	<div id="tooltip" style="position: absolute; display: none; "></div>
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+	<script type="text/javascript">
+		// ===========================================
+		//
+		// !! get ixmaps api from story parent/opener
+		//
+		// ===========================================
+
+		var ixmaps = null;
+		if (window.opener) {
+			ixmaps = window.opener.ixmaps;
+		} else
+		if (parent) {
+			ixmaps = parent.window.ixmaps;
+		} else {
+			alert("error: missing parent window for themes !");
+		}
+
+		ixmaps.initialized = true;
+
+		// ===================================
+		// define local functions
+		// ===================================
+
+		// ------------------------
+		// tooltips for SVG charts
+		// ------------------------
+
+		var showTooltip = function(evt, text) {
+			if (text && text.length) {
+				var tooltip = document.getElementById("tooltip");
+				tooltip.innerHTML = text;
+				tooltip.style.display = "block";
+				tooltip.style.background = "white";
+				var left = 0; //parseInt(sidebar.style.getPropertyValue("left"));
+				tooltip.style.left = evt.pageX - left - 20 + 'px';
+				tooltip.style.top = evt.pageY + 20 + 'px';
+				console.log(tooltip);
+			}
+		}
+
+		var hideTooltip = function() {
+			var tooltip = document.getElementById("tooltip");
+			tooltip.style.display = "none";
+		}
+
+		ixmaps.onMouseOver = function() {
+			var szTooltip = null;
+			var source = event.target;
+			while (!szTooltip && source) {
+				szTooltip = source.getAttribute("tooltip");
+				time = new Date(Number(source.getAttribute("time")));
+				if ((time != "Invalid Date") && time.getTime() ){
+					szTooltip += "<br>"+time.toLocaleDateString();
+				}
+				source = source.parentNode;
+			}
+			showTooltip(event, szTooltip);
+			event.stopPropagation();
+			event.preventDefault();
+		};
+
+		ixmaps.onMouseOut = function() {
+			hideTooltip();
+		};
+
+		var DonutCharts = {};
+		DonutCharts.partOver = function() {};
+		DonutCharts.partOut = function() {};
+
+		/**
+		 * make SVG chart for the item info
+		 *
+		 * @parameter szId the id of the item
+		 * @parameter szTargetDiv the id of the target html <di> element
+		 * @type void
+		 */
+		ixmaps.makeChartHTML = function(szId, szTargetDiv) {
+			
+			var __themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
+
+			if (!__themeObj) {
+				return;
+			}
+			if (__themeObj.szFlag.match(/GRIDSIZE/) && !(__themeObj.szFlag.match(/PLOT/) || __themeObj.szFlag.match(/WAFFLE/))) {
+				return;
+			}
+
+			// make <div> + <svg> to receive the chart (svg)
+			var nWidth = $("#" + szTargetDiv).innerWidth() * 0.9;
+			var nHeight = $("#" + szTargetDiv).innerWidth();
+			var szHtml = "";
+			szHtml += "<div id='chart-title' style='font-size:1.2em;font-weight:300;margin-top:0.2em;margin-bottom:-1em'></div>";
+			szHtml += "<div id='chartDiv' style='margin:1em;height:"+nHeight+"px;width:"+nWidth+"px;overflow:hidden'><svg width='"+nWidth+"' height='"+nHeight+"' viewBox='-500 -3500 5000 5000'><g id='getchartmenutarget' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();' style='pointer-events:all'></g></svg></div>";
+			$("#" + szTargetDiv).append(szHtml);
+
+			// draw the chart by theme api call 
+
+			var old_szValueUpper = __themeObj.szValueUpper;
+			__themeObj.szValueUpper = null;
+
+			var szIdA = szId.split(":");
+			var szFlag = __themeObj.szFlag.match(/PLOT/) ? "VALUES|XAXIS|ZOOM|BOX|GRID" :
+				(__themeObj.szFlag.match(/POINTER/) ? "VALUES|XAXIS" :
+					"VALUES|XAXIS|ZOOM");
+
+
+			if (szId.match(/chart/i)) {
+				var ptNull = __themeObj.drawChart($("#getchartmenutarget")[0], szIdA[1] + "::" + szIdA[3], 30, szFlag);
+			} else {
+				__themeObj.parent.getChartAll(szId, $("#getchartmenutarget")[0], szFlag);
+			}
+
+			__themeObj.szValueUpper = old_szValueUpper;
+
+			// size the chart to div extent
+
+			var SVGBox = $("#getchartmenutarget")[0].getBBox();
+
+			if (SVGBox.width && SVGBox.height) {
+				var scale = Math.max(1, nHeight / SVGBox.width);
+				SVGBox.width *= scale;
+				SVGBox.height *= scale;
+				SVGBox.y -= 30;
+				SVGBox.height += 60;
+
+				var size = __themeObj.szFlag.match(/PLOT|HORZ|PIE/) ? nHeight : nHeight/2;
+				var width = size;
+				var height = size / SVGBox.width * SVGBox.height;
+
+				while (height > width) {
+					height *= 0.9;
+				}
+
+				$("#getchartmenutarget")[0].parentNode.setAttribute("height", height);
+				$("#getchartmenutarget")[0].parentNode.setAttribute("viewBox", SVGBox.x + ' ' + SVGBox.y + ' ' + SVGBox.width + ' ' + SVGBox.height);
+
+			} else {
+				$("#chartDiv").height(0);
+			}
+
+			if (__themeObj.szFlag.match(/\b(VECTOR|BEZIER)\b/)) {
+
+				szHtml = "";
+
+				var szIdA = szId.split(":");
+				var item = __themeObj.itemA[szIdA[1] + "::" + szIdA[3]];
+				if (item) {
+					szHtml += "<div><h1>";
+					var szValue = ixmaps.__formatValue(item.nSize, 2, "SPACE");
+					var szColor = item.szColor;
+					if (item.szSelectionId) {
+						szHtml += "<span>" + item.szSelectionId;
+						if (item.szSelectionId2) {
+							szHtml += " &rarr; " + item.szSelectionId2;
+						}
+						szHtml += "</span><br>";
+					}
+					szHtml += "<span style='color:" + (__themeObj.szLineColor || item.szColor) + ";margin-top:0.5em'>" + szValue + " " + __themeObj.szUnits + "<h1>";
+					szHtml += "</span>";
+
+					$("#chartDiv").html(szHtml);
+					$("#chartDiv").height("auto");
+				}
+			}
+
+
+			// make legend chart title from theme and item
+
+			var data = ixmaps.getData('map', szId);
+			if (1 || data) {
+				var szTmp = __themeObj.szTitle || "";
+				var szTitle = szTmp.length ? "<span style='font-weight:bold'>" + szTmp + "</span><br>" : "";
+
+				szTmp = __themeObj.szSnippet || "";
+				szTitle += (szTmp && szTmp.length) ? ("<span style='font-size:0.8em'>" + szTmp + "</span><br>") : "";
+
+				if (data) {
+					szTmp = (__themeObj.itemA[szIdA[1] + "::" + szIdA[3]].szTitle) || "";
+					szTitle += (szTmp && szTmp.length) ? ("<p style='font-weight:normal;font-size:1em;margin-bottom:-0.5em;'>" + szTmp + "</p><br>") : "";
+				} else {
+					var item = __themeObj.itemA[szIdA[1] + "::" + szIdA[3]] || __themeObj.itemA[szIdA[0] + "::" + szIdA[2]];
+					szTmp = item ? (item.szTitle || "") : "";
+					szTitle += (szTmp && szTmp.length) ? ("<p style='font-weight:normal;font-size:1.3em;margin:0.2em 0em;'>" + szTmp + "</p><br>") : "";
+				}
+
+				$("#chart-title").html(szTitle);
+			}
+			height += ($("#chart-title").height() + 20);
+			$("#" + szTargetDiv).css("height", height);
+		};
+
+		/**
+		 * make SVG chart for the item info
+		 *
+		 * @parameter szId the id of the item
+		 * @parameter szTargetDiv the id of the target html <di> element
+		 * @type void
+		 */
+		ixmaps.makeShapeHTML = function(szId, szTargetDiv) {
+
+			var szHtml = "";
+			szHtml += "<div id='chart-title' style='font-size:1.2em;font-weight:300;padding:1em;margin-bottom:-1em'></div>";
+			szHtml += "<div id='menuDiv' style='margin:1em;height:400px;width:400px;overflow:hidden'><svg width='400' height='400' viewBox='0 0 5000 5000'><g id='getshapemenutarget' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();'></g></svg></div>";
+			$("#" + szTargetDiv).append(szHtml);
+			if (ixmaps.embeddedSVG.window.map.Api.getShape) {
+				ixmaps.embeddedSVG.window.map.Api.getShape(szId, $("#getshapemenutarget")[0]);
+				var SVGBox = $("#getshapemenutarget")[0].getBBox();
+				if (SVGBox.width && SVGBox.height) {
+					var scale = Math.max(1, 400 / SVGBox.width);
+					SVGBox.width *= scale;
+					SVGBox.height *= scale;
+
+					var size = 400;
+					var width = size;
+					var height = size; // / SVGBox.width * SVGBox.height;
+
+					while (height > width) {
+						height *= 0.9;
+					}
+
+					$("#getshapemenutarget")[0].parentNode.setAttribute("height", height);
+					$("#getshapemenutarget")[0].parentNode.setAttribute("viewBox", SVGBox.x + ' ' + SVGBox.y + ' ' + SVGBox.width + ' ' + SVGBox.height);
+
+				}
+			}
+
+		};
+
+		// ===================================
+		// ===================================
+		//
+		// here we go and make the item info
+		//
+		// ===================================
+		// ===================================
+
+		ixmaps.makeItemContent = function() {
+
+			var szId = ixmaps.szMapItemId;
+
+			if (0 && !szId.match(/chart/i)) {
+
+				var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szId);
+
+				// get theme chart if present
+				// --------------------------
+				var szChartId = szId.match(/::/) ? szId : obj.parentNode.getAttribute("id");
+				var szIdA = szChartId.split("#");
+				if (szIdA.length > 1) {
+					var szIdAA = szIdA[1].split(/\b::\b/);
+					szChartId = szIdA[0] + "::" + szIdAA[1];
+					szTitle = szIdAA[1];
+				}
+				szId = ixmaps.getThemes()[1].szId + ":" + szChartId + ":chartgroup";
+
+			}
+
+			var themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
+			
+			if (szId.match(/chart/i)) {
+
+				// item is part of a theme, so show chart 
+				// ---------------------------------------
+				$("#chart-div").html("");
+				ixmaps.makeChartHTML(szId, "chart-div");
+
+				var szHtml = "";
+				
+				// and data  
+				// ---------------------------------------
+				var data = ixmaps.getData(szId);
+
+				if (data) {
+					szHtml = "<section>";
+					szHtml += "<div style='margin:1em 1em 1em 0.5em'>";
+
+					//szHtml += "<h2><b>" + data[0]['country'] + "</b></h2>";
+					// header
+					szHtml += "<p>" + (themeObj.szDescription||"<div style='color:#dddddd;'>values:</div>") + "</p><br>";
+					//szHtml += "<h1>Overall <b>" + data[0]['mean_overall'] + "</b>/100</h1>";
+
+					var max = themeObj.szFieldsA.length;
+
+					szHtml += "<table>";
+					for (var i = 0; i < max; i++) {
+						
+						if ( themeObj.nGridX ){
+							if ( i%themeObj.nGridX == 0){
+								szHtml += "<tr><td style='border-bottom:0'>&nbsp;</td></tr>";
+							}
+						}
+
+						szHtml += "<tr>";
+						szStyle = 'color:' + themeObj.colorScheme[i % (themeObj.nGridX || 1)];
+						szHtml += "<td>" + themeObj.szFieldsA[i] + "</td><td><b><span style='" + szStyle + "'>" + data[0][themeObj.szFieldsA[i]] + "</span></b> "+themeObj.szUnits+"</td>";
+						szHtml += "</tr>";
+						
+					}
+					szHtml += "</table>";
+
+
+					szHtml += "</div>";
+					szHtml += "</section>";
+				}
+
+				if (1) {
+					szHtml += "</br>";
+					szHtml += "</br>";
+					szHtml += "</br>";
+					szHtml += "&nbsp;";
+				}
+			} else {
+
+				// item is a map shape 
+				//
+				// !! this part was created for testing purpose, must be revisionized and generalised !!
+				//
+
+				var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szId);
+
+				// get theme chart if present
+				// --------------------------
+				var szChartId = szId.match(/::/) ? szId : obj.parentNode.getAttribute("id");
+				var szIdA = szChartId.split("#");
+				if (szIdA.length > 1) {
+					var szIdAA = szIdA[1].split(/\b::\b/);
+					szChartId = szIdA[0] + "::" + szIdAA[1];
+					szTitle = szIdAA[1];
+				}
+
+				ixmaps.makeShapeHTML(szId, "chart-div");
+				$("#chart-div").css("opacity", "0.5");
+				
+				var themesA = ixmaps.getThemes(); 
+				for (var i=0; i<themesA.length; i++){
+					if (themesA[i].szFlag.match(/CHOROPLETH/) ){
+						szId = ixmaps.getThemes()[i].szId + ":" + szChartId + ":chartgroup";
+						ixmaps.makeChartHTML(szId, "chart-div2");
+					}
+				}
+				
+				
+				// get shape info
+				// --------------------------
+				var layerA = ixmaps.getLayer();
+
+				var szLayer = (szChartId.split("::")[0]);
+				var szLayerName = layerA[szLayer].szLegendName || szLayerName;
+
+				var szItemName = (szChartId.split("::")[1]);
+				if (!isNaN(szItemName)) {
+					szItemName = layerA[szLayer].szSelection + ": " + szItemName;
+				} else {
+					szItemName = szItemName;
+					szLayerName += ":";
+				}
+
+				var themeObj = ixmaps.getThemeObj(szChartId.split(":")[0]);
+				if (themeObj && (themeObj.szThemes != szLayerName)) {
+					themeObj = null;
+				}
+
+				// list shape info
+				// --------------------------
+				var szHtml = "";
+				if (!themeObj) {
+					szHtml += "<div style='margin-top:1em;background:#ffffff;width:100%;padding:1.5em;overflow:auto'>";
+					szHtml += "<h4>" + (szLayerName) + "</h4>";
+					szHtml += "<h3>" + (szItemName) + "</h3>";
+					szHtml += "</div>";
+				} else {
+					szHtml += "<div style='background:#ffffff;width:100%;'>&nbsp;";
+					szHtml += "</div>";
+				}
+
+				// get map shape metadata or theme data
+				// ------------------------------------
+				var child = obj.childNodes.item(1);
+				var data = ixmaps.embeddedSVG.window.map.Api.getShapeMetadataArray(child || obj);
+				if (themeObj) {
+					data = ixmaps.getData('map', "theme:" + szChartId + ":chartgroup");
+					data = data ? data[0] : [];
+				}
+
+				// list data
+				// ----------
+				if (data && !(themeObj && !themeObj.fShowData)) {
+					var maxHeight = ($("#result-div").innerHeight());
+					szHtml += "<div style='background:#f8f8f8;width:100%;padding:1.5em;height:" + (maxHeight - 50) + "px;overflow:auto'>";
+					szHtml += "<table>"
+					for (i in data) {
+						if (i != "NIX") {
+							szHtml += "<tr><td class='label'>" + i + "</td><td class='value'>" + data[i] + "</td></tr>";
+						}
+					}
+					szHtml += "</table>";
+					szHtml += "</div>";
+				}
+
+				$("#result-div").css("height", "0");
+
+				// set tooltip for cloned SVG shape  
+				// ---------------------------------
+				// try to get tooltip from shape, if not, use item data (see above) 
+				//
+				var szMapNs = "http:" + "/" + "/" + "www.medienobjekte.de";
+				var szTooltip = $("#getshapemenutarget")[0].firstChild.getAttributeNS(szMapNs, "tooltip") || szItemName;
+				$("#getshapemenutarget")[0].setAttribute("tooltip", szTooltip);
+
+
+			}
+
+			// show the item legend when its ready
+
+			$("#result").html(szHtml);
+			$("#result-div").show();
+
+			//ixmaps.sidebar(1);
+
+
+		};
+
+		setTimeout("ixmaps.makeItemContent()", 100);
+
+		window.onresize = function(){
+			setTimeout("ixmaps.makeItemContent()", 100);
+		};
+		
+		
+	</script>
+
+</body>
+
+</html>

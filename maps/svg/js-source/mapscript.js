@@ -558,6 +558,10 @@ Map.prototype.setFeatures = function(szFeatures){
 			case "normalSizeScale":
 				map.Scale.nNormalSizeScale = Number(szAttA[1]);
 				break;
+			// GR 04.01.2018
+			case "dynamicScalePow":
+				map.Scale.nDynamicScalePow = Number(szAttA[1]);
+				break;
 		}
 	}
 	// execute new settings
@@ -670,7 +674,7 @@ Map.prototype.pushInitAction = function(szAction,szMessage){
 Map.prototype.popAction = function(){
 	_TRACE("--- map.popAction() "+ this.actionA.length +" ["+ this.actionA[0]+"]");
 	if ( this.actionA.length == 0 ){
-		clearMessage();
+		//clearMessage();
 		return;
 	}
 	if ( this.isLoading() || this.isInitializing() ){
@@ -859,7 +863,7 @@ Map.prototype.clearAll = function(){
 	map.Dom.clearGroup(SVGToolsGroup);
 	map.Dom.clearGroup(SVGFixedGroup);
 	map.removeAllHighlights();
-	this.Themes.removeAll();
+	map.Themes.removeAll();
 	setMapTool("");	
 	this.Scale.nObjectScaling  = 1.0;
 };
@@ -874,6 +878,9 @@ Map.prototype.loadMap = function(szUrl){
 		this.mapLoader = new SVGLoaderMap();
 	}
 	if (this.mapLoader.importSVGFile(szUrl,SVGDocument)){
+		try	{
+			HTMLWindow.ixmaps.loadingMap = szUrl;
+		} catch(e){}
 		if ( szUrl.match(/http/)){
 			szUrlA = szUrl.split(/\//);
 			szUrlA.splice(-1);
@@ -882,11 +889,13 @@ Map.prototype.loadMap = function(szUrl){
 		}else{
 			this.mapRoot = "";
 		}
+		map.Themes = new Map.Themes();
+		map.Dom.clearGroup(map.Layer.objectGroup);
 	}
 };
 
 // create instance here 
-var thisversion = "0.9";
+var thisversion = "0.91";
 map = new Map();
 map.version = thisversion;
 
@@ -1176,7 +1185,8 @@ function doInitAll_2(evt){
 	}
 
 	// show all
-	setTimeout("map.showAll()",1500);
+	//setTimeout("map.showAll()",1500);
+	//map.pushAction('map.showAll()');
 
 	// init delayed to include all loaded parameter 
 	setTimeout("map.Zoom.init()",1000);
@@ -1196,6 +1206,9 @@ function doInitAll_2(evt){
 	if ( HTMLWindow ){
 		map.pushInitAction("HTMLWindow.ixmaps.htmlgui_onMapReady(window)");
 	}
+	
+	// show all
+	map.pushInitAction('map.showAll()');
 
 	// with this dummy, we force the popInitAction() to start, if no other pushInitAction() has been done
 	// this is necessary to get the popAction() running when the initAction queue has been done
@@ -1568,6 +1581,29 @@ Map.Dom.prototype.newTSpan = function(targetGroup,s,szText){
 	return nT;
 };
 /**
+ * creates a new SVG text on path element
+ * @param targetGroup the target group to create the new textPath node within 
+ * @param szPathId the id of a SVG path element
+ * @param szText text itself 
+ * @param s the text style 
+ * @param offset an offset of the text resp. the start of the path 
+ * @return the created text element
+ */
+Map.Dom.prototype.newTextOnPath = function(targetGroup,szPathId,szText,s,offset){
+	if (!szText || (typeof(szText) == "undefined") ){
+		szText = "(undefined)";
+	}
+	szText = String(szText);
+	nT = this.constructNode('text',targetGroup,{style:s});
+	nTP = this.constructNode('textPath',targetGroup,{style:s});
+	nTP.setAttributeNS(szXlink,"xlink:href","#"+szPathId);
+	nTP.setAttributeNS(null,"startOffset",offset);
+	atext = this.targetDocument.createTextNode(szText);
+	nTP.appendChild(atext);
+	nT.appendChild(nTP);
+	return nT;
+};
+/**
  * creates a new SVG text link element ( &lt;a&gt; tag with blue and underlined text ).
  * <br>If the parameter <CODE>szLink</CODE> is missing, the displayed text will be the same as the link, but clipped at 30 characters.
  * @param targetGroup the target group to create the new text node within 
@@ -1596,16 +1632,25 @@ Map.Dom.prototype.newTextLink = function(targetGroup,x,y,s,szText,szLink){
  * break long text into lines to fit within max width
  * @param textNode the SVG DOM node with the long text 
  * @param nMaxWidth the maximal block width
- * @return void
+ * @return number of rows
  */
 Map.Dom.prototype.wrapText = function(textNode,nMaxWidth){
 
 	var text = textNode.firstChild.data;
+	var fontsize = textNode.style.getPropertyValue("font-size");
 	if ( text ){
+		// get text offset
+		var x = textNode.getAttributeNS(null,"x");
+
+		// get possible breaks
 		var words = text.split(' '); 
 		textNode.removeChild(textNode.firstChild);
 
 		var tspan_element = this.newTSpan(textNode,"",words[0]);
+			tspan_element.setAttributeNS(null, "x", x);
+
+		var nRows = 1;
+
 		for(var i=1; i<words.length; i++)
 		{
 			var len = tspan_element.firstChild.data.length;             // Find number of letters in string
@@ -1615,10 +1660,12 @@ Map.Dom.prototype.wrapText = function(textNode,nMaxWidth){
 			{
 				tspan_element.firstChild.data = tspan_element.firstChild.data.slice(0, len);    // Remove added word
 				var tspan_element = this.newTSpan(textNode,"",words[i]);
-				tspan_element.setAttributeNS(null, "x", 0);
-				tspan_element.setAttributeNS(null, "dy", 300);
+				tspan_element.setAttributeNS(null, "x", x);
+				tspan_element.setAttributeNS(null, "dy", fontsize);
+				nRows++;
 			}
 		}
+		return nRows;
 	}
 };
 /**
@@ -2287,10 +2334,29 @@ Map.Scale.prototype.getMapCoordinateUTM = function(x,y){
 	if ( this.szMapProjection == "Mercator" ){
 		ptCoord = _LLtoMercator(ptCoord.y, ptCoord.x);
 	}else
+	if ( this.szMapProjection == "WinkelTripel" ){
+		ptCoord = _LLtoWinkelTripel(ptCoord.y, ptCoord.x);
+	}else
 	if ( this.szMapUnits != "feet" && this.szMapUnits != "meter" && this.szMapUnits != "meters" ){
 		ptCoord = _LLtoUTM("WGS84", ptCoord.y, ptCoord.x);
 	}
 	return ptCoord;
+};
+/**
+ * returns the map position of geo coordinates in x/y UTM (meter)
+ * @param x of the UTM coordinate
+ * @param y of the UTM coordinate
+ * @param szUtmZone the UTM zone (tipo: 33N)
+ * @type point
+ * @return the map coordinates as point object
+ */
+Map.Scale.prototype.getMapPositionOfUTM = function(x,y,szDatum,szUtmZone){
+
+	ptOff = _UTMtoLL(szDatum, x, y,szUtmZone);
+	ptOff = map.Scale.getMapCoordinateOfLatLon(ptOff.y,ptOff.x);
+	var nX  = (ptOff.x-map.Scale.minBoundX)/map.Scale.mapUnitsPPX - map.Scale.mapOffset.x;
+	var nY  = map.Scale.bBox.height - (ptOff.y-map.Scale.minBoundY)/map.Scale.mapUnitsPPY - map.Scale.mapOffset.y;
+	return {x:nX,y:nY}; // new point(nX,nY);
 };
 /**
  * returns the map position of geo coordinates in Lat/Lon
@@ -2318,6 +2384,9 @@ Map.Scale.prototype.getMapCoordinateOfLatLon = function(lat,lon){
 	var	ptCoord;
 	if ( this.szMapProjection == "Mercator" ){
 		ptCoord = _LLtoMercator(lat, lon);
+	}else
+	if ( this.szMapProjection == "WinkelTripel" ){
+		ptCoord = _LLtoWinkelTripel(lat, lon);
 	}else
 	if ( this.szMapUnits == "feet" || this.szMapUnits == "meter" || this.szMapUnits == "meters" ){
 		if ( !this.szDatum && !this.szUTMZone ){
@@ -4495,7 +4564,8 @@ function displayMessage(szMessage,nTimeout,fAlert){
 	szMessage =  map.Dictionary.getLocalText(szMessage);
 	// use HTML messaging if possible
 	//
-	if ( fAlert != "notify" ){
+
+	if ( (fAlert != "notify") && (fAlert != "big") ){
 		if ( map.isInitializing() ){
 			try{
 				HTMLWindow.ixmaps.htmlgui_displayInfo(szMessage);
@@ -4506,6 +4576,9 @@ function displayMessage(szMessage,nTimeout,fAlert){
 			try{
 				if ( HTMLWindow.ixmaps.htmlgui_isInfoDisplay() ){
 					HTMLWindow.ixmaps.htmlgui_displayInfo(szMessage);
+					if (nTimeout){
+						clearMessage(nTimeout);
+					}
 					return;
 				}
 			}
@@ -4519,7 +4592,7 @@ function displayMessage(szMessage,nTimeout,fAlert){
 		var fontheight   = 64;
 		var szTemplate = "transparent";
 		var ptPos = new point(  map.Scale.bBox.width/2+map.Scale.mapPosition.x
-							   ,map.Scale.normalY(64)
+							   ,map.Scale.normalY(38)
 							 );
 	}else
 	if ( fAlert == "notify" ){
@@ -4578,6 +4651,9 @@ function displayMessage(szMessage,nTimeout,fAlert){
  * Clear the message text box  
  */
 function clearMessage(nTimeout){
+	if (tClearMessage && !nTimeout){
+		return;
+	}
 	do_clearMessage(nTimeout||0);
 }
 function do_clearMessage(nTimeout){
@@ -4916,7 +4992,7 @@ function executeWithMessage(szFu,szMessage,nTimeout){
 function doExecuteWithMessage(szFu){
 
 	if ( map.isIdle() ){
-		clearMessage(250);
+		//clearMessage(250);
 	}
 	// GR 26.07.2017 lets try without
 	// setTimeout("SVGMessageGroup.fu.clear()",500);
@@ -5086,6 +5162,12 @@ function __formatValue(nValue,nPrecision,szFlag){
 		return String(nValue);
 	}
 	if ( nValue == 0 ){
+		return String(nValue);
+	}
+	if ( nValue > 1000000000000 ){
+		return String(nValue);
+	}
+	if ( nValue < -1000000000000 ){
 		return String(nValue);
 	}
 
@@ -5279,13 +5361,13 @@ function SVGLoader(){
 			}
 		};
         CallbackHandler.prototype.processImported = function (d){
-
+			/** GR 01.09.2019 not necessary
 			try{
 				d = SVGDocument.importNode(d, true);
 			}
 			catch (e){
 			}
-
+			**/
 			if (szUrl.match(/widget/)){
 				// check for already defined templates, and remove them
 				var idA = map.Dom.getAllIds(d);
@@ -5554,7 +5636,7 @@ function SVGLoaderTiles(){
 			else{
 				this.nRequest = 0;
 				this.nToLoad = 0;
-				clearMessage();
+				//clearMessage();
 			}
 		}
 	};
@@ -5618,13 +5700,13 @@ function SVGLoaderTiles(){
 				_TRACE("Tiling: doppio tile !!!");
 				return;
 			}
-
+			/** GR 01.09.2019 not necessary
 			try{
 				d = SVGDocument.importNode(d, true);
 			}
 			catch (e){
 			}
-
+			**/
 			_TRACE("Tiling: -------------------------------------------------------------- "+szUrl+" imported !!!");
 			targetGroup.appendChild(d);
 
@@ -5796,7 +5878,7 @@ function SVGLoaderMap(){
 			else{
 				this.nRequest = 0;
 				this.nToLoad = 0;
-				clearMessage();
+				//clearMessage();
 			}
 		}
 	};
@@ -5842,6 +5924,7 @@ function SVGLoaderMap(){
         function CallbackHandler(parent){
 			this.parent = parent;
         }
+		
         CallbackHandler.prototype.operationComplete = function (status,xmlObject,szText){
 
 			this.parent.szUrlA[szUrl] = null;
@@ -5855,6 +5938,7 @@ function SVGLoaderMap(){
 			}
 			this.parent.pop();
 		};
+		
         CallbackHandler.prototype.processImported = function (d){
 
 			// local helper
@@ -5864,7 +5948,7 @@ function SVGLoaderMap(){
 					oldNode.parentNode.removeChild(oldNode);
 				}else
 				if (newNode){
-					SVGRootElement.appendChil(newNode);
+					SVGRootElement.appendChild(newNode);
 				}else
 				if (oldNode){
 					oldNode.parentNode.removeChild(oldNode);
@@ -5874,10 +5958,16 @@ function SVGLoaderMap(){
 			// ------------------------------
 			// import new map SVG nodes
 			// ------------------------------
-
-			d = SVGDocument.importNode(d, true);
-			console.log(d);
-
+			
+			map.hideAll();
+			
+			/** GR 01.09.2019 not necessary
+			try{
+				d = SVGDocument.importNode(d, true);
+			}
+			catch (e){
+			**/
+			
 			// replace metadata with data from new map
 			__replace(SVGDocument.getElementsByTagName("metadata")[2],
 								d.getElementsByTagName("metadata")[0]);
@@ -5926,7 +6016,7 @@ function SVGLoaderMap(){
 			map.Viewport = new Map.Viewport();
 
 			map.Query = new Map.Query();
-
+			
 			// magick !!!
 			var rectArea = map.Zoom.getBox();
 			var pt1 = map.Scale.getMapCoordinate(rectArea.x+rectArea.width/2,rectArea.y+rectArea.height/2);
@@ -5936,6 +6026,8 @@ function SVGLoaderMap(){
 			map.Scale.refreshCSSStyles();
 
 			HTMLWindow.ixmaps.htmlgui_onMapReady(window);
+			
+			setTimeout("map.showAll()",1000);
 
 			return;
         };
@@ -6452,7 +6544,7 @@ function _UTMtoLL(szRefEllipsoid, UTMNorthing, UTMEasting, szUTMZone )
 		return null;
 	}
 
-    var k0			= 0.9996;
+	var k0			= 0.9996;
     var a			= _refEllipsoid[szRefEllipsoid]._EquatorialRadius;
     var eccSquared	= _refEllipsoid[szRefEllipsoid]._eccentricitySquared;
     var e1			= (1-Math.sqrt(1-eccSquared))/(1+Math.sqrt(1-eccSquared));
@@ -6551,6 +6643,65 @@ function _MercatortoLL( nNorthing, nEasting )
 	var nLon = nEasting;
     return new point(nLon,nLat);
 }
+
+/**
+ * converts lat/long to WinkelTripple coords.
+ * East Longitudes are positive, West longitudes are negative. 
+ * North latitudes are positive, South latitudes are negative
+ * Lat and Long are in decimal degrees
+ * @param  nLat latitude in decimal degrees
+ * @param  nLon longitude in decimal degrees
+ * @type   point
+*/
+function _copysign(a,b)
+{
+	if ( a<0 && b>0 ){
+		return -a;
+	}
+	if ( a>0 && b<0 ){
+		return -a;
+	}
+	return a;
+}
+var WGS_84_EQ_RAD = 6378137;
+var CENTRAL_MERIDIAN = 0;
+function _LLtoWinkelTripel(nLat, nLon)
+{
+	/* Convert lon/lat to Winkel Tripel x/y */
+	var C, D, x1, x2, y1, y2;
+	
+	if ((nLon - CENTRAL_MERIDIAN) < -180.0) nLon = -180.0 + CENTRAL_MERIDIAN;
+	if ((nLon - CENTRAL_MERIDIAN) >  180.0) nLon =  180.0 + CENTRAL_MERIDIAN;
+
+	nLon -= CENTRAL_MERIDIAN;
+	nLat *= _deg2rad;
+	nLon *= (0.5 * _deg2rad);
+	
+	/* Fist find Aitoff x/y */
+	
+	D = Math.acos (Math.cos (nLat) * Math.cos (nLon));
+	if (D == 0.0)
+		x1 = y1 = 0.0;
+	else {
+		C = Math.sin (nLat) / Math.sin (D);
+		D *= WGS_84_EQ_RAD;
+		x1 = _copysign (2.0 * D * Math.sqrt (1.0 - C * C), nLon);
+		y1 = D * C;
+	}
+	
+	/* Then get equirectangular projection */
+	
+	x2 = WGS_84_EQ_RAD * 2 * nLon * Math.cos(50.467);
+	y2 = WGS_84_EQ_RAD * nLat;
+	
+	/* Winkler is the average value */
+	
+	x = 0.5 * (x1 + x2);
+	y = 0.5 * (y1 + y2);
+
+    return new point(x,y);
+}
+
 
 // .............................................................................
 // EOF

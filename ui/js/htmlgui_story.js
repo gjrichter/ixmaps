@@ -19,17 +19,17 @@ $Log: htmlgui_story.js,v $
  * @version 1.0 
  */
 
-(function( ixmaps, $, undefined ) {
+(function (ixmaps, $, undefined) {
 
 	// globals vars
 	ixmaps.storyUrl = null;
 	ixmaps.objThemesA = new Array();
 
 	// local vars
-	var szStoryRoot = ""; 
-	var szStoryRootA = []; 
-	var xmlLegendItems = null; 
-	var szTheme = null; 
+	var szStoryRoot = "";
+	var szStoryRootA = [];
+	var xmlLegendItems = null;
+	var szTheme = null;
 
 	// global functions
 
@@ -38,9 +38,9 @@ $Log: htmlgui_story.js,v $
 	 * (called on changing map, important if stories are defined with relativ urls)
 	 * @return void
 	 */
-	ixmaps.resetStory = function(){
-		szStoryRoot = ""; 
-		szStoryRootA = []; 
+	ixmaps.resetStory = function () {
+		szStoryRoot = "";
+		szStoryRootA = [];
 	};
 
 	/**
@@ -51,21 +51,21 @@ $Log: htmlgui_story.js,v $
 	 * @param szUrl the url of the story (may be relative)
 	 * @return void
 	 */
-	ixmaps.loadStory = function(szUrl,szFlag,target){
+	ixmaps.loadStory = function (szUrl, szFlag, target) {
 
-		if ( (szUrl == null) || typeof(szUrl) == 'undefined' || (szUrl == 'null') || (szUrl.length == 0) ){
+		if ((szUrl == null) || typeof (szUrl) == 'undefined' || (szUrl == 'null') || (szUrl.length == 0)) {
 			return;
 		}
-		if ( target == null ){
+		if (target == null) {
 			target = $('#story-board');
 		}
 
 		// set story board height (important for scrolling) 
 		// ------------------------------------------------
-		target.css("height",String(target.parent().height()-target.offset().top+25)+"px");
+		target.css("height", String(target.parent().height() - target.offset().top + 25) + "px");
 		// something gone wrong, so set to 100%
-		if ( target.css("height") == "0px" ){
-			target.css("height","100%");
+		if (target.css("height") == "0px") {
+			target.css("height", "100%");
 		}
 
 		/**
@@ -75,39 +75,39 @@ $Log: htmlgui_story.js,v $
 		}
 		**/
 		szUrl = encodeURI(unescape(szUrl));
-		
+
 		// absolute or relative URL 
 		// ------------------------
-		if ( szUrl.match(/HTTP:\/\//) || szUrl.match(/http:\/\//) || szUrl.match(/\/\//) || szUrl.match(/\//) ) {
-			szStoryRoot = ""; 
+		if (szUrl.match(/HTTP:\/\//) || szUrl.match(/http:\/\//) || szUrl.match(/\/\//) || szUrl.match(/\//)) {
+			szStoryRoot = "";
 			urlA = szUrl.split("/");
-			for ( var i=0; i<urlA.length-1; i++){
-				szStoryRoot += urlA[i]+"/";
+			for (var i = 0; i < urlA.length - 1; i++) {
+				szStoryRoot += urlA[i] + "/";
 			}
-			szUrl = urlA[urlA.length-1];
+			szUrl = urlA[urlA.length - 1];
 		}
 
 		// we have a master story loaded; all child stories refer to this root
 		// -------------------------------------------------------------------
-		if ( this.storyUrl && !this.masterStoryRoot ){
+		if (this.storyUrl && !this.masterStoryRoot) {
 			// make absolute master story URL
-			var urlA = String($(location).attr('origin')+$(location).attr('pathname')).split("/");
+			var urlA = String($(location).attr('origin') + $(location).attr('pathname')).split("/");
 			urlA.pop();
-			var szMasterStory = urlA.join('/') +'/'+ this.storyUrl; 
+			var szMasterStory = urlA.join('/') + '/' + this.storyUrl;
 
 			// get absolute master story root
 			urlA = szMasterStory.split("/");
 			urlA.pop();
-			this.masterStoryRoot = urlA.join('/')+'/';
+			this.masterStoryRoot = urlA.join('/') + '/';
 		}
-		
+
 		// make absolute story root, if we have a master story loaded
 		// ----------------------------------------------------------
-		szStoryRoot = (this.masterStoryRoot||"")+szStoryRoot;
+		szStoryRoot = (this.masterStoryRoot || "") + szStoryRoot;
 
 		// if not story root yet, preset with SVG map root
 		// ----------------------------------------------------------------------------
-		if ( !szStoryRoot || (szStoryRoot.length == 0) ){
+		if (!szStoryRoot || (szStoryRoot.length == 0)) {
 			szStoryRoot = this.szUrlSVGRoot;
 		}
 
@@ -122,43 +122,42 @@ $Log: htmlgui_story.js,v $
 			szUrl += urlA[i];
 		}
 		**/
-		var szStoryFilename = urlA[urlA.length-1];
+		var szStoryFilename = urlA[urlA.length - 1];
 		ixmaps.storyRoot = szStoryRoot;
-		ixmaps.storyUrl = szStoryRoot+szUrl;
-		if ( szUrl && typeof(szUrl) == "string" && szUrl.length ){
+		ixmaps.storyUrl = szStoryRoot + szUrl;
+		if (szUrl && typeof (szUrl) == "string" && szUrl.length) {
 
-			$("#story-css").attr("href", szStoryRoot+szUrl.split('.')[0]+".css");
-			$("#story-css-font").attr("href", szStoryRoot+szUrl.split('.')[0]+"_fonts.css");
+			$("#story-css").attr("href", szStoryRoot + szUrl.split('.')[0] + ".css");
+			$("#story-css-font").attr("href", szStoryRoot + szUrl.split('.')[0] + "_fonts.css");
 
-			target.attr("visibility","invisible");
+			target.attr("visibility", "invisible");
 
 			// store root for further use inside callbacks
 			szStoryRootA[szUrl] = szStoryRoot;
 
-			target.load(szStoryRoot+szUrl+' #story', function(response, status, xhr) {
+			target.load(szStoryRoot + szUrl + ' #story', function (response, status, xhr) {
 				if (status == "error") {
 					var msg = "Sorry but there was an error: ";
-					$("#story").html(msg + xhr.status + "<br><br> '" +szStoryRoot+szUrl+ "'<br><br> " + xhr.statusText);
-				}else{
-					try{
-						ixmaps.htmlgui_onStoryLoaded(szUrl,target);
-					}
-					catch (e){}
+					$("#story").html(msg + xhr.status + "<br><br> '" + szStoryRoot + szUrl + "'<br><br> " + xhr.statusText);
+				} else {
+					try {
+						ixmaps.htmlgui_onStoryLoaded(szUrl, target);
+					} catch (e) {}
 					$.ajax({
 						type: "GET",
-						url: szStoryRootA[szUrl]+szUrl.split('.')[0]+".xml",
+						url: szStoryRootA[szUrl] + szUrl.split('.')[0] + ".xml",
 						dataType: "xml",
-						success: function(xml) {
+						success: function (xml) {
 							ixmaps.objThemesA[String(szStoryFilename.split('.')[0])] = xml;
-							if ( !szFlag || !szFlag.match(/silent/) ){
-								$.getScript(szStoryRootA[szUrl]+szUrl.split('.')[0]+".js");
+							if (!szFlag || !szFlag.match(/silent/)) {
+								$.getScript(szStoryRootA[szUrl] + szUrl.split('.')[0] + ".js");
 							}
 						},
-						error: function(xml) {
-							if ( !szFlag || !szFlag.match(/silent/) ){
-								$.getScript(szStoryRootA[szUrl]+szUrl.split('.')[0]+".js");
-								}
+						error: function (xml) {
+							if (!szFlag || !szFlag.match(/silent/)) {
+								$.getScript(szStoryRootA[szUrl] + szUrl.split('.')[0] + ".js");
 							}
+						}
 					});
 				}
 			});
@@ -172,9 +171,9 @@ $Log: htmlgui_story.js,v $
 	 * @param szUrl the url of the story (may be relative)
 	 * @return void
 	 */
-	ixmaps.setStoryUrl = function(szUrl){
+	ixmaps.setStoryUrl = function (szUrl) {
 
-		if ( (szUrl == null) || typeof(szUrl) == 'undefined' || (szUrl == 'null') || (szUrl.length == 0) ){
+		if ((szUrl == null) || typeof (szUrl) == 'undefined' || (szUrl == 'null') || (szUrl.length == 0)) {
 			return;
 		}
 
@@ -182,18 +181,18 @@ $Log: htmlgui_story.js,v $
 
 		// absolute or relative URL 
 		// ------------------------
-		if ( szUrl.match(/HTTP:\/\//) || szUrl.match(/http:\/\//) || szUrl.match(/\/\//) || szUrl.match(/\//) ) {
-			szStoryRoot = ""; 
+		if (szUrl.match(/HTTP:\/\//) || szUrl.match(/http:\/\//) || szUrl.match(/\/\//) || szUrl.match(/\//)) {
+			szStoryRoot = "";
 			urlA = szUrl.split("/");
-			for ( var i=0; i<urlA.length-1; i++){
-				szStoryRoot += urlA[i]+"/";
+			for (var i = 0; i < urlA.length - 1; i++) {
+				szStoryRoot += urlA[i] + "/";
 			}
-			szUrl = urlA[urlA.length-1];
+			szUrl = urlA[urlA.length - 1];
 		}
 
 		// relative URL, combine with old story root or if not given, with SVG map root
 		// ----------------------------------------------------------------------------
-		if ( !szStoryRoot || (szStoryRoot.length == 0) ){
+		if (!szStoryRoot || (szStoryRoot.length == 0)) {
 			szStoryRoot = this.szUrlSVGRoot;
 		}
 
@@ -204,7 +203,7 @@ $Log: htmlgui_story.js,v $
 		urlA = szUrl.split("./");
 
 		ixmaps.storyRoot = szStoryRoot;
-		ixmaps.storyUrl = szStoryRoot+szUrl;
+		ixmaps.storyUrl = szStoryRoot + szUrl;
 	};
 
 	/**
@@ -215,26 +214,26 @@ $Log: htmlgui_story.js,v $
 	 * @param szUrl the url of the story (may be relative)
 	 * @return void
 	 */
-	ixmaps.loadStoryTool = function(szUrl,opt){
+	ixmaps.loadStoryTool = function (szUrl, opt) {
 
-		if ( (szUrl == null) || typeof(szUrl) == 'undefined' || (szUrl == 'null') || (szUrl.length == 0) ){
+		if ((szUrl == null) || typeof (szUrl) == 'undefined' || (szUrl == 'null') || (szUrl.length == 0)) {
 			return;
 		}
 		$('#story-board').hide();
-		$('#story-tool').show();
 
 		var target = $('#story-tool');
+		
 		//target.html("<p>loading ...</p>");
 
 		// set story board height (important for scrolling) 
 		// ------------------------------------------------
-		target.css("height",String(target.parent().height()-target.offset().top+25)+"px");
+		target.css("height", String(target.parent().height() - target.offset().top + 25) + "px");
 		// something gone wrong, so set to 100%
-		if ( target.css("height") == "0px" ){
-			target.css("height","100%");
+		if (target.css("height") == "0px") {
+			target.css("height", "100%");
 		}
-		if ( opt && opt.background ){
-			target.css("background",opt.background);
+		if (opt && opt.background) {
+			target.css("background", opt.background);
 		}
 		/**
 		if ( !(this.embeddedSVG || (this.embeddedApi && this.embeddedApi.embeddedSVG) ) && (!szFlag || !szFlag.match(/silent/)) ){
@@ -243,39 +242,45 @@ $Log: htmlgui_story.js,v $
 		}
 		**/
 		szUrl = encodeURI(unescape(szUrl));
-		
+
 		// absolute or relative URL 
 		// ------------------------
-		if ( szUrl.match(/HTTP:\/\//) || szUrl.match(/http:\/\//) || szUrl.match(/\/\//) || szUrl.match(/\//) ) {
-			szStoryRoot = ""; 
+		if (szUrl.match(/HTTP:\/\//) || szUrl.match(/http:\/\//) || szUrl.match(/\/\//) || szUrl.match(/\//)) {
+			szStoryRoot = "";
 			urlA = szUrl.split("/");
-			for ( var i=0; i<urlA.length-1; i++){
-				szStoryRoot += urlA[i]+"/";
+			for (var i = 0; i < urlA.length - 1; i++) {
+				szStoryRoot += urlA[i] + "/";
 			}
-			szUrl = urlA[urlA.length-1];
+			szUrl = urlA[urlA.length - 1];
 		}
 
 		// we have a master story loaded; all child stories refer to this root
 		// -------------------------------------------------------------------
-		if ( this.storyUrl && !this.masterStoryRoot ){
-			// make absolute master story URL
-			var urlA = String($(location).attr('origin')+$(location).attr('pathname')).split("/");
-			urlA.pop();
-			var szMasterStory = urlA.join('/') +'/'+ this.storyUrl; 
+		if (this.storyUrl && !this.masterStoryRoot) {
+			if (this.storyUrl.substr(0,4) == "http"){
+				var urlA = this.storyUrl.split("/");
+				urlA.pop();
+				this.masterStoryRoot = urlA.join('/') + '/';
+			} else {
+				// make absolute master story URL
+				var urlA = String($(location).attr('origin') + $(location).attr('pathname')).split("/");
+				urlA.pop();
+				var szMasterStory = urlA.join('/') + '/' + this.storyUrl;
 
-			// get absolute master story root
-			urlA = szMasterStory.split("/");
-			urlA.pop();
-			this.masterStoryRoot = urlA.join('/')+'/';
+				// get absolute master story root
+				urlA = szMasterStory.split("/");
+				urlA.pop();
+				this.masterStoryRoot = urlA.join('/') + '/';
+			}
 		}
-		
+
 		// make absolute story root, if we have a master story loaded
 		// ----------------------------------------------------------
-		szStoryRoot = (this.masterStoryRoot||"")+szStoryRoot;
+		szStoryRoot = (this.masterStoryRoot || "") + szStoryRoot;
 
 		// if not story root yet, preset with SVG map root
 		// ----------------------------------------------------------------------------
-		if ( !szStoryRoot || (szStoryRoot.length == 0) ){
+		if (!szStoryRoot || (szStoryRoot.length == 0)) {
 			szStoryRoot = this.szUrlSVGRoot;
 		}
 
@@ -285,49 +290,62 @@ $Log: htmlgui_story.js,v $
 
 		urlA = szUrl.split("./");
 
-		var szStoryFilename = urlA[urlA.length-1];
+		var szStoryFilename = urlA[urlA.length - 1];
 
-		if ( szUrl && typeof(szUrl) == "string" && szUrl.length ){
+		if (szUrl && typeof (szUrl) == "string" && szUrl.length) {
 
 			var backButtonStyle = {
-				"position":"absolute",
-				"left":"1em",
-				"top":"0.5em",
-				"background":"#aaaaaa",
-				"border-radius":"5px",
-				"width":"80%",
-				"margin-right":"5em",
-				"padding":"0.5em",
-				"text-align":"center",
-				"color":"white",
-				"text-decoration":"none"
-				};
+				"position": "absolute",
+				"left": "1em",
+				"top": "0.5em",
+				"background": "#aaaaaa",
+				"border-radius": "5px",
+				"width": "80%",
+				"margin-right": "5em",
+				"padding": "0.5em",
+				"text-align": "center",
+				"color": "white",
+				"text-decoration": "none",
+				"pointer-events": "all"
+			};
 
-			$("#story-css").attr("href", szStoryRoot+szUrl.split('.')[0]+".css");
-			$("#story-css-font").attr("href", szStoryRoot+szUrl.split('.')[0]+"_fonts.css");
+			$("#story-css").attr("href", szStoryRoot + szUrl.split('.')[0] + ".css");
+			$("#story-css-font").attr("href", szStoryRoot + szUrl.split('.')[0] + "_fonts.css");
 
-			target.attr("visibility","visible");
+			target.attr("visibility", "visible");
 
 			// store root for further use inside callbacks
 			szStoryRootA[szUrl] = szStoryRoot;
 
-			if ( opt && opt.frame ){
+			if (opt && opt.frame) {
 				// GR 14.09.2017 load story on map ready
 				// -------------------------------------
-				var width  = parseInt($("#sidebar").css("width"))-ixmaps.overlap/2;
+				var width = parseInt($("#sidebar").css("width")) - ixmaps.overlap / 2;
 				var height = parseInt($("#sidebar").css("height"));
-				$("#story-tool").html("<iframe id='embed-tool' src=\"" + szStoryRoot+szUrl + "\" " +
-						" style='border:0;margin:0px;width:"+width+"px;height:"+height+"px' /><a href='javascript:ixmaps.hideStoryTool()' class='hide-story-tool-button' ><span style='vertical-align:5%'>&larr;</span> Back</a>");
-			}else{
-				target.load(szStoryRoot+szUrl, function(response, status, xhr) {
+				target.html("<iframe id='embed-tool' src=\"" + szStoryRoot + szUrl + "\" " +
+					" style='border:0;margin:0px;width:" + width + "px;height:" + height + "px;pointer-events:all' /><a href='javascript:ixmaps.hideStoryTool()' class='hide-story-tool-button' ><span style='font-size:24px;color:#aaaaaa;vertical-align:10px'><i class='fa fa-times fa-fw' ></i></span></a>");
+			} else {
+				target.css("pointer-events", "all");
+				target.load(szStoryRoot + szUrl, function (response, status, xhr) {
 					if (status == "error") {
 						var msg = "Sorry but there was an error: ";
-						$("#story").html(msg + xhr.status + "<br><br> '" +szStoryRoot+szUrl+ "'<br><br> " + xhr.statusText);
-					}else{
-						target.append('<a href="javascript:ixmaps.hideStoryTool()" class="hide-story-tool-button" ><span style="vertical-align:5%">&larr;</span> Back</a>');
+						$("#story").append(msg + xhr.status + "<br><br> '" + szStoryRoot + szUrl + "'<br><br> " + xhr.statusText);
+					} else {
+						target.append('<a href="javascript:ixmaps.hideStoryTool()" class="hide-story-tool-button" ><span style="font-size:24px;color:#aaaaaa;vertical-align:10px"><i class="fa fa-times fa-fw" ></i></span></a>');
 					}
 				});
 			}
+			if (!ixmaps.fStoryTool) {
+				$('#story-board').fadeOut("fast", function () {
+					$('#story-tool').fadeIn("slow");
+				});
+
+				if (!ixmaps.fSidebar) {
+					ixmaps.toggleSidebar();
+					ixmaps.fSidebar = false;
+				}
+			}
+			ixmaps.fStoryTool = true;
 		}
 	};
 
@@ -336,9 +354,9 @@ $Log: htmlgui_story.js,v $
 	 * @param szColor the background color
 	 * @return void
 	 */
-	ixmaps.setStoryBg = function(szColor){
-		$('#story-board').css("background",szColor);
-		$('#story-tool').css("background",szColor);
+	ixmaps.setStoryBg = function (szColor) {
+		$('#story-board').css("background", szColor);
+		$('#story-tool').css("background", szColor);
 
 	}
 
@@ -346,11 +364,30 @@ $Log: htmlgui_story.js,v $
 	 * hide story tool and go back to main story content
 	 * @return void
 	 */
-	ixmaps.hideStoryTool = function(){
-		$('#story-board').show();
-		$('#story-tool').hide();
-		ixmaps.embeddedSVG.window.map.Api.clearHighlight();
-		ixmaps.embeddedSVG.window.map.Api.setMapTool("pan");
+	ixmaps.hideStoryTool = function () {
+
+		if (ixmaps.fStoryTool) {
+
+			$('#story-tool').fadeOut("fast", function () {
+				if (!ixmaps.fSidebar) {
+					ixmaps.fSidebar = true;
+					ixmaps.toggleSidebar();
+					setTimeout("$('#story-board').show()", 500);
+				} else {
+					$('#story-board').fadeIn();
+				}
+				$('#story-tool').html("");
+			});
+			ixmaps.embeddedSVG.window.map.Api.clearHighlight();
+			ixmaps.embeddedSVG.window.map.Api.clearAllOverlays();
+			//ixmaps.embeddedSVG.window.map.Api.setMapTool("pan");
+		}
+		
+		try {
+			ixmaps.htmlgui_onHideStoryTool();
+		} catch (e) {}
+
+		ixmaps.fStoryTool = false;
 	}
 
 	// -----------------------------------
@@ -365,20 +402,25 @@ $Log: htmlgui_story.js,v $
 	 * @type string
 	 * @return an executable theme definition string (javascript function call)
 	 */
-	ixmaps.getTheme = function(szThemeName,szSourceName){
+	ixmaps.getTheme = function (szThemeName, szSourceName) {
+		
+		ixmaps.objThemesA = ixmaps.objThemesA || ixmaps.embeddedApi.objThemesA;
+		if (!ixmaps.objThemesA.length){
+			ixmaps.objThemesA = ixmaps.embeddedApi.objThemesA;
+		}
 
 		var szTheme = null;
-		for ( a in ixmaps.objThemesA )	{
-			if ( !szSourceName || (szSourceName == a) ){
-				$(ixmaps.objThemesA[a]).find('LEGENDITEM').each(function(){
-					if ( $(this).attr('name') == szThemeName ){
-						szTheme = $(this).attr('onactivate').replace(/\n/gi,"");
+		for (a in ixmaps.objThemesA) {
+			if (!szSourceName || (szSourceName == a)) {
+				$(ixmaps.objThemesA[a]).find('LEGENDITEM').each(function () {
+					if ($(this).attr('name') == szThemeName) {
+						szTheme = $(this).attr('onactivate').replace(/\n/gi, "");
 					}
 				}); //close each(
 			}
 		}
-		if ( szTheme == null ){
-			alert("error on getTheme(): '"+szThemeName+"' not found!");
+		if (szTheme == null) {
+			alert("error on getTheme(): '" + szThemeName + "' not found!");
 		}
 		return szTheme;
 	};
@@ -387,11 +429,10 @@ $Log: htmlgui_story.js,v $
 	 * @param szText the error message
 	 * @return void
 	 */
-	ixmaps.error = function(szText){
-		try	{
-			MessageBox.show(MESSAGE_TYPE.Error, "iXmaps", szText.replace(/\n+/g,'<br>'), null, null);
-		}
-		catch (e){
+	ixmaps.error = function (szText) {
+		try {
+			MessageBox.show(MESSAGE_TYPE.Error, "iXmaps", szText.replace(/\n+/g, '<br>'), null, null);
+		} catch (e) {
 			alert(szText);
 		}
 	};
@@ -402,20 +443,18 @@ $Log: htmlgui_story.js,v $
 	 * @param callCancel the function to call on cancel
 	 * @return void
 	 */
-	ixmaps.confirm = function(szText,callOk,callCancel){
-		try	{
-			MessageBox.show(MESSAGE_TYPE.Confirmation, "iXmaps", szText.replace(/\n+/g,'<br>'), callOk, callCancel);
-		}
-		catch (e){
-			if ( confirm("szText") ){
+	ixmaps.confirm = function (szText, callOk, callCancel) {
+		try {
+			MessageBox.show(MESSAGE_TYPE.Confirmation, "iXmaps", szText.replace(/\n+/g, '<br>'), callOk, callCancel);
+		} catch (e) {
+			if (confirm("szText")) {
 				callOk();
 			}
 		}
 	};
 
-}( window.ixmaps = window.ixmaps || {}, jQuery ));
+}(window.ixmaps = window.ixmaps || {}, jQuery));
 
 // .............................................................................
 // EOF
 // .............................................................................
-

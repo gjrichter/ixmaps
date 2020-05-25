@@ -50,6 +50,10 @@
 	{"word":"BOX","freq":24,"score":300,"flags":"bc","syllables":"1","help":"make chart background"},
 	{"word":"RECT","freq":24,"score":300,"flags":"bc","syllables":"1","help":"rectangular grid"},
 	{"word":"RELOCATE","freq":24,"score":300,"flags":"bc","syllables":"1","help":"position from grid point to barycenter of values"},
+	{"word":"COMPOSECOLOR","freq":24,"score":300,"flags":"bc","syllables":"1","help":"create composed color from value and colorscheme"},
+	{"word":"SUBTRACTIVE","freq":24,"score":300,"flags":"bc","syllables":"1","help":"use subtractive color mixing with COMPOSECOLOR"},
+	{"word":"NORMALIZE","freq":24,"score":300,"flags":"bc","syllables":"1","help":"scale all values into ragne 0 ... 1 with common MAX"},
+	{"word":"HARMONIZE","freq":24,"score":300,"flags":"bc","syllables":"1","help":"scale all values into ragne 0 ... 1"},
 
 	{"word":"overviewchart","freq":24,"score":300,"flags":"bc","syllables":"1","help":"theme base layer"},
 	{"word":"evidence","freq":24,"score":300,"flags":"bc","syllables":"1","help":"[isolate|highlight]"},
@@ -73,6 +77,7 @@
 	{"word":"lookupfield","freq":24,"score":300,"flags":"bc","syllables":"1","help":"data column -> layer items"},
 	{"word":"lookuptoupper","freq":24,"score":300,"flags":"bc","syllables":"1","help":"make upper case"},
 	{"word":"lookupsuffix","freq":24,"score":300,"flags":"bc","syllables":"1","help":"add suffix to data"},
+	{"word":"lookupdigits","freq":24,"score":300,"flags":"bc","syllables":"1","help":"add leading 0 > number of digits"},
 
 
 	{"word":"ranges","freq":24,"score":300,"flags":"bc","syllables":"1","help":"expl:\"-100,0,100\""},
@@ -87,7 +92,7 @@
 	{"word":"sizevalueunits","freq":24,"score":300,"flags":"bc","syllables":"1","help":"add to value display"},
 	{"word":"legendunits","freq":24,"score":300,"flags":"bc","syllables":"1","help":"add to value display"},
 	{"word":"xaxis","freq":24,"score":300,"flags":"bc","syllables":"1","help":"axis label (bar charts)"},
-	{"word":"label","freq":24,"score":300,"flags":"bc","syllables":"1","help":"for EXACT themes"},
+	{"word":"label","freq":24,"score":300,"flags":"bc","syllables":"1","help":"for CATEGORICAL themes"},
 	{"word":"weights","freq":24,"score":300,"flags":"bc","syllables":"1","help":"add.factor for ranges"},
 	{"word":"scale","freq":24,"score":300,"flags":"bc","syllables":"1","help":"chart size scaling"},
 

@@ -38,7 +38,8 @@ $Log: htmlgui.js,v $
 			}
 		}
 		// GR 05.06.2014 restore input mode after dialog closed
-		ixmaps.beforeDialogTool = ixmaps.getMapTool();
+        // GR 12.11.2019 always set to "" !!
+		ixmaps.beforeDialogTool = ""; //ixmaps.getMapTool();
 
 		var offsetLeft = null;
 		var offsetTop  = null;
@@ -128,11 +129,16 @@ $Log: htmlgui.js,v $
 		$("#"+szElement).parent().css("z-index","10000");
 		// load content
 		if ( typeof(szUrl) == "string" && szUrl.length ){
-			$("#"+szElement)[0].innerHTML = 
-				"<div overflow=\"auto\">"+
-				"<iframe style=\"width:100%;height:"+(dialogHeight-60)+"px;\" id=\"dialogframe\" src=\""+szUrl+"\" frameborder=\"0\" marginwidth=\"0px\" />"+
-				"</div>";
+			if ( (szUrl.substr(0,4) == "http") || (szUrl.substr(0,1) == ".") ){
+				$("#"+szElement)[0].innerHTML = 
+					"<div overflow=\"auto\">"+
+					"<iframe style=\"width:100%;height:"+(dialogHeight-115)+"px;\" id=\"dialogframe\" src=\""+szUrl+"\" frameborder=\"0\" marginwidth=\"0px\" />"+
+					"</div>";
+			}else{
+				$("#"+szElement)[0].innerHTML = 
+					"<div overflow=\"auto\"><span style=\"color:#888\">"+szUrl+"</span></div>";
 			}
+		}
 		return 	$("#"+szElement)[0];
 	};
 	ixmaps.openSidebar = function(event,szElement,szUrl,szTitle,szPosition,nMinWidth,nMinHeight){
@@ -277,10 +283,36 @@ $Log: htmlgui.js,v $
 		window.idialog = this.openDialog(null,'editor','./tools/theme_editor.html','Theme Editor',position||'10,103',380,600);
 	};
 
-	ixmaps.popupTools = function(position){
-		ixmaps.openDialog(null, "tools", './tools/popuptools_line_v2.html', 'Tools', '10,10', "95%", 150);
+	ixmaps.popupProjectEditor = function(position){
+		window.idialog = this.openDialog(null,'editor','./tools/project_editor.html','Project Editor',position||'10,103',380,600);
 	};
 
+	ixmaps.popupThemeConfigurator = function(position){
+		window.idialog = this.openDialog(null,'configurator','./tools/theme_configurator.html','Theme Configuator',position||'10,10',450,660);
+	};
+
+	ixmaps.popupThemeFacets = function(position){
+		window.idialog = this.openDialog(null,'facets','./tools/theme_facets.html','Theme Facets',position||'10,10',450,660);
+	};
+
+	ixmaps.popupTools = function(position){
+		var szPos = String(parseInt($(ixmaps.gmapDiv).css('left')) + 55) + ',13';
+		ixmaps.openDialog(null, 'dialog', './tools/popuptools_line_v2.html', '', szPos, 700, 100);
+		$("#dialog").css("height", "100%");
+		$("#dialog").css("width", "90%");
+		$("#dialog").css("position", "absolute");
+		$("#dialog").css("top", "10px");
+		$("#dialog").css("overflow", "hidden");
+		//ixmaps.openDialog(null, "tools", './tools/popuptools_line_v2.html', 'Tools', '10,10', "95%", 150);
+	};
+
+	ixmaps.showAbout= function(position){
+		if ( ixmaps.loadedProject.metadata.about && ixmaps.loadedProject.metadata.about.length ) {
+			ixmaps.openDialog(null, "tools", ixmaps.loadedProject.metadata.about, 'about', position||'100,100',"50%","500");
+		}
+	};
+
+	
 	ixmaps.fullScreenMap = function(szTemplateUrl){
 
 		var szMapService = this.szMapService;
@@ -320,6 +352,7 @@ $Log: htmlgui.js,v $
 		// ------------------------------------------------------------------
 		var szEditUrl   = ixmaps.getEditUrl  ?ixmaps.getEditUrl()  :null;
 		var szViewUrl   = ixmaps.getViewUrl  ?ixmaps.getViewUrl()  :null;
+		var szPViewUrl  = ixmaps.getPViewUrl ?ixmaps.getPViewUrl() :null;
 		var szAloneUrl  = ixmaps.getLinkUrl  ?ixmaps.getLinkUrl()  :null;
 		var szEmbedUrl  = ixmaps.getEmbedUrl ?ixmaps.getEmbedUrl() :null;
 		var szPopoutUrl = ixmaps.getPopoutUrl?ixmaps.getPopoutUrl():null;
@@ -354,35 +387,45 @@ $Log: htmlgui.js,v $
 
 		var szTemplateEdit   = szTemplateUrl + "ui=edit"   + szBasemap;
 		var szTemplateView   = szTemplateUrl + "ui=view"   + szBasemap;
+		var szTemplatePView  = szTemplateUrl + "ui=pview"  + szBasemap;
 		var szTemplateEmbed  = szTemplateUrl + "ui=embed"  + szBasemap;
 		var szTemplateMain   = szTemplateUrl + "ui=embed"  + szBasemap;
 		var szTemplatePopout = szTemplateUrl + "ui=popout" + szBasemap;
 
 		window.document.body.topMargin = 0;
 		window.document.body.leftMargin = 0;
-
-		var szMapType  = ixmaps.getMapTypeId();
-		var szMapUrl   = ixmaps.getMapUrl();
-		var szStoryUrl = ixmaps.getStoryUrl();
-		var szBookmark = ixmaps.getBookmarkString(2);
-		var szAttrib   = ixmaps.htmlgui_getAttributionString();
-
-		szQuery  = "&maptype=" + szMapType;
-		szQuery += "&minimal=1&toolbutton=1&logo=1&child=1";
-		szQuery += "&svggis=" + encodeURI(szMapUrl);
-		szQuery += "&story="  + encodeURI(szStoryUrl||"");
-		szQuery += "&bookmark=" + encodeURIComponent(szBookmark);
-		szQuery += "&attribution=" + encodeURIComponent(szAttrib);
+		
+		var szProject = ixmaps.getProjectString();
+		// test project string size
+		// URL strings > 5000 lead to browser error
+		if ( szProject.length > 4000 ){
+			// if we have a project URL (.json) return this
+			if ( ixmaps.loadedProjectUrl ){
+				szProject =  ixmaps.loadedProjectUrl;
+			}else
+			// if not, try the original loaded project
+			if ( ixmaps.loadedProject ){
+				szProject = JSON.stringify(ixmaps.loadedProject);
+			}
+		}
+		var szQuery = "&project=" + szProject;
+		// if szProject is JSON, encode URI
+		if (szProject.match(/\{/)){
+			var szQuery = "&project=" + encodeURIComponent(szProject);
+		}
 
 		szEmbedUrl  = szEmbedUrl || (szTemplateEmbed + szQuery);
 		szAloneUrl  = szAloneUrl || (szTemplateMain + szQuery);
 		szEditUrl   = szEditUrl  || (szTemplateEdit + szQuery);
 		szViewUrl   = szViewUrl  || (szTemplateView + szQuery);
+		szPViewUrl  = szPViewUrl || (szTemplatePView + szQuery);
 		szPopoutUrl = szTemplatePopout + szQuery;
 
 		switch(szType){
 			case "view":
 				return szViewUrl;
+			case "pview":
+				return szPViewUrl;
 			case "edit":
 				return szEditUrl;
 		}
@@ -395,6 +438,10 @@ $Log: htmlgui.js,v $
 
 	ixmaps.popOutEdit = function(fFlag,szTemplateUrl){
 		window.open(ixmaps.getShareUrl("edit"));
+	};
+	
+	ixmaps.popOutProject = function(fFlag,szTemplateUrl){
+		window.open(ixmaps.getShareUrl("pview"));
 	};
 
 	ixmaps.popOutMap = function(fFlag,szTemplateUrl){
@@ -474,6 +521,13 @@ $Log: htmlgui.js,v $
 	ixmaps.getMapUrl = function(){
 		return decodeURI(ixmaps.szUrlSVG);
 	};
+	ixmaps.getLoadedMapUrl = function(){
+		if ( ixmaps.loadedMap ){
+			return decodeURI(ixmaps.loadedMap);
+		}else{
+			return "";
+		}
+	};
 	ixmaps.getLoadedMapString = function(){
 		if ( ixmaps.loadedMap ){
 			return "map.Api.loadMap('"+decodeURI(ixmaps.loadedMap)+"');";
@@ -482,8 +536,11 @@ $Log: htmlgui.js,v $
 		}
 	};
 	ixmaps.getStoryUrl = function(){
-		return decodeURI( $(document).getUrlParam('story')					||
-						  $(window.parent.document).getUrlParam('story')	 );
+		try {
+			return decodeURI( $(document).getUrlParam('story')					||
+							  $(window.parent.document).getUrlParam('story')	 );
+		}
+		catch (e){ return null; }
 	};
 	ixmaps.getMapTypeId = function(){
 		return htmlMap_getMapTypeId();
@@ -507,12 +564,22 @@ $Log: htmlgui.js,v $
 
 	ixmaps.htmlgui_setMapTypeBG = function(szId){
 
+		if (!szId){
+			return;
+		}
+
 		$("#css-modifier-container").remove();
 
 		if ( szId.match(/dark/i) || szId.match(/black/i) ){
 			$("#ixmap").css({"background":"black"});
 			$("#gmap").css({"background":"black"});
 			$("#story_board").css({"background":"black"});
+
+			// GR 18.06.2019 change color of sidebar body, for legend left/right
+			try{
+				window.parent.window.parent.window.document.getElementById('sidebar').parentNode.parentNode.style.setProperty("background-color","black");
+			}
+			catch (e){}
 
 			$( "#switchlegendbutton" ).css("background-color","#222222");
 			$( "#switchlegendbutton" ).css("border-color","#666666");
@@ -536,17 +603,34 @@ $Log: htmlgui.js,v $
 			changeCss(".loading-text","background-color:rgba(0,0,0,0.5)");
 
 		}else if ( szId.match(/gray/i) ){
-			$("#ixmap").css({"background":"#E6E6E6"});
-			$("#gmap").css({"background":"#E6E6E6"});
-			$("#story_board").css({"background":"#E6E6E6"});
-			$( "#switchlegendbutton" ).css("background-color","#E6E6E6");
+			$("#ixmap").css({"background":"#D4DADC"});
+			$("#gmap").css({"background":"#D4DADC"});
+			$("#story_board").css({"background":"#D4DADC"});
+
+			// GR 18.06.2019 change color of sidebar body, for legend left/right
+			try{
+				window.parent.window.parent.window.document.getElementById('sidebar').parentNode.parentNode.style.setProperty("background-color","#D4DADC");
+			}
+			catch (e){}
+
+			$( "#switchlegendbutton" ).css("background-color","#D4DADC");
 			$( "#switchlegendbutton" ).css("border-color","#dddddd");
+
+			changeCss(".loading-text","background-color:rgba(255,255,255,0.5)");
 		}else{
 			$("#ixmap").css({"background":"white"});
 			$("#gmap").css({"background":"white"});
 			$("#story_board").css({"background":"#ffffff"});
+			// GR 18.06.2019 change color of sidebar body, for legend left/right
+			try{
+				window.parent.window.parent.window.document.getElementById('sidebar').parentNode.parentNode.style.setProperty("background-color","#ffffff");
+			}
+			catch (e){}
+
 			$( "#switchlegendbutton" ).css("background-color","#ffffff");
 			$( "#switchlegendbutton" ).css("border-color","#dddddd");
+
+			changeCss(".loading-text","background-color:rgba(255,255,255,0.5)");
 		}
 
 		__cssControls(szId);
@@ -701,6 +785,10 @@ $Log: htmlgui.js,v $
 			var xA = szFeaturesA[i].split(":");
 			result[xA[0]] = xA[1];
 		}
+
+		// add htmlgui options
+		result.basemapopacity = $(this.gmapDiv).css("opacity");
+
 		return result;
 	};
 
@@ -757,9 +845,6 @@ $Log: htmlgui.js,v $
 
 			// execute bookmark, which are direct Javascript calls
 			this.embeddedSVG.window.map.Api.executeJavascriptWithMessage(xxx,"-> Bookmark",100);
-
-//			// force HTML map synchronisation 
-//			setTimeout('ixmaps.htmlgui_synchronizeMap(false,true);',100);
 		}
 		catch (e){
 			try{
@@ -922,7 +1007,7 @@ $Log: htmlgui.js,v $
 	ixmaps.pasteThemeFromClipboard = function(){
 		navigator.clipboard.readText()
 			.then(function(text) {
-				this.embeddedSVG.window.map.Api.newMapThemeByObj(JSON.parse(text));
+				ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(JSON.parse(text));
 			})
 			.catch(function(err) {
 				// maybe user didn't grant access to read from clipboard

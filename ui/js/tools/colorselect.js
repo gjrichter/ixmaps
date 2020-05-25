@@ -47,19 +47,40 @@
 		colorSchemesA['density3']	= "#FFEDA0,#800026,3colors,#FC5E2A";
 		colorSchemesA['density4']	= "#D1EC6E,#F7C025,null,null";
 
-		colorSchemesA['filler1']		= "#ffffff,#ffffff,#ffffff,#ffffff";
+		colorSchemesA['filler1']		= "#eeeeee,#eeeeee,#eeeeee,#eeeeee";
 
 		colorSchemesA['heatmap']	= "blue,#ffcc77,3low,red";
 		colorSchemesA['heatmap0']	= "#eeffaa,#9944B5,3colors,#ff8800";
 		colorSchemesA['heatmap01']	= "#6E4AF6,#F9FA84,3colors,#F52926";
 		colorSchemesA['heatmap1']	= "#ddff66,#AA7FB5,3low,#DB706D";
+
+		colorSchemesA['viridis-b']   = "#440154,#FDE725,3colors,#238A8D";
+		colorSchemesA['viridis-a']   = "#FDE725,#440154,3colors,#238A8D";
+		colorSchemesA['magma-b']     = "#100050,#F2F226,3colors,#CC4878";
+		colorSchemesA['magma-a']     = "#F2F226,#100050,3colors,#CC4878";
+
+		colorSchemesA['filler11']		= "#eeeeee,#eeeeee,#eeeeee,#eeeeee";
+
 		colorSchemesA['heatmap2']	= "#000523,#446CFF,3colors,#2239FC";
 		colorSchemesA['heatmap3']	= "#000523,#ffffFF,3colors,#2239FC";
 		colorSchemesA['heatmap31']	= "#334455,#88eeFF,dynamic,cold";
 		colorSchemesA['heatmap4']	= "RGB(74,74,255)|RGB(245,41,38)|dynamic";
 		colorSchemesA['heatmap5']	= "RGB(245,41,38)|RGB(74,74,255)|dynamic";;
 
-		colorSchemesA['filler2']		= "#ffffff,#ffffff,#ffffff,#ffffff";
+
+		colorSchemesA['filler2']		= "#eeeeee,#eeeeee,#eeeeee,#eeeeee";
+
+		colorSchemesA['blue-red9'] = "#36A6B1|#794073|3colors|#DDA729";
+		colorSchemesA['red-blue9'] = "#794073|#36A6B1|3colors|#DDA729";
+		colorSchemesA['green-red9'] = "#56A651|#794073|3colors|#DDA729";
+		colorSchemesA['red-green9'] = "#794073|#56A651|3colors|#DDA729";
+
+		colorSchemesA['blue-green-red'] = "#5EB6BA,#DD8356,3colors,#95B526";
+		colorSchemesA['red-green-blue'] = "#DD8356,#5EB6BA,3colors,#95B526";
+		colorSchemesA['green-blue-red1'] = "#95B526,#DD8356,3colors,#5EB6BA";
+		colorSchemesA['red-blue-green1'] = "#DD8356,#95B526,3colors,#5EB6BA";
+
+		colorSchemesA['filler3']		= "#eeeeee,#eeeeee,#eeeeee,#eeeeee";
 
 		colorSchemesA['green-red']	= "green,red,,warm";
 		colorSchemesA['red-green']	= "red,green,,warm";
@@ -67,6 +88,8 @@
 		colorSchemesA['red-green2'] = "#FF4800,#7CB832,auto,#F7FA7A";
 		colorSchemesA['green-red3'] = "#41826C,#EF5D52,3colors,#E1D495";
 		colorSchemesA['red-green3'] = "#EF5D52,#41826C,3colors,#E1D495";
+		colorSchemesA['blue-red9'] = "#36A6B1|#794073|3colors|#DDA729";
+		colorSchemesA['red-blue9'] = "#794073|#36A6B1|3colors|#DDA729";
 
 		colorSchemesA['blue-red']	= "blue,red,,warm";
 		colorSchemesA['red-blue']	= "red,blue,,warm";
@@ -84,14 +107,9 @@
 		colorSchemesA['red-blue7'] = "#FF6801|#62D2EA|3colors|#E0E4CB";
 		colorSchemesA['blue-red8'] = "#80AF9B|#FF3D62|3colors|#FBCDAB";
 		colorSchemesA['red-blue8'] = "#FF3D62|#80AF9B|3colors|#FBCDAB";
-		colorSchemesA['blue-red9'] = "#36A6B1|#794073|3colors|#DDA729";
-		colorSchemesA['red-blue9'] = "#794073|#36A6B1|3colors|#DDA729";
 		colorSchemesA['blue-redA'] = "#276E83|#AA0321|3colors|#FBF7B6";
 		colorSchemesA['red-blueA'] = "#AA0321|#276E83|3colors|#FBF7B6";
 		
-		colorSchemesA['green-red9'] = "#56A651|#794073|3colors|#DDA729";
-		colorSchemesA['red-green9'] = "#794073|#56A651|3colors|#DDA729";
-
 		colorSchemesA['green-brown']= "#828A4D,#CF926D,3colors,#FFFFFF";
 		colorSchemesA['brown-green']= "#CF926D,#828A4D,3colors,#FFFFFF";
 
@@ -100,10 +118,6 @@
 		colorSchemesA['blue-orange2']= "#04A3F4,#F5A506,3colors,#F4E4C0";
 		colorSchemesA['orange-blue2']= "#F5A506,#04A3F4,3colors,#F4E4C0";
 
-		colorSchemesA['blue-green-red'] = "#5EB6BA,#DD8356,3colors,#95B526";
-		colorSchemesA['red-green-blue'] = "#DD8356,#5EB6BA,3colors,#95B526";
-		colorSchemesA['green-blue-red1'] = "#95B526,#DD8356,3colors,#5EB6BA";
-		colorSchemesA['red-blue-green1'] = "#DD8356,#95B526,3colors,#5EB6BA";
 		colorSchemesA['green-blue-red2'] = "RGB(207,255,51)|RGB(221,0,0)|3colors|RGB(148,204,200)";
 		colorSchemesA['red-blue-green2'] = "RGB(221,0,0)|RGB(207,255,51)|3colors|RGB(148,204,200)";
 
@@ -122,18 +136,25 @@
 		colorSchemesA['brown-blue5'] = "#ffaa88,#0044dd";
 		colorSchemesA['blue5-brown'] = "#0044dd,#ffaa88";
 
-		colorSchemesA['filler3']		= "#ffffff,#ffffff,#ffffff,#ffffff";
+		colorSchemesA['filler31']		= "#eeeeee,#eeeeee,#eeeeee,#eeeeee";
 
 		colorSchemesA['spectral']	= "spectrum,default,200,0";
 		colorSchemesA['rev-spec.']	= "spectrum,default,0,200";
 
-		colorSchemesA['filler4']		= "#ffffff,#ffffff,#ffffff,#ffffff";
+		colorSchemesA['filler4']		= "#eeeeee,#eeeeee,#eeeeee,#eeeeee";
 
 		colorSchemesA['office']		= "office,,,";
 		colorSchemesA['mineral']	= "mineral,,";
 		colorSchemesA['pastel']		= "pastel,,";
 		colorSchemesA['harvest']	= "harvest,,,";
 		colorSchemesA['fruit']		= "fruit,,,";
+		colorSchemesA['filler5']	= "none,none,none,none";
+		colorSchemesA['kmeans']		= "kmeans,,,";
+		colorSchemesA['kmeansp']	= "kmeansp,,,";
+		colorSchemesA['pimp']		= "pimp,,,";
+		colorSchemesA['intense']	= "intense,,,";
+		colorSchemesA['fluo']		= "fluo,,,";
+		colorSchemesA['tableau']	= "tableau,,,";
 
 	__getThemeColorDef = function(szColor){
 		return colorSchemesA[szColor];

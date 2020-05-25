@@ -51,6 +51,10 @@
 		font-weight: 300;
 		color: #444;
 	}
+	.filter-input::placeholder{
+		font-style:normal;
+		color:#bbbbbb;
+	}
 	.minvalue, .maxvalue {
 		margin-left: 1em;
 		margin-right: 1em;
@@ -80,6 +84,15 @@
 	<!-- Container -->
 	<div id="container" style="padding:2.5em 1em;vertical-align:middle;background-color:rgba(255,255,255,0.9);" >
 
+		<form style="display:inline-block;left:0px;margin-right:10px;border:1px solid #ddd;background:#fff;width:100%" name="FilterForm"
+		onsubmit="javascript:var value = $('#query').val();ixmaps.filterThemeItems(null,value);__facetFilterA = [];__setFacetFilter(value)" onkeyup="javascript:var value = $('#query').val();ixmaps.filterThemeItems(null,ixmaps.filterThemeId,value.trim());"> 
+			<textarea class="filter-input" id="query" type="text" placeholder="define filter or click on facets below ..." value="" 
+					title="query map items" style="font-size:14px;width:95%" rows="3" >
+			</textarea>
+			<!--
+			<input type="submit">
+			-->
+		</form>
 
 		<div class="btn-group" style="margin-top:0.8em;margin-bottom:0em;">
 			<button id="btn-solo-attivi" type="button" class="btn btn-default" onclick="$('.facet').hide();">solo filtri attivi</button>
@@ -92,10 +105,9 @@
 
 	</div>
 
- 	<script type="text/javascript" src="assets/plugins/jquery-1.10.2.js"></script>
+ 	<script type="text/javascript" src="assets/plugins/jquery-3.5.1.min.js"></script>
     <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="assets/js/main.js"></script>
-	<script type="text/javascript" src="assets/js/masonry.pkgd.min.js"></script>
 	<script type="text/javascript" src="assets/js/imagesloaded.js"></script>
     <script type="text/javascript" src="assets/js/classie.js"></script>
 	<script type="text/javascript" src="assets/js/AnimOnScroll.js"></script>
@@ -136,18 +148,29 @@
 		};
 
 		$.getScript("./filter.js",function(){
-
-			var objTheme = ixmaps.getThemeObj();
-			if ( !objTheme.szFlag.match(/EXACT/) ){
-				ixmaps.changeThemeStyle(null,objTheme.szId,"type:RANGES","add");
+			
+			if ( ixmaps.legend.legendA[ixmaps.legend.activeLegendId] ){
+           		ixmaps.filterThemeId = ixmaps.legend.legendA[ixmaps.legend.activeLegendId].szId || null;
 			}
-
-			var objThemeDefinition = ixmaps.getThemeDefinitionObj();
+      
+            if ( !ixmaps.filterThemeId ){
+			    var themes = ixmaps.getThemes();
+                for ( i in themes ){
+                    if ( !themes[i].szFlag.match(/POSITION|FEATURE/) ){
+                        ixmaps.filterThemeId = themes[i].szId;
+                        break;
+                    }
+                }
+            } 
+            
+ 			var objTheme = ixmaps.getThemeObj(ixmaps.filterThemeId);
+			var objThemeDefinition = ixmaps.getThemeDefinitionObj(ixmaps.filterThemeId);
 
 			if ( !objThemeDefinition ){
 				$("#facets").html("<h3>...nessun tema da filtrare!</h3>");
 				return;
 			}
+            
 			// theme data
 			// ------------------------------------
 			var szFilter = objThemeDefinition.style.filter;
@@ -161,6 +184,7 @@
 				//setTimeout('$("#btn-solo-attivi").click();',10);
 
 			}else{
+				$("#query").val("");
 				setTimeout("ixmaps.data.makeFacets(null,'facetDiv')",10);
 			}
 

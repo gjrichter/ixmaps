@@ -107,7 +107,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		var themeObj = ixmaps.getThemeObj(szId);
 
-		if ( fLegendCompact && !themeObj.szFlag.match(/EXACT/) && themeObj.partsA.length >= 5 && !( !(themeObj.szFlag.match(/SEQUENCE/) && !themeObj.szFlag.match(/SYMBOL/)) && themeObj.szLabelA && themeObj.szLabelA.length ) ){
+		if ( fLegendCompact && !themeObj.szFlag.match(/CATEGORICAL/) && themeObj.partsA.length >= 5 && !( !(themeObj.szFlag.match(/SEQUENCE/) && !themeObj.szFlag.match(/SYMBOL/)) && themeObj.szLabelA && themeObj.szLabelA.length ) ){
 			return ixmaps.legend.makeColorLegendHTMLCompact(szId,szLegendId);
 		}
 
@@ -143,13 +143,13 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		sortA = [];
 		for ( var i=0; i<max; i++){
 			if(  themeObj.szFlag.match(/SUM/) || 
-				(themeObj.szFlag.match(/EXACT/) && !themeObj.szFlag.match(/SIZE/)) ){
+				(themeObj.szFlag.match(/CATEGORICAL/) && !themeObj.szFlag.match(/SIZE/)) ){
 				sortA.push({index:i,count:(themeObj.exactSizeA[i]||themeObj.exactCountA[i]||themeObj.nMeanA[i]||((ixmaps.themeObj.szFieldsA.length > 1)?themeObj.nOrigSumA[i]:null))});
 			}else{
 				sortA.push({index:i,count:(themeObj.exactSizeA[i]/themeObj.exactCountA[i])});
 			}
 		}
-		if( themeObj.szFlag.match(/EXACT/) && !themeObj.szFlag.match(/NOSORT/) ){
+		if( themeObj.szFlag.match(/CATEGORICAL/) && !themeObj.szFlag.match(/NOSORT/) ){
 			sortA.sort(functiuon(a,b) {
 				return b.count - a.count; 
 			});
@@ -180,7 +180,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		if ( fColorScheme &&
 			( ( themeObj.partsA.length > 2)		||
 				themeObj.szLabelA				||
-				themeObj.szFlag.match(/EXACT/)	||
+				themeObj.szFlag.match(/CATEGORICAL/)	||
 				themeObj.szRangesA ) ){
 
 			// get exact count from themeObj
@@ -491,7 +491,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		szHtml += "</p>";
 		szHtml += "</div>"
 		
-		if ( ixmaps.themeObj.szFieldsA.length == 1 && !ixmaps.themeObj.szFlag.match(/EXACT/) ){
+		if ( ixmaps.themeObj.szFieldsA.length == 1 && !ixmaps.themeObj.szFlag.match(/CATEGORICAL/) ){
 			szHtml += "<div style='font-size:0.6em;margin-bottom:0.5em;overflow:hidden;'>Histogram:</div>";
 			szHtml += "<div id='histogram1Div' style='width:400px;height:100px;overflow:auto'><div><svg width='400' height='100' viewBox='-20 0 2000 500'><g id='histogram_target_1"+szLegendId+"'></g></svg></div></div>";
 			szHtml += "<div style='font-size:0.6em;margin-bottom:0.5em'>Distribuzione:</div>";
@@ -522,7 +522,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 		ixmaps.themeObj = ixmaps.legend.legendA[szLegendId].themeObj; 
 		// insert SVG
-		if ( ixmaps.themeObj.szFieldsA.length == 1 && !ixmaps.themeObj.szFlag.match(/EXACT/) ){
+		if ( ixmaps.themeObj.szFieldsA.length == 1 && !ixmaps.themeObj.szFlag.match(/CATEGORICAL/) ){
 			$("#histogram_target_1"+szLegendId).empty();
 			$("#histogram_target_2"+szLegendId).empty();
 			ixmaps.themeObj.getHistogram(null,$("#histogram_target_1"+szLegendId)[0],"");
@@ -648,7 +648,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		});
 
 		// insert SVG
-		if ( ixmaps.themeObj.szFieldsA.length == 1 && !ixmaps.themeObj.szFlag.match(/EXACT/) ){
+		if ( ixmaps.themeObj.szFieldsA.length == 1 && !ixmaps.themeObj.szFlag.match(/CATEGORICAL/) ){
 			ixmaps.themeObj.getHistogram(null,$("#histogram_target_1"+szLegendId)[0],"");
 			setTimeout('ixmaps.themeObj.getHistogram(null,$("#histogram_target_2'+szLegendId+'")[0],"DISTRIBUTION")',200);
 		}else{
@@ -873,7 +873,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		ixmaps.setTitle(String(ixmaps.themeObj.szSnippet||ixmaps.themeObj.szTitle));
 	};
 
-	ixmaps.setTitle = function(szTitle) { 
+	ixmaps.setTitle = function(szTitle) {
 		if ( szTitle && szTitle.length ){
 			$("#title").html(szTitle).show();
 		}else{
@@ -888,7 +888,13 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 	 * intercept theme deletion 
 	 * @param szId the id of the theme
 	 */
+	var old_onRemoveTheme = ixmaps.htmlgui_onRemoveTheme;
 	ixmaps.htmlgui_onRemoveTheme = function(szId){
+
+		try {
+			old_onRemoveTheme(szId);			
+		}
+		catch (e){}
 
 		// must clear some chars to get it through the .dialog precedures 
 		var szLegendId = __getLegendId(szId);

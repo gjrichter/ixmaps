@@ -31,397 +31,28 @@
 	<!--========================================================================= -->
 
 	<link rel="shortcut icon" href="../resources/images/ixmaps_logo.png" />
+	
+	<link rel="stylesheet" type="text/css" href="../../ui/libs/leaflet-1.3.4/leaflet.css" />
 
 	<link rel="stylesheet" type="text/css" href="../../ui/html/assets/css/icomoon.css" />
+	<link rel="stylesheet" type="text/css" href="../../ui/html/assets/css/font-awesome.min.css" >
 	<link rel="stylesheet" type="text/css" href="../../ui/libs/jquery/ui/css/smoothness/jquery-ui-1.8.16.custom.css" />
 	<link rel="stylesheet" type="text/css" href="../css/jquery-ui.css" />
 	<link rel="stylesheet" type="text/css" href="../css/custom.css" />
 	<link rel="stylesheet" type="text/css" href="../css/messagebox.css" />
 	<link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
 	<link rel="stylesheet" type="text/css" href="../css/legend.css" />
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
 
 	<!--========================================================================= -->
-
-	<style type="text/css">
-		a:hover {
-			background-color: yellow;
-			text-decoration: underline;
+	<style>
+		.disable-select {
+			user-select: none; /* supported by Chrome and Opera */
+		   -webkit-user-select: none; /* Safari */
+		   -khtml-user-select: none; /* Konqueror HTML */
+		   -moz-user-select: none; /* Firefox */
+		   -ms-user-select: none; /* Internet Explorer/Edge */
 		}
-	</style>
-	<style type="text/css">
-		/* style the scrollbar */
-
-		::-webkit-scrollbar {
-			width: 15px;
-		}
-
-		/* Track */
-
-		::-webkit-scrollbar-track {
-			box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
-			-webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
-			-webkit-border-radius: 0px;
-			border-radius: 0px;
-		}
-
-		/* Handle */
-
-		::-webkit-scrollbar-thumb {
-			-webkit-border-radius: 0px;
-			border-radius: 0px;
-			background: rgba(212, 212, 212, 0.6);
-			box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.1);
-			-webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.1);
-		}
-
-		::-webkit-scrollbar-thumb:window-inactive {
-			background: rgba(222, 222, 222, 0.4);
-		}
-
-		/* popup dialogs */
-
-		.ui-dialog {
-			opacity: 1;
-			-moz-box-shadow: 0px 0px 0px #888;
-			-webkit-box-shadow: 0px 0px 0px #888;
-			box-shadow: 0px 0px 0px #888;
-			border: solid #888 0.5px;
-		}
-
-		.ui-dialog-title {
-			font-size: 0.9em;
-		}
-
-		.ui-dialog .ui-dialog-titlebar {
-			padding: 0.5em 0.5em 0.6em 0.7em;
-			margin-bottom: 0.3em;
-		}
-
-		.ui-dialog .ui-dialog-content {
-			margin: 0 0.3em 0.5em 0.3em;
-		}
-
-		.ui-dialog .ui-dialog-titlebar-close {
-			padding: 5px;
-		}
-
-		.ui-dialog .ui-dialog-titlebar-close:hover,
-		.ui-dialog .ui-dialog-titlebar-close:focus {
-			padding: 4px;
-			background: none;
-		}
-
-		.toolbutton {
-			background: #ffffff;
-			background-size: 8px;
-			border: #aaa solid 0.5px;
-			border-radius: 0.5em;
-		}
-
-		#switchmodebutton {
-			background: #ffffff url(../resources/images/info.png) no-repeat 95% 95%;
-			background-size: 14px;
-		}
-
-		/* geo search */
-
-		.search-box {
-			width: 275px;
-			margin: 0;
-			float: left;
-			outline: none;
-			font-size: 1.2em;
-			border: 0;
-			margin-left: 0.2em;
-		}
-
-		.search-container {
-			width: 275px;
-			margin: 0;
-			float: left;
-			outline: none;
-			border: 1px solid #ddd;
-			font-size: 1.1em;
-			border-radius: 6px;
-			background: #ffffff url(../resources/images/search.png) no-repeat 98% 50%;
-			background-size: 28px;
-		}
-
-		.search-btn {
-			background-color: #0079c6;
-			padding: 9px 13px;
-			color: white;
-			float: left;
-			font-size: 0.9em;
-			cursor: pointer;
-			border-radius: 6px;
-			-moz-box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
-			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
-			;
-			-webkit-box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
-			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
-			;
-			box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
-			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
-			;
-		}
-
-		.result-list {
-			font-family: Verdana, Helvetica, arial;
-			display: none;
-			border: 1px solid lightgray;
-			border-top: none;
-			position: absolute;
-			z-index: 9999;
-			box-sizing: border-box;
-			font-size: 1.2em;
-			-moz-box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
-			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
-			;
-			-webkit-box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
-			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
-			;
-			box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
-			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
-			;
-		}
-
-		.result-item {
-			background-color: white;
-			border-bottom: 1px solid lightgray;
-			padding: 8px;
-			cursor: pointer;
-			width: auto;
-			overflow: hidden;
-			white-space: nowrap;
-			text-overflow: ellipsis;
-		}
-
-		.result-item:last-child {
-			border: none;
-		}
-
-		.result-item.selected {
-			background-color: whitesmoke;
-		}
-
-		/* color select */
-
-		.colorlist {
-			padding: 0px;
-			margin: 0px;
-			margin-left: -10px;
-			border: 0;
-		}
-
-		.colorlistitem {
-			padding: 1px;
-			margin: 3px;
-			border: 0;
-		}
-
-		.colorlistitem>a {
-			text-decoration: none;
-			padding: 3px;
-			margin: 3px;
-			border: 0;
-		}
-
-		.colorlistitem>a:hover {
-			text-decoration: none;
-			background: #fd8;
-		}
-
-		/* theme legend */
-
-		a.theme-button {
-			text-decoration: none;
-			margin-right: 0.01em;
-		}
-
-		span.theme-button {
-			font-size: 14px;
-			color: #444444;
-			background: #ffffff;
-			padding: 0.5em;
-		}
-
-		span.legend-button-settings {
-			color: #eeeeee;
-		}
-
-		table.theme-legend {
-			font-size: 0.8em;
-			line-height: 0.9em;
-			color: #888888;
-			max-width: 300px;
-		}
-
-
-		td.theme-legend {
-			max-width: 200px;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-
-		td.theme-legend-count {
-			min-width: 60px;
-			overflow: hidden;
-		}
-
-		tr.theme-legend-item-selected {
-			background: #F9F4C2;
-		}
-
-		/* loading message */
-
-		.loading-text-div {
-			position: absolute;
-			top: 47%;
-			width: 100%;
-			opacity: 1;
-			z-index: 99;
-			text-align: center;
-		}
-
-		.loading-text {
-			font-family: arial;
-			font-size: 48px;
-			opacity: 1;
-			color: #777;
-			padding: 3px 1em 3px 1em;
-			border: solid #666 1px;
-			border-radius: 0.2em;
-			background: rgb(255, 255, 255, 0.6 );
-		}
-
-		#loading-gif {
-			margin-top: -1em;
-		}
-
-		#loading-gif>img {
-			display: block;
-			margin: 1em auto;
-			height: 64px;
-		}
-
-
-		#divlogo {
-			pointer-events:none;
-			z-index:99;
-			visibility:hidden;
-			}
-		#logo-image {
-			position:absolute;
-			top:60px;
-			left:10px;
-			padding-top:2px;
-			padding-left:5px;
-			padding-right:5px;
-			background: rgba(255, 255, 255, 0.9);
-			border-radius:2px
-			}
-		#logo-image span {
-			font-family:helvetica,arial,sans;
-			color:#444;
-			font-size:0.7em;
-			vertical-align:3px;
-			padding:0px;
-			margin:0px;
-			}
-		#logo-image img {
-			height:12px;
-			}
-
-		#attribution-div {
-			position:absolute;
-			bottom:0px;
-			left:0px;
-			z-index:999
-			}
-		#attribution {
-			font-family: arial;
-			font-size: 12px;
-			color:#666;
-			background-color:rgba(255,255,255,0.5);
-			margin-left:50px;
-			padding: 0.1em 0.5em;
-			}
-
-		/* map */
-
-		#attribution a {
-			text-decoration: none;
-			color: #428bca;
-			font-family: helvetica, arial, sans;
-			font-size: 12px;
-		}
-
-
-		p.legend-description {
-			margin-top: 1em;
-			margin-bottom: 1em;
-			font-size: 0.6em;
-		}
-
-		#title {
-			font-family: arial;
-			color: #666666;
-			font-size: 1.3em;
-			line-height: 1.1em;
-			padding: 0.2em 0.5em;
-		}
-
-		.title-field {
-			position: absolute;
-			top: 11px;
-			height: 32px;
-			max-width: 200px;
-			display: none;
-			z-index: 9999;
-			border: #d8d8d8 solid 1px;
-			border-radius: 0.3em;
-			background: #ffffff;
-			opacity: 0.95;
-			-moz-box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
-			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
-			;
-			-webkit-box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
-			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
-			;
-			box-shadow: 0px 2px 4px/*{global-box-shadow-size}*/
-			rgba(0, 0, 0, .2)/*{global-box-shadow-color}*/
-			;
-		}
-
-		.shadow {
-			-webkit-box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.4);
-			box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.4);
-		}
-
-		.contextmenu {
-			font-family: aria,verdana;
-			position:absolute;
-			left:50%;
-			top:50%;
-			z-index:99999;
-		}
-		.contextmenu li {
-			list-style-type: none;
-			min-width: 180px;
-		}
-		.contextmenu a {
-			text-decoration:none;
-			border-bottom:solid #ddd 1px;
-		}
-
-		.icon-context {
-			color:#66aaff;
-			color:#aaaaaa;
-			vertical-align:-5%;
-		}
-
 	</style>
 
 	<!--========================================================================= -->
@@ -447,7 +78,7 @@
 
 			<button type="button" id="switchmodebutton" title="info/pan" class="toolbutton shadow" style="height:40px;width:40px;display:none;">
 				<label for="switchmodebutton" style="height:36px;">
-					<img id="switchmodebuttonicon" src="../resources/images/mano.png" style="height:24px;margin-left:-5px;margin-right:-4px;"
+					<img id="switchmodebuttonicon" src="../resources/images/mano.png" style="height:24px;margin-left:-5px;margin-right:0px;"
 					/>
 				</label>
 			</button>
@@ -475,8 +106,8 @@
 
 			<button type="button" id="switchinfobutton" title="end info window mode" class="toolbutton shadow" style="height:40px;width:40px;display:none;">
 				<label for="switchinfobutton" style="height:36px;">
-					<img id="switchinfobuttonicon" src="../resources/images/info_window.png" style="height:24px;margin-left:-5px;margin-right:-4px;"
-					/>
+					<img id="switchinfobuttonicon" src="../resources/images/info_window.png" style="height:24px;margin-left:-2px;margin-top:5px;"
+					/><span style="position:relative;top:-33px;right:-12px">&nbsp;x</span>
 				</label>
 			</button>
 
@@ -512,15 +143,29 @@
 		</div>
 
 		<!-- title -->
-		<div id="title" class="title-field" style="z-index:1000;display:none;">
+		<div id="title" class="title-field" style="width:100%;z-index:1000;display:none;">
 		</div>
 
 		<!-- legend -->
-		<div id="map-legend" class="map-legend" style="z-index:1000;display:none;">
+		<div id="map-legend" class="map-legend disable-select" style="z-index:1000;display:none;">
 		</div>
 
+		<!-- overlay -->
+		<div id="map-overlay" class="map-overlay" style="width:100%;z-index:1000;display:none;">
+		</div>
+        
+		<!-- popup -->
+		<div id="map-popup" class="map-overlay" style="z-index:100000;display:none;">
+		</div>
+        
 	</div>
 
+	<!-- footer -->
+	<div id="map-footer" class="map-footer" style="margin-left:10px;z-index:1000;display:none;">
+		<a href="http://ixmaps.com" target="_blank" >powered by iXmaps </a> &bullet;
+		<a href="javascript:ixmaps.popOutView()" >open in viewer</a>
+	</div>
+	
 	<!--========================================================================= 
 		loading, messages, help etc
 	<!--========================================================================= -->
@@ -528,14 +173,14 @@
 	<div id="divlogo" style="pointer-events:none;z-index:99;visibility:hidden;">
 		<div id="logo-image">
 			<span>application:</span>
-			<img alt="logo" src="../resources/images/ixmaps_logo_transparent.png" />
+			<img alt="logo" src="../resources/images/ixmaps_logo_grey_transparent.png" />
 		</div>
 	</div>
 
 	<div id="divloading" style="pointer-events:none;z-index:9999">
 		<div id="loading-text-div" class="loading-text-div">
-			<span id="loading-text" class="loading-text">IXMAPS</span>
-			<div id="loading-gif">
+			<span id="loading-text" class="loading-text">.&nbsp;&nbsp;</span>
+			<div id="loading-gif" style="display:none">
 				<img src="../resources/images/loading_blue.gif" />
 			</div>
 		</div>
@@ -574,6 +219,11 @@
 								height:100%;
 								z-index:1000;" width="100%" height="100%">
 	</div>
+
+	<!--========================================================================= 
+		overlay divs for help, tools, etc.
+	<!--========================================================================= -->
+
 	<div id="help" style="visibility:hidden">
 	</div>
 	<div id="dialog" style="visibility:hidden">
@@ -585,10 +235,14 @@
 	<div id="projects" style="visibility:hidden;">
 	</div>
 
-	<div id="contextmenu" class="contextmenu" style="display:none;" onmouseover="__contextmenuOver($(this))" onmouseout="__contextmenuOut($(this))" onclick="__contextmenuOut($(this))">
-	  <ul class="dropdown-menu" style="display:inline;padding-bottom:0px">
+	<!--========================================================================= 
+		context menu
+	<!--========================================================================= -->
 
-		<li><a href="http://www.ixmaps.com" target="_blank" style="margin-top:0.2em;border:0;color:#ccc">iXmaps</a></li>
+	<div id="contextmenu" class="contextmenu" style="display:none;" onmouseover="__contextmenuOver($(this))" onmouseout="__contextmenuOut($(this))" onclick="__contextmenuOut($(this))">
+	  <ul class="dropdown-menu" style="display:inline;padding-bottom:0.5em">
+
+		<li><a href="http://www.ixmaps.com" target="_blank" style="margin-top:0.2em;margin-bottom:0.2em;border:0;color:#ccc">iXmaps</a></li>
 
 		<li><a href="javascript:ixmaps.popupTools()">
 			<i class="icon icon-context icon-cog" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
@@ -596,20 +250,30 @@
 		<li><a href="javascript:ixmaps.popupThemeEditor()">
 			<i class="icon icon-context icon-pencil" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
 			&nbsp;edit theme</a></li>
+		<li><a href="javascript:ixmaps.popupThemeConfigurator()">
+			<i class="icon icon-context icon-menu" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
+			&nbsp;config theme</a></li>
+		<li><a href="javascript:ixmaps.popupThemeFacets()">
+			<i class="icon icon-context icon-filter" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
+			&nbsp;filter theme</a></li>
 		<li><a href="javascript:ixmaps.popupShare()">
 			<i class="icon icon-context icon-share2" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
 			&nbsp;share map</a></li>
 
-	  <ul class="dropdown-menu" style="display:inline;padding-bottom:0px">
+		<li class="contextmenu-separator"></li>
 
-		<li><a href="javascript:ixmaps.popOutEdit()">
-			<i class="icon icon-context icon-share" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
-			&nbsp;open in editor</a></li>
 		<li><a href="javascript:ixmaps.popOutView()">
 			<i class="icon icon-context icon-share" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
 			&nbsp;open in viewer</a></li>
+		<li><a href="javascript:ixmaps.popOutEdit()">
+			<i class="icon icon-context icon-share" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
+			&nbsp;open in editor</a></li>
+		<li><a href="javascript:ixmaps.popOutProject()">
+			<i class="icon icon-context icon-share" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
+			&nbsp;explore project</a></li>
 
-	  <ul class="dropdown-menu" style="display:inline;padding-bottom:0px">
+		<li class="contextmenu-separator"></li>
+
 		<li><a href="javascript:ixmaps.copyThemeToClipboard()">
 			<i class="icon icon-context icon-scissors" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
 			&nbsp;copy theme</a></li>
@@ -617,7 +281,8 @@
 			<i class="icon icon-context icon-paste" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
 			&nbsp;paste theme</a></li>
 
-	  <ul class="dropdown-menu" style="display:inline;padding-bottom:0px">
+		<li class="contextmenu-separator"></li>
+
 		<li><a href="javascript:ixmaps.popupProject()">
 			<i class="icon icon-context icon-download" title="Layer" tabindex="-1" style="margin-left:0.2em" ></i>
 			&nbsp;save project</a></li>
@@ -626,7 +291,7 @@
 	  </ul>
 	  </ul>
 	  </ul>
-	  <a href="#" style="border:0">iXmaps context menu</a>
+	  <a href="#" style="border:0"></a>
 	</div>
 
 
@@ -642,29 +307,17 @@
 <script src="../libs/modernizr/js/testsvg.js"></script>
 <script src="../libs/messagebox.js"></script>
 
-<script type="text/javascript" src="../js/htmlgui.js">
-</script>
-<script type="text/javascript" src="../js/htmlgui_sync.js">
-</script>
-<script type="text/javascript" src="../js/htmlgui_sync_Leaflet.js">
-</script>
+<script type="text/javascript" src="../js/htmlgui.js"></script>
+<script type="text/javascript" src="../js/htmlgui_sync.js"></script>
+<script type="text/javascript" src="../js/htmlgui_sync_Leaflet.js"></script>
+<script type="text/javascript" src="../js/htmlgui_dialog.js"></script>
+<script type="text/javascript" src="../js/htmlgui_story.js"></script>
 
-<script type="text/javascript" src="../js/htmlgui_dialog.js">
-</script>
-<script type="text/javascript" src="../js/htmlgui_story.js">
-</script>
-
-<script type="text/javascript" src="../js/tools/history.js">
-</script>
-
-<script type="text/javascript" src="../../../data.js/data.js"></script>
+<script type="text/javascript" src="../../../data.min.js/data.js"></script>
 
 <!--========================================================================= -->
 
-<link rel="stylesheet" href="../../ui/libs/leaflet-1.3.4/leaflet.css" />
-
 <script src="../../ui/libs/leaflet-1.3.4/leaflet.js"></script>
-
 
 <!--========================================================================= -->
 
@@ -691,18 +344,18 @@
 				alert("sorry ! your browser has no native SVG support;\n\nPlease try:   Chrome, Firefox, Safari, Opera or IE9");
 			}
 
-			// get ixmaps API from opener or parent
-
-			if (window.opener) {
-				ixmaps.parentApi = window.opener.ixmaps;
-				ixmaps.szName = window.opener.name;
-			} else
-			if (parent) {
-				ixmaps.parentApi = parent.window.ixmaps;
-				ixmaps.szName = parent.window.name;
-			} else {
-				alert("error: missing parent window for parameter !");
-			}
+			// try to get a ixmaps API from opener or parent
+			// --------------------------
+			try {
+				if (window.opener) {
+					ixmaps.parentApi = window.opener.ixmaps;
+					ixmaps.szName = window.opener.name;
+				} else
+				if (parent) {
+					ixmaps.parentApi = parent.window.ixmaps;
+					ixmaps.szName = parent.window.name;
+				} 
+			} catch (e) {}
 
 			// register the embedded map
 			// --------------------------
@@ -735,7 +388,7 @@
 			// title
 
 			if (!$(document).getUrlParam('title')) {
-				$("#title").remove();
+				//$("#title").remove();
 			}
 
 			// big legend
@@ -745,7 +398,25 @@
 				$("#switchlegendbutton").remove();
 				$.getScript("../js/tools/legend.js", function () {
 					var state = $(document).getUrlParam('legend');
-					ixmaps.legendState = ((state == 'true') ? "1" : state);
+					switch ( state ){
+						case '1':
+						case 'true':
+						case 'open':
+						case 'expanded':
+							state = '1';
+							break;
+						case '0':
+						case 'false':
+						case 'closed':
+						case 'collapsed':
+							state = '0';
+							break;
+						default:
+							ixmaps.legend.url = state;
+							state = '1';
+							break;
+					}
+					ixmaps.legendState = state;
 					$.getScript("../js/tools/layer_legend.js", function () {});
 				});
 			}
@@ -773,12 +444,12 @@
 				$("#switchmodebutton").button().click(function (e) {
 					e.preventDefault();
 					e.stopPropagation();
-					__switchInputMode();
+					__switchInputMode("button");
 				});
 				$("#switchinfobutton").button().click(function (e) {
 					e.preventDefault();
 					e.stopPropagation();
-					__switchInfoMode();
+					__switchInfoMode("button");
 				});
 				$("#switchlegendbutton").button().click(function (e) {
 					e.preventDefault();
@@ -813,6 +484,11 @@
 				if ($(document).getUrlParam('modebutton') && ($(document).getUrlParam('modebutton') == "1")) {
 					$("#switchmodebutton").show();
 				}
+				$("#switchinfobutton").button().click(function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+					__switchInfoMode();
+				});
 			}
 
 			// geonames search
@@ -840,7 +516,7 @@
 						width: "0px"
 					}, 500);
 					$(".search-container").hide();
-					$(" .search-box").val("");
+					$(".search-box").val("");
 					$("#switchsearchbutton").show();
 				});
 				$(".search-box").click(function (e) {
@@ -849,24 +525,42 @@
 				setTimeout('$("#onmapbuttondiv").show();', 1000);
 			}
 
+			// embed footer 
+
+			if ($(document).getUrlParam('footer')) {
+				$("#map-footer").show();
+				ixmaps.footer = 20;
+			}
+
 			// ----------------------
 			// align user interface
 			// ----------------------
 
 			if ($(document).getUrlParam('align')) {
 				if ($(document).getUrlParam('align') == "left") {
-					$(".map-legend").css("left", "60px");
+					ixmaps.legendAlign = "left";
+					$(".map-legend").attr("data-align","left")
+					$(".map-legend").css("left", "4%");
 					$(".map-legend").css("top", "12px");
 					$(".title-field").css("left", "100px");
 				}
 				if ($(document).getUrlParam('align') == "right") {
+					ixmaps.legendAlign = "right";
 					$("#onmapbuttondiv").css("left", "");
 					$("#onmapbuttondiv").css("right", "60px");
 					$(".map-legend").css("right", "80px");
 					$(".title-field").css("right", "100px");
 				}
 			} else {
+				$(".map-legend").css("right", "80px");
 				$(".title-field").css("left", "100px");
+			}
+			
+			if ($(document).getUrlParam('toolmargintop')) {
+				$("#onmapbuttondiv").css("top", String(Number($(document).getUrlParam('toolmargintop'))) + "px") ;
+			}
+			if ($(document).getUrlParam('toolmarginleft')) {
+				$("#onmapbuttondiv").css("left", String(Number($(document).getUrlParam('toolmarginleft'))) + "px") ;
 			}
 
 			// ====================
@@ -881,17 +575,29 @@
 					maptype: decodeURIComponent($(document).getUrlParam('maptype')),
 					svg: szMap,
 					mapsize: "fullscreen",
+					footer: ixmaps.footer||0,
 					mode: szSvgLegendFlag,
 					controls: szControls,
 					silent: decodeURIComponent($(document).getUrlParam('silent'))
 				});
 				var oldReady = ixmaps.onMapReady;
 				ixmaps.onMapReady = function () {
+					if ($(document).getUrlParam('map')) {
+						szMapUrl = $(document).getUrlParam('map');
+						ixmaps.loadMap(szMapUrl);
+						ixmaps.onMapReady = null;
+					}
 					if ($(document).getUrlParam('project')) {
 						szProjectUrl = $(document).getUrlParam('project');
 						ixmaps.loadProject(szProjectUrl, false);
+						ixmaps.onMapReady = null;
 					}
-					oldReady();
+					if (ixmaps.parentApi.onMapReady){
+						ixmaps.parentApi.onMapReady();
+					}
+					if (oldReady){
+						oldReady();
+					}
 				};
 
 
@@ -939,7 +645,7 @@
 		// =======================
 
 		// on windiow resize
-
+ 
 		$(window).resize(function (e) {
 			$("#banner").css('width', window.innerWidth + 'px');
 			__switchBannerElements();
@@ -998,7 +704,7 @@
 					ixmaps.switchAndroidEventPane(true);
 					$("#switchmodebuttonicon").attr("src", "../resources/images/mano.png");
 					$("#switchmodebuttonicon").css("opacity", "1");
-					$("#switchmodebutton").css("background", "#ffffff url(../resources/images/info.png) no-repeat 95% 95%");
+					$("#switchmodebutton").css("background", "#ffffff url(../resources/images/info.png) no-repeat 95% 55%");
 					$("#switchmodebutton").css("background-size", "13px");
 					$("#switchinfobutton").hide();
 					break;
@@ -1007,7 +713,7 @@
 					ixmaps.mapTool('info');
 					ixmaps.switchAndroidEventPane(false);
 					$("#switchmodebuttonicon").attr("src", "../resources/images/info.png");
-					$("#switchmodebutton").css("background", "#ffffff url(../resources/images/mano.png) no-repeat 98% 95%");
+					$("#switchmodebutton").css("background", "#ffffff url(../resources/images/mano.png) no-repeat 98% 55%");
 					$("#switchmodebutton").css("background-size", "13px");
 					$("#switchmodebuttonicon").css("opacity", "1");
 					break;
@@ -1019,7 +725,7 @@
 				switch (szMode) {
 					case 'info':
 						$("#switchmodebuttonicon").attr("src", "../resources/images/info.png");
-						$("#switchmodebutton").css("background", "#ffffff url(../resources/images/mano.png) no-repeat 98% 95%");
+						$("#switchmodebutton").css("background", "#ffffff url(../resources/images/mano.png) no-repeat 98% 55%");
 						$("#switchmodebutton").css("background-size", "13px");
 						$("#switchmodebuttonicon").css("opacity", "1");
 						break;
@@ -1027,7 +733,7 @@
 					default:
 						$("#switchmodebuttonicon").attr("src", "../resources/images/mano.png");
 						$("#switchmodebuttonicon").css("opacity", "1");
-						$("#switchmodebutton").css("background", "#ffffff url(../resources/images/info.png) no-repeat 95% 95%");
+						$("#switchmodebutton").css("background", "#ffffff url(../resources/images/info.png) no-repeat 95% 55%");
 						$("#switchmodebutton").css("background-size", "13px");
 						break;
 				}
@@ -1099,11 +805,66 @@
 			}
 		};
 
+		var __olditemclick = ixmaps.htmlgui_onItemClick;
+		ixmaps.htmlgui_onItemClick = function(szId){
+			if ( __olditemclick(szId) ){
+				return true;
+			}else{
+                if (szId.match(/mapbackground:eventrect/)){
+                    $("#switchinfobutton").hide();
+                }else{
+					if (ixmaps.loadedProject.map.item){
+						ixmaps.szMapItemId = szId;
+						window.idialog = this.openDialog(null,'item','./tools/item.html','Item info','50,50',450,660);
+						ixmaps.onDialogClose = function(){
+							ixmaps.embeddedSVG.window.map.Api.clearHighlight();
+							ixmaps.embeddedSVG.window.map.Api.clearAllOverlays();
+						};
+
+						//ixmaps.loadPopUp(ixmaps.loadedProject.map.item||'./item.html',{frame:true});
+						return true;
+					}
+                    $("#onmapbuttondiv").show();
+                    $("#switchinfobutton").show();
+                }
+				return false;
+			}
+		}
+
 		// -------------------------------------------
 		// search tool 
 		// ------------------------------------------- 
 
 		ixmaps.search = ixmaps.search || {};
+
+		ixmaps.search.show = function (fFlag) {
+			$("#switchsearchbutton").show();
+			$("#switchsearchbutton").button().click(function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+				$(".search-container").css('top', $("#switchsearchbutton").offset().top);
+				$(".search-container").css('left', $("#switchsearchbutton").offset().left);
+				$("#switchsearchbutton").hide();
+				$(".search-container").show().animate({
+					width: "400px"
+				}, 500);
+				$(".search-box").show();
+			});
+			$(".search-container").click(function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+				$(".search-container").animate({
+					width: "0px"
+				}, 500);
+				$(".search-container").hide();
+				$(".search-box").val("");
+				$("#switchsearchbutton").show();
+			});
+			$(".search-box").click(function (e) {
+				e.stopPropagation();
+			});
+			setTimeout('$("#onmapbuttondiv").show();', 1000);
+		};
 
 		ixmaps.search.positionResultList = function (input) {
 			$('.result-list').css({
@@ -1284,9 +1045,12 @@
 		}
 
 		$(document).on('click', '.search-btn', ixmaps.search.queryNominatim);
+		
+		
 		// ------------------------------------------- 
 		// END search tool 
 		// ------------------------------------------- 
+		
 
 	}(window.ixmaps = window.ixmaps || {}, jQuery));
 </script>

@@ -268,6 +268,24 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			subdomains: ['otile1','otile2','otile3','otile4']
 		});
 
+		__addTileLayer("http://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+			name: "OpenTopoMap",
+			myname: "OpenTopoMap",
+			minZoom: 2,
+			maxZoom: 17,
+			attribution: "Kartendaten: © <a href='https://openstreetmap.org/copyright' target='_blank'>OpenStreetMap</a>-Mitwirkende, SRTM | Kartendarstellung: © <a href='http://opentopomap.org' target='_blank'>OpenTopoMap</a> (<a href='https://creativecommons.org/licenses/by-sa/3.0/' target='_blank'>CC-BY-SA</a>)",
+			subdomains: ['a','b','c']
+		});
+
+		__addTileLayer("http://openptmap.org/tiles/{z}/{x}/{y}.png", {
+			name: "OpenPtMap",
+			myname: "OpenPtMap",
+			minZoom: 2,
+			maxZoom: 17,
+			attribution: "OpenPtMap",
+			subdomains: ['a','b','c']
+		});
+
 		__addTileLayer("http://{s}.openpistemap.org/landshaded/{z}/{x}/{y}.png", {
 			name: "Openpistemap landschaded",
 			myname: "Openpistemap landschaded",
@@ -279,14 +297,42 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		__addTileLayer("#", {
 			name: "Black",
 			myname: "Black",
-			minZoom: 2,
+			minZoom: 0,
 			attribution: ".",
 			subdomains: ['otile1','otile2','otile3','otile4']
 		});
 		__addTileLayer("#", {
 			name: "White",
 			myname: "White",
-			minZoom: 2,
+			minZoom: 0,
+			attribution: ".",
+			subdomains: ['otile1','otile2','otile3','otile4']
+		});
+		__addTileLayer("#", {
+			name: "Gray",
+			myname: "Gray",
+			minZoom: 0,
+			attribution: ".",
+			subdomains: ['otile1','otile2','otile3','otile4']
+		});
+		__addTileLayer("#", {
+			name: "black",
+			myname: "black",
+			minZoom: 0,
+			attribution: ".",
+			subdomains: ['otile1','otile2','otile3','otile4']
+		});
+		__addTileLayer("#", {
+			name: "white",
+			myname: "white",
+			minZoom: 0,
+			attribution: ".",
+			subdomains: ['otile1','otile2','otile3','otile4']
+		});
+		__addTileLayer("#", {
+			name: "gray",
+			myname: "gray",
+			minZoom: 0,
 			attribution: ".",
 			subdomains: ['otile1','otile2','otile3','otile4']
 		});
@@ -323,6 +369,13 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			attribution: "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, under <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a>. Data by <a href='http://openstreetmap.org'>OpenStreetMap</a>, under <a href='http://creativecommons.org/licenses/by-sa/3.0'>CC BY SA</a>.",
 			subdomains: ['a','b','c','d']
 		});
+		__addTileLayer("http://{s}.tile.stamen.com/terrain/{z}/{x}/{y}.png", {
+			name: "Stamen - terrain",
+			myname: "Stamen - terrain",
+			minZoom: 2,
+			attribution: "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, under <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a>. Data by <a href='http://openstreetmap.org'>OpenStreetMap</a>, under <a href='http://creativecommons.org/licenses/by-sa/3.0'>CC BY SA</a>.",
+			subdomains: ['a','b','c','d']
+		});
 
 		/** CartoDB */
 
@@ -348,7 +401,27 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			subdomains: ['a','b','c','d']
 		});
 
+        /** MapTiler.org */
+
+		__addTileLayer("https://api.maptiler.com/maps/positron/{z}/{x}/{y}.png?key=LudxviPEVIlE5TvReqTC", {
+			name: "MapTiler - Positron",
+			myname: "MapTiler - Positron",
+			minZoom: 2,
+			attribution: "&copy; <a href='https://www.maptiler.com/copyright/' target='_blank'>© MapTiler</a> <a href='https://www.openstreetmap.org/copyright' target='_blank'>© OpenStreetMap contributors</a>",
+			subdomains: ['a','b','c','d']
+		});
+		__addTileLayer("https://api.maptiler.com/maps/darkmatter/{z}/{x}/{y}.png?key=LudxviPEVIlE5TvReqTC", {
+			name: "MapTiler - Dark Matter",
+			myname: "MapTiler - Dark Matter",
+			minZoom: 2,
+			attribution: "&copy; <a href='https://www.maptiler.com/copyright/' target='_blank'>© MapTiler</a> <a href='https://www.openstreetmap.org/copyright' target='_blank'>© OpenStreetMap contributors</a>",
+			subdomains: ['a','b','c','d']
+		});
+        
 		__cssControls = function(szId){
+			if ( !szId ){
+				return;
+			}
 			if (szId.match(/dark/i) || szId.match(/black/i) ){
 
 				$("#attribution").css("background-color","rgba(0,0,0,1)");
@@ -388,7 +461,9 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		LMap.addLayer(ixmaps.layers[ixmaps.fMapType]);
 
 		lastLeafletLayer = ixmaps.fMapType;
-		ixmaps.htmlgui_setMapTypeBG(lastLeafletLayer);
+		try {
+			ixmaps.htmlgui_setMapTypeBG(lastLeafletLayer);
+		}catch(e){}	
 		__cssControls(lastLeafletLayer);
 
 		// --------------------
@@ -411,7 +486,9 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		// ------------------------------------------------------------------------------------------
 		LMap.on('baselayerchange', function(e) { 
 			lastLeafletLayer = e.layer.options.myname; 
-			ixmaps.htmlgui_setMapTypeBG(lastLeafletLayer);
+			try {
+				ixmaps.htmlgui_setMapTypeBG(lastLeafletLayer);
+			}catch(e){}	
 			__cssControls(lastLeafletLayer);
 		});		
 			
@@ -517,6 +594,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			if ( lastLeafletLayer ){
 				LMap.removeLayer(ixmaps.layers[lastLeafletLayer]);
 			}
+			lastLeafletLayer = mapTypeTranslate[szMapType]||szMapType;
 			LMap.addLayer(ixmaps.layers[mapTypeTranslate[szMapType]||szMapType]);
 			lastLeafletLayer = mapTypeTranslate[szMapType]||szMapType;
 		} catch (e){return null;}

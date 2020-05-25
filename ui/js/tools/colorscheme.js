@@ -31,6 +31,10 @@ if ( typeof(szMapNs) == "undefined" ){
  */
 function _circ_getDerivateColor(cc0, nFaktor){
 
+	if ( cc0 == "none" ){
+		return cc0;
+	}
+
 	cc0 = _circ_getHexaColor(cc0);
 
 	var rr, gg, bb, hh="0123456789abcdef";
@@ -39,9 +43,12 @@ function _circ_getDerivateColor(cc0, nFaktor){
     bb=parseInt(cc0.substr(5,2),16);
 
 	if ( nFaktor > 1 ){
-		rr = Math.max(rr,50);
-		gg = Math.max(gg,50);
-		bb = Math.max(bb,50);
+		rr = Math.max(rr,90);
+		gg = Math.max(gg,90);
+		bb = Math.max(bb,90);
+		if ( (rr >= 250) || (gg >= 250) || (bb >= 250) ){
+			nFaktor = Math.max(nFaktor*0.9,1.1);
+		}
 	}
 	rr=Math.min(255,Math.floor(rr*nFaktor)); 
     gg=Math.min(255,Math.floor(gg*nFaktor));
@@ -86,7 +93,7 @@ function _circ_getTextColor(cc0){
     gg=parseInt(cc0.substr(3,2),16);
     bb=parseInt(cc0.substr(5,2),16);
 
-	if ( ((rr + gg) > 300) || (rr > 127 && gg > 127 && bb > 127)  ){
+	if ( ((rr + gg) > 300) || ((bb + gg) > 400) || ((bb + rr) > 400) || (rr > 127 && gg > 127 && bb > 127)  ){
 		return ( _circ_getDerivateColor(cc0,0.6) );
 	}else{
 		return ( _circ_getDerivateColor(cc0,4.0) );
@@ -133,6 +140,36 @@ function _circ_createColorScheme(cc1, cc2, nSteps, nParam1, nParam2 ){
 		 cc1 == "FRUIT" ||
 		 cc1 == "Fruit" ){
 		return _circ_createPaletteColorScheme("fruit",nSteps,Number(cc2));
+	}
+	if ( cc1 == "kmeans" ||
+		 cc1 == "KMEANS" ||
+		 cc1 == "Kmeans" ){
+		return _circ_createPaletteColorScheme("kmeans",nSteps,Number(cc2));
+	}
+	if ( cc1 == "kmeansp" ||
+		 cc1 == "KMEANSP" ||
+		 cc1 == "Kmeansp" ){
+		return _circ_createPaletteColorScheme("kmeansp",nSteps,Number(cc2));
+	}
+	if ( cc1 == "pimp" ||
+		 cc1 == "PIMP" ||
+		 cc1 == "Pimp" ){
+		return _circ_createPaletteColorScheme("pimp",nSteps,Number(cc2));
+	}
+	if ( cc1 == "intense" ||
+		 cc1 == "INTENSE" ||
+		 cc1 == "Intense" ){
+		return _circ_createPaletteColorScheme("intense",nSteps,Number(cc2));
+	}
+	if ( cc1 == "fluo" ||
+		 cc1 == "FLUO" ||
+		 cc1 == "Fluo" ){
+		return _circ_createPaletteColorScheme("fluo",nSteps,Number(cc2));
+	}
+	if ( cc1 == "tableau" ||
+		 cc1 == "TABLEAU" ||
+		 cc1 == "Tableau" ){
+		return _circ_createPaletteColorScheme("tableau",nSteps,Number(cc2));
 	}
 	nSteps = Number(nSteps);	
 
@@ -328,13 +365,13 @@ function _circ_createColorScheme(cc1, cc2, nSteps, nParam1, nParam2 ){
 		}
 		var nPart2 = 1 - nPart1;
 
-		var dr1 = (rr3-rr1)/(nSteps*nPart1+1);
-		var dg1 = (gg3-gg1)/(nSteps*nPart1+1);
-		var db1 = (bb3-bb1)/(nSteps*nPart1+1);
+		var dr1 = (rr3-rr1)/((nSteps-1)*nPart1);
+		var dg1 = (gg3-gg1)/((nSteps-1)*nPart1);
+		var db1 = (bb3-bb1)/((nSteps-1)*nPart1);
 
-		var dr2 = (rr3-rr2)/(nSteps*nPart2+1);
-		var dg2 = (gg3-gg2)/(nSteps*nPart2+1);
-		var db2 = (bb3-bb2)/(nSteps*nPart2+1);
+		var dr2 = (rr3-rr2)/((nSteps-1)*nPart2);
+		var dg2 = (gg3-gg2)/((nSteps-1)*nPart2);
+		var db2 = (bb3-bb2)/((nSteps-1)*nPart2);
 		var rr, gg, bb;
 
 		var ss="";
@@ -346,7 +383,14 @@ function _circ_createColorScheme(cc1, cc2, nSteps, nParam1, nParam2 ){
 
 		for (var i=0;i<nSteps-1;i++){
 
-			if ( i < nSteps*nPart1 ){
+			ss="#";
+			ss+=hh.charAt(Math.floor(rr/16))+hh.charAt(rr%16);
+			ss+=hh.charAt(Math.floor(gg/16))+hh.charAt(gg%16);
+			ss+=hh.charAt(Math.floor(bb/16))+hh.charAt(bb%16);
+
+			ssA[ssA.length] = ss;
+
+			if ( i < (nSteps-1)*nPart1 ){
 				rr += dr1; 
 				gg += dg1;
 				bb += db1;
@@ -356,20 +400,18 @@ function _circ_createColorScheme(cc1, cc2, nSteps, nParam1, nParam2 ){
 				gg -= dg2;
 				bb -= db2;
 			}
-			ss="#";
-			ss+=hh.charAt(Math.floor(rr/16))+hh.charAt(rr%16);
-			ss+=hh.charAt(Math.floor(gg/16))+hh.charAt(gg%16);
-			ss+=hh.charAt(Math.floor(bb/16))+hh.charAt(bb%16);
-
-			ssA[ssA.length] = ss;
+			rr = Math.max(Math.min(255,rr),0);
+			gg = Math.max(Math.min(255,gg),0);
+			bb = Math.max(Math.min(255,bb),0);
 		}
+
 		ssA[ssA.length] = cc2;
 
 		return(ssA);
 	}
 	// 2.1 generate 2 color sweep with compressed mid range
 	// ---------------------------------------------------------------------------------
-	else if (nParam1 == '2narrow'){
+	else if (nParam1 == '2narrow' || nParam1 == '3narrow'){
 
 		var nnSteps = 0;
 		for (var i=0;i<nSteps/2;i++){
@@ -417,7 +459,7 @@ function _circ_createColorScheme(cc1, cc2, nSteps, nParam1, nParam2 ){
 	}
 	// 2.2 generate 2 color sweep with expanded mid range
 	// ---------------------------------------------------------------------------------
-	else if (nParam1 == '2wide'){
+	else if (nParam1 == '2wide' || nParam1 == '3wide'){
 		var nnSteps = 0;
 		for (var i=0;i<nSteps/2;i++){
 			nnSteps += i;
@@ -466,7 +508,7 @@ function _circ_createColorScheme(cc1, cc2, nSteps, nParam1, nParam2 ){
 	}
 	// 2.3 generate 2 color sweep - cc1 -> white -> cc2 with expanded low range
 	// ------------------------------------------------------------------------
-	else if (nParam1 == '2low' ){
+	else if (nParam1 == '2low' || nParam1 == '3low'){
 	
 		var dr1 = (rr3-rr1)/(nSteps*0.75+1);
 		var dg1 = (gg3-gg1)/(nSteps*0.75+1);
@@ -509,7 +551,7 @@ function _circ_createColorScheme(cc1, cc2, nSteps, nParam1, nParam2 ){
 	}
 	// 2.4 generate 2 color sweep - cc1 -> white -> cc2 with expanded high range
 	// ------------------------------------------------------------------------
-	else if (nParam1 == '2high' ){
+	else if (nParam1 == '2high' || nParam1 == '3high' ){
 	
 		var dr1 = (rr3-rr1)/(nSteps*0.3+1);
 		var dg1 = (gg3-gg1)/(nSteps*0.3+1);
@@ -877,7 +919,153 @@ var __fruitColors = new Array(
 	'#AEC7E8'
 	);
 
+var __kmeansColors = new Array(
+	"#c17cd3",
+	"#91c15d",
+	"#6a70d7",
+	"#bab440",
+	"#513688",
+	"#5dc67f",
+	"#993888",
+	"#37d8b0",
+	"#e3586f",
+	"#36dee6",
+	"#d66044",
+	"#47b795",
+	"#ab396c",
+	"#568429",
+	"#e07db5",
+	"#3c7c3d",
+	"#628bd5",
+	"#cb8832",
+	"#ad4258",
+	"#a2863e",
+	"#ad4248",
+	"#9c4629"	
+	);
 
+var __kmeanspColors = new Array(
+	"#ffd1b2",
+	"#a5b2e9",
+	"#effcc2",
+	"#e1c3f8",
+	"#acc692",
+	"#d899b7",
+	"#bbfdd9",
+	"#e8a197",
+	"#8ceceb",
+	"#fab9a0",
+	"#6dc5b7",
+	"#ffc0bc",
+	"#66b8bd",
+	"#dcc992",
+	"#7db3c8",
+	"#fffedb",
+	"#ffdfff",
+	"#84b5ac",
+	"#ffebf2",
+	"#a2aead",
+	"#e1f3ff",
+	"#b5e6ff"
+	);
+
+var __pimpColors = new Array(
+	"#b09234",
+	"#5f3dc1",
+	"#4ca735",
+	"#b54ade",
+	"#7e9a36",
+	"#cb43b3",
+	"#4a9f61",
+	"#d93f76",
+	"#3a9e88",
+	"#da4631",
+	"#7876dc",
+	"#d57a29",
+	"#5e90cd",
+	"#814b1b",
+	"#554f95",
+	"#396829",
+	"#c275ba",
+	"#75702e",
+	"#89376c",
+	"#bf7f51",
+	"#923432",
+	"#d37075"
+	);
+
+var __intenseColors = new Array(
+	"#c98ab6",
+	"#5bbb42",
+	"#6035bd",
+	"#9dac3c",
+	"#c450da",
+	"#66b888",
+	"#d84fa9",
+	"#44733a",
+	"#7370d7",
+	"#d19231",
+	"#443672",
+	"#db4d32",
+	"#4ca5b0",
+	"#d5466d",
+	"#829fdb",
+	"#8b3b26",
+	"#506793",
+	"#a69358",
+	"#873987",
+	"#4f4b21",
+	"#d58873",
+	"#79354c"
+	);
+
+var __fluoColors = new Array(
+	"#ecd730",
+	"#4ddded",
+	"#c0ee32",
+	"#f6ac8d",
+	"#64ea51",
+	"#eebd5e",
+	"#5be9c8",
+	"#d9db55",
+	"#77e7a1",
+	"#c6e552",
+	"#8ac793",
+	"#95e354",
+	"#a5e3ad",
+	"#dff782",
+	"#67ee8b",
+	"#e2d680",
+	"#a5e47d",
+	"#b0d490",
+	"#9fc658",
+	"#d1f5a5",
+	"#b4db6c",
+	"#c1d271"
+	);
+
+var __tableauColors = new Array(
+	"#4e79a7",
+	"#a0cbe8",
+	"#f28e2b",
+	"#ffbe7d",
+	"#59a14f",
+	"#8cd17d",
+	"#b6992d",
+	"#f1ce63",
+	"#499894",
+	"#86bcb6",
+	"#e15759",
+	"#ff9d9a",
+	"#79706e",
+	"#bab0ac",
+	"#d37295",
+	"#fabfd2",
+	"#b07aa1",
+	"#d4a6c8",
+	"#9d7660",
+	"#d7b5a6"
+	);
 
 var __colorPaletteA = new Array();
 __colorPaletteA["office"]  = __officeColors;
@@ -885,6 +1073,12 @@ __colorPaletteA["mineral"] = __mineralColors;
 __colorPaletteA["pastel"]  = __pastelColors;
 __colorPaletteA["harvest"] = __harvestColors;
 __colorPaletteA["fruit"]   = __fruitColors;
+__colorPaletteA["kmeans"]   = __kmeansColors;
+__colorPaletteA["kmeansp"]   = __kmeanspColors;
+__colorPaletteA["pimp"]   = __pimpColors;
+__colorPaletteA["intense"]   = __intenseColors;
+__colorPaletteA["fluo"]   = __fluoColors;
+__colorPaletteA["tableau"]   = __tableauColors;
 
 function _circ_createPaletteColorScheme(szPalette,nColors,nOffset){
 	var colorPalette = __colorPaletteA[szPalette];
@@ -1073,5 +1267,27 @@ Color.prototype.rotate = function (nAngle) {
 };
 
 
+/**
+ * create ColorScheme instance, to export some functions 
+ */
+	ColorScheme = new _ColorScheme();
+/**
+ * This is the api class for the Class: ColorScheme  
+ * @constructor
+ * @throws 
+ * @return A new DonutChart api
+ */
+    function _ColorScheme() {
+	/** make public */
+	this.createColorScheme = _circ_createColorScheme;	
+	/** make public */
+	this.getDerivateColor = _circ_getDerivateColor;	
+	/** make public */
+	this.getBorderColor = _circ_getBorderColor;	
+	/** make public */
+	this.getTextColor = _circ_getTextColor;	
+	/** make public */
+	this.getHexaColor = _circ_getHexaColor;
+	}
+
 // EOF
-function testVar() {}

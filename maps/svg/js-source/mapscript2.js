@@ -729,6 +729,9 @@ Map.Zoom.prototype.doExecuteZoomMap = function(nZoom,nOldZoom){
 	var newX = (SVGRootElement.currentTranslate.x + map.Scale.embedX(zoomMatrixA[4])) / nOldZoom * nZoom;
 	var newY = (SVGRootElement.currentTranslate.y + map.Scale.embedX(zoomMatrixA[5])) / nOldZoom * nZoom;
 
+	this.nOldZoomX = this.nZoomX;
+	this.nOldZoomY = this.nZoomY;
+
 	this.nZoomX = this.nZoomX / nOldZoom * nZoom;
 	this.nZoomY = this.nZoomY / nOldZoom * nZoom;
 
@@ -803,6 +806,10 @@ Map.Zoom.prototype.doZoomMapToArea = function(rectArea){
 		this.zoomNode.setAttributeNS(null,"transform","matrix("+nNewZoomX+" 0 0 "+nNewZoomY+" "+0+" "+0+")");
 	}
 	this.nZoom = nNewZoom;
+
+	this.nOldZoomX = this.nZoomX;
+	this.nOldZoomY = this.nZoomY;
+
 	this.nZoomX = nNewZoomX;
 	this.nZoomY = nNewZoomY;
 	this.doCenterMapToArea(rectArea);
@@ -1098,7 +1105,7 @@ Map.Zoom.prototype.doZoomMapToLayer = function(szLayerName){
 					_TRACE("box!!!:"+allBox.x+','+allBox.y+','+allBox.width+','+allBox.height);
 				}catch (e){	}
 			**/
-			map.hideMap();
+			//map.hideMap();
 			map.Zoom.setNewArea(allBox);
 		}
 	}
@@ -1115,7 +1122,7 @@ Map.Zoom.prototype.doSetMapToGeoBounds = function(latSW,lonSW,latNE,lonNE){
 	var ptSW = map.Scale.getMapCoordinateOfLatLon(latSW,lonSW);
 	var ptNE = map.Scale.getMapCoordinateOfLatLon(latNE,lonNE);
 	if ( ptSW && ptNE ){
-		map.hideMap();
+		//map.hideMap();
 		this.doZoomMapToEnvelope(ptSW.x,ptNE.x,ptSW.y,ptNE.y);
 	}
 	else{
@@ -1642,6 +1649,10 @@ Map.Layer.prototype.switchLayer = function(evt,szLayer,szClassName,nState){
 	var szDisplay = nState?'inline':'none';
 	var layerItem = this.listA[szLayer.split(':')[0]];
 
+	if (!layerItem){
+		return false;
+	}
+
 	// a legend group is not a layer; so we have done here 
 	if (szClassName && szClassName.match(/legendgroup/)){
 		return true;
@@ -1680,10 +1691,10 @@ Map.Layer.prototype.switchLayer = function(evt,szLayer,szClassName,nState){
 	}
 
 	_TRACE("switchLayer "+szLayer+' Item='+layerItem+' Class='+szClassName);
-	if ( szLayer.split("::")[1] && layerItem.categoryA[szLayer.split("::")[1]] ) {
+	if ( szLayer.match(/::/) && szLayer.split("::")[1] && layerItem.categoryA[szLayer.split("::")[1]] ) {
 		layerItem.categoryA[szLayer.split("::")[1]].display = szDisplay;
 	}else{
-		if (layerItem.categoryA[null]){
+		if (layerItem.categoryA && layerItem.categoryA[null]){
 			layerItem.categoryA[null].display = szDisplay;
 		}
 		layerItem.display = szDisplay;
@@ -2180,7 +2191,7 @@ Map.Layer.prototype.changeFeatureScaling = function(evt,newScale,fOverride){
 	var newObjectScale = newScale;
 
 	if ( fFeatureScalingDynamic ){
-		_TRACE("fFeatureScalingDynamic:"+newScale+" d:"+Math.log(1/newScale));
+		_TRACE("fFeatureScalingDynamic = true");
 			var nD = Math.log(1/newScale);
 			if ( nD > 1 ){
 				newScale *= nD;
@@ -2223,7 +2234,7 @@ Map.Layer.prototype.changeFeatureScaling = function(evt,newScale,fOverride){
 			nodeA.item(i).setAttributeNS(null,"patternTransform","matrix("+patternScale+" 0 0 "+patternScale+" "+String(newX)+" "+String(newY)+")");
 		}
 	}
-	_TRACE('.feature scaling: pattern done');
+	_TRACE('.scaling: pattern done');
 
 	// check if relative scaling (stroke, symbols, ...) is necessary 
 	// -------------------------------------------------------------
@@ -2271,7 +2282,7 @@ Map.Layer.prototype.changeFeatureScaling = function(evt,newScale,fOverride){
 			}
 		}
 	}
-	_TRACE('.feature scaling: filter done');
+	_TRACE('.scaling: filter done');
 
 	// styles --------------------------------------------
 
@@ -2307,7 +2318,7 @@ Map.Layer.prototype.changeFeatureScaling = function(evt,newScale,fOverride){
 	var symbolsNode = SVGDocument.getElementById('symbolstore');
 	if ( symbolsNode ){
 		nodeA = symbolsNode.getElementsByTagName('g');
-		_TRACE("S Y M B O L S T O R E : "+nodeA.length+" symbols to scale");
+		_TRACE("SYMBOLSTORE : "+nodeA.length+" symbols to scale");
 		for ( i=0; i<nodeA.length;i++){
 			var szId = nodeA.item(i).getAttributeNS(null,"id");
 			if ( !szId || !szId.length || !szId.match(/symbol/) || szId.match(/antizoomandpan/)  ) {
@@ -2325,7 +2336,7 @@ Map.Layer.prototype.changeFeatureScaling = function(evt,newScale,fOverride){
 	}
 	var legendNode = SVGDocument.getElementById("widgets:antizoomandpan");
 	nodeA = legendNode.getElementsByTagName('use');
-	_TRACE("L E G E N D N O D E : "+nodeA.length+" symbols to scale");
+	_TRACE("LEGENDNODE : "+nodeA.length+" symbols to scale");
 	for ( i=0; i<nodeA.length;i++){
 		var szRefId = nodeA.item(i).getAttributeNS(szXlink,'href');
 		if ( !map.Scale.scaledSymbolsA[szRefId] ){
@@ -2338,7 +2349,7 @@ Map.Layer.prototype.changeFeatureScaling = function(evt,newScale,fOverride){
 		}
 	}
 	nodeA = SVGHiddenGroup.getElementsByTagName('use');
-	_TRACE("H I D D E N N O D E : "+nodeA.length+" symbols to scale");
+	_TRACE("HIDDENNODE : "+nodeA.length+" symbols to scale");
 	for ( i=0; i<nodeA.length;i++){
 		var szRefId = nodeA.item(i).getAttributeNS(szXlink,'href');
 		if ( !map.Scale.scaledSymbolsA[szRefId] ){
@@ -2353,7 +2364,7 @@ Map.Layer.prototype.changeFeatureScaling = function(evt,newScale,fOverride){
 	newScale = tmpNewScale;
 	nDelta = tmpDelta;
 
-	_TRACE('.feature scaling: symbols done');
+	_TRACE('.scaling: symbols done');
 
 	this.scaleTextOffsets(SVGRootElement,newScale,nDelta,SVGDoc.getElementById("mapstyles"));
 
@@ -2383,7 +2394,7 @@ Map.Layer.prototype.doFeatureScaling = function(nDelta){
 		szNewStylesValue = __scaleLineStyleString(szStylesValue,nDelta);
 		cssStyles.firstChild.nextSibling.nodeValue = szNewStylesValue;
 		map.Scale.fCSSStyleNodeChanged = true;
-		_TRACE('.feature scaling: CSS styles done');
+		_TRACE('.scaling: CSS styles done');
 	}
 	else{
 	// normal style attributes -------------------------------------------
@@ -2489,7 +2500,7 @@ Map.Layer.prototype.doFeatureScaling = function(nDelta){
 				}
 			}
 		}
-		_TRACE('.feature scaling: '+nodeA.length+' styles done');
+		_TRACE('.scaling: '+nodeA.length+' styles done');
 	}
 };
 /**
@@ -2533,7 +2544,6 @@ Map.Layer.prototype.doObjectScaling = function(newScale){
 		return;
 	}
 
-	_TRACE("---- ???? ---- map.Scale.nObjectScaling = "+map.Scale.nObjectScaling);
 	var fDoit = true;
 	// if objects are originally scaled < 1; increase scaling til 1:1 
 	if ( map.Scale.nObjectScaling < 1 ){
@@ -2553,24 +2563,39 @@ Map.Layer.prototype.doObjectScaling = function(newScale){
 	}
 	// here we go
 	if ( fDoit ){
-		_TRACE('.feature scaling: objects begin');
+
+		var nDeltaX = nDelta; 
+		var nDeltaY = nDelta/map.Zoom.nOldZoomX*map.Zoom.nOldZoomY/map.Zoom.nZoomY*map.Zoom.nZoomX;
+
+		_TRACE('.scaling: objects begin');
 		var objectGroup = map.Layer.objectGroup;
 		nodeA = objectGroup.childNodes;
 		for ( i=0; i<nodeA.length;i++){
+			// features have no visible objects
+			if( nodeA.item(i).getAttributeNS(null,"id").match(/featuregroup/) ){
+				continue;
+			}
 			if (antiZoomAndPanList.isContained(nodeA.item(i))){
+				// scale VECTOR charts by stroke-width
+				var objectsA = nodeA.item(i).childNodes;
+				for ( ii=0; ii<objectsA.length;ii++){
+					if ( objectsA.item(ii).firstChild ){
+						objectsA.item(ii).firstChild.style.setProperty("stroke-width", objectsA.item(ii).firstChild.style.getPropertyValue("stroke-width")*nDeltaX);
+					}
+				}
 				continue;
 			}
 			var objectsA = nodeA.item(i).childNodes;
 			for ( ii=0; ii<objectsA.length;ii++){
 				if ( (matrixA = getMatrix(objectsA.item(ii))) ){
-					matrixA[0] *= nDelta;
-					matrixA[3] *= nDelta;
+					matrixA[0] *= nDeltaX;
+					matrixA[3] *= nDeltaY;
 					setMatrix(objectsA.item(ii),matrixA);
 				}
 			}
 		}
 	}
-	_TRACE('.feature scaling: objects done');
+	_TRACE('.scaling: objects done');
 };
 /**
  * called on pan to do tiles which get visible and have stored feature scaling
@@ -2700,7 +2725,7 @@ Map.Layer.prototype.scaleTextOffsets = function(targetGroup,newScale,nDelta,cssS
 		}
 	}
 
-	_TRACE('.feature scaling: text offsets done');
+	_TRACE('.scaling: text offsets done');
 
 };
 /**
@@ -2727,7 +2752,7 @@ Map.Layer.prototype.scaleLineDecorations = function(targetGroup,newScale){
 			nodeA.item(i).setAttributeNS(null,"dy",nYoff);
 		}
 	}
-	_TRACE('.feature scaling: linedecoration done');
+	_TRACE('.scaling: linedecoration done');
 
 };
 /**
@@ -3524,7 +3549,7 @@ Map.Label.Item.prototype.scaleBackground = function(){
  * stop all label processing
  */
 Map.Label.prototype.stopProcessing = function(){
-	_TRACE("Map.Label: stopProcessing ==== >" );
+	_TRACE("Map.Label: stopProcessing =====>" );
 	this.killProcess = true;
 };
 /**
@@ -3532,7 +3557,7 @@ Map.Label.prototype.stopProcessing = function(){
  * @param rootNode the DOM SVG node to beginn to search for label
  */
 Map.Label.prototype.prepareCheckOverlap = function(rootNode){
-	_TRACE("Map.Label: prepareCheckOverlap ============ >>>");
+	_TRACE("Map.Label: prepareCheckOverlap =====>");
 	var nodeTempA = rootNode.getElementsByTagName('text');
 	for ( var j=0;j<nodeTempA.length;j++ ){
 		if (  nodeTempA.item(j).firstChild &&
@@ -3557,7 +3582,7 @@ Map.Label.prototype.initCheckOverlap = function(rootNode){
 	}
 	this.fCheckLabelOverlappingPending = true;
 	
-	_TRACE("Map.Label: initCheckOverlap ============ >>>");
+	_TRACE("Map.Label: initCheckOverlap =>");
 
 	this.checkItemA.length = 0;
 	this.checkOvlA.length = 0;
@@ -3600,7 +3625,12 @@ Map.Label.prototype.addCheckItem = function(textNode,fScale){
 		this.checkItemA[this.checkItemA.length] = cItem;
 		return;
 	}
+	
 	var layerObj = map.Layer.getLayerObjOfNode(textNode);
+	
+	if ( !layerObj ){
+		return;
+	}	
 	if ( layerObj && !textNode.parentNode.getAttributeNS(null,"id").match(/value/) ){
 		if ( !(layerObj.szDisplayLabel == "inline") ){
 			return;
@@ -3609,6 +3639,7 @@ Map.Label.prototype.addCheckItem = function(textNode,fScale){
 	if ( !fCheckLabelOverlap && !(layerObj.szType == "polygon") ){
 		return;
 	}
+	
 	if (  textNode.firstChild &&
 		 !(textNode.firstChild.nodeName == "textPath") && 
 		 !(textNode.getAttributeNS(null,"id").match(/:bg/)) ){
@@ -3637,7 +3668,7 @@ Map.Label.prototype.addCheckItem = function(textNode,fScale){
  */
 Map.Label.prototype.collectCheckOverlap = function(){
 
-	_TRACE("Map.Label: collectCheckOverlap ============ >>>");
+	_TRACE("Map.Label: collectCheckOverlap =>");
 
 	var nodeTempA = null;
 	var fGot = false;
@@ -5210,21 +5241,36 @@ Map.Event.prototype.defaultMouseOver = function(evt){
 	}
 		
 	// HTML interface interception
-	try{
-		if ( HTMLWindow.ixmaps.htmlgui_onItemClick(mapObject.szId) ){
-			__circleHighlight(evt,mapObject);
-			killTooltip();
-			// avoid subsequent onMouseOver
-			HTMLWindow.ixmaps.htmlgui_onSVGPointerIdle();
-			return null;
+
+	if (szMapToolType == "clickinfo"){
+		try{
+            // GR 28.10.2019 if click on text of chart, get parent = chart group
+            if (mapObject.szId.match(/text/i)){
+                mapObject = new MapObject(onoverShape.parentNode);
+            }
+            // GR 07.04.2020 fix :chart:box -> :chartgroup
+            if (mapObject.szId.match(/:chart:box/i)){
+				var szId = mapObject.szId.split(":chart:box")[0]+":chartgroup";
+                mapObject =  new MapObject(mapObject.objNode.ownerDocument.getElementById(szId));
+            }
+			//szMapToolType = "";
+			if ( HTMLWindow.ixmaps.htmlgui_onItemClick(mapObject.szId) ){
+				__circleHighlight(evt,mapObject);
+                SVGPopupGroup.fu.clear();
+				killTooltip();
+				// avoid subsequent onMouseOver
+				HTMLWindow.ixmaps.htmlgui_onSVGPointerIdle();
+				return null;
+			}
+		}
+		catch (e){
 		}
 	}
-	catch (e){
-	}
+
 	// mouse over shape
 	if (( !this.onoverPopup					 ) && 
 		( __normalHighlight(evt,onoverShape) ) &&
-		( szMapToolType === "info"  || szMapToolType === ""				  )
+		( szMapToolType === "info"  || szMapToolType === "clickinfo"  || szMapToolType === "" )
 		){
 
 		displayInfo(evt,onoverShape,"delayed|pointer");
@@ -5238,6 +5284,7 @@ Map.Event.prototype.defaultMouseOver = function(evt){
 	}else{
 		__simpleHighlight(evt,onoverShape);
 		this.tooltipDone = displayTooltip(evt,onoverShape);
+		this.onoverShape = onoverShape;
 	}
 
 	try	{
@@ -5298,11 +5345,6 @@ __simpleHighlightRemove = function(evt,onoverShape){
  */
 var __normalHighlight = function(evt,onoverShape){
 
-	if (__isChart(evt,onoverShape)){
-		new MapObject(onoverShape).fu.scale(1.05,1.05);
-		return true;
-	}
-
 	var mapObject = new MapObject(onoverShape);
 	if ( mapObject == null ){
 		return false;
@@ -5316,7 +5358,7 @@ var __normalHighlight = function(evt,onoverShape){
 		                   || szId.match(/button/) 
 		                   || szId.match(/widget/) 
 		                   || szId.match(/textgrid/) 
-		                   || (szMapToolType != "info" && szMapToolType != "") ){
+		                   || (szMapToolType != "clickinfo" && szMapToolType != "info" && szMapToolType != "") ){
 		if (highLightList){
 			highLightList.removeAll();
 		}
@@ -5331,7 +5373,7 @@ var __normalHighlight = function(evt,onoverShape){
 		if (legendId && !legendId.match(/chartgroup/)){
 			if (_activeTheme != map.Tiles.getMasterId(legendId.split(':')[0]) ){
 				var layerObj = map.Layer.getLayerObj(legendId);
-				if ( layerObj && layerObj.szSelection && !map.Event.tooltipDone && (szMapToolType == "info" || szMapToolType == "") ){
+				if ( layerObj && layerObj.szSelection && !map.Event.tooltipDone && (szMapToolType == "clickinfo" || szMapToolType == "info" || szMapToolType == "") ){
 					displayTooltipText(evt, map.Dictionary.getLocalText("click to activate"));
 				}
 				if ( fHighlightHint ){
@@ -5369,9 +5411,9 @@ var __circleHighlight = function(evt,mapObject){
 		return false;
 	}
 	if (highLightList && !highLightList.checkItem(mapObject.objNode)){
-		highLightList.unlock();
+ 		highLightList.unlock();
 		highLightList.removeAll();
-		highLightList.addItem(mapObject.objNode,"circle");
+		highLightList.addItem(mapObject.objNode,__isChart(null,mapObject.objNode)?"isolate":"");
 		highLightList.lock();
 	}
 };
@@ -5411,10 +5453,6 @@ Map.Event.prototype.defaultMouseOut = function(evt){
 
 	if (this.onoverShape ){
 		removeInfo(evt,this.onoverShape);
-		if (__isChart(evt,this.onoverShape)){
-			new MapObject(this.onoverShape).fu.scale(1,1);
-		}
-
 	}
 	if (this.onoverShape && !_activeItem){
 		highLightList.removeItem(this.onoverShape);
@@ -5480,6 +5518,7 @@ Map.Event.prototype.defaultMouseClick = function(evt){
 	try{
 		if ( HTMLWindow.ixmaps.htmlgui_onItemClick(szId) ){
 			__circleHighlight(evt,mapObject);
+                SVGPopupGroup.fu.clear();
 			killTooltip();
 			return null;
 		}
@@ -5510,7 +5549,7 @@ Map.Event.prototype.defaultMouseClick = function(evt){
 				return;
 			}
 			szId = clickNode.parentNode.getAttributeNS(null,"id");
-			if (szId && (szId != "PopupGroup") && (!szId.match(/widget/)) && (fActivateInfoOnClick || (szMapToolType == "info") || (szMapToolType == "") || (szMapToolType == "zoomrect") ) ){
+			if (szId && (szId != "PopupGroup") && (!szId.match(/widget/)) && (fActivateInfoOnClick || (szMapToolType == "info") || (szMapToolType == "clickinfo") || (szMapToolType == "") || (szMapToolType == "zoomrect") ) ){
 				if ( isActiveTheme(map.Layer.getLayerName(szId)) ){
 					SVGPopupGroup.fu.clear();
 					// fix an info popup to a permanent info bubble
@@ -5776,7 +5815,14 @@ Map.Event.prototype.doDefaultZoom = function(evt){
 	
 	SVGNotifyGroup.fu.clear();
 
-	map.showMap();
+    // GR 03.11.2019 avoid ugly remaining label (if labels are scaledepending)
+    try	{
+        map.Themes.getTheme().unlabelMap();
+    }
+    catch (e){
+    }
+
+    map.showMap();
 
 	_TRACE("@ default zoom -->");
 
@@ -5853,7 +5899,9 @@ Map.Event.prototype.doDefaultZoom = function(evt){
 	// if zoom changed, change feature scaling
 	// -----------------------------------------------
 	if ( Math.abs(map.Scale.oldZoomScale-map.Scale.nZoomScale) > (map.Scale.oldZoomScale/100) ){
-		_TRACE("--- zoom changed --- ("+map.Scale.oldZoomScale+" != "+map.Scale.nZoomScale+") !");
+		_TRACE("--- zoom changed --- !");
+		_TRACE("old: "+map.Scale.oldZoomScale);
+		_TRACE("new: "+map.Scale.nZoomScale);
 		if (fFeatureScaling == "delayed" ){
 			setTimeout("map.Layer.changeFeatureScaling(null,'"+map.Scale.nZoomScale+"')",1000);
 		}
@@ -5933,10 +5981,6 @@ Map.Event.prototype.doDefaultZoom = function(evt){
 
 	map.Scale.refreshCSSStyles();
 	
-	setTimeout("map.showAll()",10);
-
-
-
 	_TRACE("@ default zoom done: "+1/map.Scale.nZoomScale);
 };
 /**
@@ -6458,11 +6502,11 @@ InfoContainer.prototype.makePointer = function(){
 			pWidth = this.ptOffset.x+this.bBox.width-pSize*2;
 		}
 		if ( pHeight > 0 ){
-			newPath = map.Dom.newShape('path',this.pointShObj,'M'+(-this.ptOffset.x)+','+(-this.ptOffset.y)+' l '+(pWidth-map.Scale.normalX(8.5))+','+(this.ptOffset.y+map.Scale.normalX(1))+' '+map.Scale.normalX(20)+',0 z','fill:black;fill-opacity:0.5');
+			newPath = map.Dom.newShape('path',this.pointShObj,'M'+(-this.ptOffset.x)+','+(-this.ptOffset.y)+' l '+(pWidth-map.Scale.normalX(8.0))+','+(this.ptOffset.y+map.Scale.normalX(1))+' '+map.Scale.normalX(20)+',0 z','fill:black;fill-opacity:0.2');
 			newPath = map.Dom.newShape('path',this.pointerObj,'M'+(-this.ptOffset.x)+','+(-this.ptOffset.y)+' l '+(pWidth-map.Scale.normalX(7.5))+','+(this.ptOffset.y+map.Scale.normalX(1))+' '+map.Scale.normalX(15)+',0 z','fill:white');
 		}
 		else{
-			newPath = map.Dom.newShape('path',this.pointShObj,'M'+(-this.ptOffset.x)+','+(-this.ptOffset.y)+' l '+(pWidth-map.Scale.normalX(8.5))+','+(this.ptOffset.y+this.bBox.height-map.Scale.normalX(1))+' '+map.Scale.normalX(20)+',0 z','fill:black;fill-opacity:0.5');
+			newPath = map.Dom.newShape('path',this.pointShObj,'M'+(-this.ptOffset.x)+','+(-this.ptOffset.y)+' l '+(pWidth-map.Scale.normalX(8.0))+','+(this.ptOffset.y+this.bBox.height-map.Scale.normalX(1))+' '+map.Scale.normalX(20)+',0 z','fill:black;fill-opacity:0.2');
 			newPath = map.Dom.newShape('path',this.pointerObj,'M'+(-this.ptOffset.x)+','+(-this.ptOffset.y)+' l '+(pWidth-map.Scale.normalX(7.5))+','+(this.ptOffset.y+this.bBox.height-map.Scale.normalX(1))+' '+map.Scale.normalX(15)+',0 z','fill:white');
 		}
 	}
@@ -6486,11 +6530,11 @@ InfoContainer.prototype.makePointer = function(){
 			pHeight = this.ptOffset.y+this.bBox.height-pSize*2;
 		}
 		if ( pWidth > 0 ){
-			newPath = map.Dom.newShape('path',this.pointShObj,'M'+(-this.ptOffset.x)+','+(-this.ptOffset.y)+' l '+(this.ptOffset.x+map.Scale.normalX(1))+','+(pHeight-map.Scale.normalX(8.5))+' 0,'+map.Scale.normalX(20)+' z','fill:black;fill-opacity:0.5');
+			newPath = map.Dom.newShape('path',this.pointShObj,'M'+(-this.ptOffset.x)+','+(-this.ptOffset.y)+' l '+(this.ptOffset.x+map.Scale.normalX(1))+','+(pHeight-map.Scale.normalX(8.0))+' 0,'+map.Scale.normalX(20)+' z','fill:black;fill-opacity:0.2');
 			newPath = map.Dom.newShape('path',this.pointerObj,'M'+(-this.ptOffset.x)+','+(-this.ptOffset.y)+' l '+(this.ptOffset.x+map.Scale.normalX(1))+','+(pHeight-map.Scale.normalX(7.5))+' 0,'+map.Scale.normalX(15)+' z','fill:white');
 		}
 	else{
-			newPath = map.Dom.newShape('path',this.pointShObj,'M'+(-this.ptOffset.x)+','+(-this.ptOffset.y)+' l '+(this.ptOffset.x+this.bBox.width+map.Scale.normalX(1))+','+(pHeight-map.Scale.normalX(8.5))+' 0,'+map.Scale.normalX(20)+' z','fill:black;fill-opacity:0.5');
+			newPath = map.Dom.newShape('path',this.pointShObj,'M'+(-this.ptOffset.x)+','+(-this.ptOffset.y)+' l '+(this.ptOffset.x+this.bBox.width+map.Scale.normalX(1))+','+(pHeight-map.Scale.normalX(8.0))+' 0,'+map.Scale.normalX(20)+' z','fill:black;fill-opacity:0.2');
 			newPath = map.Dom.newShape('path',this.pointerObj,'M'+(-this.ptOffset.x)+','+(-this.ptOffset.y)+' l '+(this.ptOffset.x+this.bBox.width+map.Scale.normalX(1))+','+(pHeight-map.Scale.normalX(7.5))+' 0,'+map.Scale.normalX(15)+' z','fill:white');
 		}
 	}
@@ -8146,6 +8190,7 @@ MapTool.prototype.onMouseUp = function(evt){
  * @param evt the actual event
  */
 MapTool.prototype.beginPan = function(evt){
+    fFroozeDynamicContent = true;
 	if ( fPanToolByViewer && fPanHideTools && !fPDFEmbed ){
 		this.endPanTimeout = false;
 		map.Zoom.activateClipping(evt);
@@ -8167,6 +8212,7 @@ MapTool.prototype.beginPan = function(evt){
  * @param evt the actual event
  */
 MapTool.prototype.endPan = function(evt){
+    fFroozeDynamicContent = false;
 	if( fEndPan != "delayed"){
 		if ( fPanToolByViewer && fPanHideTools && !fPDFEmbed ){
 			map.Zoom.removeClipping(evt);
@@ -8186,7 +8232,7 @@ MapTool.prototype.endPan = function(evt){
  */
 MapTool.prototype.doEndPan = function(evt){
 	if ( this.endPanTimeout == true) {
-		if ( fPanToolByViewer && fPanHideTools && !fPDFEmbed ){
+        if ( fPanToolByViewer && fPanHideTools && !fPDFEmbed ){
 			map.Zoom.removeClipping(evt);
 			this.showTools(evt);
 		}
@@ -9094,7 +9140,7 @@ HighLight.prototype.unlock = function(){
  * @return A new HighLightItem Object
  */
 function HighLightItem(itemNode,szMode) {
-	if ( szMode != "circle" ){
+	if ( (szMode != "circle") && (szMode != "isolate") ){
 		itemNode = map.Layer.getLayerItemNodeOfNode(itemNode);
 		if ( !itemNode ){
 			return null;
@@ -9115,15 +9161,81 @@ HighLightItem.prototype.doHighLight = function(){
 	if (onoverShape){
 
 		if ( this.szMode && this.szMode == "circle"){
-			this.highlightGroup = map.Dom.newGroup(map.Layer.objectGroup,":highlightgroup");
-			this.itemNode = map.Dom.newGroup(this.highlightGroup);
-			var nRadius		 = map.Scale.normalX(50) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
-			var nStrokeWidth = map.Scale.normalX(10) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
-			var nDash = map.Scale.normalX(5) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
-			map.Dom.newShape('circle',this.itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:black;stroke-dasharray:"+nDash+" "+nDash+";stroke-width:"+(nStrokeWidth*1.1)+"px;pointer-events:none");
-			map.Dom.newShape('circle',this.itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:white;stroke-dasharray:"+nDash+" "+nDash+";stroke-width:"+nStrokeWidth+"px;pointer-events:none");
-			this.itemNode.fu.setPosition(this.node.parentNode.fu.getPosition().x,this.node.parentNode.fu.getPosition().y);
-			return true;
+			if ( this.node.parentNode.fu && this.node.parentNode.fu.getPosition ){
+				this.highlightGroup = this.highlightGroup || map.Dom.newGroup(map.Layer.objectGroup,":highlightgroup");
+				this.itemNode = map.Dom.newGroup(this.highlightGroup);
+				var nRadius		 = map.Scale.normalX(50) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+				var nStrokeWidth = map.Scale.normalX(10) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+				var nDash = map.Scale.normalX(5) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+				var nRadiusX = nRadius;
+				var nRadiusY = nRadius;
+				map.Dom.newShape('circle',this.itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:black;stroke-dasharray:"+nDash+" "+nDash+";stroke-width:"+(nStrokeWidth*1.1)+"px;pointer-events:none");
+				map.Dom.newShape('circle',this.itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:white;stroke-dasharray:"+nDash+" "+nDash+";stroke-width:"+nStrokeWidth+"px;pointer-events:none");
+				var box = map.Dom.getBox(this.node);
+				var scale = this.node.parentNode.fu.getScale();
+				var dx = this.node.fu.getPosition().x*scale.x;// + box.width/2*scale.x;
+				var dy = this.node.fu.getPosition().y*scale.y;// - box.height/2*scale.y;
+				var posX = this.node.parentNode.fu.getPosition().x + dx;
+				var posY = this.node.parentNode.fu.getPosition().y + dy;
+				this.itemNode.fu.setPosition(posX,posY);
+				this.itemNode.fu.scaleBy(1,1/map.Zoom.nZoomY*map.Zoom.nZoomX);
+				return true;
+			}
+		}
+		if ( this.szMode && this.szMode == "isolate"){
+ 			if ( this.node.parentNode.fu && this.node.parentNode.fu.getPosition ){
+                var clonedNode = onoverShape.cloneNode(1000);
+                this.highlightGroup = this.highlightGroup || map.Dom.newGroup(map.Layer.objectGroup.parentNode,":highlightgroup");
+                this.itemNode = this.highlightGroup.appendChild(clonedNode);
+                this.itemNode.setAttributeNS(null,"id","");
+                this.itemNode.style.removeProperty("fill");
+                this.itemNode.style.removeProperty("fill-opacity");
+                if ( 0 && this.itemNode.hasChildNodes ){
+                    var cNodes = this.itemNode.childNodes;
+                    for ( var i=0; i<cNodes.length; i++ ){
+                        if ( cNodes.item(i).nodeType == 1 ){
+                            cNodes.item(i).style.setProperty("stroke","yellow","");
+                        }
+                    }
+                }
+                var box = map.Dom.getBox(this.node);
+                var scale = this.node.parentNode.fu.getScale();
+                var dx = this.node.fu.getPosition().x*scale.x;// + box.width/2*scale.x;
+                var dy = this.node.fu.getPosition().y*scale.y;// - box.height/2*scale.y;
+                var posX = this.node.parentNode.fu.getPosition().x + dx;
+                var posY = this.node.parentNode.fu.getPosition().y + dy;
+                this.itemNode.fu = new Methods(this.itemNode);
+                this.itemNode.fu.setPosition(posX,posY);
+				
+                var scale1 = this.node.fu.getScale();
+                var scale2 = this.node.parentNode.fu.getScale();
+                this.itemNode.fu.scale(scale1.x*scale2.x,scale1.y*scale2.y);
+                
+                this.objectGroupOpacity = map.Layer.objectGroup.style.getPropertyValue("opacity") || 1;
+                map.Layer.objectGroup.style.setProperty("opacity","0.3");
+                
+                // add circle
+                
+				var itemNode = map.Dom.newGroup(this.itemNode);
+				var nRadius		 = map.Scale.normalX(50) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+				var nStrokeWidth = map.Scale.normalX(10) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+				var nDash = map.Scale.normalX(5) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+				var nRadiusX = nRadius;
+				var nRadiusY = nRadius;
+				map.Dom.newShape('circle',itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:black;stroke-dasharray:"+nDash+" "+nDash+";stroke-width:"+(nStrokeWidth*1.1)+"px;pointer-events:none");
+				map.Dom.newShape('circle',itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:white;stroke-dasharray:"+nDash+" "+nDash+";stroke-width:"+nStrokeWidth+"px;pointer-events:none");
+				var box = map.Dom.getBox(this.node);
+				var scale = this.node.parentNode.fu.getScale();
+				var dx = this.node.fu.getPosition().x*scale.x;// + box.width/2*scale.x;
+				var dy = this.node.fu.getPosition().y*scale.y;// - box.height/2*scale.y;
+				var posX = this.node.parentNode.fu.getPosition().x + dx;
+				var posY = this.node.parentNode.fu.getPosition().y + dy;
+				//this.itemNode.fu.setPosition(posX,posY);
+                itemNode.fu.scale(1/scale.x,1/scale.y);
+				itemNode.fu.scaleBy(1,1/map.Zoom.nZoomY*map.Zoom.nZoomX);
+                
+               return true;
+            }
 		}
 
 		var mapObj = new MapObject(onoverShape);
@@ -9218,9 +9330,13 @@ HighLightItem.prototype.doHighLight = function(){
  */
 HighLightItem.prototype.removeHighLight = function(){
 	if (this.highlightGroup){
-		this.highlightGroup.removeChild(this.itemNode);
+		this.highlightGroup.parentNode.removeChild(this.highlightGroup);		
 	}
 	this.highlighted = false;
+    if (this.objectGroupOpacity){
+        map.Layer.objectGroup.style.setProperty("opacity",this.objectGroupOpacity);
+        this.objectGroupOpacity = null;
+    }
 };
 
 // .............................................................................
@@ -9538,6 +9654,9 @@ doDisplayInfo = function(xPos,yPos,szMode){
 			_TRACE("now try this  '"+szTheme+"::"+szChart+"'");
 			szShapeId = szTheme+"::"+szChart;
 
+			if ( chartTheme.szFlag.match(/PLOT/) ){
+				ptNull = map.Themes.getChart(szShapeId,chartGroup,"VALUES|XAXIS|ZOOM|BOX|GRID",chartTheme);
+			}else
 			if ( chartTheme.szFlag.match(/POINTER/) && (chartTheme.nOrigSumA.length > 1) && (chartTheme.partsA.length > 1) ){
 				ptNull = map.Themes.getChart(szShapeId,chartGroup,"VALUES|ZOOM|AXIS|HORZ",chartTheme);
 			}else{
@@ -9559,6 +9678,9 @@ doDisplayInfo = function(xPos,yPos,szMode){
 			}
 			if ( chartTheme && chartTheme.itemA[szShapeId] && chartTheme.itemA[szShapeId].szTitle ){
 				szInfoTitle = chartTheme.itemA[szShapeId].szTitle;
+			}
+			if ( chartTheme && chartTheme.itemA[szShapeId] && chartTheme.itemA[szShapeId].szSelectionId2 && (chartTheme.itemA[szShapeId].szSelectionId2 != "undefined") ){
+				szInfoTitle += " ==> " + chartTheme.itemA[szShapeId].szSelectionId2;
 			}
 			// GR 29.08.2013 allow user hook
 			try{
@@ -9586,7 +9708,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 					var szTextStyle = __scaleStyleString(map.Scale.tStyle.Description.szStyle,0.5); 
 					nYpos += map.Scale.tStyle.Description.nFontHeight*0.25 + map.Scale.normalY(1);
 					map.Dom.newText(chartGroup,chartBox.x,nYpos,szTextStyle,chartTheme.szTitle);
-					nYpos += map.Scale.tStyle.Description.nFontHeight*0.5 + map.Scale.normalY(1);
+					nYpos += map.Scale.tStyle.Description.nFontHeight*1 + map.Scale.normalY(1);
 					// add snippet
 					/**
 					if (chartTheme.itemA[szShapeId].szSnippet || chartTheme.szSnippet){
@@ -9600,23 +9722,31 @@ doDisplayInfo = function(xPos,yPos,szMode){
 					if ( szTotal ){
 						var szTextStyle = __scaleStyleString(map.Scale.tStyle.Summary.szStyle,0.5); 
 						map.Dom.newText(chartGroup,chartBox.x,nYpos,szTextStyle,szTotal);
-						nYpos += map.Scale.tStyle.Summary.nFontHeight*0.5 + map.Scale.normalY(0.5);
+						nYpos += map.Scale.tStyle.Summary.nFontHeight*1 + map.Scale.normalY(0.5);
 					}
 					// add summary
 					var szTotal = map.Themes.getSummary(szShapeId,map.Themes.activeTheme);
 					if ( szTotal ){
-						var szTextStyle = __scaleStyleString(map.Scale.tStyle.Summary.szStyle,0.5); 
-						map.Dom.newText(chartGroup,chartBox.x,nYpos,szTextStyle,szTotal);
+						var szTextStyle = __scaleStyleString(map.Scale.tStyle.Summary.szStyle,1); 
+						map.Dom.newText(chartGroup,chartBox.x,nYpos,szTextStyle,szTotal+chartTheme.szUnits);
 						nYpos += map.Scale.tStyle.Summary.nFontHeight;
 					}
 					contentBox = map.Dom.getBox(infoWorkspace);
 					contentBox.height += map.Scale.normalY(nIndent*2);
+				}else{
+					var szTotal = map.Themes.getSummary(szShapeId,chartTheme);
+					if ( szTotal ){
+						szTotal = szTotal.split("Total:")[1];
+						var szTextStyle = __scaleStyleString(map.Scale.tStyle.Summary.szStyle,2.5); 
+						map.Dom.newText(infoWorkspace,100,500,szTextStyle,szTotal+chartTheme.szUnits);
+						contentBox = map.Dom.getBox(infoWorkspace);
+					}
 				}
 
 				// make info text grid
 				// ===================
-				if ( objTheme.fShowData ){
-					dataGrid = objTheme.getDataGrid(szShapeId,infoWorkspace);
+				if ( chartTheme.fShowData ){
+					dataGrid = chartTheme.getDataGrid(szShapeId,infoWorkspace);
 					if ( dataGrid ){
 						dataGrid.setPosition(map.Scale.normalX(5),contentBox.height);
 						if ( dataGrid.hasScrollBars && dataGrid.hasScrollBars() ){
@@ -9867,7 +9997,7 @@ createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumn
 	var newxGroup = map.Dom.newNode('g',newGroup);
 	var xOffset = map.Scale.normalX(5);
 	var yOffset = map.Scale.normalX(3);
-	var maxWidth = Math.min(map.Scale.normalX(250),map.Scale.bBox.width/5);
+	var maxWidth = Math.min(map.Scale.normalX(250),map.Scale.bBox.width/7);
 
 	for (c=0;c<nColumns;c++ ){
 		var dy = map.Scale.normalY(lineheight);

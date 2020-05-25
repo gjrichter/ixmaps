@@ -103,11 +103,13 @@ $Log: htmlgui_api.js,v $
  * @namespace ixmaps
  */
 
-(function (window, document, undefined) {
-
+(function( ixmaps, $, undefined ) {
+	/**
 	var ixmaps = {
 		version: "1.0"
 	};
+	**/
+	//ixmaps.version = "1.0";
 
 	function expose() {
 		var oldIxmaps = window.ixmaps;
@@ -372,6 +374,19 @@ $Log: htmlgui_api.js,v $
 	};
 
 	/**
+	 * bubble up loaded project
+	 * @param {object} loaded project (json)
+	 * @return void
+	 * @private
+	 */
+	ixmaps.setLoadedProject = function(loadedProject){
+		this.loadedProject = loadedProject;
+		if (this.parentApi && (this.parentApi != this) && this.parentApi.setLoadedProject ){
+			this.parentApi.setLoadedProject(loadedProject);
+		}
+	};
+
+    /**
 	 * gives the parent api a function to wait for the embedded map
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
 	 * @param {Function} fCallBack the function to call, if the map is loaded
@@ -379,8 +394,6 @@ $Log: htmlgui_api.js,v $
 	 * @private
 	 */
 	ixmaps.waitForEmbeddedMap = function(szMap,fCallBack){
-
-		//console.log("waitForEmbeddedMap: "+szMap);
 
 		if ( ( ixmaps.embeddedApiA[szMap] && ixmaps.embeddedApiA[szMap].embeddedSVG ) ||
 			 ( ixmaps.embeddedApiA["map"]  && ixmaps.embeddedApiA["map"].embeddedSVG  ) ) {
@@ -423,10 +436,16 @@ $Log: htmlgui_api.js,v $
 	 * @private
 	 */
 	ixmaps.dispatchToEmbeddedApi = function(szMap,szFunc,argA){
+		
+		// GR 04.02.2020 handle'old' generic map name 'map'
+		// --------------------------------------------------------------------
+		if ( (szMap == "map") && !ixmaps.embeddedApiA[szMap] ){
+			szMap = Object.keys(ixmaps.embeddedApiA)[0];
+		}
 
 		// GR 28.11.2017 workaround for 'old' calls without szMap specification
 		// --------------------------------------------------------------------
-		if ( szMap && !ixmaps.embeddedApiA[szMap] ){
+		if ( 0 && szMap && !ixmaps.embeddedApiA[szMap] ){
 			argA.unshift(szMap);
 			szMap = Object.keys(ixmaps.embeddedApiA)[0];
 		}
@@ -508,6 +527,16 @@ $Log: htmlgui_api.js,v $
 	// .............................................................................
 
 	/**
+	 * a helper function to check number of arguments
+	 */
+	var __checkArguments = function(arg,n,fu){
+		var args = Array.prototype.slice.call(arg);
+		if (args.length<n){
+			ixmaps.error("error: missing arguments in "+(fu||"function call")+" !");
+		}
+	};
+	
+	/**
 	 * a function to wait for the embedded map
 	 * a map can have a specific name or the generic name 'map'
 	 * @param {String} szMap the name of the embedded map
@@ -543,6 +572,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void
 	 */
 	ixmaps.loadProject = function(szMap,szUrlProject,szFlag){
+		__checkArguments(arguments,2,"loadProject()");
 		this.isMap = false;
 		this.dispatchToEmbeddedApi(szMap,"loadProject",[szUrlProject,szFlag]);
 	};
@@ -554,6 +584,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void
 	 */
 	ixmaps.loadMap = function(szMap,szUrlMap,szUrlStory){
+		__checkArguments(arguments,2,"loadMap()");
 		this.isMap = false;
 		this.dispatchToEmbeddedApi(szMap,"loadMap",[szUrlMap,szUrlStory]);
 	};
@@ -565,6 +596,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void 
 	 */
 	ixmaps.loadStory = function(szMap,szUrlStory,nWidth){
+		__checkArguments(arguments,2,"loadStory()");
 		this.dispatchToEmbeddedApi(szMap,"loadStory",[szUrlStory,nWidth]);
 	};
 	/**
@@ -575,6 +607,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void
 	 */
 	ixmaps.loadSidebar = function(szMap,szUrlStory,nWidth){
+		__checkArguments(arguments,2,"loadSidebar()");
 		this.dispatchToEmbeddedApi(szMap,"loadSidebar",[szUrlStory,nWidth]);
 	};
 	/**
@@ -600,6 +633,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void
 	 */
 	ixmaps.setProject = function(szMap,szProject){
+		__checkArguments(arguments,2,"setProject()");
 		this.isMap = false;
 		this.dispatchToEmbeddedApi(szMap,"setProject",[szProject]);
 	};
@@ -612,6 +646,7 @@ $Log: htmlgui_api.js,v $
      * @example ixmaps.setBounds("map",[36.485910216989004,-0.11973237624387232,47.639325496476276,27.80527925124387]);
 	 */
 	ixmaps.setBounds = function(szMap,bounds){
+		__checkArguments(arguments,2,"setBounds()");
 		this.dispatchToEmbeddedApi(szMap,"setBounds",[bounds]);
 	};
 	/**
@@ -623,6 +658,7 @@ $Log: htmlgui_api.js,v $
      * @example ixmaps.setView("map1",[51.59898731096802,-0.33786544322673245],10);
 	 */
 	ixmaps.setView = function(szMap,center,nZoom){
+		__checkArguments(arguments,3,"setView()");
 		this.dispatchToEmbeddedApi(szMap,"setView",[center,nZoom]);
 	};
 	/**
@@ -633,6 +669,7 @@ $Log: htmlgui_api.js,v $
      * @example ixmaps.setCenter("map",[51.59898731096802,-0.33786544322673245]);
 	 */
 	ixmaps.setCenter = function(szMap,center){
+		__checkArguments(arguments,2,"setCenter()");
 		this.dispatchToEmbeddedApi(szMap,"setCenter",[center]);
 	};
 	/**
@@ -643,6 +680,7 @@ $Log: htmlgui_api.js,v $
      * @example ixmaps.setZoom("map",10);
 	 */
 	ixmaps.setZoom = function(szMap,nZoom){
+		__checkArguments(arguments,2,"setZoom()");
 		this.dispatchToEmbeddedApi(szMap,"setZoom",[nZoom]);
 	};
 	/**
@@ -652,6 +690,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void
 	 */
 	ixmaps.minZoom = function(szMap,nZoom){
+		__checkArguments(arguments,2,"minZoom()");
 		this.dispatchToEmbeddedApi(szMap,"minZoom",[nZoom]);
 	};
 	/**
@@ -723,6 +762,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void
 	 */
 	ixmaps.switchLayer = function(szMap,szLayerName,fState){
+		__checkArguments(arguments,3,"setView()");
 		this.dispatchToEmbeddedApi(szMap,"switchLayer",[szLayerName,fState]);
 	};
 	/**
@@ -734,6 +774,7 @@ $Log: htmlgui_api.js,v $
 	 * @private
 	 */
 	ixmaps.execBookmark = function(szMap,szBookmark,fClear){
+		__checkArguments(arguments,2,"execBookmark()");
 		this.dispatchToEmbeddedApi(szMap,"execBookmark",[szBookmark,fClear]);
 	};
 
@@ -746,6 +787,7 @@ $Log: htmlgui_api.js,v $
 	 * @private
 	 */
 	ixmaps.execScript = function(szMap,szScript,fClear){
+		__checkArguments(arguments,2,"execScript()");
 		this.dispatchToEmbeddedApi(szMap,"execScript",[szScript,fClear]);
 	};
 
@@ -849,7 +891,7 @@ $Log: htmlgui_api.js,v $
 		}
 		
 		var szScript = "map.Api.newMapTheme(\""+(opt.layer||"")+"\",\""+(opt.field||"")+"\",\""+(opt.field100||"")+"\",\""+opt.style+"\",\""+szThemeName+"\",\""+opt.axis+"\")";
-		//console.log(szScript);
+
 		this.dispatchToEmbeddedApi(szMap,"execScript",[szScript,fClear]);
 	};
 
@@ -862,6 +904,24 @@ $Log: htmlgui_api.js,v $
 	 */
 	ixmaps.refreshTheme = function(szMap,szThemeName){
 		this.dispatchToEmbeddedApi(szMap,"refreshTheme",[szThemeName]);
+	};
+	/**
+	 * show a Theme on the map
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szThemeName a name for the theme [optional]; will be displayed if the theme has no title defined
+	 * @return void
+	 */
+	ixmaps.showTheme = function(szMap,szThemeName){
+		this.dispatchToEmbeddedApi(szMap,"showTheme",[szThemeName]);
+	};
+	/**
+	 * hide a Theme on the map
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szThemeName a name for the theme [optional]; will be displayed if the theme has no title defined
+	 * @return void
+	 */
+	ixmaps.hideTheme = function(szMap,szThemeName){
+		this.dispatchToEmbeddedApi(szMap,"hideTheme",[szThemeName]);
 	};
 	/**
 	 * remove a Theme from the map
@@ -878,8 +938,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void
 	 */
 	ixmaps.clearAll = function(szMap){
-		var szScript = "map.Api.clearAll()";
-		this.dispatchToEmbeddedApi(szMap,"execScript",[szScript]);
+		this.dispatchToEmbeddedApi(szMap,"clearAll",[]);
 	};
 	/**
 	 * remove all chart themes (symbol or chart symbols) from the map
@@ -887,8 +946,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void
 	 */
 	ixmaps.clearAllCharts = function(szMap){
-		var szScript = "map.Api.clearAllCharts()";
-		this.dispatchToEmbeddedApi(szMap,"execScript",[szScript]);
+		this.dispatchToEmbeddedApi(szMap,"clearAllCharts",[]);
 	};
 	/**
 	 * remove all chart themes (symbol or chart symbols) from the map
@@ -898,8 +956,7 @@ $Log: htmlgui_api.js,v $
 	 * @deprecated - use ixmaps.clearAllCharts()
 	 */
 	ixmaps.clearAllChart = function(szMap){
-		var szScript = "map.Api.clearAllCharts()";
-		this.dispatchToEmbeddedApi(szMap,"execScript",[szScript]);
+		this.dispatchToEmbeddedApi(szMap,"clearAllChart",[]);
 	};
 	/**
 	 * remove all choropleth themes from the map
@@ -907,8 +964,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void
 	 */
 	ixmaps.clearAllChoropleth = function(szMap) {
-		var szScript = "map.Api.clearAllChoropleth()";
-		this.dispatchToEmbeddedApi(szMap,"execScript",[szScript]);
+		this.dispatchToEmbeddedApi(szMap,"clearAllChoropleth",[]);
 	};
 	
 	/**
@@ -961,7 +1017,6 @@ $Log: htmlgui_api.js,v $
 	 * @return void
 	 */
 	ixmaps.changeFeatureScaling = function(szMap,nDelta){
-		console.log("changeFeatureScaling");
 		this.dispatchToEmbeddedApi(szMap,"changeFeatureScaling",[nDelta]);
 	};
 
@@ -1021,6 +1076,60 @@ $Log: htmlgui_api.js,v $
 	}
 
 	/**
+	 * set time frame
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szThemeId the id of the theme received on create
+	 * @param {Number} nUMin the lower time limit (utime) of the frame
+	 * @param {Number} nUMax the upper time limit (utime) of the frame
+	 * @return void
+	 */
+	ixmaps.setThemeTimeFrame = function(szMap,szThemeId,nUMin,nUMax){
+		this.dispatchToEmbeddedApi(szMap,"setThemeTimeFrame",[szThemeId,nUMin,nUMax]);
+	}
+
+	/**
+	 * pause theme clip
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szThemeId the id of the theme received on create
+	 * @return void
+	 */
+	ixmaps.pauseThemeClip = function(szMap,szThemeId){
+		this.dispatchToEmbeddedApi(szMap,"pauseThemeClip",[szThemeId]);
+	}
+
+	/**
+	 * start theme clip
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szThemeId the id of the theme received on create
+	 * @return void
+	 */
+	ixmaps.startThemeClip = function(szMap,szThemeId,nFrame){
+		this.dispatchToEmbeddedApi(szMap,"startThemeClip",[szThemeId,nFrame]);
+	}
+
+	/**
+	 * set theme clip frame
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szThemeId the id of the theme received on create
+	 * @param {Number} nFrame number of the clip frame to show
+	 * @return void
+	 */
+	ixmaps.setThemeClipFrame = function(szMap,szThemeId,nFrame){
+		this.dispatchToEmbeddedApi(szMap,"setThemeClipFrame",[szThemeId,nFrame]);
+	}
+
+	/**
+	 * bext theme clip frame
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szThemeId the id of the theme received on create
+	 * @return void
+	 */
+	ixmaps.nextThemeClipFrame = function(szMap,szThemeId){
+		this.dispatchToEmbeddedApi(szMap,"nextThemeClipFrame",[szThemeId]);
+	}
+
+	
+	/**
 	 * filter theme items by reloading theme
 	 * @param szThemeId the id of the theme received on create
 	 * @param szFilter the filter string
@@ -1062,6 +1171,17 @@ $Log: htmlgui_api.js,v $
 			return;
 		}
 		this.dispatchToEmbeddedApi(szMap,"filterThemeItems",[szThemeId,szFilter,mode]);
+	};
+	/**
+	 * highlight theme items 
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szThemeId the id of the theme received on create
+	 * @param {String} szItems the ids of the items to highlight
+	 * @param {String} mode an additional flag
+	 * @return void
+	 */
+	ixmaps.highlightThemeItems = function(szMap,szThemeId,szItems,separator){
+		this.dispatchToEmbeddedApi(szMap,"highlightThemeItems",[szThemeId,szItems,separator]);
 	};
 
 	/**
@@ -1130,6 +1250,24 @@ $Log: htmlgui_api.js,v $
 		this.dispatchToEmbeddedApi(szMap,"popupThemeEditor",[position]);
 	};
 	/**
+	 * show Theme Configurator (Wizzard)
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {Array} position x,y screen position for the modal dialog
+	 * @void
+	 */
+	ixmaps.popupThemeConfigurator = function(szMap,position){
+		this.dispatchToEmbeddedApi(szMap,"popupThemeConfigurator",[position]);
+	};
+	/**
+	 * show Theme Facets (Filter)
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {Array} position x,y screen position for the modal dialog
+	 * @void
+	 */
+	ixmaps.popupThemeFacets = function(szMap,position){
+		this.dispatchToEmbeddedApi(szMap,"popupThemeFacets",[position]);
+	};
+	/**
 	 * show actual map in viewer
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
 	 * @param {Array} position x,y screen position for the modal dialog
@@ -1155,6 +1293,15 @@ $Log: htmlgui_api.js,v $
 	 */
 	ixmaps.popOutEdit = function(szMap,position){
 		this.dispatchToEmbeddedApi(szMap,"popOutEdit",["window"]);
+	};
+	/**
+	 * show actual map in project explorer
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {Array} position x,y screen position for the modal dialog
+	 * @void
+	 */
+	ixmaps.popOutProject = function(szMap,position){
+		this.dispatchToEmbeddedApi(szMap,"popOutProject",["window"]);
 	};
 	/**
 	 * get themes
@@ -1326,7 +1473,19 @@ $Log: htmlgui_api.js,v $
 		ixmaps.embeddedApi.embeddedSVG.map.Api.clearAll();
 		ixmaps.embeddedApi.embeddedSVG.map.Api.doZoomMapToFullExtend();
 	};
+	
+	/**
+	 * set title 
+	 * @param {String}	a new title to show on the map
+	 * @return void
+	 */
+	ixmaps.setTitle = function(szTitle){
+		for ( a in ixmaps.embeddedApiA ){
+			ixmaps.embeddedApiA[a].setTitle(szId);
+		}
+	};
 
+	
 	/**
 	 * set map tool in all embedded maps;  
 	 * the map tool manages the mouse (touch) input; 
@@ -1400,7 +1559,6 @@ $Log: htmlgui_api.js,v $
 	ixmaps.htmlgui_getStoryUrl = function(szMap){
 		return (ixmaps.embeddedApiA[szMap||'map']||ixmaps.embeddedApi).getStoryUrl();
 	};
-
 	/**
 	 * get the url of the actual loaded SVG map 
 	 * @param {String} szMap the map name [optional]
@@ -1408,6 +1566,14 @@ $Log: htmlgui_api.js,v $
 	 */
 	ixmaps.getMapUrl = function(szMap){
 		return (ixmaps.embeddedApiA[szMap||'map']||ixmaps.embeddedApi).getMapUrl();
+	};
+	/**
+	 * get the url of the actual loaded SVG map 
+	 * @param {String} szMap the map name [optional]
+	 * @return {String} the URL of the SVG map
+	 */
+	ixmaps.getLoadedMapUrl = function(szMap){
+		return (ixmaps.embeddedApiA[szMap||'map']||ixmaps.embeddedApi).getLoadedMapUrl();
 	};
 	/**
 	 * @deprecated old function call
@@ -1493,7 +1659,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void
 	 */
 	ixmaps.setMapWidgetMarginTop = function(szMap,nMarginTop){
-		this.setMapFeatures(szMap,"toolmargintop:40");
+		this.setMapFeatures(szMap,"toolmargintop:"+String(Number(nMarginTop)));
 	};
 
 	/**
@@ -1669,6 +1835,16 @@ $Log: htmlgui_api.js,v $
 			ixmaps.embeddedApiA[a].showUi();
 		}
 	};
+	
+	/**
+	 * show the an about dialog 
+	 * @return void
+	 */
+	ixmaps.showAbout = function(){ 
+		for ( a in ixmaps.embeddedApiA ){
+			ixmaps.embeddedApiA[a].showAbout();
+		}
+	};
 
 	/**
 	 * show error message
@@ -1702,7 +1878,19 @@ $Log: htmlgui_api.js,v $
 			}
 		}
 	};
-	
+
+	/**
+	 * display a HTML map overlay
+	 * @param {String} szHTML the HTML code 
+	 * @return void
+	 */
+	ixmaps.setMapOverlayHTML = function(szHTML){
+		for ( a in ixmaps.embeddedApiA ){
+			ixmaps.embeddedApiA[a].setMapOverlayHTML(szHTML);
+		}
+	};
+    
+    
 	// ---------------------------------------------------
 	//
 	// functions to synchronize two or more embedded maps
@@ -1744,11 +1932,12 @@ $Log: htmlgui_api.js,v $
 		// loop over the registered maps and synch center and zoom  
 		//
 		for ( a in ixmaps.embeddedApiA ){
+			
 			if ( a != szMaster ){
 				if ( ixmaps.embeddedApiA[a].syncMap ){
 					ixmaps.embeddedApiA[a].syncMap(a,ptSW,ptNE,nZoom);
 				}else{
-					this.dispatchToEmbeddedApi(a,"syncEmbedMap",[ptSW,ptNE,nZoom]);
+					this.dispatchToEmbeddedApi(a,"syncEmbed",[ptSW,ptNE,nZoom]);
 				}
 			}else{
 				//ixmaps.dispatchToParentApi("syncEmbed",[szMaster,ptSW,ptNE,nZoom]);
@@ -1848,6 +2037,23 @@ $Log: htmlgui_api.js,v $
 		}
 	};
 
+	/**
+	 * helper function to get any theme id selected by a legend
+     * bubble up though ixmaps apis and check .activeThemeId value
+	 * @string 
+	 */
+    ixmaps.getLegendThemeId = function() {
+        var api = ixmaps;
+        do {
+            if ( api.activeThemeId ){
+                return api.activeThemeId;
+            }
+        }
+        while (api.parentApi && (api.parentApi != api) && (api = api.parentApi) );
+        
+        return null;
+    };
+                                    
 	// ---------------------------------------------------
 	//
 	// bubble up map events
@@ -1902,6 +2108,10 @@ $Log: htmlgui_api.js,v $
 		}
 	};
 
+	ixmaps.htmlgui_initChart = function(SVGDoc,args){
+		return ( ixmaps.parentApi != ixmaps ) ? ixmaps.parentApi.htmlgui_initChart(SVGDoc,args) : null;
+	};
+
 	ixmaps.htmlgui_drawChart = function(SVGDoc,args){
 		return ( ixmaps.parentApi != ixmaps ) ? ixmaps.parentApi.htmlgui_drawChart(SVGDoc,args) : null;
 	};
@@ -1934,6 +2144,11 @@ $Log: htmlgui_api.js,v $
 		}
 	};
 
+	ixmaps.htmlgui_onProjectLoaded = function(obj){
+		if ( ixmaps.parentApi && (ixmaps.parentApi != ixmaps) ){
+			ixmaps.parentApi.htmlgui_onProjectLoaded(obj);
+		}
+	};
 	// function called on SVG map ready
 	// must be dispatched
 	// !! may be redefined by user
@@ -1953,19 +2168,19 @@ $Log: htmlgui_api.js,v $
 	};
 
 	ixmaps.onMapZoom = function(obj){
-		if ( ixmaps.parentApi != ixmaps ){
+		if ( ixmaps.parentApi && (ixmaps.parentApi != ixmaps) ){
 			ixmaps.parentApi.onMapZoom(obj);
 		}
 	};
 
 	ixmaps.htmlgui_onWindowResize = function(){
-		if ( ixmaps.parentApi != ixmaps ){
+		if ( ixmaps.parentApi && (ixmaps.parentApi != ixmaps) ){
 			ixmaps.parentApi.htmlgui_onWindowResize();
 		}
 	};
 
 	ixmaps.htmlgui_setMapTypeBG = function(szId){
-		if ( ixmaps.parentApi != ixmaps ){
+		if ( ixmaps.parentApi && (ixmaps.parentApi != ixmaps) ){
 			ixmaps.parentApi.htmlgui_setMapTypeBG(szId);
 		}
 	};
@@ -2063,6 +2278,11 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 
+		setLocalString: function(szGlobal,szLocal){
+			ixmaps.setLocal(this.szMap,szGlobal,szLocal);
+			return this;
+		},
+
 		getLayer: function(){
 			return ixmaps.getLayer(this.szMap);
 		},
@@ -2085,8 +2305,19 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 
-		loadProject: function(szUrl){
-			ixmaps.loadProject(this.szMap,szUrl);
+		changeThemeStyle: function(style,flag){
+			ixmaps.changeThemeStyle(this.szMap,style,flag);
+			return this;
+		},
+
+		loadMap: function(szUrl){
+			ixmaps.loadMap(this.szMap,szUrl);
+			return this;
+		},
+
+		loadProject: function(szUrl,szFlag){
+			console.log(szUrl);
+			ixmaps.loadProject(this.szMap,szUrl,szFlag);
 			return this;
 		},
 
@@ -2145,11 +2376,29 @@ $Log: htmlgui_api.js,v $
 		//return new Promise(function(resolve, reject){
 
 			var target = window.document.getElementById(szTargetDiv);
-			var szName = opt.mapName || "map";
-			var szBasemap = opt.mapService || "leaflet";
-			var szMapType = opt.mapType || "CartoDB - Positron";
-			
-			var szUrl = "/ui/dispatch.htm?ui=embed&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName;
+			if ( !target ){
+				alert("embed map target-element '" + szTargetDiv + "' not found!");
+				return;
+			}
+			var szName = opt.mapName || opt.name || "map" + String(Math.random()).split(".")[1];
+			var szBasemap = opt.mapService || opt.basemap || "leaflet";
+			var szMapType = opt.mapType || opt.maptype || "CartoDB - Positron";
+
+			// make sure than a map name exists only once
+			while ( ixmaps.embeddedApiA[szName] ){
+				szName += "1";
+			}
+			// register map name
+			ixmaps.embeddedApiA[szName] = {};
+		
+			var szUrl = "";
+			if ( opt.story ) {
+				szUrl = "/ui/dispatch.htm?ui=story&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName+"&story="+opt.story;
+			}else if ( opt.mapStory ) {
+				szUrl = "/ui/dispatch.htm?ui=story&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName+"&story="+opt.mapStory;
+			}else{
+				szUrl = "/ui/dispatch.htm?ui=embed&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName;
+			}
 
 			var scripts = window.document.scripts;
 			for ( a in scripts ){
@@ -2168,6 +2417,9 @@ $Log: htmlgui_api.js,v $
 			}
 			if ( opt.search ){
 				szUrl += "&search="+opt.search;
+			}
+			if ( opt.align ){
+				szUrl += "&align="+opt.align;
 			}
 			if ( opt.legend ){
 				szUrl += "&legend="+opt.legend;
@@ -2191,13 +2443,25 @@ $Log: htmlgui_api.js,v $
 					szUrl += "&"+o+'='+opt.mapOpt[o];
 				}
 			}
+			if ( opt.project ){
+				szUrl += "&project="+opt.project;
+			}
+		
 			var szHeight = opt.height || "640px";
 			var szWidth  = opt.width  || "100%";
-
+		
 			if ( target ){
 				target.innerHTML = "<iframe id=\""+szName+"\" style=\"border:0;width:"+szWidth+";height:"+szHeight+"\" src=\""+szUrl+"\" ></iframe>";
+                // GR 08.09.2019 adapt the created frame on window resize 
+                window.onresize = function(event) {
+                    var newWidth  = window.innerWidth;
+                    var newHeight = window.innerHeight;
+                    window.document.getElementById(szName).style.setProperty("width",String(newWidth)+"px");
+                    window.document.getElementById(szName).style.setProperty("height",String(newHeight-5)+"px");
+                };
 			}
-			if ( callback )	{
+        
+ 			if ( callback )	{
 				ixmaps.waitForMap(szName,callback);
 			}else{
 				ixmaps.waitForMap(szName,
@@ -2214,7 +2478,7 @@ $Log: htmlgui_api.js,v $
 	}
 
 
-}(window, document));
+}( window.ixmaps = window.ixmaps || {} ));
 
 // .............................................................................
 // EOF

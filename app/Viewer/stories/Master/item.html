@@ -3,305 +3,561 @@
 <html lang="en">
 
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
-<meta http-equiv="Content-Language" content="en-us" />
-<meta name="copyright" content="Guenter Richter"/>
-<meta name="author" content="service@medienobjekte.de"/>
-<meta name="description" content="Interactive &amp; estensible maps in SVG"/>
-<meta name="revisit-after" content="30 days"/>
-<meta name="distribution" content="Global"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Language" content="en-us" />
+	<meta name="copyright" content="Guenter Richter" />
+	<meta name="author" content="service@medienobjekte.de" />
+	<meta name="description" content="Interactive &amp; estensible maps in SVG" />
+	<meta name="revisit-after" content="30 days" />
+	<meta name="distribution" content="Global" />
 
-<link rel="stylesheet" href="../../app/Generic/stories/master/story/index.css" type="text/css" />
+	<link rel="stylesheet" href="../../stories/Master/index.css" type="text/css" />
 
-<style type="text/css">
+	<style type="text/css">
+		body {
+			font-family: courier new, Raleway, Roboto Slab, monospace, Lato, arial, helvetica;
+			color: #444;
+			font-weight: 300;
+		}
 
-	body{
-		font-family: courier new,Raleway,Roboto Slab,monospace,Lato,arial,helvetica;
-		color: #444;
-		font-weight: 300;
-	}
+		td {
+			font-weight: 400;
+			font-size: 1.1em;
+			padding: 0.1em 0.5em;
+			vertical-align: top;
+		}
 
-	td {
-		font-weight: 400;
-		font-size: 1.1em;
-		padding: 0.1em 0.5em;
-		vertical-align: top;
-	}
-	.label{
-		text-align: right;
-		font-size: 0.8em;
-		padding-top: 0.4em;
-		color: #aaa;
-		width: 33%;
-	}
-	.value{
-		text-align: left;
-		color: #000;
-		font-weight: 600;
-	}
-	.clip {
-		max-width: 100px;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-	.item-list{
-		margin-right:0em;
-		padding:1em 0.5em 1.5em 0.66em;
-		color:#aaa;
-	}
-	a {
-		color: #4466ff;
-	}
+		.label {
+			text-align: right;
+			font-size: 0.8em;
+			padding-top: 0.4em;
+			color: #888;
+			width: 33%;
+		}
 
-	object {
-		margin:0;
-		padding:0;
-		margin-right: -1em;
-		width:100%;
-		height:1000px;
-	}
+		.value {
+			text-align: left;
+			color: #666;
+			font-weight: 600;
+		}
 
-	#container {
-		margin-top:2.6em;
-		margin-left:0em;
-		margin-right:0em;
-		xxpadding-bottom:1em;
-		xxpadding-right:2em;
-		vertical-align:middle;
-		background-color: rgba(239,235,239,0.7);
-	}
+		.clip {
+			max-width: 100px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
 
-	#tooltip {
-		font-family: arial narrow,system; 
-	  background: white;
-	  border: 0.5px solid black;
-	  border-radius: 5px;
-	  padding: 5px;
-	  max-width: 80%;
-	}
-</style>
+		.item-list {
+			margin-right: 0em;
+			padding: 1em 0.5em 1.5em 0.66em;
+			color: #aaa;
+		}
+
+		a {
+			color: #4466ff;
+		}
+
+		object {
+			margin: 0;
+			padding: 0;
+			margin-right: -1em;
+			width: 100%;
+			height: 1000px;
+		}
+
+		#container {
+			margin-top: 2.1em;
+			margin-left: 0em;
+			margin-right: 0em;
+			xxpadding-bottom: 1em;
+			xxpadding-right: 2em;
+			vertical-align: middle;
+			background-color: rgba(239, 235, 239, 0.7);
+		}
+
+		#tooltip {
+			font-family: arial narrow, system;
+			color: #444;
+			background: white;
+			border: 0.5px solid black;
+			border-radius: 5px;
+			padding: 5px;
+			max-width: 80%;
+		}
+
+	</style>
 
 </head>
 
 <body style="margin:0px;padding:0px;" onload="">
 
 	<!-- Container -->
-	<div id="container">
+	<div id="container" style="background:#fff">
 
-		<div id="menu-div">
+		<div id="chart-div" style="position:relative;top:0px">
+		</div>
+		<div id="chart-div2" style="position:relative;top:-420px;pointer-events:none;max-height:0px">
 		</div>
 
 		<div id="result-div">
 			<div id="result">
 			</div>
-		<div>
+		</div>
+
+
+		<div id="tooltip" style="position: absolute; display: none;"></div>
 
 	</div>
 	
-	<div id="tooltip" style="position: absolute; display: none;"></div>
+	<script type="text/javascript" src="assets/plugins/jquery-1.7.1.min.js"></script>
 
 	<script type="text/javascript">
+		// ===========================================
+		//
+		// !! get ixmaps api from story parent/opener
+		//
+		// ===========================================
 
+		var ixmaps = null;
+		if (window.opener) {
+			ixmaps = window.opener.ixmaps;
+		} else
+		if (parent) {
+			ixmaps = parent.window.ixmaps;
+		} else {
+			alert("error: missing parent window for themes !");
+		}
+
+		ixmaps.initialized = true;
 
 		// ===================================
 		// define local functions
 		// ===================================
 
+		// ------------------------
 		// tooltips for SVG charts
 		// ------------------------
 
-		function showTooltip(evt, text) {
-		  if ( text && text.length )		  {
-			  var tooltip = document.getElementById("tooltip");
-			  var sidebar = document.getElementById("sidebar");
-			  tooltip.innerHTML = text;
-			  tooltip.style.display = "block";
-			  var left = parseInt(sidebar.style.getPropertyValue("left"));
-			  tooltip.style.left = evt.pageX - left - 20 + 'px';
-			  tooltip.style.top = evt.pageY + 20 + 'px';
-		  }
+		var showTooltip = function(evt, text) {
+			if (text && text.length) {
+				var tooltip = document.getElementById("tooltip");
+				tooltip.innerHTML = text;
+				tooltip.style.display = "block";
+				var left = 0; //parseInt(sidebar.style.getPropertyValue("left"));
+				tooltip.style.left = evt.pageX - left - 20 + 'px';
+				tooltip.style.top = evt.pageY + 20 + 'px';
+			}
 		}
 
-		function hideTooltip() {
-		  var tooltip = document.getElementById("tooltip");
-		  tooltip.style.display = "none";
+		var hideTooltip = function() {
+			var tooltip = document.getElementById("tooltip");
+			tooltip.style.display = "none";
 		}
 
-		ixmaps.onMouseOver = function(){
-			showTooltip(event,event.target.getAttribute("tooltip"));
-			showTooltip(event,event.target.parentNode.getAttribute("tooltip"));
-		}
+		ixmaps.onMouseOver = function() {
+			var szTooltip = null;
+			var source = event.target;
+			while (!szTooltip && source) {
+				szTooltip = source.getAttribute("tooltip");
+				time = new Date(Number(source.getAttribute("time")));
+				if ((time != "Invalid Date") && time.getTime() ){
+					szTooltip += "<br>"+time.toLocaleDateString();
+				}
+				source = source.parentNode;
+			}
+			showTooltip(event, szTooltip);
+			event.stopPropagation();
+			event.preventDefault();
+		};
 
-		ixmaps.onMouseOut = function(){
+		ixmaps.onMouseOut = function() {
 			hideTooltip();
-		}
+		};
 
-		// make SVG chart for the item info
-		// ---------------------------------
+		var DonutCharts = {};
+		DonutCharts.partOver = function() {};
+		DonutCharts.partOut = function() {};
 
-		ixmaps.makeChartHTML = function(szId){
+		/**
+		 * make SVG chart for the item info
+		 *
+		 * @parameter szId the id of the item
+		 * @parameter szTargetDiv the id of the target html <di> element
+		 * @type void
+		 */
+		ixmaps.makeChartHTML = function(szId, szTargetDiv) {
 
-			ixmaps.themeObj = ixmaps.themeObj || ixmaps.getThemeObj(szId);
+			var __themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
 
-			if ( ixmaps.themeObj.szFlag.match(/GRIDSIZE/) && !(ixmaps.themeObj.szFlag.match(/PLOT/)||ixmaps.themeObj.szFlag.match(/WAFFLE/))){
+			if (!__themeObj) {
+				return;
+			}
+			if (__themeObj.szFlag.match(/GRIDSIZE/) && !(__themeObj.szFlag.match(/PLOT/) || __themeObj.szFlag.match(/WAFFLE/))) {
 				return;
 			}
 
 			// make <div> + <svg> to receive the chart (svg)
 
 			var szHtml = "";
-			szHtml += "<div id='chart-title' style='font-size:1.2em;font-weight:300;padding:1em;margin-bottom:-1em'>chart:</div>";
-			szHtml += "<div id='menuDiv' style='margin:1em;height:400px;width:400px;overflow:hidden'><svg width='400' height='400' viewBox='-500 -3500 5000 5000'><g id='getchartmenutarget' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();'></g></svg></div>";
-			$("#menu-div").append(szHtml);
+			szHtml += "<div id='chart-title' style='font-size:1.2em;font-weight:300;padding:1em;margin-bottom:-1em'></div>";
+			szHtml += "<div id='chartDiv' style='margin:1em;height:400px;width:400px;overflow:hidden'><svg width='400' height='400' viewBox='-500 -3500 5000 5000'><g id='getchartmenutarget' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();' style='pointer-events:all'></g></svg></div>";
+			$("#" + szTargetDiv).append(szHtml);
 
 			// draw the chart by theme api call 
 
+			var old_szValueUpper = __themeObj.szValueUpper;
+			__themeObj.szValueUpper = null;
+
 			var szIdA = szId.split(":");
-			var szFlag = ixmaps.themeObj.szFlag.match(/PLOT/)?"VALUES|XAXIS|ZOOM":"VALUES|XAXIS|ZOOM";
-			var ptNull = ixmaps.themeObj.drawChart($("#getchartmenutarget")[0], szIdA[1]+"::"+szIdA[3], 30, szFlag);
+			var szFlag = __themeObj.szFlag.match(/PLOT/) ? "VALUES|XAXIS|ZOOM|BOX|GRID" :
+				(__themeObj.szFlag.match(/POINTER/) ? "VALUES|XAXIS" :
+					"VALUES|XAXIS|ZOOM");
+			if (szId.match(/chart/i)) {
+				var ptNull = __themeObj.drawChart($("#getchartmenutarget")[0], szIdA[1] + "::" + szIdA[3], 30, szFlag);
+			} else {
+				__themeObj.parent.getChartAll(szId, $("#getchartmenutarget")[0], szFlag);
+			}
+
+			__themeObj.szValueUpper = old_szValueUpper;
 
 			// size the chart to div extent
 
 			var SVGBox = $("#getchartmenutarget")[0].getBBox();
-			var scale = Math.max(1,400/SVGBox.width);
-			SVGBox.width *= scale;
-			SVGBox.height *= scale;
-			SVGBox.y -= 30;
-			SVGBox.height += 60;
+			if (SVGBox.width && SVGBox.height) {
+				var scale = Math.max(1, 400 / SVGBox.width);
+				SVGBox.width *= scale;
+				SVGBox.height *= scale;
+				SVGBox.y -= 30;
+				SVGBox.height += 60;
 
-			var size = ixmaps.themeObj.szFlag.match(/PLOT/)?400:300;
-			var width  = size;
-			var height = size/SVGBox.width*SVGBox.height;
+				var size = __themeObj.szFlag.match(/PLOT|HORZ|STACKED/) ? 400 : 300;
+				var width = size;
+				var height = size / SVGBox.width * SVGBox.height;
 
-			while (height > width){
-				height*= 0.9;
+				while (height > width) {
+					height *= 0.9;
+				}
+
+				$("#getchartmenutarget")[0].parentNode.setAttribute("height", height);
+				$("#getchartmenutarget")[0].parentNode.setAttribute("viewBox", SVGBox.x + ' ' + SVGBox.y + ' ' + SVGBox.width + ' ' + SVGBox.height);
+
+			} else {
+				$("#chartDiv").height(0);
 			}
 
-			$("#menuDiv").css("height",height);
-			$("#getchartmenutarget")[0].parentNode.setAttribute("height",height);
-			$("#getchartmenutarget")[0].parentNode.setAttribute("viewBox",SVGBox.x+' '+SVGBox.y+' '+SVGBox.width+' '+SVGBox.height);
+			if (__themeObj.szFlag.match(/\b(VECTOR|BEZIER)\b/)) {
+
+				szHtml = "";
+
+				var szIdA = szId.split(":");
+				var item = __themeObj.itemA[szIdA[1] + "::" + szIdA[3]];
+				if (item) {
+					szHtml += "<div><h1>";
+					var szValue = ixmaps.__formatValue(item.nSize, 2, "SPACE");
+					var szColor = item.szColor;
+					if (item.szSelectionId) {
+						if (__themeObj.szFlag.match(/\b(REVERSE)\b/)){
+							szHtml += "<span>" + item.szSelectionId2;
+							if (item.szSelectionId) {
+								szHtml += " &rarr; " + item.szSelectionId;
+							}
+							szHtml += "</span><br>";
+						}else{
+							szHtml += "<span>" + item.szSelectionId;
+							if (item.szSelectionId2) {
+								szHtml += " &rarr; " + item.szSelectionId2;
+							}
+							szHtml += "</span><br>";
+						}
+					}
+					szHtml += "<span style='color:" + (__themeObj.szLineColor || item.szColor) + ";margin-top:0.5em'>" + szValue + " " + __themeObj.szUnits + "<h1>";
+					szHtml += "</span>";
+
+					$("#chartDiv").html(szHtml);
+					$("#chartDiv").height("auto");
+				}
+			}
+
 
 			// make legend chart title from theme and item
 
-			var data = ixmaps.getData('map',szId);
+			var data = ixmaps.getData('map', szId);
+			if (1 || data) {
+				var szTmp = __themeObj.szTitle || "";
+				var szTitle = szTmp.length ? "<span style='font-weight:bold'>" + szTmp + "</span><br>" : "";
 
-			var szTmp  = ixmaps.themeObj.szTitle || "";
-			var szTitle  = szTmp.length?"<span style='font-weight:bold'>"+szTmp+"</span><br>":"";
+				szTmp = __themeObj.szSnippet || "";
+				szTitle += (szTmp && szTmp.length) ? ("<span style='font-size:0.8em'>" + szTmp + "</span><br>") : "";
 
-				  szTmp  = ixmaps.themeObj.szSnippet || "";
-				szTitle += szTmp.length?("<span style='font-size:0.8em'>"+szTmp+"</span><br>"):"";
-
-				if ( data.length <= 1 ){
-					  szTmp  = ixmaps.themeObj.itemA[szIdA[1]+"::"+szIdA[3]].szTitle || ""; 
-					szTitle += szTmp.length?("<span style='font-weight:bold;font-size:1em'>"+szTmp+"</span><br>"):"";
+				if (data) {
+					szTmp = (__themeObj.itemA[szIdA[1] + "::" + szIdA[3]].szTitle) || "";
+					szTitle += (szTmp && szTmp.length) ? ("<p style='font-weight:normal;font-size:1em;margin-bottom:-0.5em;'>" + szTmp + "</p><br>") : "";
+				} else {
+					var item = __themeObj.itemA[szIdA[1] + "::" + szIdA[3]] || __themeObj.itemA[szIdA[0] + "::" + szIdA[2]];
+					szTmp = item ? (item.szTitle || "") : "";
+					szTitle += (szTmp && szTmp.length) ? ("<p style='font-weight:normal;font-size:1.3em;margin-bottom:-0.5em;'>" + szTmp + "</p><br>") : "";
 				}
 
-			$("#chart-title").html(szTitle);
+				$("#chart-title").html(szTitle);
+			}
+			height += ($("#chart-title").height() + 20);
+			$("#" + szTargetDiv).css("height", height);
+		};
+
+		/**
+		 * make SVG chart for the item info
+		 *
+		 * @parameter szId the id of the item
+		 * @parameter szTargetDiv the id of the target html <di> element
+		 * @type void
+		 */
+		ixmaps.makeShapeHTML = function(szId, szTargetDiv) {
+
+			var szHtml = "";
+			szHtml += "<div id='chart-title' style='font-size:1.2em;font-weight:300;padding:1em;margin-bottom:-1em'></div>";
+			szHtml += "<div id='menuDiv' style='margin:1em;height:400px;width:400px;overflow:hidden'><svg width='400' height='400' viewBox='0 0 5000 5000'><g id='getshapemenutarget' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();'></g></svg></div>";
+			$("#" + szTargetDiv).append(szHtml);
+			if (ixmaps.embeddedSVG.window.map.Api.getShape) {
+				ixmaps.embeddedSVG.window.map.Api.getShape(szId, $("#getshapemenutarget")[0]);
+				var SVGBox = $("#getshapemenutarget")[0].getBBox();
+				if (SVGBox.width && SVGBox.height) {
+					var scale = Math.max(1, 400 / SVGBox.width);
+					SVGBox.width *= scale;
+					SVGBox.height *= scale;
+
+					var size = 400;
+					var width = size;
+					var height = size; // / SVGBox.width * SVGBox.height;
+
+					while (height > width) {
+						height *= 0.9;
+					}
+
+					$("#getshapemenutarget")[0].parentNode.setAttribute("height", height);
+					$("#getshapemenutarget")[0].parentNode.setAttribute("viewBox", SVGBox.x + ' ' + SVGBox.y + ' ' + SVGBox.width + ' ' + SVGBox.height);
+
+				}
+			}
 
 		};
 
 		// ===================================
+		// ===================================
+		//
 		// here we go and make the item info
+		//
+		// ===================================
 		// ===================================
 
-		var szId = ixmaps.szMapItemId;
+		ixmaps.makeItemContent = function() {
 
-		if ( szId.match(/theme/) ){
-
-			// item is part of a theme, so show chart and data  
-			//
-
-			ixmaps.makeChartHTML(szId);
-
-			console.log(ixmaps);
-			var data = ixmaps.getData('map',szId);
-
-			var szTitle = data.nome || "";
-
-			var suffix="";
+			$("#result").html("");
+			$("#chart-div").html("");
+			$("#chart-div2").html("");
 
 			var szHtml = "";
-				szHtml += "<div style='padding-top:0.5em;padding-bottom:2em;overflow:auto'>";
-				szHtml += "<div style='padding:0 0.5em 0em 1.5em;color:#aaa'> data of "+data.length+" item(s) at mouse position</div>";
-			if ( data.length > 50 ) {
-				szHtml += "<div style='padding:0 0.5em 0em 1.5em;color:#a00'> list limited to the first 50 items!</div>";
+
+			var normal = "#888888";
+			var highLight = "#000000";
+			var highLightBg = "#e8e8e8";
+
+			if (ixmaps.getMapTypeId().match(/dark/i)) {
+				$("#container").css("background-color", "#333");
+				$("#container").css("color", "#ddd");
+				normal = "#aaaaaa";
+				highLight = "#ffffff";
+				highLightBg = "#808080";
 			}
 
-			for ( d=0; d<Math.min(50,data.length); d++ ){
+			var szId = ixmaps.szMapItemId;
+			var themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
 
-				szHtml += "</div><div class='item-list' style='background:"+((d%2)?"none":"rgba(0,0,0,0.04)")+"'>";
+			if (szId.match(/chart/i)) {
 
-				szHtml += "<span style='border:solid #bbb 1px;border-radius:15px;padding:0.2em 0.5em'>"+(d+1)+"</span>"+"<table>"
-				var dataObject = data[d];
-				for ( i in dataObject ){
-					var value = String(dataObject[i]);
-					if ( value.match(/http:/) || value.match(/https:/) ){
-						if ( value.match(/.jpg/) || value.match(/.png/) ){
-							value = "<img  src='"+value+"' style='max-width:100%'>";
-							szHtml += "<tr><td class='label'>"+i+"</td><td class='value clip'>"+value+"</td></tr>";
-						}else{
-							value = "<a  href='"+value+"' target='_blank' style='width:100px'>"+value+"</a>";
-							szHtml += "<tr><td class='label'>"+i+"</td><td class='value clip'>"+value+"</td></tr>";
+				// item is part of a theme, so show chart 
+				// ---------------------------------------
+				ixmaps.makeChartHTML(szId, "chart-div");
+
+				// and data  
+				// ---------------------------------------
+				var data = ixmaps.getData('map', szId);
+
+				if (data) {
+
+					var szTitle = data.nome || "";
+
+					var suffix = "";
+
+					szHtml += "<div style='padding-top:1.5em;padding-bottom:1em;overflow:auto'>";
+
+					if (data.length > 1) {
+						szHtml += "<div style='padding:1em 0.5em 0em 1.5em;color:#aaa'> data of " + data.length + " aggregated items</div>";
+					} else //{
+						//    szHtml += "<div style='padding:1em 0.5em 0em 1.5em;color:#aaa'> data of " + data.length + " item</div>";
+						//}
+						if (data.length > 50) {
+							szHtml += "<div style='padding:0 0.5em 0em 1.5em;color:#a00'> list limited to the first 50 items!</div>";
 						}
-					}else{
-						if ( !i.match(/------/) ){
-							szHtml += "<tr><td class='label'>"+(i.replace(/\_/g," "))+"</td><td class='value'>"+value+suffix+"</td></tr>";
-						}else{
+
+					for (d = 0; d < Math.min(50, data.length); d++) {
+
+						szHtml += "</div><div class='item-list' style='background:" + ((d % 2) ? "none" : "rgba(0,0,0,0.04)") + "'>";
+
+						szHtml += "<span style='border:solid #bbb 1px;border-radius:15px;padding:0.2em 0.5em'>" + (d + 1) + "</span>" + "<table>"
+						var dataObject = data[d];
+						for (i in dataObject) {
+							var value = dataObject[i];
+							var szValue = (isNaN(value) || value < 10000) ? String(value) : ixmaps.__formatValue(dataObject[i], 2, "SPACE");
+							if (szValue.match(/http:/) || szValue.match(/https:/)) {
+								if (szValue.match(/.jpg/) || szValue.match(/.png/)) {
+									szValue = "<img  src='" + szValue + "' style='max-width:100%'>";
+									szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
+								} else {
+									szValue = "<a  href='" + szValue + "' target='_blank' style='width:100px'>" + szValue + "</a>";
+									szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
+								}
+							} else {
+								if (!i.match(/------/)) {
+									if (i == themeObj.szSizeField ||
+										i == themeObj.szSymbolField ||
+										i == themeObj.szColorField ||
+										(themeObj.szFieldsA.indexOf(i) >= 0)
+									) {
+										szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' ><b>" + (i.replace(/\_/g, " ")) + "</b></td><td class='value' style='color:" + highLight + ";background:" + highLightBg + "'>" + szValue + suffix + "</td></tr>";
+									} else {
+										szHtml += "<tr><td></td><td class='label'>" + (i.replace(/\_/g, " ")) + "</td><td class='value' style='color:" + normal + "'>" + szValue + suffix + "</td></tr>";
+									}
+								} else {}
+							}
 						}
+						szHtml += "</table>";
+					}
+					szHtml += "</div>";
+
+					if (data.length > 50) {
+						szHtml += "<div style='padding:0 0.5em 0em 1.5em;color:#444'> list limited to 50 items!<br>" + (data.length - 50) + " more items not shown!</div>";
+					} else {
+						szHtml += "<br><br>";
 					}
 				}
-				szHtml += "</table>";
-			}
-			szHtml += "</div>";
 
-			if ( data.length > 50 ) {
-				szHtml += "<div style='padding:0 0.5em 0em 1.5em;color:#444'> list limited to 50 items!<br>"+(data.length-50)+" more items not shown!</div>";
-			}
-
-			szHtml += "</br>";
-			szHtml += "</br>";
-			szHtml += "</br>";
-			szHtml += "&nbsp;";
-		}
-
-		else{
-
-			// item is a map shape 
-			//
-			// !! this part was created for testing purpose, must be revisionized and generalised !!
-			//
-			var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szId);
-			var child = obj.childNodes.item(1);
-			var data = ixmaps.embeddedSVG.window.map.Api.getShapeMetadataArray(child||obj);
-
-			var maxHeight = ($("#result-div").innerHeight());
-			var szHtml = "";
-			szHtml += "<div style='margin-top:1.5em;height:"+(maxHeight-50)+"px;overflow:auto'>";
-			szHtml += "<table>"
-			for ( i in data ){
-				if ( i == "ART_CDU" ){
-					szHtml += "<tr><td>"+i+"</td><td><a href='../../data/Napoli/pdf/"+data[i]+"_PDFsam_parteII_schedecs_norm.pdf' target='_blank'>"+data[i]+"</a></td></tr>";
-				}else{
-					szHtml += "<tr><td class='label'>"+i+"</td><td class='value'>"+data[i]+"</td></tr>";
+				if (data.length > 1) {
+					szHtml += "</br>";
+					szHtml += "</br>";
+					szHtml += "</br>";
+					szHtml += "&nbsp;";
 				}
+			} else {
+
+				// item is a map shape 
+				//
+				// !! this part was created for testing purpose, must be revisionized and generalised !!
+				//
+
+				var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szId);
+				
+				var szId =  ixmaps.embeddedSVG.window.map.Api.getShapeId(obj);
+				var ptEnvelopeA = ixmaps.embeddedSVG.window.map.Api.getActualEnvelopeCoordinates();
+				var ptList =ixmaps.embeddedSVG.window.map.Api.getShapeCoordinates(obj);
+				
+				// get theme chart if present
+				// --------------------------
+				var szChartId = szId.match(/::/) ? szId : obj.parentNode.getAttribute("id");
+				var szIdA = szChartId.split("#");
+				if (szIdA.length > 1) {
+					var szIdAA = szIdA[1].split(/\b::\b/);
+					szChartId = szIdA[0] + "::" + szIdAA[1];
+					szTitle = szIdAA[1];
+				}
+
+				ixmaps.makeShapeHTML(szId, "chart-div");
+				$("#chart-div").css("opacity", "0.5")
+				ixmaps.makeChartHTML(szChartId, "chart-div2");
+
+				// get shape info
+				// --------------------------
+				var layerA = ixmaps.getLayer();
+
+				var szLayer = (szChartId.split("::")[0]);
+				var szLayerName = layerA[szLayer].szLegendName || szLayerName;
+
+				var szItemName = (szChartId.split("::")[1]);
+				if (!isNaN(szItemName)) {
+					szItemName = layerA[szLayer].szSelection + ": " + szItemName;
+				} else {
+					szItemName = szItemName;
+					szLayerName += ":";
+				}
+
+				var themeObj = ixmaps.getThemeObj(szChartId.split(":")[0]);
+				if (themeObj && (themeObj.szThemes != szLayerName)) {
+					themeObj = null;
+				}
+
+				// list shape info
+				// --------------------------
+				var szHtml = "";
+				if (!themeObj) {
+					szHtml += "<div style='margin-top:1em;background:#ffffff;width:100%;padding:1.5em;overflow:auto'>";
+					szHtml += "<h4>" + (szLayerName) + "</h4>";
+					szHtml += "<h3>" + (szItemName) + "</h3>";
+					szHtml += "</div>";
+				} else {
+					szHtml += "<div style='background:#ffffff;width:100%;'>&nbsp;";
+					szHtml += "</div>";
+				}
+
+				// get map shape metadata or theme data
+				// ------------------------------------
+				var child = obj.childNodes.item(1);
+				var data = ixmaps.embeddedSVG.window.map.Api.getShapeMetadataArray(child || obj);
+				if (themeObj) {
+					data = ixmaps.getData('map', "theme:" + szChartId + ":chartgroup");
+					data = data ? data[0] : [];
+				}
+
+				// list data
+				// ----------
+				if (data && !(themeObj && !themeObj.fShowData)) {
+					var maxHeight = ($("#result-div").innerHeight());
+					szHtml += "<div style='background:#f8f8f8;width:100%;padding:1.5em;height:" + (maxHeight - 50) + "px;overflow:auto'>";
+					szHtml += "<table>"
+					for (i in data) {
+						if (i != "NIX") {
+							szHtml += "<tr><td class='label'>" + i + "</td><td class='value'>" + data[i] + "</td></tr>";
+						}
+					}
+					szHtml += "</table>";
+					szHtml += "</div>";
+				}
+
+				$("#result-div").css("height", "0");
+
+				// set tooltip for cloned SVG shape  
+				// ---------------------------------
+				// try to get tooltip from shape, if not, use item data (see above) 
+				//
+				var szMapNs = "http:" + "/" + "/" + "www.medienobjekte.de";
+				var szTooltip = $("#getshapemenutarget")[0].firstChild.getAttributeNS(szMapNs, "tooltip") || szItemName;
+				$("#getshapemenutarget")[0].setAttribute("tooltip", szTooltip);
+
+
 			}
-			szHtml += "</table>";
-			szHtml += "</div>";
 
-			szHtml += "<div style='margin-top:1em'>";
-			szHtml += "<a href='../../data/Napoli/pdf/"+data["ART_CDU"]+"_PDFsam_parteII_schedecs_norm.pdf' target='_blank'><object data	='../../data/Napoli/pdf/"+data["ART_CDU"]+"_PDFsam_parteII_schedecs_norm.pdf'></a>";
-			szHtml += "</div>";
-		}
+			// show the item legend when its ready
+			$("#result").html(szHtml);
+			$("#result-div").show();
 
-		// show the item legend when its ready
+			//ixmaps.sidebar(1);
 
-		$("#result").html(szHtml);
-		$("#result-div").show();
 
-		ixmaps.sidebar(1);
+		};
+
+		setTimeout("ixmaps.makeItemContent()", 100);
 
 	</script>
 
 </body>
+
 </html>

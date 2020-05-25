@@ -377,7 +377,7 @@ $Log: htmlgui_sync.js,v $
 					(Math.abs(ixmaps.mouseDownY - ixmaps.mouseMoveY) < 10))) {
 				var now = new Date();
 				if (!this.isTouchDevice() || ((now.getTime() - ixmaps.lastMoveTime) > 50)) {
-					__switchInputMode();
+					ixmaps.mapTool("clickinfo");
 					ixmaps.fInputModeSwitched = true;
 					fEnableAutoDisable = true;
 					//setTimeout("ixmaps.htmlgui_onSVGPointerIdle()",2000);
@@ -399,20 +399,20 @@ $Log: htmlgui_sync.js,v $
 	 * enable events on SVG map
 	 * @return void
 	 */
-	do_enableSVG = function () {
+	ixmaps.do_enableSVG = function () {
 		if (fShareEvents) {
 			if (fEnableEventsOnSVG && !fBlockSVGMapEvents) {
 				__activateSVGElements(true);
-				setTimeout("do_disableSVG()", 25);
+				setTimeout("ixmaps.do_disableSVG()", 25);
 			}
-			setTimeout("do_enableSVG()", 250);
+			setTimeout("ixmaps.do_enableSVG()", 250);
 		}
 	};
 	/**
 	 * disable events on SVG map
 	 * @return void
 	 */
-	do_disableSVG = function () {
+	ixmaps.do_disableSVG = function () {
 		if (fShareEvents) {
 			if (fEnableAutoDisable) {
 				__activateSVGElements(false);
@@ -505,6 +505,7 @@ $Log: htmlgui_sync.js,v $
 				fEnableSwitchEvents = false;
 				break;
 			case "info":
+			case "clickinfo":
 				__activateSVGElements(true);
 				fEnableSwitchEvents = true;
 				break;
@@ -548,7 +549,7 @@ $Log: htmlgui_sync.js,v $
 
 	// if set to true, all maps on one html page will be synchronized (zoom and pan)
 	// ! every map and containing iframe must have the same unique name 
-	ixmaps.fSyncMultiMaps = false;
+	ixmaps.fSyncMultiMaps = true;
 
 	ixmaps.fSynchronized = false;
 
@@ -559,6 +560,12 @@ $Log: htmlgui_sync.js,v $
 	var nLastSynchZoom = null;
 
 	ixmaps.syncSlaveMaps = function (ptSW, ptNE, nZoom) {
+		if ((typeof(ixmaps.fSyncMap) != "undefined") && !ixmaps.fSyncMap){
+			return;
+		}
+		if ((typeof(ixmaps.parentApi.fSyncMap) != "undefined") && !ixmaps.parentApi.fSyncMap){
+			return;
+		}
 		if (ixmaps.szName == ixmaps.szSlave) {
 			return;
 		}
@@ -566,6 +573,9 @@ $Log: htmlgui_sync.js,v $
 	};
 
 	ixmaps.syncMap = function (szMap, ptSW, ptNE, nZoom) {
+		if ((typeof(ixmaps.fSyncMap) != "undefined") && !ixmaps.fSyncMap){
+			return;
+		}
 		ixmaps.szSlave = szMap;
 
 		ixmaps.htmlgui_setCenterAndZoom({
@@ -599,18 +609,18 @@ $Log: htmlgui_sync.js,v $
 		}
 
 		try {
-			ixmaps.embeddedSVG.window._TRACE("=========> htmlgui: htmlgui_synchronizeMap() callback=" + callback + " zoomto=" + zoomto);
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: htmlgui_synchronizeMap() callback=" + callback + " zoomto=" + zoomto);
 		} catch (e) {}
 
 		// ok, go ahead and sync the HTML map
 		//
 		try {
-			ixmaps.embeddedSVG.window._TRACE("=========> htmlgui: request to synchronize HTML map ! ==>    ==>    ==>   ==>    ==>");
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: request to synchronize HTML map ! ==>    ==>    ==>   ==>    ==>");
 		} catch (e) {}
 
 		try {
 			var arrayPtLatLon = getBoundsLatLon();
-			ixmaps.embeddedSVG.window._TRACE("<========= htmlgui: request to adapt HTML map ! to sw:" + arrayPtLatLon[0].lat + "," + arrayPtLatLon[0].lng + " ne:" + arrayPtLatLon[1].lat + "," + arrayPtLatLon[1].lng);
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: request to adapt HTML map ! to sw:" + arrayPtLatLon[0].lat + "," + arrayPtLatLon[0].lng + " ne:" + arrayPtLatLon[1].lat + "," + arrayPtLatLon[1].lng);
 			if (arrayPtLatLon && (arrayPtLatLon.length == 2)) {
 				if (1 || zoomto) {
 					htmlMap_setBounds(arrayPtLatLon, zoomto);
@@ -675,9 +685,14 @@ $Log: htmlgui_sync.js,v $
 		var nZoom = htmlMap_getZoom();
 
 		try {
-			ixmaps.embeddedSVG.window._TRACE("<========= htmlgui: request to adapt SVG map ! to sw:" + arrayPtLatLon[0].lat + "," + arrayPtLatLon[0].lng + " ne:" + arrayPtLatLon[1].lat + "," + arrayPtLatLon[1].lng);
-			ixmaps.embeddedSVG.window._TRACE("           htmlgui: html map zoom:" + nZoom);
-			ixmaps.embeddedSVG.window._TRACE("           htmlgui:          fPan:" + fPan);
+			ixmaps.embeddedSVG.window._TRACE("");
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: sync ================>");
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: " + arrayPtLatLon[0].lat);
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: " + arrayPtLatLon[0].lng);
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: " + arrayPtLatLon[1].lat);
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: " + arrayPtLatLon[1].lng);
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: zoom:" + nZoom);
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: fPan:" + fPan);
 		} catch (e) {}
 
 		// get the HTML map center
@@ -694,8 +709,12 @@ $Log: htmlgui_sync.js,v $
 		}
 
 		try {
-			ixmaps.embeddedSVG.window._TRACE("           htmlgui:  Center = lat:" + ptLatLon.lat + " lon:" + ptLatLon.lng);
-			ixmaps.embeddedSVG.window._TRACE("           htmlgui: bCenter = lat:" + ptBlat + " lon:" + ptBlng);
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: Center = ");
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: " + ptLatLon.lat);
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: " + ptLatLon.lng);
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: bCenter = ");
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: " + ptBlat);
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: " + ptBlng);
 		} catch (e) {}
 
 		// do some coordinate smoothing
@@ -746,8 +765,7 @@ $Log: htmlgui_sync.js,v $
 		ixmaps.fInSVGSync = false;
 
 		try {
-			ixmaps.embeddedSVG.window._TRACE("           htmlgui: request to adapt SVG map ! to sw:" + arrayPtLatLon[0].lat + "," + arrayPtLatLon[0].lng + " ne:" + arrayPtLatLon[1].lat + "," + arrayPtLatLon[1].lng);
-			ixmaps.embeddedSVG.window._TRACE("           htmlgui: html map zoom:" + nZoom);
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: request to adapt SVG map");
 		} catch (e) {}
 
 		// try to sync slave maps
@@ -777,6 +795,11 @@ $Log: htmlgui_sync.js,v $
 		ixmaps.showAll();
 
 		setTimeout("ixmaps.HTML_showMap()", 1000);
+
+		try {
+			ixmaps.embeddedSVG.window._TRACE("htmlgui: sync done ===");
+		} catch (e) {}
+
 	}
 
 	ixmaps.setSyncMultiMaps = function (fFlag) {
@@ -869,13 +892,13 @@ $Log: htmlgui_sync.js,v $
 		while (arrayPtLatLon[1].lng > ptLatLon.lng + 360) {
 			arrayPtLatLon[1].lng -= 360;
 		}
-
+	
 		// set SVG map bounds
 		var time = setBoundsLatLonSilent(
-			arrayPtLatLon[0].lat,
-			arrayPtLatLon[0].lng,
-			arrayPtLatLon[1].lat,
-			arrayPtLatLon[1].lng);
+			ptLatLon.lat,
+			ptLatLon.lng,
+			ptLatLon.lat,
+			ptLatLon.lng);
 
 		// if dragging takes to much time, hide the SVG on start dragging
 		//
@@ -953,7 +976,7 @@ $Log: htmlgui_sync.js,v $
 
 		// share events active ?
 		//
-		if (fEnableAutoDisable || fShareEvents) {
+		if (fShareEvents) {
 			__activateSVGElements(false);
 		}
 
@@ -961,6 +984,7 @@ $Log: htmlgui_sync.js,v $
 		//
 		if (ixmaps.fInputModeSwitched) {
 			__switchInputMode();
+			__activateSVGElements(false);
 			ixmaps.mouseDownX = ixmaps.mouseMoveX = ixmaps.mouseDownY = ixmaps.mouseMoveY = null;
 			ixmaps.fInputModeSwitched = false;
 		}

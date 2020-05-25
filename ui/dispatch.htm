@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE HTML>
 <html>
 
 <head>
@@ -8,24 +8,10 @@
   <meta name="keywords" content="ixmaps interactive map interface ui">
   <meta name="description" content="ixmaps map interface dispatcher">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
-  <link rel="shortcut icon" href="./html/resources/images/ixmaps_logo.png" >
+  <link rel="shortcut icon" href="./resources/images/ixmaps_logo.png" >
 </head>
 
-
-<body style="margin:0;overflow:hidden">
-
-	<div id="divloading" style="pointer-events:none;z-index:9999">
-		<div id="loading-text-div" style="position:absolute;top:47%;width:100%;opacity:1;z-index:99">
-			<div id="loading-text" style="font-family:arial;font-size:48px;opacity:1;
-								color: #dddddd;
-								text-align:center;
-								">IXMAPS
-			</div>
-			<div id="loading-gif" style="margin-top:-1em"><img src="./resources/images/loading_blue.gif" style='display:block;margin:1em auto;height:64px'/></div>
-			</div>
-		</div>
-	</div>
-
+<body class="splash" style="margin:0;overflow:hidden;">
 </body>
 
   <script src = "../ui/libs/jquery/jquery-1.7.1.min.js"></script>
@@ -52,9 +38,6 @@
 	  }
 	});
 
-	var mapList = new Array();
-	mapList["ISTAT_P_AP"] = { url:"../maps/svg/project/ISTAT 2001 Provincia AP/comuni.svgz" };
-
 	var uiList = {"ui": [
 					 { "type":"full",	"service":"ll",	"url": "../ui/html/main_sync_Mapstraction_jquery.html?mapservice=leaflet" }
 					,{ "type":"full",	"service":"bg",	"url": "../ui/html/main_sync_Mapstraction_jquery.html?mapservice=microsoft" }
@@ -65,6 +48,9 @@
 					,{ "type":"story",	"service":"bg",	"url": "../ui/html/main_sync_story_drame.html?basemap=microsoft" }
 					,{ "type":"story",	"service":"ol", "url": "../ui/html/main_sync_story_frame.html?basemap=openlayers" }
 					,{ "type":"story",	"service":"go",	"url": "../ui/html/main_sync_story_frame.html?" }
+		
+					,{ "type":"story",	"service":"leaflet",	"url": "../ui/html/main_sync_story_frame.html?basemap=leaflet" }
+					,{ "type":"story",	"service":"leaflet_vt",	"url": "../ui/html/main_sync_story_frame.html?basemap=leaflet_vt" }
 
 					,{ "type":"embed",	"service":"ll",	"url": "../ui/html/embed_sync_Leaflet.html?mapservice=leaflet" }
 					,{ "type":"embed",	"service":"lv",	"url": "../ui/html/embed_sync_Leaflet_VT.html?mapservice=leaflet" }
@@ -101,6 +87,11 @@
 					,{ "type":"view",	"service":"ol", "url": "../app/Viewer/index.html?mapservice=openlayers" }
 					,{ "type":"view",	"service":"go",	"url": "../app/Viewer/index.html?" }
 					
+					,{ "type":"pview",	"service":"ll", "url": "../app/ProjectV/index.html?mapservice=leaflet" }
+					,{ "type":"pview",	"service":"bg", "url": "../app/ProjectV/index.html?mapservice=microsoft" }
+					,{ "type":"pview",	"service":"ol", "url": "../app/ProjectV/index.html?mapservice=openlayers" }
+					,{ "type":"pview",	"service":"go",	"url": "../app/ProjectV/index.html?" }
+					
 					]
 				 };
 
@@ -124,9 +115,14 @@
 	serviceA[""] = "go";
 
     $(document).ready(function() {
-
+		
+		$(".splash").css("background-image","url('./resources/images/loading_blue.gif')");
+		$(".splash").css("background-position","50% 48%");
+		$(".splash").css("background-repeat","no-repeat");
+		$(".splash").css("background-color","rgba(255,255,255,1)");
+		
 		var szName = $(document).getUrlParam('name')||"map";
-
+		
 		// register the embedded map,
 		// with the name given in the query params
 		// this is important to access the map from within the calling window
@@ -153,12 +149,8 @@
 		var mapid =		$(document).getUrlParam('mapid');
 		var svgmap =	$(document).getUrlParam('svgmap');
 
-		// try to get a map by the query parameter mapid
+		// default: no map
 		var szMap = "";
-		if ( mapid ){
-			var map = mapList[mapid].url;
-			szMap = "&svggis=" + map;
-		}
 
 		// test if map is given by svgmap parameter
 		// see if absolute or relative path
@@ -176,14 +168,14 @@
 		}
 			
 		// translate service names
-		service = serviceA[service]?serviceA[service]:"go";
+		service = serviceA[service]?serviceA[service]:"ll";
 
 		if ( ui == "popout" ){
 			ui = "embed";
 			}
 
 		// dispatch to the ui templates
-		var uiurl = "../ui/html/main_sync_GoogleV3_jquery.html?";
+		var uiurl = "../ui/html/embed_sync_Leaflet.html?";
 		for ( i=0; i<uiList.ui.length;i++ ){
 			if ( service == uiList.ui[i].service && ui == uiList.ui[i].type ){
 				uiurl = uiList.ui[i].url;
@@ -204,7 +196,7 @@
 			// on iPad height = 100% causes strange behaviour, i.e. continous grow of page height
 			// so we have to set height to 99%
 			$("body").html("<iframe id='"+szName+"' src=\"" + uiurl + szMap + szParams + "\" " +
-						" style='width:100%;height:99%;padding:0;margin:0;border:0;overflow:hidden' />");
+						" style='width:"+maxWidth+"px;height:"+(maxHeight-5)+"px;padding:0;margin:0;border:0;overflow:hidden' />");
 		}else{
 			// embed the template via iframe and pass the parameter
 			$("body").html("<iframe id='"+szName+"' src=\"" + uiurl + szMap + szParams + "\" " +
@@ -222,6 +214,9 @@
 			$("#"+szName).css("height",window.innerHeight+"px");
 		});
 		ixmaps.szMap = szName;
+
+		ixmaps.fSyncMap = $(document).getUrlParam('sync') ? ($(document).getUrlParam('sync') == "true") : true;
+		
 		ixmaps.registerMe();
 
 	});

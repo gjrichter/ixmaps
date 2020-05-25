@@ -49,8 +49,18 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 		reader.readAsText(file);
 
 		reader.onload = function(event){
-			ixmaps.setProject(event.target.result);
+
+			try	{
+				project = JSON.parse(event.target.result);
+			} catch (e){
+				ixmaps.error("Code: "+e);
+				return;
+			}
+
+			ixmaps.setProject(null,event.target.result);
+			
 			$("#loadProject").hide();
+			$("#legend").hide();
 			$("#themeLegendDiv").show();
 		}
 
