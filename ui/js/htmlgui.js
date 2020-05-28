@@ -1197,9 +1197,13 @@ $Log: htmlgui.js,v $
 		} catch (e) {}
 	};
 
-	ixmaps.changeThemeStyle = function (szThemeName, szStyle, szFlag) {
+	ixmaps.changeThemeStyle = function (szThemeName, szStyle, szFlag, szPlus) {
+		// may be called with szMap == null, then shift arguents
+		if (arguments[0] == arguments[1]) {
+			[].shift.call(arguments);
+		}
 		try {
-			ixmaps.embeddedSVG.window.map.Api.changeThemeStyle(szThemeName, szStyle, szFlag);
+			ixmaps.embeddedSVG.window.map.Api.changeThemeStyle(arguments[0], arguments[1], arguments[2]);
 		} catch (e) {}
 	};
 
@@ -2462,7 +2466,6 @@ $Log: htmlgui.js,v $
 					var fLoading = false;
 					
 					ixmaps.showLoadingArray(["loading data ...", " ... "]);
-					//ixmaps.message("gooooo");
 
 					try {
 						eval("fLoading = ixmaps." + options.name + "(options.theme,options)");
