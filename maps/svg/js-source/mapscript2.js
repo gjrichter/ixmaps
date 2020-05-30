@@ -5253,7 +5253,7 @@ Map.Event.prototype.defaultMouseOver = function(evt){
 				var szId = mapObject.szId.split(":chart:box")[0]+":chartgroup";
                 mapObject =  new MapObject(mapObject.objNode.ownerDocument.getElementById(szId));
             }
-			//szMapToolType = "";
+			szMapToolType = "";
 			if ( HTMLWindow.ixmaps.htmlgui_onItemClick(mapObject.szId) ){
 				__circleHighlight(evt,mapObject);
                 SVGPopupGroup.fu.clear();
@@ -8190,7 +8190,6 @@ MapTool.prototype.onMouseUp = function(evt){
  * @param evt the actual event
  */
 MapTool.prototype.beginPan = function(evt){
-    fFroozeDynamicContent = true;
 	if ( fPanToolByViewer && fPanHideTools && !fPDFEmbed ){
 		this.endPanTimeout = false;
 		map.Zoom.activateClipping(evt);
@@ -8212,7 +8211,6 @@ MapTool.prototype.beginPan = function(evt){
  * @param evt the actual event
  */
 MapTool.prototype.endPan = function(evt){
-    fFroozeDynamicContent = false;
 	if( fEndPan != "delayed"){
 		if ( fPanToolByViewer && fPanHideTools && !fPDFEmbed ){
 			map.Zoom.removeClipping(evt);

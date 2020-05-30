@@ -1644,7 +1644,7 @@ Map.Api.prototype.highlightItem = function(szId){
 		highLightList.lock();
 		return;
 	}
-	/**
+
 	highLightList.unlock();
 	highLightList.removeAll();
 	for ( var i=0; i<shapeNodesA.length; i++ ){
@@ -1652,12 +1652,11 @@ Map.Api.prototype.highlightItem = function(szId){
 		highLightList.addItem(shapeNodesA[i],"circle");
 	}
 	highLightList.lock();
-	**/
+	
 	
 	var shapeNodesA = map.Layer.getLayerItemNodes(objNode);
-	
 	highLightList.unlock();
-	//highLightList.removeAll();
+	highLightList.removeAll();
 	for ( var i=0; i<shapeNodesA.length; i++ ){
 		highLightList.removeItem(shapeNodesA[i]);
 		highLightList.addItem(shapeNodesA[i]);

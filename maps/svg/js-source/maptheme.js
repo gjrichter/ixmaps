@@ -13755,19 +13755,6 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				shapeGroup.fu.setMatrix([this.nScale, 0, 0, this.nScale, ptOff.x - (ptNull.x * this.nScale), ptOff.y - (ptNull.y * this.nScale)]);
 			} else {
 				shapeGroup.fu.setMatrix([this.nChartGroupScaleX*nAutoScale, 0, 0, this.nChartGroupScaleY*nAutoScale, ptOff.x - (ptNull.x) * map.Layer.nObjectScale * this.nScale, ptOff.y - (ptNull.y) * map.Layer.nObjectScale * this.nScale]);
-				
-				if (this.szFlag.match(/ANIMATE/)) {
-					var myAnimation = map.Dom.constructNode('animateTransform', shapeGroup, {
-							'attributeType': 'XML',
-							'attributeName': 'transform',
-							"additive": 'sum',
-							'type': "scale",
-							'from': "0 0",
-							'to': 1+" "+1,
-							'dur': '10s',
-							'repeatCount': '1'
-						});
-				}
 			}
 		}
 		this.nScale = __scale;
