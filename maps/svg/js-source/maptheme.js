@@ -16337,7 +16337,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 				// GR 22.07.2017 no value -> no chart part
 				// exception PLOT - there we need zero symbols!
-				if (!nValue && !szFlag.match(/PLOT/)) {
+				if (!nValue && !szFlag.match(/PLOT|NOSIZE/)) {
 					continue;
 				}
 
@@ -16733,7 +16733,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						textOnTopGroup = textOnTopGroup || map.Dom.newGroup(chartGroup, this.szId + ":" + a + ":textchartontop");
 						nFontSize = 4 + (0.5 * nPartsA.length / (this.nGridX ? (this.nGridX * 2) : 1));
 
-						newText = this.createTextLabel(SVGDocument, textOnTopGroup, "", szText, nFontSize * 1.5, "", "rgba(255,255,255,0.7)", cColor.lowColor, "GLOW");
+						newText = this.createTextLabel(SVGDocument, textOnTopGroup, "", szText, nFontSize * 1.5, "", "rgba(255,255,255,0)", cColor.lowColor, "GLOW");
 						newText.setAttributeNS(null, "opacity", "0.9");
 						//textOnTopGroup.fu.setPosition(-map.Scale.normalX(nFontSize) * 1.7, - map.Scale.normalY(nFontSize) * 0.3 / (this.nGridX||1) );
 						textOnTopGroup.fu.setPosition(-map.Scale.normalX(nFontSize) * 1.7, - map.Scale.normalY(5/(this.nGridX||1)) );
@@ -16744,7 +16744,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					} else {
 						if (szSymbol == "circle" || szSymbol == "square" || szSymbol == "triangle" || szSymbol == "hexagon" || szSymbol == "label" || szSymbol == "empty") {
 							if (szFlag.match(/CENTERVALUES/)) {
-								if (nClass == 1) {
+								if (nClass == 0) {
 									newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:arial;font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szText);
 								}
 							} else

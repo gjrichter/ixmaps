@@ -116,7 +116,7 @@
 <!-- End of Header ------------------------ -->
 
 <body>
-	<div id="importdiv">
+	<div id="importdiv" style="margin-top:-1em;background-color:beige">
 		<div>
 			<p>Please select a <a href="#" title="select a valid ixmaps project file; format: JSON">iXMaps project file</a> from your drive</p>
 
@@ -198,6 +198,7 @@
 	function doFile(file, i) {
 		$("#fileName").val(file.name);
 		actFile = file;
+		doLoadFile();
 	}
 	/**
 	 * doLoadFile  

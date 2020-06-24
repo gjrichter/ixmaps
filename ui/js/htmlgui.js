@@ -2450,110 +2450,74 @@ $Log: htmlgui.js,v $
 
 		ixmaps.showLoadingArray(["loading data ...", " ... "]);
 
-		// a) data is loaded by a specific data provider function
-		// -------------------------------------------------------
-		if (options.type == "ext") {
-			$.ajax({
-				type: "GET",
-				url: options.ext,
-				dataType: "text",
-				success: function (script) {
+		$.getScript("../../../data.min.js/data.js")
+			.done(function (script, textStatus) {
 
-					eval(script);
+				// a) data is loaded by a specific data provider function
+				// -------------------------------------------------------
+				if (options.type == "ext") {
+					$.ajax({
+						type: "GET",
+						url: options.ext,
+						dataType: "text",
+						success: function (script) {
 
-					options.setData = ixmaps.setExternalData;
+							eval(script);
+							options.setData = ixmaps.setExternalData;
+							var fLoading = false;
 
-					var fLoading = false;
-					
-					ixmaps.showLoadingArray(["loading data ...", " ... "]);
-
-					try {
-						eval("fLoading = ixmaps." + options.name + "(options.theme,options)");
-					} catch (e) {
-						try {
-							eval("fLoading = ixmaps.parentApi." + options.name + "(options.theme,options)");
-						} catch (e) {
 							try {
-								eval("fLoading = ixmaps.parentApi.parentApi." + options.name + "(options.theme,options)");
+								eval("fLoading = ixmaps." + options.name + "(options.theme,options)");
 							} catch (e) {
 								try {
-									eval("fLoading = ixmaps.queryData(options.theme,options)");
+									eval("fLoading = ixmaps.parentApi." + options.name + "(options.theme,options)");
 								} catch (e) {
-									ixmaps.showLoadingArrayStop();
-									ixmaps.hideLoading();
-									ixmaps.error("external data function: '" + options.name + "' not defined !", 2000);
+									try {
+										eval("fLoading = ixmaps.parentApi.parentApi." + options.name + "(options.theme,options)");
+									} catch (e) {
+										try {
+											eval("fLoading = ixmaps.queryData(options.theme,options)");
+										} catch (e) {
+											ixmaps.showLoadingArrayStop();
+											ixmaps.hideLoading();
+											ixmaps.error("external data function: '" + options.name + "' not defined !", 2000);
+										}
+									}
 								}
 							}
-						}
-					}
-					if (!fLoading) {
-						ixmaps.showLoadingArrayStop();
-					}
-				},
-				error: function (jqxhr, settings, exception) {
-					ixmaps.showLoadingArrayStop();
-					ixmaps.hideLoading();
-					ixmaps.error("external data provider: '" + options.ext + "' could not be loaded !", 2000);
-				}
-			});
-
-			/**
-			$.getScript(options.ext)
-				.done(function(script, textStatus) {
-
-					options.setData = ixmaps.setExternalData;
-
-					var fLoading = false;
-
-					try {
-						eval("fLoading = ixmaps."+options.name+"(options.theme,options)");
-					} catch (e){
-						try {
-							eval("fLoading = ixmaps.parentApi."+options.name+"(options.theme,options)");
-						}catch (e){
-							try {
-								eval("fLoading = ixmaps.parentApi.parentApi."+options.name+"(options.theme,options)");
-							}catch (e){
-								try {
-									eval("fLoading = ixmaps.queryData(options.theme,options)");
-								}catch (e){
-								}
+							if (!fLoading) {
+								ixmaps.showLoadingArrayStop();
 							}
+						},
+						error: function (jqxhr, settings, exception) {
+							ixmaps.showLoadingArrayStop();
+							ixmaps.hideLoading();
+							ixmaps.error("external data provider: '" + options.ext + "' could not be loaded !", 2000);
+						}
+					});
+
+				} else {
+					
+					// b) data is loaded by data.js
+					// -------------------------------------------------------
+
+					// check if exist already a broker for this data source
+					for (i in ixmaps.dataLoaderA) {
+						if (ixmaps.dataLoaderA[i].url == szUrl &&
+							ixmaps.dataLoaderA[i].name == options.name &&
+							ixmaps.dataLoaderA[i].ext == options.ext &&
+							options.theme.fDataCache) {
+							_LOG("double loading suppressed: " + szUrl);
+							ixmaps.showLoadingArrayStop();
+							return;
 						}
 					}
-					if ( !fLoading ){
-						ixmaps.showLoadingArrayStop();
-					}
-				})
-				.fail(function(jqxhr, settings, exception) {
-					ixmaps.showLoadingArrayStop();
-					ixmaps.hideLoading();
-					ixmaps.error("external data provider: '"+options.ext+"' could not be loaded !",2000);
-				});
-				**/
-		} else {
-			// check if exist already a broker for this data source
-			for (i in ixmaps.dataLoaderA) {
-				if (ixmaps.dataLoaderA[i].url == szUrl &&
-					ixmaps.dataLoaderA[i].name == options.name &&
-					ixmaps.dataLoaderA[i].ext == options.ext &&
-					options.theme.fDataCache) {
-					_LOG("double loading suppressed: " + szUrl);
-					ixmaps.showLoadingArrayStop();
-					return;
-				}
-			}
-			ixmaps.dataLoaderA.push({
-				url: szUrl,
-				name: options.name,
-				ext: options.ext,
-				cache: options.theme.fDataCache
-			});
-
-			// b) data is loaded by data.js
-			// -------------------------------------------------------
-			$.getScript("../../../data.min.js/data.js")
-				.done(function (script, textStatus) {
+					ixmaps.dataLoaderA.push({
+						url: szUrl,
+						name: options.name,
+						ext: options.ext,
+						cache: options.theme.fDataCache
+					});
 
 					var broker = new Data.Broker();
 					broker.addSource(szUrl, options.type)
@@ -2582,7 +2546,6 @@ $Log: htmlgui.js,v $
 									process(themeDataObj,options);
 									ixmaps.embeddedSVG.window.map.Api.setThemeExternalData(null, themeDataObj, options.name);
 									return;
-
 								}
 
 								$.ajax({
@@ -2593,27 +2556,6 @@ $Log: htmlgui.js,v $
 
 										eval(script);
 										var fError = 0;
-										/**
-										eval("var fu = ixmaps."+options.name+".after;");
-										if ( fu ){
-											try	{
-												themeDataObj = fu(themeDataObj);
-											} catch (e)	{
-												alert(options.ext+":\nerror on executing\nixmaps." +options.name+ ".after() !");
-											}
-										}else{
-											eval("var fu = ixmaps."+options.name+".process;");
-											if ( fu ){
-												try	{
-													themeDataObj = fu(themeDataObj);
-												} catch (e)	{
-													alert(options.ext+":\nerror on executing\nixmaps." +options.process+ ".after() !");
-												}
-											}else{
-												alert(options.ext+":\ndata processing functions\nixmaps." +options.name+ ".after or ixmaps."+options.name+ ".process\nnot found!");
-											}
-										}
-										**/
 										try {
 											eval("themeDataObj = ixmaps." + options.name + ".after(themeDataObj,options) || themeDataObj");
 										} catch (e) {
@@ -2670,11 +2612,11 @@ $Log: htmlgui.js,v $
 								ixmaps.embeddedSVG.window.map.Api.setThemeExternalData(null, themeDataObj, options.name);
 							}
 						});
+					}
 				})
 				.fail(function (jqxhr, settings, exception) {
 					alert("'" + options.type + "' unknown format !");
 				});
-		}
 	};
 
 	/**

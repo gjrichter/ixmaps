@@ -46,11 +46,12 @@
 		}
 
 		.navbar-fixed-top {
-			box-shadow: inset 0 5px 6px -3px rgba(0, 0, 0, 0.4);
-			min-height: 20px;
+			xxbox-shadow: inset 0 5px 6px -3px rgba(0, 0, 0, 0.4);
+			min-height: 60px;
+			padding-top: 5px;
 			margin-bottom: 0px;
 			background-color: white;
-			border-bottom: solid #ddd 1px;
+			border-bottom: solid #fff 1px;
 		}
 
 		.navbar-inverse .navbar-nav>li>a,
@@ -63,6 +64,10 @@
 		.navbar-inverse .navbar-nav>.open>a:hover {
 			color: #000;
 			background-color: #eee;
+		}
+		
+		.navbar-container {
+			margin: 0em 40px 0em 10px;			
 		}
 
 		.dropdown-menu {
@@ -101,7 +106,7 @@
 	<div class="docs-header">
 		<!-- Fixed navbar -->
 		<div class="navbar navbar-inverse navbar-fixed-top">
-			<div class="container">
+			<div class="navbar-container">
 				<div class="navbar-header">
 					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 						<span class="icon-bar"></span>
@@ -109,8 +114,8 @@
 						<span class="icon-bar"></span>
 					</button>
 					<a class="navbar-brand" href="javascript:window.scrollTo(0,window.innerHeight+200);">
-						<span style="color:#0079C6">iX</span>
-						<span style="color:#48A542">Maps</span> editor</a>
+						<b><span style="color:#0079C6">iX</span><span style="color:#48A542">Maps</span></b>
+						<span style="color:#bbb"> editor</span></a>
 				</div>
 				<div class="navbar-collapse collapse">
 					<ul class="nav navbar-nav navbar-right">
@@ -215,7 +220,7 @@
 	// ---------------------------------------------------------------------
 
 	var __embedMap =
-		"../../ui/html/main_sync_story_frame.html?basemap=leaflet&tools=1&sidebar=33%";
+		"../../ui/html/main_sync_story_frame.html?basemap=leaflet&tools=1&sidebar=42%";
 
 	// ----------------------------------------------------------
 	// on document ready, load the map into the iframe   
@@ -246,17 +251,17 @@
 		var szMaptype = $(document).getUrlParam('maptype');
 		var szProject = $(document).getUrlParam('project');
 		var szData = $(document).getUrlParam('data');
-
+		
 		// is there a bookmark within the URL, recreate embed URL
 		// ----------------------------------------------------------
 
-		if ((szMap || szBookmark)) {
+		if ((szMap || szBookmark || szProject)) {
 			// create new embed URL
 			__embedMap = "../../ui/html/main_sync_story_frame.html" +
 
 				"?basemap=" + (szBasemap || "leaflet	") +
 				"&maptype=" + (szMaptype || "Stamen - toner-lite") +
-				"&minimal=1&toolbutton=1&themelegend=0&sidebar=33%" +
+				"&minimal=1&toolbutton=1&themelegend=0&sidebar=42%" +
 				"&svggis=" + (szMap || "") +
 				"&bookmark=" + (szBookmark || "") +
 				"&project=" + (szProject || "") +

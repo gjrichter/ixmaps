@@ -148,8 +148,9 @@ try{
 		,"CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM|DOPACITY"
 		);
 
-		szDictionary["... processing ..."]	= "...";
-		szDictionary["... actualize ..."]	= "...";
+		map.Dictionary.add("... processing ...","");
+		map.Dictionary.add("... actualize ...","");
+		map.Dictionary.add("painting map","");
 	}
 catch(e) {}
 

@@ -91,25 +91,9 @@
 <!-- End of Header ------------------------ -->
 
 <body>
-	<div id="importdiv" style="margin-bottom:5em">
+	<div id="importdiv" style="margin-bottom:5em;margin-top:-1em;background-color: #eeeeee">
 
-		<h3 style="margin-top:-0.6em">add data ...</h3>
-		<div >
-			<form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
-			<fieldset>
-				<input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
-				<div id="loadProject">
-					<input type="file" id="fileSelect" name="fileselect[]" multiple="multiple" style="display:none"/>
-					<div id="filedrag" style="clear:both;height:8em;width:100%;border:dashed #dddddd 2px;padding:0 0.25em">drop <b>.cvs</b> or<b> .json</b> file here </div>
-					<label class="fileContainer" for="fileSelect" style="position:relative;top:-5em;left:33%">or select file from disk</label>
-				</div>
-			</fieldset>
-			</form>
-		</div>
-
-		<div id="localdiskinfo" style="clear:both;padding:0.5em 0.5em 1px 0.5em;margin:-1.5em 0em 0.8em 0em;background:#ddd">
-			<p style="font-size:0.95em;">Data you add from your <strong>local disk</strong> is <strong>not</strong> uploaded to any server or cloud service.</p><p style="font-size:0.95em;">If you want to <strong>publish</strong> your work later you need to specify a <strong>web based data source</strong>.</p>
-		</div>
+		<h3 style="margin-top:0em">add data ...</h3>
 		<div>
 			<center>
 				<img src="../resources/images/loading_blue.gif" id="load-file-spinner" style="height:64px;margin:-0.4em 0 0 -2em;display:none">
@@ -136,7 +120,7 @@
 			<ul>
 			<li>
 				<a href="#" 
-				onclick="$('#dataURL').val('https://cdn.rawgit.com/ondata/alberimonumentaliitalia/c3c82d9a/alberiMonumentali.csv');" >
+				onclick="$('#dataURL').val('https://raw.githubusercontent.com/ondata/alberimonumentaliitalia/master/alberiMonumentali.csv');" >
 				alberi monumentali d'italia</a><br>
 				<span style="color:#888">(onData, Andrea Borruso, cc-by-4.0</span> -><a href="https://github.com/ondata/alberimonumentaliitalia" target="_blank"> GitHub</a>)
 			</li>
@@ -153,8 +137,27 @@
 				<span style="color:#888">(World Resource Institute, cc-by-4.0</span> -><a href="https://github.com/wri/global-power-plant-database" target="_blank"> GitHub</a>)
 			</li>
 			<li>
+				<script>
+					__INGV_ultima_settimana = function(){
+						var date = new Date();
+						var uTime = date.getTime();
+
+						// 7 days to the past
+						uTime -= 1000*60*60*24 * 7;
+
+						date = new Date(uTime);
+
+						var year  = date.getFullYear();
+						var month = date.getMonth()+1;
+						var day   = date.getDate();
+
+						var szStartdate = year +"-"+ String("0"+month).slice(-2) +"-"+ String("0"+day).slice(-2);
+
+						$('#dataURL').val('http://webservices.ingv.it/fdsnws/event/1/query?starttime='+szStartdate+'T00%3A00%3A00&minmag=1&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000');
+					}
+				</script>
 				<a href="#" 
-				onclick="$('#dataURL').val('http://webservices.ingv.it/fdsnws/event/1/query?starttime=2018-11-15T00%3A00%3A00&endtime=2018-11-22T23%3A59%3A59&minmag=1&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000');" >
+				onclick="__INGV_ultima_settimana()" >
 				INGV terremoti ultima settimana - magnitudine > 1</a><br>
 				<span style="color:#888">INGV Centro Nazionale Terremoti, cc-by-4.0</span> -><a href="http://cnt.rm.ingv.it/" target="_blank"> sito web</a>)
 			</li>
@@ -227,6 +230,22 @@
 			<input id="run" type="button" value="Run" class="btn btn-md btn-default" />
 			<img src="../resources/images/loading_blue.gif" id="load-text-spinner" style="height:24px;vertical-align:top;display:none">
 		</div>
+		</div>
+		<div >
+			<form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
+			<fieldset>
+				<input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+				<div id="loadProject">
+					<input type="file" id="fileSelect" name="fileselect[]" multiple="multiple" style="display:none"/>
+					<div id="filedrag" style="clear:both;height:8em;width:100%;border:dashed #dddddd 2px;padding:0 0.25em">drop <b>.cvs</b> or<b> .json</b> file here </div>
+					<label class="fileContainer" for="fileSelect" style="position:relative;top:-5em;left:33%">or select file from disk</label>
+				</div>
+			</fieldset>
+			</form>
+		</div>
+
+		<div id="localdiskinfo" style="clear:both;padding:0.5em 0.5em 1px 0.5em;margin:-1.5em 0em 0.8em 0em;background:#ddd">
+			<p style="font-size:0.95em;">Data you add from your <strong>local disk</strong> is <strong>not</strong> uploaded to any server or cloud service. If you want to <strong>publish</strong> your work later you need to specify a <strong>web based data source</strong>.</p>
 		</div>
 		</section>
 	</div>
@@ -579,38 +598,41 @@
 				processTextData($('#textInput').val(), "text");
 			}
 
-			function processTextData(csv, szSource) {
-
-				if ( csv.match(/created by dbf2xml/) ){
-					console.log(csv);
+			function processTextData(text, szSource) {
+				
+				if ( text.match(/created by dbf2xml/) ){
 					$("#load-text-spinner").hide();
-					__processJsonDBData(eval(csv), {name:szSource.split(".")[0]}); 
+					__processJsonDBData(eval(text), {name:szSource.split(".")[0]}); 
 					return true;
 				}
 
-				if ( csv.match(/{\"type\":\"FeatureCollection\"/) ){
-					console.log(csv);
+				if ( text.match(/{\"type\":\"FeatureCollection\"/) ){
 					$("#load-text-spinner").hide();
-					processGeoJSONData(csv,szSource); 
+					processGeoJSONData(text,szSource); 
+					return true;
+				}
+				if ((text[0] == "{") || (text[0] == "[")){
+					$("#load-text-spinner").hide();
+					processJSONData(text,szSource); 
 					return true;
 				}
 
 				$("#load-text-spinner").show();
 
-				// GR 02.11.2015 nuovo csv parser Papa Parse by Matt Hold 
+				// GR 02.11.2015 nuovo text parser Papa Parse by Matt Hold 
 				// GR 21.07.2016 if autodecet delimiter fails, try first ; and then ,   
 
-				var newData = Papa.parse(csv).data;
+				var newData = Papa.parse(text).data;
 				if (newData[0].length != newData[1].length) {
 					_LOG("csv parser: autodetect failed");
 					_LOG("csv parser: delimiter = ;");
-					newData = Papa.parse(csv, {
+					newData = Papa.parse(text, {
 						delimiter: ";"
 					}).data;
 					if (newData[0].length != newData[1].length) {
 						_LOG("csv parser: delimiter = ; failed");
 						_LOG("csv parser: delimiter = ,");
-						newData = Papa.parse(csv, {
+						newData = Papa.parse(text, {
 							delimiter: ","
 						}).data;
 						if (newData[0].length != newData[1].length) {
@@ -699,9 +721,55 @@
 
 				$("#load-text-spinner").show();
 
+				data = (typeof(data)=="string")?JSON.parse(data):data;
+
+				var dataA = [];
+				var row = [];
+
+				// json with structure data.columns[] data.rows[][]
+				// -------------------------------------------------
+				if ( data && data.data && data.data.columns && data.data.rows ){
+
+					var columns = data.data.columns;
+					var rows = data.data.rows;
+
+					for ( var i in columns ){
+						row.push(columns[i]);
+					}
+					dataA.push(row);
+
+					for ( var i=0; i<rows.length;i++ ){
+						var row = [];
+						for ( var ii in rows[0] ){
+							row.push(rows[i][ii]);
+						}
+						dataA.push(row);
+					}
+
+				// json without database structure
+				// -------------------------------------------------
+				}else{
+
+					for ( var a in data[0] ){
+						row.push(a);
+					}
+					dataA.push(row);
+
+					for ( var i=0; i<data.length;i++ ){
+						var row = [];
+						for ( var a in data[0] ){
+							row.push(data[i][a]);
+						}
+						dataA.push(row);
+					}
+				}
+
+				createThemeDataObject(dataA, "json", szSource);
+
 				return true;
 			}
-
+			
+			
 			function processGeoJSONData(data, szSource) {
 
 				var json = (typeof(data)=="string")?JSON.parse(data):data;
