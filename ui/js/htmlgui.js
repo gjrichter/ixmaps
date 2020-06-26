@@ -166,6 +166,10 @@ $Log: htmlgui.js,v $
 	 * @return the new ixmaps object
 	 */
 	ixmaps.map = function (szMapDiv, options, callback) {
+		
+		if (ixmaps.szGmapDiv){
+			return ixmaps;
+		}
 
 		window.console.log("*** htmlgui version: " + ixmaps.version);
 
@@ -995,7 +999,7 @@ $Log: htmlgui.js,v $
 		}
 		// clone opt to not destroy the original
 		// method found on stackoverflow.org
-		ixmaps.theme = JSON.parse(JSON.stringify(theme));
+		ixmaps.tempTheme = JSON.parse(JSON.stringify(theme));
 
 		// to clear, call clearAll() and give time by setTimeout 
 		if (fClear) {

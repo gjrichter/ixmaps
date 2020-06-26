@@ -2223,6 +2223,24 @@ $Log: htmlgui_api.js,v $
 		 **/
 		changeStyle: function(szStyle,szFlag){
 			ixmaps.changeThemeStyle(this.szMap,this.szTheme,szStyle,szFlag);
+		},
+		/**
+		 * mark/highlight theme class
+		 * @param {Number} nClass the number of the class to mark/highlight
+		 * @example ixmaps.map().theme().markClass(1);
+		 * @return void
+		 **/
+		markClass: function(nClass){
+			ixmaps.markThemeClass(this.szMap,this.szTheme,nClass);
+		},
+		/**
+		 * unmark theme class
+		 * @param {Number} nClass the number of the class to un mark
+		 * @example ixmaps.map().theme().unmarkClass(1);
+		 * @return void
+		 **/
+		unmarkClass: function(nClass){
+			ixmaps.unmarkThemeClass(this.szMap,this.szTheme,nClass);
 		}
 
 	};
@@ -2305,8 +2323,8 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 
-		changeThemeStyle: function(style,flag){
-			ixmaps.changeThemeStyle(this.szMap,style,flag);
+		changeThemeStyle: function(szTheme,style,flag){
+			ixmaps.changeThemeStyle(this.szMap,szTheme,style,flag);
 			return this;
 		},
 

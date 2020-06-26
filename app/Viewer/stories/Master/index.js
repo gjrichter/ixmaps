@@ -149,6 +149,7 @@
 	
 	var old_onDrawTheme = ixmaps.htmlgui_onDrawTheme;
 	var __noSlideRefresh = false;
+	var __sliderRange = null;
 
 	// intercept theme creation done, and make the legend
 	//
@@ -313,18 +314,47 @@
 			}
         }
 		
-		// if tine field is defined, make time slider 
+		// if time field is defined, make time slider 
 		// ---------------------------------------------------------------
 		var uMin = 10000000000000;
 		var uMax = -100000000000000;
-		if (themeObj.szTimeField && (themeObj.szTimeField != "$item$") ){
+		if (themeObj.szTimeField  ){
 			szHtml += "<h4 style='margin-top:0.5em;margin-bottom:0.5em'>time <span id='time-span'></span></h4>";
+			if ( themeObj.szTimeField == "$item$" ){
+				uMin = new Date(themeObj.szFieldsA[0]).getTime();
+				uMax = new Date(themeObj.szFieldsA[themeObj.szFieldsA.length-1]).getTime();
+				__sliderRange = uMax-uMin;
+			}else
 			for ( a in themeObj.itemA ){
 				var uTime = new Date(themeObj.itemA[a].szTime).getTime();
 				uMax = Math.max(uMax,uTime);
 				uMin = Math.min(uMin,uTime);
 			}
 	  		szHtml += "<input type='range' min='"+uMin+"' max='"+uMax+"' value='0' class='slider' id='myRange'>";
+
+			var uDay = 1000*60*60*24;
+			var days = (uMax-uMin)/uDay;
+
+			szHtml += "<div class='btn-group btn-group-toggle' data-toggle='buttons' style='margin-left:-0.6em;margin-top:0.5em'>";
+			szHtml += "  <label class='btn btn-secondary' onclick='javascript:__sliderRange=1000*60*60*24;'>";
+			szHtml += "	<input type='radio' name='options' id='option1'> day";
+			szHtml += "  </label>";
+			if ( days > 13 ){
+				szHtml += "  <label class='btn btn-secondary' onclick='javascript:__sliderRange=1000*60*60*24*7;'>";
+				szHtml += "	<input type='radio' name='options' id='option1'> week";
+				szHtml += "  </label>";
+			}
+			if ( days > 55 ){
+				szHtml += "  <label class='btn btn-secondary' onclick='javascript:__sliderRange=1000*60*60*24*28;'>";
+				szHtml += "	<input type='radio' name='options' id='option2'> month";
+				szHtml += "  </label>";
+			}
+			if ( days > 365 ){
+				szHtml += "  <label class='btn btn-secondary' onclick='javascript:__sliderRange=1000*60*60*24*365;'>";
+				szHtml += "	<input type='radio' name='options' id='option3' > year";
+				szHtml += "  </label>";
+			}
+			szHtml += "</div>";
 		}
 		
  		// if theme is CLIP, make clip frame slider 
@@ -507,8 +537,17 @@
 					if (days < 7){
 						range = 1000*60*60;
 					}
-					ixmaps.setThemeTimeFrame(null,null,this.value-range,this.value);
-					$("#time-span").html(x.toLocaleDateString()+"-"+x.toLocaleTimeString());
+					range = __sliderRange||range;
+					if ( themeObj.szTimeField == "$item$" ){
+						ixmaps.setThemeTimeFrame(null,null,Number(this.value)-Number(range),this.value);
+					}else{
+						ixmaps.setThemeTimeFrame(null,null,this.value,Number(this.value)+Number(range));
+					}
+					if (range < uDay){
+						$("#time-span").html(x.toLocaleDateString()+"-"+x.toLocaleTimeString());
+					}else{
+						$("#time-span").html(x.toLocaleDateString()+" - "+new Date(Number(this.value)+Number(range)).toLocaleDateString());
+					}
 				}
 				//clearTimeout(clipTimeout);
 				//ixmaps.setClipFrame(Number(this.value));
