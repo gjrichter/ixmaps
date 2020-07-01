@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Language" content="en-us">
+    <meta name="copyright" content="Guenter Richter">
+    <meta name="author" content="service@medienobjekte.de">
+    <meta name="description" content="Interactive &amp; estensible maps in SVG">
+    <meta name="revisit-after" content="30 days">
+    <meta name="distribution" content="Global">
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/css/icomoon.css" rel="stylesheet">
+    <style>
+	body{
+		font-family: courier new,Raleway,Roboto Slab,monospace,Lato,arial,helvetica;
+		color: #444;
+		font-weight: 300;
+	}
+	h1,h2,h3,h4,h5,h6,p {
+		font-family: courier new,Raleway,Roboto Slab,monospace,Lato,arial,helvetica;
+		color: #888;
+		font-weight: 300;
+	}
+	p {
+		font-family: courier new,Raleway,Roboto Slab,monospace,Lato,arial,helvetica;
+		color: #444;
+		font-weight: 300;
+	}
+	a {
+		font-family: courier new,Raleway,Roboto Slab,monospace,Lato,arial,helvetica;
+		font-weight: 100;
+		color: black;
+		text-decoration:none;
+	}
+	img {
+		vertical-align: middle;
+	}
+	hr {
+		margin-top:0em;
+		height:0px;
+		background-color:none;
+		border:none;
+	}	
+</style> </head>
+  <body style="                   margin:0px;padding:0px;" onload="">
+    <!-- Container -->
+    <div id="container" style="padding:2em 1em;vertical-align:middle;background-color:rgba(255,255,255,0.9)">
+      <span lang="it">
+        <div>
+          <div style="position:absolute;top:0px;right:20px;pointer-events:none;">
+          </div>
+          <p>In seguito alcuni informazione sulla interfaccia utente per le
+            mappa iXMaps:</p>
+          <hr>
+          <h2><b>interagire con la mappa</b></h2>
+          <p>Ci sono <strong>due modi </strong>principali di interattività:</p>
+          <p>Nel modo <img src="http://maps.ixmaps.com/ui/html/resources/icons/mano.png"
+              height="18"> <strong>'zoom/pan'</strong> si può usare il mouse e
+            la rotellina per spostare o zoomare la mappa, come nel maggiore
+            parte delle interfacce per mappe.</p>
+          <p>Nel modo <img src="http://maps.ixmaps.com/ui/html/resources/icons/info.png"
+              height="18"> <strong>'info'</strong> il mouse sollecita il
+            display di informazioni aggiuntivi.</p>
+          <p>Il modo <b>'info'</b> si <b>attiva</b> cliccando su elementi
+            della mappa o, se presente, sulla apposita icona in alto a sinistra.</p>
+          <br>
+          <hr>
+          <h2><b>adattare la grafica<br>
+            </b></h2>
+          <p> <b>L'icona <img src="http://maps.ixmaps.com/ui/html/resources/icons/gear_empty.png"
+                height="18"></b> attiva una <b>barra di strumenti</b> per
+            controllare e cambiare la visualizzazione dei temi e la mappa di
+            base. <br>
+            <b>La barra ha vari contenuti</b>. Con un click sul nome all'inizio
+            della riga, si passa da uno all'altro. </p>
+          <p><span lang="it"><b>Altri strumenti</b> per analizzare o cambiare la
+              configurazione del tema si trovano nel <b>menu in alto</b>, o in
+              un <b>menu contestuale</b> (tasto destra) della mappa.</span></p>
+          <p><span lang="it">Una descrizione del menu contestuale si trova più
+              in basso.</span> </p>
+          <hr>
+          <h2><b>salvare o condividere<br>
+            </b></h2>
+          <p>Strumenti per <b>condividere</b> e <b>salvare</b> il tema attuale<b>
+            </b>si trovano sia nel <b>menu in alto</b> sia in un <b>menu
+              contestuale</b> (tasto destra) della mappa.</p>
+          <p>Con lo strumento <b>'save project'</b> del <b>menu contestuale</b>
+            si può salvare l'attuale mappa con tutti i temi in un file JSON.</p>
+          <p> Una descrizione del menu contestuale si trova più in basso.&nbsp;
+          </p>
+          <h3> </h3>
+          <hr>
+          <h2 style="padding-bottom:0.5em;border-bottom:solid black 1px"><b>menu in alto<br>
+            </b></h2>
+          <i class="icon shareIcon blackHover share_twitter icon-bookmark" title="open bookmark dialog"
+            tabindex="-1"></i>
+          <p> apre il dialogo per definire o attivare 'segna libri'. Questi
+            permettono di memorizzare una posizione della mappa per poi tornare
+            li</p>
+          <p><span class="fa fa-share fa-fw" title="share actual map"></span> </p>
+          <p>apre il dialogo per condividere l'attuale mappa o avere il codice
+            per inserirla in una pagina HTML</p>
+          <p><i class="icon shareIcon blackHover share_bitly icon-filter" title="filter items"
+              tabindex="-1" style="margin-left:0.2em"></i></p>
+          <p> avvia lo strumento per analizzare e filtrare i dati alla base
+            della mappa tematica. </p>
+          <p><i class="icon shareIcon blackHover share_bitly icon-map" title="select base map"
+              tabindex="-1" style="margin-left:0.2em"></i></p>
+          <p> apre il menu per scegliere una mappa di fondo </p>
+          <p><i class="icon shareIcon blackHover share_bitly icon-info" title="About"
+              tabindex="-1" style="margin-left:0.2em"></i></p>
+          <p>apre questa informazione </p>
+          <p><span class="fa fa-columns fa-fw" title="layout menu"></span></p>
+          <p> apre il menu per cambiare la posizione degli elementi della pagina</p>
+          <p><i class="icon shareIcon blackHover share_bitly icon-table2" title="table view"
+              tabindex="-1" style="margin-left:0.2em"></i></p>
+          <p> avvia lo strumento per vedere i dati in forma tabellare<span lang="it">
+              (solo dati dei elementi visibili attualmente sulla mappa)</span></p>
+          <p><i class="icon shareIcon blackHover share_bitly icon-insert-template"
+              title="list view" tabindex="-1" style="font-size:0.95em;margin-left:0.2em"></i></p>
+          <p> </p>
+          vedere i dati in forma di schede (solo dati dei elementi visibili
+          attualmente sulla mappa)
+          <p></p>
+          <h3> </h3>
+          <hr>
+          <h2 style="padding-bottom:0.5em;border-bottom:solid black 1px"><b>menu contestuale della mappa<br>
+            </b></h2>
+          <p> <img src="../../app/viewer/stories/Master/resources/images/context_menu.png"
+              alt="context menu" title="context menu" style="float:left;margin-right:1em;width: 149px; height: 255px;">
+          </p>
+          <p><span lang="it">Cliccando con il <b>tasto destro del mouse su
+                qualsiasi punto della mappa</b> si apre il menu contestuale
+              della mappa che da accesso a vari funzioni per analizzare,
+              riconfigurare e salvare la mappa tematica.</span></p>
+          <i class="icon icon-context icon-cog" title="Layer" tabindex="-1"></i>
+          <b>open tools</b>
+          <p class="comment"> apre una barra con vari strumenti per <strong></strong>
+            adattare la visualizzazione </p>
+          <p class="comment">&nbsp;<i class="icon icon-context icon-pencil" title="Layer"
+              tabindex="-1"></i> <b>edit theme</b></p>
+          <p class="comment"> apre una finestra con un editore codice per il
+            JSON che definisce il tema attuale</p>
+          <p class="comment"> </p>
+          <p class="comment">&nbsp;<b><i class="icon icon-context icon-menu" title="Layer"
+                tabindex="-1" style="margin-left:0.2em"></i> config theme</b> </p>
+          <p class="comment"> apre il configuratore iXMaps con il tema attuale
+            in una finestra.&nbsp; </p>
+          <p class="comment"> </p>
+          <p class="comment">&nbsp;<i class="icon icon-context icon-filter" title="Layer"
+              tabindex="-1" style="margin-left:0.2em"></i><b> filter theme</b> </p>
+          <p class="comment"> analizza i dati del tema e crea dei filtri facet
+            per i vari campi della tabelle dati alla base del tema.<br>
+            Questi filtri sono da una parte un analisi contestuale della
+            visualizzazione con informazioni su tutti campi della tabella dati e
+            non solo quelli utilizzati per la visualizzazione, dall'altro si
+            possono utilizzare quelle faccette dei dati per filtrare i dati
+            usati nella visualizzazione per crearne derivati.</p>
+          <p class="comment">&nbsp;<i class="icon icon-context icon-share2" title="Layer"
+              tabindex="-1" style="margin-left:0.2em"></i> <b>share map</b></p>
+          <p class="comment"> </p>
+          <p class="comment">usi questa funzioni <strong></strong> per
+            condividere esattamente quello che vedi. Cosi prima puoi esplorare,
+            combinare temi, zoomare e spostare la mappa, e quando vuoi
+            condividere il risultato.</p>
+          <p class="comment">&nbsp;<i class="icon icon-context icon-share" title="Layer"
+              tabindex="-1" style="margin-left:0.2em"></i> <b>open in editor</b>
+          </p>
+          <p class="comment"> apre il editore iXMaps in una nuove scheda del
+            browser caricato con il tema attuale.<br>
+          </p>
+          <p class="comment">&nbsp;<i class="icon icon-context icon-share" title="Layer"
+              tabindex="-1" style="margin-left:0.2em"></i> <b>open in viewer</b>
+          </p>
+          <p class="comment"> apre il tema attuale in un applicazione che
+            permette un'analisi più profondo della mappa tematica.</p>
+          <p class="comment">&nbsp;<i class="icon icon-context icon-scissors" title="Layer"
+              tabindex="-1" style="margin-left:0.2em"></i> <b>copy theme / <i
+                class="icon icon-context icon-paste" title="Layer" tabindex="-1"
+                style="margin-left:0.2em"></i> paste theme</b> </p>
+          <p class="comment"> Siccome le visualizzazioni tematici in iXMaps sono
+            sempre definiti con un singolo oggetto JSON, questo si estrarre da
+            una mappa tematica (copy) e poi applicare in un'altra mappa (paste).</p>
+          <p class="comment">Il risultato, una mappa con due temi, può essere
+            salvato in un nuovo progetto.</p>
+          <p class="comment"><br>
+          </p>
+		  <h3 style="padding-bottom:0em;border-bottom:solid black 1px;margin-top:-2em">		
+          <p class="comment">&nbsp;<i class="icon icon-context icon-download" title="Layer"
+              tabindex="-1" style="margin-left:0em"></i> <b>save project</b></p>
+			</h3>
+          <p class="comment">In <b>qualsiasi momento</b> si può utilizzare
+            questa funzione per <b>salvare l'attuale mappa</b> in un nuovo
+            progetto creando un <b>file JSON sul disco</b> del computer. </p>
+          <p class="comment"><span lang="it">Un progetto definisce completamente
+              un'applicazione iXMaps con mappa di base, fonte dati,
+              configurazione del tema ed attuale posizione e zoom in un oggetto
+              JSON.</span></p>
+          <p class="comment"><b><span lang="it"></span>Progetti sono alla base
+              delle mappe interattive di iXMaps.</b></p>
+          <p class="comment"> Ci sono vari applicazioni del iXMaps framework che
+            caricano questi progetti per sostenere la loro configurazione,
+            creare presentazioni o integrare le mappa in pagine HTML&nbsp; </p>
+          <hr></div>
+        <div id="footer" style="position:relative;">© 2019 iXmaps </div>
+        <!-- fine Footer --> <br>
+      </span></div>
+    <!-- fine Container -->
+  </body>
+</html>

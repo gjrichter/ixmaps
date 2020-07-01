@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Language" content="en-us">
+    <meta name="copyright" content="Guenter Richter">
+    <meta name="author" content="service@medienobjekte.de">
+    <meta name="description" content="Interactive &amp; estensible maps in SVG">
+    <meta name="revisit-after" content="30 days">
+    <meta name="distribution" content="Global">
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/css/icomoon.css" rel="stylesheet">
+    <style>
+	body{
+		font-family: courier new,Raleway,Roboto Slab,monospace,Lato,arial,helvetica;
+		color: #444;
+		font-weight: 300;
+	}
+	h1,h2,h3,h4,h5,h6,p {
+		font-family: courier new,Raleway,Roboto Slab,monospace,Lato,arial,helvetica;
+		color: #888;
+		font-weight: 300;
+	}
+	p {
+		font-family: courier new,Raleway,Roboto Slab,monospace,Lato,arial,helvetica;
+		color: #444;
+		font-weight: 300;
+	}
+	a {
+		font-family: courier new,Raleway,Roboto Slab,monospace,Lato,arial,helvetica;
+		font-weight: 100;
+		color: black;
+		text-decoration:none;
+	}
+	img {
+		vertical-align: middle;
+	}
+	hr {
+		margin-top:0em;
+		height:0px;
+		background-color:none;
+		border:none;
+	}	
+</style> </head>
+  <body style="                     margin:0px;padding:0px;" onload="">
+    <!-- Container -->
+    <div id="container" style="padding:2em 1em;vertical-align:middle;background-color:rgba(255,255,255,0.9)">
+      <span lang="it">
+        <div>
+          <div style="position:absolute;top:0px;right:20px;pointer-events:none;">
+          </div>
+          <p>Some information how to use the map application</p>
+          <hr>
+          <h2><b>interact with the map</b></h2>
+          <p>There are two states for interaction with the map:</p>
+          <p>In the <img src="http://maps.ixmaps.com/ui/html/resources/icons/mano.png"
+              height="18"> <strong>'zoom/pan'</strong> mode you can use the
+            mouse and the mouse wheel to zoom and pan the map, like in most
+            other map applications.</p>
+          <p>In the <img src="http://maps.ixmaps.com/ui/html/resources/icons/info.png"
+              height="18"> <strong>'info'</strong> mode you can evoke the
+            display of map item information.</p>
+          <p>You can enter the <b>'info'</b> mode by clicking either on a map
+            object or on the specific icon in the upper left corner. </p>
+          <p>Clicking on the map background brings you back to the zoom/pan
+            mode.</p>
+          <br>
+          <hr>
+          <h2><b>adapt the map theme<br>
+            </b></h2>
+          <p> All map themes are defined by a project object and created in the
+            browser. You can change the theme parameters by tools or using an
+            online source editor to customize the theme.</p>
+          <p><b>The icon <img src="http://maps.ixmaps.com/ui/html/resources/icons/gear_empty.png"
+                height="18"></b> opens a tool bar to change the theme. The bar
+            has several content layer. By clicking on the first element of the
+            bar you can walk through the tools.</p>
+          <p>Furthermore there is a <b>context menu</b> (right mouse click) to
+            open theme configuration tools, to share or save the customized
+            theme. </p>
+          <p><span lang="it">You will find a description of this menu below.</span>
+          </p>
+          <hr>
+          <h2><b>save and share<br>
+            </b></h2>
+          <p>Tools to save or share the actual map you find either in the top
+            menu of map viewer or in a context menu.</p>
+          With <b>'save project'</b> of the context menu you can save the
+          actual map as iXMaps Project (JSON) into a local file.
+          <h3> </h3>
+          <hr>
+          <h2 style="padding-bottom:0.5em;border-bottom:solid black 1px"><b>top
+              menu<br>
+            </b></h2>
+          <p><span class="fa fa-share fa-fw" title="share actual map"></span> </p>
+          <p>opens the share dialog which provides you with a link to share the
+            actual map and view or with the HTML code to embed the map into a
+            HTML context</p>
+          <p><i class="icon shareIcon blackHover share_bitly icon-filter" title="filter items"
+              tabindex="-1" style="margin-left:0.2em"></i></p>
+          <p> activates an interactive facet filter tool to analyze and filter
+            the data behind the map theme </p>
+          <p><i class="icon shareIcon blackHover share_bitly icon-map" title="select base map"
+              tabindex="-1" style="margin-left:0.2em"></i></p>
+          <p> opens a menu to change the basemap which is provided by map tile
+            services and Leaflet </p>
+          <p><i class="icon shareIcon blackHover share_bitly icon-info" title="About"
+              tabindex="-1" style="margin-left:0.2em"></i></p>
+          <p>opens this information </p>
+          <p><span class="fa fa-columns fa-fw" title="layout menu"></span></p>
+          <p> opens a menu to change the map overlay layout</p>
+          <p><i class="icon shareIcon blackHover share_bitly icon-table2" title="table view"
+              tabindex="-1" style="margin-left:0.2em"></i></p>
+          <p> opens the map theme data in a table view<span lang="it"> (only
+              data of visible theme elements is displayed)</span><span lang="it"><span
+                lang="it"> </span></span></p>
+          <p><i class="icon shareIcon blackHover share_bitly icon-insert-template"
+              title="list view" tabindex="-1" style="font-size:0.95em;margin-left:0.2em"></i></p>
+          <p> </p>
+          show the map theme data as list (<span lang="it"><span lang="it">only
+              data of visible theme elements is displayed</span></span>)
+          <p></p>
+          <h3> </h3>
+          <hr>
+          <h2 style="padding-bottom:0.5em;border-bottom:solid black 1px"><b>context
+              menu<br>
+            </b></h2>
+          <p> <img src="../../app/viewer/stories/Master/resources/images/context_menu.png"
+              alt="context menu" title="context menu" style="float:left;margin-right:1em;width: 149px; height: 255px;">
+          </p>
+          <p><span lang="it">You can open the context menu clicking with the
+              right mouse key on any point of the map. The menu offers several
+              functions to analyze, customize, share or save the actual map.</span></p>
+          <i class="icon icon-context icon-cog" title="Layer" tabindex="-1"></i>
+          <b>open tools</b>
+          <p class="comment">opens a toolbar with instruments to customize the
+            map theme</p>
+          <p class="comment">&nbsp;<i class="icon icon-context icon-pencil" title="Layer"
+              tabindex="-1"></i> <b>edit theme</b></p>
+          <p class="comment">opens an online editor to inspect and change the
+            JSON code that defines the actual map theme</p>
+          <p class="comment"> </p>
+          <p class="comment">&nbsp;<b><i class="icon icon-context icon-menu" title="Layer"
+                tabindex="-1" style="margin-left:0.2em"></i> config theme</b> </p>
+          <p class="comment">opens the iXMaps theme configurator loaded with the
+            actual map theme&nbsp; </p>
+          <p class="comment"> </p>
+          <p class="comment">&nbsp;<i class="icon icon-context icon-filter" title="Layer"
+              tabindex="-1" style="margin-left:0.2em"></i><b> filter theme</b> </p>
+          <p class="comment"> opens a dialog to analyze the theme data and
+            create facet filter based on the data columns.</p>
+          <p class="comment">&nbsp;<i class="icon icon-context icon-share2" title="Layer"
+              tabindex="-1" style="margin-left:0.2em"></i> <b>share map</b></p>
+          <p class="comment"> </p>
+          <p class="comment">opens a share dialog to obtain a sharable link to
+            the actual map and theme or HTML embed code.</p>
+          <p class="comment">&nbsp;<i class="icon icon-context icon-share" title="Layer"
+              tabindex="-1" style="margin-left:0.2em"></i> <b>open in editor</b>
+          </p>
+          <p class="comment"> opens the iXMaps editor application in a new
+            browser tab preloaded with the actual map theme.<br>
+          </p>
+          <p class="comment">&nbsp;<i class="icon icon-context icon-share" title="Layer"
+              tabindex="-1" style="margin-left:0.2em"></i> <b>open in viewer</b>
+          </p>
+          <p class="comment"> opens a copy of the actual map in the viewer
+            application within a new browser tab</p>
+          <p class="comment">&nbsp;<i class="icon icon-context icon-scissors" title="Layer"
+              tabindex="-1" style="margin-left:0.2em"></i> <b>copy theme / <i
+                class="icon icon-context icon-paste" title="Layer" tabindex="-1"
+                style="margin-left:0.2em"></i> paste theme</b> </p>
+          <p class="comment"> because iXMaps themes are defined each by one JSON
+            object, you can copied and paste a theme, may be to add it to
+            another map</p>
+          <p class="comment">You can save the result, the map with two themes,
+            into a new project.</p>
+          <p class="comment"><br>
+          </p>
+          <h3 style="padding-bottom:0em;border-bottom:solid black 1px;margin-top:-2em">
+            <p class="comment">&nbsp;<i class="icon icon-context icon-download"
+                title="Layer" tabindex="-1" style="margin-left:0em"></i> <b>save
+                project</b></p>
+          </h3>
+          <p class="comment">You can save the actual map and theme into a local
+            JSON file.</p>
+          <p class="comment"><span lang="it">An iXMaps project defines all
+              elements of an iXMaps thematic map in one JSON object. <br>
+            </span></p>
+          <p class="comment"><span lang="it">With a project defined in JSON you
+              can reproduce the thematic map on any browser loading the project
+              into the iXMaps project viewer or an embed frame.</span></p>
+          <br>
+          <hr></div>
+        <div id="footer" style="position:relative;">© 2020 iXmaps </div>
+        <!-- fine Footer --> <br>
+      </span></div>
+    <!-- fine Container -->
+  </body>
+</html>
