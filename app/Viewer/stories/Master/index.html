@@ -439,8 +439,11 @@
 		
 		__showAbout = function(){
 			ixmaps.showAbout();
-			ixmaps.loadStoryTool('./about.html');
-			ixmaps.loadStoryTool('./about.html');
+			ixmaps.loadStoryTool('./about_en-EN.html');
+            try	{
+			     ixmaps.loadStoryTool('./about_'+window.navigator.language+'.html');
+            }
+            catch (e){}
 		}
 
 		// ===========================================
