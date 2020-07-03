@@ -13443,17 +13443,22 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				var x = (p2.x - p1.x);
 				var y = (p2.y - p1.y);
 				var len = Math.sqrt(x * x + y * y);
+                
+                var nBow = this.nRangeScale;
+                if (this.szFlag.match(/\bRANDOM\b/)) {
+                    nBow -= (this.nRangeScale * 0.66 * Math.random());
+                }
 
 				if (this.szFlag.match(/\bSHORT\b/)) {
-					var dx = (y) / len * (this.nRangeScale || 5) * 100 * this.nChartGroupScaleY;
-					var dy = (x) / len * (this.nRangeScale || 5) * 100 * this.nChartGroupScaleY;
+					var dx = (y) / len * (nBow || 5) * 100 * this.nChartGroupScaleY;
+					var dy = (x) / len * (nBow || 5) * 100 * this.nChartGroupScaleY;
 				} else
 				if (this.szFlag.match(/\bLONG\b/)) {
-					var dx = (y) / 50000 * Math.max(len, 500) * (this.nRangeScale || 5);
-					var dy = (x) / 50000 * Math.max(len, 500) * (this.nRangeScale || 5);
+					var dx = (y) / 50000 * Math.max(len, 500) * (nBow || 5);
+					var dy = (x) / 50000 * Math.max(len, 500) * (nBow || 5);
 				} else {
-					var dx = (y) / 50 * (this.nRangeScale || 5);
-					var dy = (x) / 50 * (this.nRangeScale || 5);
+					var dx = (y) / 50 * (nBow || 5);
+					var dy = (x) / 50 * (nBow || 5);
 				}
 
 				x = x - (x / (len) * map.Scale.normalX(ll) * this.nChartGroupScaleY * this.nScale);
