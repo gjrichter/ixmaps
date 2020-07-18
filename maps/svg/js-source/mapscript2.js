@@ -19,6 +19,36 @@ $Log: mapscript2.js,v $
  * @author Guenter Richter guenter.richter@medienobjekte.de
  * @version 1.1 
  */
+
+/* jshint funcscope:true, evil:true, eqnull:true, loopfunc:true, shadow: true, laxcomma: true, laxbreak: true, expr: true */
+/* globals 
+	Map, map, document, HTMLDocument, HTMLWindow, navigator, contextMenu, XMLHttpRequest, SVGDocument, szMapNs, szXlink, 
+	setTimeout,	clearMessage, getMatrix, point, area, setMatrix, getScale, setScale, __timer_reset, __timer_getSEC, __timer_getMS, 
+	executeWithProgressBar, SVGLoaderTiles, SVGOrigViewBoxString,
+	SVGPopupGroup, SVGToolsGroup, SVGRootElement, SVGFixedGroup, SVGHiddenGroup, SVGNotifyGroup, SVGMenuGroup,
+	setTimeout, clearTimeout, alert, window, setMapTool, console, TRACE, _TRACE, _ERROR, _STATUS, displayMessage, displayTooltip,
+	displayTooltipText, _activeItem, isActiveTheme, activateTheme, deactivateTheme, Methods,
+	displayScale, viewBox, viewBoxScale, box, getTranslate, setRotate, getRotateAttributeValue, getTranslateAttributeValue,
+	__maptheme_formatpart, MapObject, mouseObject, highLightList, killTooltip, highlightTheme, highlightThemeRemove,	
+	TextField, InfoContainer, _activeTheme, __scaleLineStyleString, __scaleTextStyleString, __scaleStyleString,
+	szLocalPopupAlignment, szMapBackgroundStyle, szMapBackgroundColor, szMapToolType, __setContextMenu, __formatValue,
+	nMapBorderWidth, nToolMarginTop, fMapBorder, szMapBorderColor, fMapBorder3D, szMapPanBorderStyle, szMapPanBorderOnoverStyle, 
+	executeWithMessage, fNorthArrow, szNorthArrowPosition, nNormalButtonSize, fRotateOnMouseMove, fPanByViewer, fPreserveMapRatio,
+	fZoomByViewer, fZoomByViewer, fFroozeDynamicContent, antiZoomAndPanList, fPendingNewGeoBounds, fLimitMapToExtent, fPDFEmbed,
+	fClipMapDynamic, szObjectGroupId, fDynamicLayer, fSwitchByCSS, getPatternMatrix, fFeatureScalingDynamic, fFeatureScaling,
+	fFeatureScalingByLayer, fObjectScaling, fTileTextNoClip, fMarkTiles, fTilesLoaded, 
+	fAdaptLabelToScaling, fCheckLabelOverlap, fCheckLabelSpace, fCheckLabelSqueeze, fCheckLabelOnlyOne, fCheckOverlapAllLayer,
+	fCheckOverlapClipOnTiles, fCheckOverlapImplicit, nCheckLabelSpace, fCheckLabelSize, fKillOverlappingLabel, fExecuteSilent,
+	fDynamicTiles, fDiscardTiles, fHighlightHint, fActivateInfoOnClick, fTriggerMouseMoveForPan, fPanToolByViewer, fPanHideTools,
+	fEndPan, fSetToolCursor, fScaleBar, nInch, fAllIncluded, fLegendToggleButtons, fObjectPseudoShadow, fInitLegendOff, fClipMapToLegend,
+	fCheckSublayerCollapse,
+	nInfoRoundRect, szShadowFilterToolsId, szShadowFilterId, nHighlightToggle, nInfoTimeout, nInfoOffsetX, nInfoOffsetY, nFixedInfoScale,
+	__doGetPolygonCenter, __doGetPolygonSurface, printNode, szTextGridStyle, szInfoBodyColor, __getStyleArray, clearThemes
+	
+
+	*/
+
+
 // .............................................................................
 // v i e w p o r t            
 // .............................................................................
@@ -586,8 +616,8 @@ Map.Zoom.prototype.getFractionBox = function(){
 	var pRotated = map.Scale.rotatePoint(new point(zoomMatrixA[4],zoomMatrixA[5]),-1);
 	zoomMatrixA[4] = pRotated.x;
 	zoomMatrixA[5] = pRotated.y;
-	xOff = (map.Scale.normalX(SVGRootElement.currentTranslate.x) + zoomMatrixA[4]) / this.nZoomX;
-	yOff = (map.Scale.normalY(SVGRootElement.currentTranslate.y) + zoomMatrixA[5]) / this.nZoomY;
+	var xOff = (map.Scale.normalX(SVGRootElement.currentTranslate.x) + zoomMatrixA[4]) / this.nZoomX;
+	var yOff = (map.Scale.normalY(SVGRootElement.currentTranslate.y) + zoomMatrixA[5]) / this.nZoomY;
 	var maxXoff = map.Scale.bBox.width-map.Scale.bBox.width/this.nZoomX;
 	var maxYoff = map.Scale.bBox.height-map.Scale.bBox.height/this.nZoomY;
 	if ( maxXoff > 0 && maxYoff > 0 ){
@@ -851,9 +881,9 @@ Map.Zoom.prototype.doCenterMapToArea = function(rectArea){
 
 	// zoom and pan with different modes
 	if ( fZoomByViewer && fPanByViewer ){
-		SVGRootElement.currentScale = nNewZoom;
-		SVGRootElement.currentTranslate.x = map.Scale.embedX(newX-rectArea.width/2)*nNewZoomX;
-		SVGRootElement.currentTranslate.y = map.Scale.embedY(newY-rectArea.height/2)*nNewZoomY;
+		SVGRootElement.currentScale = this.nZoom;
+		SVGRootElement.currentTranslate.x = map.Scale.embedX(newX-rectArea.width/2)*this.nZoomX;
+		SVGRootElement.currentTranslate.y = map.Scale.embedY(newY-rectArea.height/2)*this.nZoomY;
 	}
 	else if ( fPanByViewer ){
 		SVGRootElement.currentTranslate.x = map.Scale.embedX(newX);
@@ -1073,7 +1103,7 @@ Map.Zoom.prototype.doZoomMapToLayer = function(szLayerName){
 		var maxX = -30000;
 		var maxY = -30000;
 		var fDone = false;
-		for ( a in map.Layer.listA ){
+		for ( var a in map.Layer.listA ){
 			if ( !a.match(/legend/) ){
 				var layerBoxNode = SVGDocument.getElementById(a+"::bbox");
 				if ( layerBoxNode ){
@@ -1209,8 +1239,8 @@ Map.Zoom.prototype.doSetAreaByParentMap = function(rectArea){
 Map.Zoom.prototype.doSetEnvelopeByParentMap = function(minBoundX,maxBoundX,minBoundY,maxBoundY){
 
 	try{
-		ptSW = map.Scale.getGeoCoordinateOfPoint(minBoundX,minBoundY); 
-		ptNE = map.Scale.getGeoCoordinateOfPoint(maxBoundX,maxBoundY);
+		var ptSW = map.Scale.getGeoCoordinateOfPoint(minBoundX,minBoundY); 
+		var ptNE = map.Scale.getGeoCoordinateOfPoint(maxBoundX,maxBoundY);
 		this.fExternalZoom = true;
 		return HTMLWindow.ixmaps.htmlgui_setCurrentEnvelopeByGeoBounds(ptSW,ptNE);
 	}
@@ -1242,7 +1272,7 @@ Map.Zoom.prototype.doCenterByParentMap = function(rectArea){
 Map.Zoom.prototype.doSetCenterByParentMap = function(minBoundX,minBoundY){
 
 	try{
-		ptCenter = map.Scale.getGeoCoordinateOfPoint(minBoundX,minBoundY); 
+		var ptCenter = map.Scale.getGeoCoordinateOfPoint(minBoundX,minBoundY); 
 		return HTMLWindow.ixmaps.htmlgui_setCurrentCenterByGeoBounds(ptCenter);
 	}
 	catch (e){
@@ -1267,7 +1297,7 @@ Map.Zoom.prototype.doZoomMap = function(nFactor,szMode){
 		var nZoom = nOldZoom;
 
 		// zoom to full extend
-		if (nFactor == 0){
+		if (nFactor === 0){
 			this.toFullExtend();
 			return Math.round(map.Scale.nMapScale);
 		}
@@ -1540,7 +1570,7 @@ Map.Layer.Item = function(layerNode){
 		if ( categoryNodesA.length ){
 			this.categoryA = [];
 			for ( var i=0; i<categoryNodesA.length; i++){
-				var obj = this.categoryA[categoryNodesA.item(i).getAttributeNS(null,"name")] = new Object();
+				var obj = this.categoryA[categoryNodesA.item(i).getAttributeNS(null,"name")] = {};
 				obj.legendname = categoryNodesA.item(i).getAttributeNS(null,"legendname");			
 				obj.fill = categoryNodesA.item(i).getAttributeNS(null,"fill");			
 				obj.stroke = categoryNodesA.item(i).getAttributeNS(null,"stroke");			
@@ -1609,7 +1639,7 @@ function __doSwitchGroupThemes(szLayer,nState){
 	var legendGroup = SVGDocument.getElementById(szLegendGroup);
 	if (legendGroup){
 		var layerA = legendGroup.childNodes;
-		for ( i=0; i<layerA.length; i++){
+		for ( var i=0; i<layerA.length; i++){
 			if (layerA.item(i).nodeType == 1){
 				var szTheme = layerA.item(i).getAttributeNS(null,"id").split("legend:setactive:")[1];
 				if ( !szTheme ){
@@ -1626,7 +1656,7 @@ function __doSwitchGroupThemes(szLayer,nState){
 					if (!SVGDocument.getElementById("legend:"+szState+":"+szTheme)){
 						continue;
 					}
-					if ( (nState == false) || map.Layer.isScaleDependentLayerOn(szTheme) ){
+					if ( (nState === false) || map.Layer.isScaleDependentLayerOn(szTheme) ){
 						_TRACE("__doSwitchGroupTheme(\""+szTheme+"\",\""+szState+"\")");
 						setTimeout("__doSwitchGroupTheme(\""+szTheme+"\",\""+szState+"\")",i*10);
 					}
@@ -1670,7 +1700,7 @@ Map.Layer.prototype.switchLayer = function(evt,szLayer,szClassName,nState){
 		}
 	}
 	// GR 24.11.2007; if we switch sublayer, switch also the lead layer, and its checkbox
-	if (szLayer && !szLayer.match(/label/) && szLayer.match(/::/) && (nState == true) ){
+	if (szLayer && !szLayer.match(/label/) && szLayer.match(/::/) && (nState === true) ){
 		var nTemp = this.fSwitchSublayer;
 		this.fSwitchSublayer = false;
 		this.switchLayer(evt,szLayer.split("::")[0],szClassName,true);
@@ -1883,7 +1913,7 @@ Map.Layer.prototype.switchScaleDependentLayer = function(evt,targetGroup){
 		else{
 			szNewDisplayAttribute = String('none');
 			if ( !this.depListA[a].shapeId.match(/:label/) && (map.Scale.nTrueMapScale*map.Scale.nZoomScale > this.depListA[a].nUpper) ){
-				if ( !map.Themes || (map.Themes.getThemeCount() == 0) ){
+				if ( !map.Themes || (map.Themes.getThemeCount() === 0) ){
 					displayMessage("'"+this.depListA[a].shapeId+"' not visible at actual zoom level!",3000,"notify");
 				}
 			}
@@ -2134,7 +2164,7 @@ Map.Layer.prototype.changeOpacity = function(szLayer,nDelta){
 Map.Layer.prototype.changeNodeOpacity = function(nodeObj,nDelta,szOpacityProperty){
 
 	var szOpacity = nodeObj.style.getPropertyValue(szOpacityProperty?szOpacityProperty:"opacity");
-	if ( !szOpacity || szOpacity.length == 0 ) {
+	if ( !szOpacity || szOpacity.length === 0 ) {
 		szOpacity = "1";
 	}
 	var nOpacity = Number(szOpacity);
@@ -2157,9 +2187,9 @@ Map.Layer.prototype.initPatternScaling = function(evt,rootGroup){
 	var patternMatrixA = null;
 
 	// get pattern --------------------------------------------
-	nodeA = rootGroup.getElementsByTagName('pattern');
+	var nodeA = rootGroup.getElementsByTagName('pattern');
 
-	for ( i=0; i<nodeA.length;i++){
+	for ( var i=0; i<nodeA.length;i++){
 		if (!nodeA.item(i).getAttributeNS(null,"id").match(/antizoomandpan/)){
 			patternMatrixA = getPatternMatrix(nodeA.item(i));
 			nodeA.item(i).setAttributeNS(null,"patternTransform","matrix("+patternScale+" 0 0 "+patternScale+" "+String(0)+" "+String(0)+")");
@@ -2268,7 +2298,7 @@ Map.Layer.prototype.changeFeatureScaling = function(evt,newScale,fOverride){
 	for ( i=0; i<nodeA.length;i++){
 		if (!nodeA.item(i).getAttributeNS(null,"id").match(/antizoomandpan/)){
 			var childsA = nodeA.item(i).childNodes;
-			for ( c=0; c<childsA.length;c++){
+			for ( var c=0; c<childsA.length;c++){
 				if (childsA.item(c).nodeName == 'feMorphology' ){
 					childsA.item(c).setAttributeNS(null,"radius",Number(childsA.item(c).getAttributeNS(null,"radius"))*nDelta);
 				}
@@ -2307,7 +2337,8 @@ Map.Layer.prototype.changeFeatureScaling = function(evt,newScale,fOverride){
 			if ( !szId || !szId.length || szId.match(/antizoomandpan/)) {
 				continue;
 			}
-			if ( (matrixA = getMatrix(nodeA.item(i))) ){
+			var matrixA = getMatrix(nodeA.item(i));
+			if ( matrixA ){
 				matrixA[0] *= nDelta;
 				matrixA[3] *= nDelta;
 				setMatrix(nodeA.item(i),matrixA);
@@ -2410,7 +2441,7 @@ Map.Layer.prototype.doFeatureScaling = function(nDelta){
 			var tilesDone = false;
 
 			// loop over all layer
-			for ( a in map.Layer.listA ){
+			for ( var a in map.Layer.listA ){
 				var layerItem = map.Layer.listA[a];
 
 				// handle tiled layer
@@ -2475,7 +2506,7 @@ Map.Layer.prototype.doFeatureScaling = function(nDelta){
 			// =====================================================
 			// now scale the style attributes of the collected nodes
 			// =====================================================
-			for ( n=0; n<nodeStyleA.length;n++){
+			for ( var n=0; n<nodeStyleA.length;n++){
 				var szStyle = nodeStyleA[n].getAttributeNS(null,"style");
 				if (szStyle && szStyle.length){
 					szNewStylesValue = __scaleLineStyleString(szStyle,nDelta*nodeStyleDeltaA[n]);
@@ -2483,24 +2514,7 @@ Map.Layer.prototype.doFeatureScaling = function(nDelta){
 				}
 			}
 		}
-		else{
-			// mode B: 
-			// search for all <g> in canvas, and scale the styles
-			// --------------------------------------------------
-			alert("B!!!");
-			nodeA = map.Scale.canvasNode.getElementsByTagName('g');
-			for ( n=0; n<nodeA.length;n++){
-				if (antiZoomAndPanList.isContained(nodeA.item(n))){
-					continue;
-				}
-				var szStyle = nodeA.item(n).getAttributeNS(null,"style");
-				if (szStyle && szStyle.length){
-					szNewStylesValue = __scaleLineStyleString(szStyle,nDelta);
-					nodeA.item(n).setAttributeNS(null,"style",szNewStylesValue);
-				}
-			}
-		}
-		_TRACE('.scaling: '+nodeA.length+' styles done');
+		_TRACE('.scaling: '+nodeTempA.length+' styles done');
 	}
 };
 /**
@@ -2569,8 +2583,8 @@ Map.Layer.prototype.doObjectScaling = function(newScale){
 
 		_TRACE('.scaling: objects begin');
 		var objectGroup = map.Layer.objectGroup;
-		nodeA = objectGroup.childNodes;
-		for ( i=0; i<nodeA.length;i++){
+		var nodeA = objectGroup.childNodes;
+		for ( var i=0; i<nodeA.length;i++){
 			// features have no visible objects
 			if( nodeA.item(i).getAttributeNS(null,"id").match(/featuregroup/) ){
 				continue;
@@ -2578,7 +2592,7 @@ Map.Layer.prototype.doObjectScaling = function(newScale){
 			if (antiZoomAndPanList.isContained(nodeA.item(i))){
 				// scale VECTOR charts by stroke-width
 				var objectsA = nodeA.item(i).childNodes;
-				for ( ii=0; ii<objectsA.length;ii++){
+				for ( var ii=0; ii<objectsA.length;ii++){
 					if ( objectsA.item(ii).firstChild ){
 						objectsA.item(ii).firstChild.style.setProperty("stroke-width", objectsA.item(ii).firstChild.style.getPropertyValue("stroke-width")*nDeltaX);
 					}
@@ -2587,7 +2601,8 @@ Map.Layer.prototype.doObjectScaling = function(newScale){
 			}
 			var objectsA = nodeA.item(i).childNodes;
 			for ( ii=0; ii<objectsA.length;ii++){
-				if ( (matrixA = getMatrix(objectsA.item(ii))) ){
+				var matrixA = getMatrix(objectsA.item(ii));
+				if ( matrixA ){
 					matrixA[0] *= nDeltaX;
 					matrixA[3] *= nDeltaY;
 					setMatrix(objectsA.item(ii),matrixA);
@@ -2649,7 +2664,7 @@ Map.Layer.prototype.doStoredFeatureScaling = function(evt){
 		}
 	}
 	// now scale the style attributes of the collected nodes
-	for ( n=0; n<nodeStyleA.length;n++){
+	for ( var n=0; n<nodeStyleA.length;n++){
 		if ( !nodeStyleA[n].getAttributeNS(null,"id").match(/:label/) ) {
 			var szStyle = nodeStyleA[n].getAttributeNS(null,"style");
 			if (szStyle && szStyle.length){
@@ -2672,7 +2687,7 @@ Map.Layer.prototype.scaleTextOffsets = function(targetGroup,newScale,nDelta,cssS
 
 	// text backgrounds --------------------------------------------
 	var nodeA = targetGroup.getElementsByTagName('rect');
-	for ( i=0; i<nodeA.length;i++){
+	for ( var i=0; i<nodeA.length;i++){
 		var szId = nodeA.item(i).getAttributeNS(null,'id');
 		if (szId && szId.match(/textbg/)){
 			var textNode = nodeA.item(i).nextSibling.nextSibling;
@@ -2706,13 +2721,13 @@ Map.Layer.prototype.scaleTextOffsets = function(targetGroup,newScale,nDelta,cssS
 			var textNode = nodeA.item(i);
 			var szTransform = textNode.getAttributeNS(null,'transform');
 			if ( szTransform ){
-				szTransformA = szTransform.split(" ");
+				var szTransformA = szTransform.split(" ");
 				for ( var ii=0; ii<szTransformA.length; ii++ ){
 					if ( szTransformA[ii].match(/translate/) ){
-						szTrans = szTransformA[ii].substr(10,szTransformA[ii].length-11);
-						szTransA = szTrans.split(',');
-						x = Number(szTransA[0])*nDelta;
-						y = Number(szTransA[1])*nDelta;
+						var szTrans = szTransformA[ii].substr(10,szTransformA[ii].length-11);
+						var szTransA = szTrans.split(',');
+						var x = Number(szTransA[0])*nDelta;
+						var y = Number(szTransA[1])*nDelta;
 						szTransformA[ii] = "translate("+x+","+y+")";
 					}
 				}
@@ -2736,7 +2751,7 @@ Map.Layer.prototype.scaleTextOffsets = function(targetGroup,newScale,nDelta,cssS
 Map.Layer.prototype.scaleLineDecorations = function(targetGroup,newScale){
 
 	var nodeA =  targetGroup.getElementsByTagName('text');
-	for ( i=0; i<nodeA.length;i++){
+	for ( var i=0; i<nodeA.length;i++){
 		if ( nodeA.item(i) && nodeA.item(i).getAttributeNS(null,"id") && nodeA.item(i).getAttributeNS(null,"id").match(/linedecoration/) ){
 			var szDominantBaseline = nodeA.item(i).style.getPropertyValue("dominant-baseline");
 			var nBaselineShift = parseFloat(nodeA.item(i).style.getPropertyValue("baseline-shift"));
@@ -2772,7 +2787,7 @@ Map.Layer.prototype.doLabelScaling = function(nDelta){
 	if ( cssStyles ){
 		szStylesValue = cssStyles.firstChild.nextSibling.nodeValue;
 
-		szNewStylesValue = __scaleTextStyleString(szStylesValue,nDelta);
+		var szNewStylesValue = __scaleTextStyleString(szStylesValue,nDelta);
 		cssStyles.firstChild.nextSibling.nodeValue = szNewStylesValue;
 		map.Scale.fCSSStyleNodeChanged = true;
 		map.Scale.refreshCSSStyles();
@@ -2794,12 +2809,12 @@ Map.Layer.prototype.doLabelScaling = function(nDelta){
 				continue;
 			}
 			var szId = nodeA.item(n).getAttributeNS(null,"id");
-			if ( !szId || (szId.length == 0) || !(szId.match(/label/)) ){
+			if ( !szId || (szId.length === 0) || !(szId.match(/label/)) ){
 				continue;
 			}
 			var szStyle = nodeA.item(n).getAttributeNS(null,"style");
 			if (szStyle && szStyle.length){
-				if ( nDelta == 0 ){
+				if ( nDelta === 0 ){
 					map.Layer.switchLayer(null,szId,null,(nodeA.item(n).style.getPropertyValue("display")=="none")?true:false);
 				}else{
 
@@ -2807,8 +2822,8 @@ Map.Layer.prototype.doLabelScaling = function(nDelta){
 					nodeA.item(n).setAttributeNS(null,"style",szNewStylesValue);
 
 					// also in childs (grouped label with different scale!)
-					childA = nodeA.item(n).childNodes;
-					for ( c=0; c<childA.length;c++){
+					var childA = nodeA.item(n).childNodes;
+					for ( var c=0; c<childA.length;c++){
 						if ( childA.item(c).nodeName == "text" ){
 							var szStyle = childA.item(c).getAttributeNS(null,"style");
 							if (szStyle && szStyle.length){
@@ -2829,7 +2844,7 @@ Map.Layer.prototype.doLabelScaling = function(nDelta){
 
 	_TRACE("scale generated label");
 
-	for ( l in map.Layer.generatedLabelA ){
+	for ( var l in map.Layer.generatedLabelA ){
 		if ( map.Layer.generatedLabelA[l]){
 			nodeA = map.Layer.generatedLabelA[l].getElementsByTagName('text');
 			for ( n=0; n<nodeA.length;n++){
@@ -2855,12 +2870,13 @@ Map.Layer.prototype.doLabelScaling = function(nDelta){
 Map.Layer.prototype.changeObjectScaling = function(evt,nDelta,objGroup){
 
 	var nodeA = null;
-	var i = 0;
+	var matrixA = null;
+	var i,ii = 0;
 	var n = 0;
 
 	_TRACE('! object scaling -->');
 
-	if ( nDelta == 0 ){
+	if ( nDelta === 0 ){
 		nDelta = 1/map.Scale.nObjectScaling;
 	}
 	if ( objGroup ){
@@ -2929,7 +2945,7 @@ _TRACE('.object scaling done');
 Map.Layer.prototype.setObjectRotate = function(evt,nRot,objGroup){
 
 	var nodeA = null;
-	var i = 0;
+	var i,ii = 0;
 	var n = 0;
 
 	_TRACE('! object rotate -->');
@@ -3172,7 +3188,7 @@ Map.Layer.prototype.adaptLabelToScaling = function(evt,rootNode){
 	}
 	if ( (fAdaptLabelToScaling || fCheckLabelOnlyOne) ){
 		var fDoit = false;
-		for ( a in map.Layer.listA ){
+		for ( var a in map.Layer.listA ){
 			var layerItem = map.Layer.listA[a];
 			if ( (layerItem.nRenderer & (4|8)) && (layerItem.szType == "line") && (layerItem.szDisplayLabel == "inline") ){
 				fDoit = true;
@@ -3295,7 +3311,7 @@ Map.Layer.prototype.removeChangedFeatures = function(szId){
  * @return true if done
  */
 Map.Layer.prototype.setPointerEvents = function(szId){
-	for ( a in map.Layer.listA ){
+	for ( var a in map.Layer.listA ){
 		var szName = map.Layer.listA[a].szName;
 		if ( szName ){
 			var layerObj = SVGDocument.getElementById(szName);
@@ -3398,7 +3414,7 @@ Map.Layer.prototype.getLayerItemNodes = function(nodeObj){
  * @return object with clas and/or style arguments
  */
 Map.Layer.prototype.getStyleOrClass = function(nodeObj){
-	var retObj = new Object();
+	var retObj = {};
 	retObj.szClass = map.Dom.getAttributeByNodeOrParents(nodeObj,null,"class");
 	retObj.szStyle = map.Dom.getAttributeByNodeOrParents(nodeObj,null,"style");
 	return retObj;
@@ -3561,7 +3577,7 @@ Map.Label.prototype.prepareCheckOverlap = function(rootNode){
 	var nodeTempA = rootNode.getElementsByTagName('text');
 	for ( var j=0;j<nodeTempA.length;j++ ){
 		if (  nodeTempA.item(j).firstChild &&
-			 !(nodeTempA.item(j).firstChild.nodeName == "textPath") && 
+			  (nodeTempA.item(j).firstChild.nodeName != "textPath") && 
 			 !(nodeTempA.item(j).getAttributeNS(null,"id").match(/:bg/)) 
 			 ){
 			var cItem = new Map.Label.Item(nodeTempA.item(j));
@@ -3632,16 +3648,16 @@ Map.Label.prototype.addCheckItem = function(textNode,fScale){
 		return;
 	}	
 	if ( layerObj && !textNode.parentNode.getAttributeNS(null,"id").match(/value/) ){
-		if ( !(layerObj.szDisplayLabel == "inline") ){
+		if ( (layerObj.szDisplayLabel != "inline") ){
 			return;
 		}
 	}
-	if ( !fCheckLabelOverlap && !(layerObj.szType == "polygon") ){
+	if ( !fCheckLabelOverlap && (layerObj.szType != "polygon") ){
 		return;
 	}
 	
 	if (  textNode.firstChild &&
-		 !(textNode.firstChild.nodeName == "textPath") && 
+		  (textNode.firstChild.nodeName != "textPath") && 
 		 !(textNode.getAttributeNS(null,"id").match(/:bg/)) ){
 
 		// GR 04.05.2011 check if visible
@@ -3678,7 +3694,7 @@ Map.Label.prototype.collectCheckOverlap = function(){
 	var aA = [];
 
 	// first all polygon layer, because this label are top
-	for ( a in map.Layer.listA ){
+	for ( var a in map.Layer.listA ){
 		if ( map.Layer.listA[a].szType == 'polygon' ){
 			aA.push(a);
 		}
@@ -3689,7 +3705,7 @@ Map.Label.prototype.collectCheckOverlap = function(){
 	}
 
 	// then the other
-	for ( a in map.Layer.listA ){
+	for ( var a in map.Layer.listA ){
 		if ( map.Layer.listA[a].szType != 'polygon' ){
 			aA.push(a);
 		}
@@ -3720,7 +3736,7 @@ Map.Label.prototype.collectCheckOverlap = function(){
 							nodeTempA = tileInfoA[i].tileGroup.getElementsByTagName('text');
 							// reverse index because represents rendering 
 							for ( var j=nodeTempA.length-1; j>=0; j-- ){
-								if ( !(nodeTempA.item(j).parentNode.style.getPropertyValue("display") == "none") ){
+								if ( (nodeTempA.item(j).parentNode.style.getPropertyValue("display") != "none") ){
 									this.addCheckItem(nodeTempA.item(j));
 								}
 							}
@@ -3817,7 +3833,7 @@ Map.Label.prototype.getBoxCheckOverlap = function(startIndex){
 			return;
 		}
 
-		cItem = this.getCheckItem(i);
+		var cItem = this.getCheckItem(i);
 
 		if ( cItem ){
 			if ( (cItem.szId == "mapLabelNullItem") && fCheckOverlapImplicit ){
@@ -3972,7 +3988,7 @@ Map.Label.prototype.doCheckOverlap = function(){
 		return;
 	}
 	_TRACE("Map.Label: "+this.nodeA.length+" label to check");
-	if ( nodeA.length > 20000 ){
+	if ( this.nodeA.length > 20000 ){
 		_TRACE("to many label to check !!!");
 		this.checkOvlA.length = 0;
 		this.nodeA.length = 0;
@@ -4098,7 +4114,7 @@ Map.Label.prototype.execCheckLabelOverlappingOne = function(nIndex){
 						var fontHeight = parseInt(cItem.textNode.style.getPropertyValue("font-size")) || 14;
 
 						// 1. check move down
-						if ( boxA.y >= boxB.y && (nPos == 11 || nPos == 12 || nPos == 1 || nPos == 9 || nPos == 3 || nPos == 0) ){
+						if ( boxA.y >= boxB.y && (nPos === 11 || nPos === 12 || nPos === 1 || nPos === 9 || nPos === 3 || nPos === 0) ){
 							cItem.textNode.setAttributeNS(null,"y",fontHeight);
 							if ( cItem.bgNode ) {
 								cItem.bgNode.setAttributeNS(null,"y",fontHeight);
@@ -4106,7 +4122,7 @@ Map.Label.prototype.execCheckLabelOverlappingOne = function(nIndex){
 							boxA.y += parseInt(fontHeight);
 						}
 						// 2. check move up
-						else if ( boxA.y <= boxB.y && (nPos == 7 || nPos == 6 || nPos == 5 || nPos == 9 || nPos == 3 || nPos == 0) ){
+						else if ( boxA.y <= boxB.y && (nPos === 7 || nPos === 6 || nPos === 5 || nPos === 9 || nPos === 3 || nPos === 0) ){
 							cItem.textNode.setAttributeNS(null,"y",-boxA.height);
 							if ( cItem.bgNode ) {
 								cItem.bgNode.setAttributeNS(null,"y",-boxA.height);
@@ -4155,7 +4171,7 @@ Map.Label.prototype.execCheckLabelOverlappingOne = function(nIndex){
  * @param bBox the second box
  * @return true if the boxes are overlapping 
  */
-__checkOverlapBox = function(aBox,bBox){
+var __checkOverlapBox = function(aBox,bBox){
 
 	if ( !aBox || !bBox ){
 		return false;
@@ -4211,7 +4227,7 @@ Map.Label.prototype.adaptLabelToScaling = function(evt,rootNode){
 			}
 		}
 	}
-	if (nodeA == null || nodeA.length == 0 ){
+	if (nodeA == null || nodeA.length === 0 ){
 		_TRACE("Map.Label: adaptLabelToScaling doAll !!!");
 		nodeTempA = SVGRootElement.getElementsByTagName('textPath');
 		for ( var i=0;i<nodeTempA.length;i++ ){
@@ -4251,7 +4267,7 @@ Map.Label.prototype.execAdaptLabelToScaling = function(startIndex){
 			var szIdLong = refNode.parentNode.getAttributeNS(null,"id");
 			var szId = map.Tiles.getMasterId(szIdLong);
 			var szIdTile = map.Tiles.getTileId(szIdLong);
-			if ( map.Layer.isScaleDependentLayerOn(szId) == false){
+			if ( map.Layer.isScaleDependentLayerOn(szId) === false){
 				nodeA[i].parentNode.style.setProperty('display','none',"");
 			}
 			else{
@@ -4267,13 +4283,13 @@ Map.Label.prototype.execAdaptLabelToScaling = function(startIndex){
 					}
 				}
 
-				pBox = map.Dom.getBox(refNode);
+				var pBox = map.Dom.getBox(refNode);
 
 				nodeA[i].setAttributeNS(szXlink,'href','');
 				nodeA[i].parentNode.style.setProperty('display','inline',"");
 				nodeA[i].parentNode.style.setProperty('font-stretch','normal',"");
 
-				tBox = map.Dom.getBox(nodeA[i].parentNode);
+				var tBox = map.Dom.getBox(nodeA[i].parentNode);
 				nodeA[i].setAttributeNS(szXlink,'href','#'+szRefId);
 
 				var tLen = Math.sqrt(tBox.width*tBox.width+tBox.height*tBox.height);
@@ -4349,7 +4365,7 @@ Map.Label.prototype.execAdaptLabelToScaling = function(startIndex){
  * @param evt the actual event
  * @param rootNode the DOM node from which on to look for labels on path
  */
-__adaptLabelToSymbols = function(evt,rootNode){
+var __adaptLabelToSymbols = function(evt,rootNode){
 
 };
 /**
@@ -4378,7 +4394,7 @@ Map.Label.prototype.getLabel = function(szId){
 		return null;
 	}
 	if ( nodeX.tagName == "g" ){
-		nodeA = nodeX.childNodes;
+		var nodeA = nodeX.childNodes;
 		for ( var i=0; i<nodeA.length; i++ ){
 			if (nodeA.item(i).nodeType == 1 ){
 				nodeX = nodeA.item(i);
@@ -4401,17 +4417,6 @@ Map.Label.prototype.getLabel = function(szId){
 		}
 	}
 	return nodeX.getAttributeNS(szMapNs,"tooltip"); 
-};
-/**
- * get the label of a shape (if exists)
- * @param the shape id
- * @type string
- * @return the label, if defined or null
- */
-Map.Label.prototype.xgetLabel = function(szId){
-	var layerInfo = map.Layer.getLayerObj(szTheme);
-	var szSelection = layerInfo?layerInfo.szSelection+" ":"";
-	return null;
 };
 
 // -------------------------------------------------------------------------------------- 
@@ -4677,13 +4682,13 @@ Map.Tiles.prototype.getTileInfo = function(){
 			}
 			x += dx;
 			dx = Math.abs(dx) + 1;
-			if ( (dx & 1) == 0 ){
+			if ( (dx & 1) === 0 ){
 				dx = -dx;
 			}
 		}
 		y += dy;
 		dy = Math.abs(dy) + 1;
-		if ( (dy & 1) == 0 ){
+		if ( (dy & 1) === 0 ){
 			dy = -dy;
 		}
 	}
@@ -4691,7 +4696,7 @@ Map.Tiles.prototype.getTileInfo = function(){
 	var nTiles		 = tileInfoA.length;
 	var nTilesLoaded = 0;
 	var nTilesInline = 0;
-	for ( a in tileInfoA ){
+	for ( var a in tileInfoA ){
 		if ( tileInfoA[a].tileGroup ){
 			if (tileInfoA[a].tileGroup.hasChildNodes()){
 				nTilesLoaded++;
@@ -4767,7 +4772,7 @@ Map.Tiles.prototype.setShapeStyle =  function(leadingNode,szStyle){
 		var szShapeId   = szMasterId.substr(szBasicId.length,szMasterId.length-szBasicId.length);
 		var szTilesIdA  = this.getTileNodeIds(szBasicId);
 		for ( var i=0; i<szTilesIdA.length; i++ ){
-			shapeNode = SVGDocument.getElementById(szTilesIdA[i] + szShapeId);
+			var shapeNode = SVGDocument.getElementById(szTilesIdA[i] + szShapeId);
 			if (shapeNode){
 				shapeNode.setAttributeNS(null,"style",szStyle);
 			}
@@ -4931,7 +4936,7 @@ Map.Tiles.prototype.clearTiles = function(evt){
 	}
 	// GR 04.02.2013 if tile layer used in theme, don't hide or discard
 	try {
-		for ( a in map.Layer.listA ){
+		for ( var a in map.Layer.listA ){
 			var layerItem = map.Layer.listA[a];
 			if ( layerItem.szFlag.match(/tiled/) ){
 				if ( map.Themes.isThemeLayerUsed(layerItem.szName) && map.Layer.isScaleDependentLayerOn(layerItem.szName) ){
@@ -5041,10 +5046,10 @@ Map.Tiles.prototype.doDiscardTiles = function(evt){
  * @return true or false
  */
 Map.Tiles.prototype.isAnyTiledLayerVisible = function(){
-	for ( a in map.Layer.listA ){
+	for ( var a in map.Layer.listA ){
 		var layerItem = map.Layer.listA[a];
 		if ( layerItem.szFlag.match(/tiled/) ){
-			if ( layerItem.nState == true ){
+			if ( layerItem.nState === true ){
 				return true;
 			}
 			if ( layerItem.szDisplay != "none" ){
@@ -5069,7 +5074,7 @@ Map.Tiles.prototype.allTilesLoaded = function(){
 	if ( tileInfoA ){
 		var nTiles		 = tileInfoA.length;
 		var nTilesLoaded = 0;
-		for ( a in tileInfoA ){
+		for ( var a in tileInfoA ){
 			if ( tileInfoA[a].tileGroup ){
 				if (tileInfoA[a].tileGroup.hasChildNodes()){
 					nTilesLoaded++;
@@ -5091,7 +5096,7 @@ Map.Tiles.prototype.isAnyLayerTileLoaded = function(szLayer){
 	if ( tileInfoA ){
 		var nTiles		 = tileInfoA.length;
 		var nTilesLoaded = 0;
-		for ( a in tileInfoA ){
+		for ( var a in tileInfoA ){
 			if ( tileInfoA[a].tileGroup ){
 				if (tileInfoA[a].tileGroup.hasChildNodes()){
 					return true;
@@ -5145,7 +5150,7 @@ Map.Event.prototype.initUseNodes = function(rootNode){
 	}
 	var useNodesA = rootNode.getElementsByTagName('use');
 	if (useNodesA && useNodesA.length){
-		for ( i=0; i<useNodesA.length; i++ ){
+		for ( var i=0; i<useNodesA.length; i++ ){
 			useNodesA.item(i).style.setProperty("pointer-events","none","");
 		}
 	}
@@ -5225,7 +5230,7 @@ Map.Event.prototype.defaultMouseOver = function(evt){
 	}
 
 	// GR 22.02.2018 non lecit call 
-	if (szMapToolType == ""){
+	if (szMapToolType === ""){
 		return;
 	}
 
@@ -5300,7 +5305,7 @@ Map.Event.prototype.defaultMouseOver = function(evt){
  * @param evt the event handle
  * @param onovershape the shape that caused the mouse over
  */
-__simpleHighlight = function(evt,onoverShape){
+var __simpleHighlight = function(evt,onoverShape){
 	if (onoverShape){
 		try{
 			var test = onoverShape.getAttributeNS(szMapNs,"origstyle");
@@ -5322,7 +5327,7 @@ __simpleHighlight = function(evt,onoverShape){
  * @param evt the event handle
  * @param onovershape the shape that caused the mouse over
  */
-__simpleHighlightRemove = function(evt,onoverShape){
+var __simpleHighlightRemove = function(evt,onoverShape){
 	if (onoverShape){
 		try{
 			var szOrigStyle = onoverShape.getAttributeNS(szMapNs,"origstyle");
@@ -5358,7 +5363,7 @@ var __normalHighlight = function(evt,onoverShape){
 		                   || szId.match(/button/) 
 		                   || szId.match(/widget/) 
 		                   || szId.match(/textgrid/) 
-		                   || (szMapToolType != "clickinfo" && szMapToolType != "info" && szMapToolType != "") ){
+		                   || (szMapToolType != "clickinfo" && szMapToolType != "info" && szMapToolType !== "") ){
 		if (highLightList){
 			highLightList.removeAll();
 		}
@@ -5373,7 +5378,7 @@ var __normalHighlight = function(evt,onoverShape){
 		if (legendId && !legendId.match(/chartgroup/)){
 			if (_activeTheme != map.Tiles.getMasterId(legendId.split(':')[0]) ){
 				var layerObj = map.Layer.getLayerObj(legendId);
-				if ( layerObj && layerObj.szSelection && !map.Event.tooltipDone && (szMapToolType == "clickinfo" || szMapToolType == "info" || szMapToolType == "") ){
+				if ( layerObj && layerObj.szSelection && !map.Event.tooltipDone && (szMapToolType == "clickinfo" || szMapToolType == "info" || szMapToolType === "") ){
 					displayTooltipText(evt, map.Dictionary.getLocalText("click to activate"));
 				}
 				if ( fHighlightHint ){
@@ -5425,7 +5430,7 @@ var __circleHighlight = function(evt,mapObject){
  * @return true if shape is part of a chart
  */
 var __isChart = function(evt,onoverShape){
-	mapObj = new MapObject(onoverShape);
+	var mapObj = new MapObject(onoverShape);
 	if ( mapObj.szId.match(/chartgroup/) || mapObj.szId.match(/chart:box/) ){
 		var theme = map.Themes.getTheme(mapObj.szId.split(":")[0]);
 		if ( theme && theme.szFlag && theme.szFlag.match(/BUFFER/) ){
@@ -5549,7 +5554,7 @@ Map.Event.prototype.defaultMouseClick = function(evt){
 				return;
 			}
 			szId = clickNode.parentNode.getAttributeNS(null,"id");
-			if (szId && (szId != "PopupGroup") && (!szId.match(/widget/)) && (fActivateInfoOnClick || (szMapToolType == "info") || (szMapToolType == "clickinfo") || (szMapToolType == "") || (szMapToolType == "zoomrect") ) ){
+			if (szId && (szId != "PopupGroup") && (!szId.match(/widget/)) && (fActivateInfoOnClick || (szMapToolType == "info") || (szMapToolType == "clickinfo") || (szMapToolType === "") || (szMapToolType == "zoomrect") ) ){
 				if ( isActiveTheme(map.Layer.getLayerName(szId)) ){
 					SVGPopupGroup.fu.clear();
 					// fix an info popup to a permanent info bubble
@@ -5584,7 +5589,7 @@ Map.Event.prototype.defaultMouseDown = function(evt){
 		__setContextMenu(evt);
 		return;
 	}
-	if ( evt.button && (evt.button != 0) ){
+	if ( evt.button && (evt.button !== 0) ){
 		return;
 	}
 	this.fMouseDown = true;
@@ -5595,7 +5600,7 @@ Map.Event.prototype.defaultMouseDown = function(evt){
 	if ( mapObject == null ){
 		return;
 	}
-	clickNode = mapObject.objNode;
+	var clickNode = mapObject.objNode;
 	var szId = String(mapObject.szId);
 	_TRACE("defaultMouseDown on: "+szId);
 
@@ -5650,12 +5655,12 @@ Map.Event.prototype.defaultMouseDown = function(evt){
 	}
 	else{
 		if (!evt.shiftKey && !evt.altKey && !evt.crtlKey && map.Layer.isMapObject(clickNode) ){
-			if (szMapToolType && szMapToolType!=""){
-				mapTool = new MapTool(evt,szMapToolType);
+			if (szMapToolType && szMapToolType !== ""){
+				var mapTool = new MapTool(evt,szMapToolType);
 			}
 		}
 		if (evt.shiftKey && !evt.altKey && !evt.crtlKey && map.Layer.isMapObject(clickNode) ){
-			if (szMapToolType == ""){
+			if (szMapToolType === ""){
 				mapTool = new MapTool(evt,"pan");
 			}
 			else{
@@ -5672,7 +5677,7 @@ Map.Event.prototype.defaultMouseDown = function(evt){
 				szId.match(/checked/)	||
 				szId.match(/unchecked/)	
 			) ){
-			if ( szMapToolType == "info" || szMapToolType == "" ){
+			if ( szMapToolType == "info" || szMapToolType === "" ){
 				this.triggerMoveForPan = true;
 			}
 		}
@@ -5721,7 +5726,7 @@ Map.Event.prototype.defaultMouseMove = function(evt){
 
 	// GR 25.01.2012 if trigger active, start pan at this point
 	if ( this.triggerMoveForPan && this.fMouseDownMoved ){
-		mapTool = new MapTool(evt,"pan");
+		var mapTool = new MapTool(evt,"pan");
 		this.triggerMoveForPan = false;
 	}
 	if ( !mouseObject ){
@@ -5851,9 +5856,9 @@ Map.Event.prototype.doDefaultZoom = function(evt){
 	map.Scale.nZoomScale = newZoomScale;
 	map.Scale.mapCenter = new point(zoomMatrixA[4],zoomMatrixA[5]);
 
-	if ( fPanByViewer == false ) {
-		if( SVGRootElement.currentTranslate.x != 0 || 
-			SVGRootElement.currentTranslate.y != 0 ) {
+	if ( fPanByViewer === false ) {
+		if( SVGRootElement.currentTranslate.x !== 0 || 
+			SVGRootElement.currentTranslate.y !== 0 ) {
 			zoomNode = map.Scale.zoomNode;
 			var zoomMatrixA = getMatrix(zoomNode);
 			var nZoomX = zoomMatrixA[0];
@@ -6363,7 +6368,7 @@ InfoContainer.prototype.reformat = function(){
 	if (this.tBox.height<0){
 		this.tBox.height = 0;
 	}
-	if ( (this.bBox.width == 0 || this.bBox.height == 0) && ( !this.szTitle || !this.szTitle.length ) ){
+	if ( (this.bBox.width === 0 || this.bBox.height === 0) && ( !this.szTitle || !this.szTitle.length ) ){
 		this.remove();	
 		return;
 	}
@@ -6611,7 +6616,7 @@ InfoContainer.prototype.clear = function(){
  * @throws 
  * @return A new MouseObject
  */
-MouseObject = function(evt,objNode,szFlag,pNode) {
+var MouseObject = function(evt,objNode,szFlag,pNode) {
 	if (objNode){
 		/** the target node of the object @type DOM node */
 		this.objNode = objNode;
@@ -6685,7 +6690,7 @@ MouseObject.prototype.onMouseUp = function(evt){
  * @throws 
  * @return A new Button object
  */
-Button = function(targetGroup,szId,szType,szStyle,szActionOn,szActionOff,szTooltip){
+var Button = function(targetGroup,szId,szType,szStyle,szActionOn,szActionOff,szTooltip){
 	/** where to create the button @type DOM node */
 	this.targetGroup = targetGroup;
 	/** the unique id of the button (created automatically) @type string */
@@ -6879,7 +6884,9 @@ Button.prototype.toggleCheckBox= function(evt){
  * @throws 
  * @return A new ScrollBar object
  */
-ScrollBar= function(contObj,contOffset,maxBox,barWidth,barHeight,barMargin ){
+var ScrollBar= function(contObj,contOffset,maxBox,barWidth,barHeight,barMargin ){
+	
+	var contBox;
 
 	if ( !contObj ){
 		return;
@@ -7111,8 +7118,8 @@ ScrollBar.prototype.onMouseUp = function(evt) {
 ScrollBar.prototype.onClick = function(evt) {
 	var mapObject = new MapObject(evt.target);
 	if (mapObject){
-		szId = mapObject.szId;
-		nStep = szId.match(/big/)?map.Scale.normalX(100):map.Scale.normalX(5);
+		var szId = mapObject.szId;
+		var nStep = szId.match(/big/)?map.Scale.normalX(100):map.Scale.normalX(5);
 		if      ( szId.match(/stepdown/ ) )	{this.vThumbObj.moveThumb(0, nStep);}	
 		else if ( szId.match(/stepup/   ) )	{this.vThumbObj.moveThumb(0,-nStep);}
 		else if ( szId.match(/stepleft/ ) )	{this.hThumbObj.moveThumb(-nStep,0);}			
@@ -7140,7 +7147,7 @@ ScrollBar.prototype.remove = function(evt) {
  * @throws 
  * @return A new Slider object
  */
-Slider = function(objNode,bArea,bScale,nStep,szValues){
+var Slider = function(objNode,bArea,bScale,nStep,szValues){
 	this.szId	   = null;
 	this.moveArea  = bArea;
 	this.scaleArea = bScale;
@@ -7202,10 +7209,10 @@ Slider.prototype.onMouseOut = function(evt){
  * @param evt the actual event handle
  */
 Slider.prototype.onMouseDown = function(evt){
-	if (this.moveArea.width == 0){
+	if (this.moveArea.width === 0){
 		mouseObject = new MouseObject(evt,this.objNode,"yonly");
 	}
-	else if (this.moveArea.height == 0){
+	else if (this.moveArea.height === 0){
 		mouseObject = new MouseObject(evt,this.objNode,"xonly");
 	}
 	else{
@@ -7306,7 +7313,7 @@ Slider.prototype.remove = function(){
  * @return A new RotationSlider object
  * -----------------------------------------------------------------------------
  */
-RotationSlider = function(objNode,nRadius,szRange,szScale,nStep,nSnap){
+var RotationSlider = function(objNode,nRadius,szRange,szScale,nStep,nSnap){
 	this.circlethumb = map.Dom.newGroup(objNode.parentNode,"widget:rotationslider:thumb");
 	this.circlethumb.setAttributeNS(null,'area',"-1000,-1000,1000,1000");
 	this.circlethumb.setAttributeNS(null,'range',szRange);
@@ -7343,10 +7350,7 @@ RotationSlider = function(objNode,nRadius,szRange,szScale,nStep,nSnap){
  * @param nAngle the new degree value
  */
 RotationSlider.prototype.setValue = function(nAngle){
-	var newX = ptValue.x*this.moveArea.width  + this.ptNull.x;
-	var newY = ptValue.y*this.moveArea.height + this.ptNull.y;
-	this.objNode.fu.setPosition(newX,newY);
-	this.onMouseMove();
+	setRotate(this.objNode,nAngle);
 };
 /**
  * handles onmouseover events on slider thumbs; show rotation ability
@@ -7453,13 +7457,10 @@ RotationSlider.prototype.onClick = function(evt){
 	this.objNode.style.setProperty("opacity","1.0","");
 	}
 };
-/*
-@ -----------------------------------------------------------------------------
-@ Function	 :	SORsliderGetAngle
-@ Description:	gets the actual angle (value) of a rotation slider
-@ Parameter  :	objNode  - node of the thumb object
-@ -----------------------------------------------------------------------------
-*/
+/**
+ * gets the actual angle (value) of a rotation slider
+ * @param evt the actual event handle
+ */
 RotationSlider.prototype.getAngle = function(evt){
 	var actPosition = this.circlethumbNode.fu.getPosition();
 	var a = actPosition.x;
@@ -7482,92 +7483,6 @@ RotationSlider.prototype.getAngle = function(evt){
 	}
 	return iAngle;
 };
-/*
-@ -----------------------------------------------------------------------------
-@ Function	 :	SORsliderMove
-@ Description:	called if the mouse is moved to change the rotation angle of the slider thumb
-@ Parameter  :	evt  - the (mouse) event
-@ Note       :  the rotation angle is changed according to the delta angle of the 
-@				mouse position relative to the center of the rotation slider thumb
-@ -----------------------------------------------------------------------------
-*/
-function SORsliderMove(evt){
-	var matrixA = getMatrix(this.symbolNode);
-	matrixA[4] = Math.min(Math.max(Number(matrixA[4]),sliderObject.moveArea.x),sliderObject.moveArea.width);	
-	matrixA[5] = Math.min(Math.max(Number(matrixA[5]),sliderObject.moveArea.y),sliderObject.moveArea.height);	
-	setMatrix(this.symbolNode,matrixA);
-	var iAngle = SORsliderGetAngle(this.symbolNode);		
-
-	var szRange = this.symbolNode.getAttribute('range');
-	if ( szRange && szRange != "" ){
-		var firstAngle = Number(szRange.split(',')[0]);
-		var lastAngle  = Number(szRange.split(',')[1]);
-		var nValue = 0; 
-		if ( firstAngle < lastAngle ){
-			iAngle = Math.min(Math.max(iAngle,firstAngle),lastAngle);
-			nValue = iAngle/(lastAngle-firstAngle)*(sliderObject.scaleVal.ymin-sliderObject.scaleVal.xmin);
-			}
-		else {
-			if ( iAngle >= lastAngle ){
-				if ( iAngle <= (firstAngle-lastAngle)/2){
-					iAngle = lastAngle;
-				}
-				else if ( iAngle <= firstAngle ){
-					iAngle = firstAngle;
-				}
-			}
-		nValue = ((iAngle<=lastAngle?iAngle+360:iAngle)-firstAngle)/(360-firstAngle+lastAngle)*(sliderObject.scaleVal.ymin-sliderObject.scaleVal.xmin);
-		}
-	}
-	this.symbolNode.parentNode.firstChild.setAttributeNS(null,'transform','rotate('+iAngle+')');
-	
-	matrixA[4] = SX(20*Math.sin(iAngle/180*Math.PI));	
-	matrixA[5] = SY(-20*Math.cos(iAngle/180*Math.PI));
-	setMatrix(this.symbolNode,matrixA);
-	
-	if ( sliderObject.onMove && sliderObject.onMove != "" ){
-		eval(sliderObject.onMove+"(evt,"+String(nValue)+")");
-	}
-}
-/*
-@ -----------------------------------------------------------------------------
-@ Function	 :	SORsliderUp
-@ Description:	removes the rotation slider object when the mouse is released
-@ Parameter  :	evt  - the (mouse) event
-@				a user defined 'onUp' function is called if defined
-@ -----------------------------------------------------------------------------
-*/
-function SORsliderUp(evt){
-	var iAngle = SORsliderGetAngle(this.symbolNode);		
-	if ( sliderObject.onUp && sliderObject.onUp != "" ){
-		eval(sliderObject.onUp+"(evt,"+String(iAngle)+")");
-	}
-	if ( sliderObject.pointNode ){
-		removeObject(sliderObject.pointNode);
-	}
-	sliderObject = null;
-}
-/*
-@ -----------------------------------------------------------------------------
-@ Function	 :	SORsliderGetAngle
-@ Description:	gets the actual angle (value) of a rotation slider
-@ Parameter  :	objNode  - node of the thumb object
-@ -----------------------------------------------------------------------------
-*/
-function SORsliderGetAngle(objNode){
-	var matrixA = getMatrix(objNode);
-	var a = Number(matrixA[4]);
-	var b = Number(matrixA[5]);
-	var c = Math.sqrt(a*a+b*b);
-	var nSin = a/c;
-	var iAngle = Math.asin(nSin)/Math.PI*180;
-	if ( a >= 0 && b >= 0 ){iAngle = 180-iAngle;}
-	if ( a >= 0 && b < 0 ) {iAngle = iAngle;}
-	if ( a < 0 && b >= 0 ) {iAngle = 180-iAngle;}
-	if ( a < 0 && b < 0 )  {iAngle = 360+iAngle;}
-	return iAngle;
-}
-
 // .............................................................................
 // widgets     
 // .............................................................................
@@ -7584,7 +7499,7 @@ function SORsliderGetAngle(objNode){
  * @throws 
  * @return A new WidgetList
  */
-WidgetList = function(){
+var WidgetList = function(){
 	/** array to hold all created {@link Widget} objects @type array */
 	this.widgetA = new Array(0);
 };
@@ -7602,7 +7517,7 @@ WidgetList.prototype.add = function(widgetObj){
  * @return the widget object, if exists, or null
  */
 WidgetList.prototype.getWidget = function(objNode){
-	for ( i in this.widgetA ){
+	for ( var i in this.widgetA ){
 		if ( this.widgetA[i].objNode == objNode ){
 			return this.widgetA[i];
 		}
@@ -7776,7 +7691,7 @@ WidgetList.prototype.clear = function(){
  * @throws 
  * @return A new Widget
  */
-Widget = function(widgetNode,widgetObj){
+var Widget = function(widgetNode,widgetObj){
 	/** the node of the shape to become a widget @type DOM node */
 	this.objNode = widgetNode;
 	/** owner object @type class */
@@ -7790,7 +7705,7 @@ Widget.prototype.remove = function(){
 	widgetList.removeWidget(this);
 };
 
-widgetList = new WidgetList();
+var widgetList = new WidgetList();
 
 // .............................................................................
 // Map tools       
@@ -7803,7 +7718,7 @@ widgetList = new WidgetList();
  * @throws 
  * @return A new MapToolList
  */
-MapToolList = function(){
+var MapToolList = function(){
 	/** array that holds all created {@link MapTool} objects @type array */
 	this.toolsA = new Array(0);
 };
@@ -7823,7 +7738,7 @@ MapToolList.prototype.add = function(mapTool,nPos){
  * @param objNode the SVG node that may be a map tool element
  */
 MapToolList.prototype.getMapTool = function(objNode){
-	for ( i in this.toolsA ){
+	for ( var i in this.toolsA ){
 		if ( this.toolsA[i].objNode == objNode.parentNode ){
 			return this.toolsA[i];
 		}
@@ -7865,7 +7780,8 @@ MapToolList.prototype.clear = function(){
 MapToolList.prototype.onMouseDown = function(evt){
 	var mapObject = new MapObject(evt.target);
 	if ( mapObject ){
-		if ( (mapTool = mapToolList.getMapTool(mapObject.objNode)) ) {
+		var mapTool = mapToolList.getMapTool(mapObject.objNode);
+		if ( mapTool ) {
 			mouseObject = new MouseObject(evt,mapObject.objNode,"parentonly",mapTool);
 			mouseObject.parent = mapTool;
 		}
@@ -7873,7 +7789,7 @@ MapToolList.prototype.onMouseDown = function(evt){
 	return;
 };
 
-mapToolList = new MapToolList();
+var mapToolList = new MapToolList();
 
 /**
  * Create a new MapTool instance.  
@@ -7884,7 +7800,7 @@ mapToolList = new MapToolList();
  * @param evt the actual event
  * @param szType the tool type ("coord","polygon",...)
  */
-MapTool = function(evt,szType,nPos) {
+var MapTool = function(evt,szType,nPos) {
 	/** fontsize for all map tool texts @type int */
 	this.nFontSize      =  14;
 	/** SVG style to draw lines in map tools @type string */
@@ -8135,7 +8051,7 @@ MapTool.prototype.onMouseUp = function(evt){
 			break;
 		case "measurement":
 		case "measurebuffer":
-			toolNodes = this.objNode.childNodes;
+			var toolNodes = this.objNode.childNodes;
 			i=0;
 			if (this.szType == "measurement" ){
 				var circleBgNode = toolNodes.item(i++);
@@ -8229,7 +8145,7 @@ MapTool.prototype.endPan = function(evt){
  * @param evt the actual event
  */
 MapTool.prototype.doEndPan = function(evt){
-	if ( this.endPanTimeout == true) {
+	if ( this.endPanTimeout === true) {
         if ( fPanToolByViewer && fPanHideTools && !fPDFEmbed ){
 			map.Zoom.removeClipping(evt);
 			this.showTools(evt);
@@ -8249,7 +8165,7 @@ MapTool.prototype.doEndPan = function(evt){
  * @param evt the actual event
  */
 MapTool.prototype.hideTools = function(evt){
-	if ( !this.toolsHidden || (this.toolsHidden == false) ){
+	if ( !this.toolsHidden || (this.toolsHidden === false) ){
 		antiZoomAndPanList.setDisplay(evt,'none');
 		this.toolsHidden = true;
 		_TRACE("hideTools done");
@@ -8260,7 +8176,7 @@ MapTool.prototype.hideTools = function(evt){
  * @param evt the actual event
  */
 MapTool.prototype.showTools = function(evt){
-	if ( this.toolsHidden == true ) {
+	if ( this.toolsHidden === true ) {
 		antiZoomAndPanList.setDisplay(evt,'inline');
 		this.toolsHidden = false;
 		_TRACE("showTools done");
@@ -8271,14 +8187,14 @@ MapTool.prototype.showTools = function(evt){
  * @param evt the actual event
  */
 MapTool.prototype.hideLayer = function(evt){
-	for ( a in map.Layer.listA ){
+	for ( var a in map.Layer.listA ){
 		var layerItem = map.Layer.listA[a];
 		if ( layerItem.szFlag.match(/invisiblepan/) ){
 			if ( map.Tiles && map.Tiles.nCount > 0 ){
 				var szTilesIdA  = map.Tiles.getTileNodeIds(a);
 				for ( var j=0; j<szTilesIdA.length; j++ ){
 					var szId = szTilesIdA[j];
-					featureNode = SVGDocument.getElementById(szId);
+					var featureNode = SVGDocument.getElementById(szId);
 					if ( featureNode ){
 						layerItem.szBeforeHideStyle = featureNode.style.getPropertyValue('display');
 						featureNode.style.setProperty('display','none',"");
@@ -8319,14 +8235,14 @@ MapTool.prototype.hideLayer = function(evt){
  * @param evt the actual event
  */
 MapTool.prototype.showLayer = function(evt){
-	for ( a in map.Layer.listA ){
+	for ( var a in map.Layer.listA ){
 		var layerItem = map.Layer.listA[a];
 		if ( layerItem.szFlag.match(/invisiblepan/) ){
 			if ( map.Tiles && map.Tiles.nCount > 0 ){
 				var szTilesIdA  = map.Tiles.getTileNodeIds(a);
 				for ( var j=0; j<szTilesIdA.length; j++ ){
 					var szId = szTilesIdA[j];
-					featureNode = SVGDocument.getElementById(szId);
+					var featureNode = SVGDocument.getElementById(szId);
 					if ( featureNode ){
 						if (layerItem.szBeforeHideStyle.length){
 							featureNode.style.setProperty('display',layerItem.szBeforeHideStyle,"");
@@ -8402,13 +8318,13 @@ MapTool.prototype.redraw = function(evt){
 			}
 			var ptList = new Array(0);
 			var toolsA = this.mapToolList.toolsA;
-			szD = "";
+			var szD = "";
 			var pmarkerNode = toolsA[0].objNode.firstChild;
 			pmarkerNode.fu = new Methods(pmarkerNode);
 			var	ptMarker = pmarkerNode.fu.getPosition();
 			ptList[ptList.length] = ptMarker;
 			szD += "M"+ptMarker.x+","+ptMarker.y;
-			for ( i=1; i<toolsA.length; i++ ){
+			for ( var i=1; i<toolsA.length; i++ ){
 				pmarkerNode = toolsA[i].objNode.firstChild;
 				pmarkerNode.fu = new Methods(pmarkerNode);
 				ptMarker = pmarkerNode.fu.getPosition();
@@ -8427,8 +8343,8 @@ MapTool.prototype.redraw = function(evt){
 				map.Dom.clearGroup(phantomPointGroup);
 			}
 			for ( i=0; i<ptList.length; i++ ){
-				x = ptList[i].x + (ptList[((i<ptList.length-1)?i+1:0)].x - ptList[i].x)/2;
-				y = ptList[i].y + (ptList[((i<ptList.length-1)?i+1:0)].y - ptList[i].y)/2;
+				var x = ptList[i].x + (ptList[((i<ptList.length-1)?i+1:0)].x - ptList[i].x)/2;
+				var y = ptList[i].y + (ptList[((i<ptList.length-1)?i+1:0)].y - ptList[i].y)/2;
 				var newPoint = map.Dom.newShape('circle',phantomPointGroup,x,y,map.Scale.normalX(10),"fill:white;stroke:none;opacity:0.1;");
 								map.Dom.newShape('circle',phantomPointGroup,x,y,map.Scale.normalX(2),this.szPolygonStyle+"pointer-events:none;");
 				newPoint.setAttributeNS(szMapNs,"tooltip","click to add point");
@@ -8620,7 +8536,7 @@ setMapTool = function(szType){
  * set map cursor according active tool
  * @param szType string that describes the tool type ( "zoomarea",...)
  */
-setMapToolCursor = function(szType){
+var setMapToolCursor = function(szType){
 	var cursorGroup = null;
 	cursorGroup = SVGDocument.getElementById('mapbackground');
 	if (cursorGroup){
@@ -8639,7 +8555,7 @@ setMapToolCursor = function(szType){
  * @param szType string that describes the tool type ( "zoomarea",...)
  */
 var _lastActiveToolBgNode = null;
-setMapToolActive = function(szType){
+var setMapToolActive = function(szType){
 	if (_lastActiveToolBgNode){
 		_lastActiveToolBgNode.style.setProperty('opacity','0',"");
 	}
@@ -8828,7 +8744,7 @@ TextField.prototype.setPosition = function(x,y){
  * @param nMaxHeight [optional] maximal height, if content exeeds this, a vertical scrollbar is created
  * @param nScrollBarWidth [optional] space of the scrollbars created, (default 10 pixel)
  */
-ScrollArea = function(evt,targetGroup,szTemplate,nMaxWidth,nMaxHeight,nScrollBarWidth){
+var ScrollArea = function(evt,targetGroup,szTemplate,nMaxWidth,nMaxHeight,nScrollBarWidth){
 
 	/** maximal width @type int */
 	this.nMaxWidth = nMaxWidth?nMaxWidth:100;
@@ -9001,7 +8917,7 @@ map.removeAllHighlights = function(){
 		}
 	}
 	allHighLights.length=0;
-}
+};
 /**
  * Create a new HighLigh instance.  
  * @class It realizes an object for highlighting map items
@@ -9009,7 +8925,7 @@ map.removeAllHighlights = function(){
  * @throws 
  * @return A new HighLight Object
  */
-HighLight = function(){
+var HighLight = function(){
 	/** array that holds all actual {@link HighLightItem} objects @type array */
 	this.itemA = new Array(0);
 	allHighLights[allHighLights.length] = this;
@@ -9311,7 +9227,7 @@ HighLightItem.prototype.doHighLight = function(){
 			if ( szHighlightStyle.match(/scale:/) ){
 				this.itemNode.fu = new Methods(this.itemNode);
 				var nScale = parseFloat(szHighlightStyle.split("scale:")[1]);
-				if ( isNaN(nScale) || nScale==0 ){
+				if ( isNaN(nScale) || nScale === 0 ){
 					nScale = 1.5;
 				}
 				this.itemNode.fu.scaleBy(nScale,nScale);
@@ -9327,7 +9243,7 @@ HighLightItem.prototype.doHighLight = function(){
  * remove the highlight effect for this highlight item
  */
 HighLightItem.prototype.removeHighLight = function(){
-	if (this.highlightGroup){
+	if (this.highlightGroup && this.highlightGroup.parentNode ){
 		this.highlightGroup.parentNode.removeChild(this.highlightGroup);		
 	}
 	this.highlighted = false;
@@ -9350,6 +9266,7 @@ HighLightItem.prototype.removeHighLight = function(){
  * @param zMode if 'add', the former info displays are not removed
  */
 var __info_infoShape = null;
+var idInfoTimeout = null;
 function displayInfo(evt,infoShape,szMode){
 
 	var position = null;
@@ -9450,6 +9367,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 
 	// look for an optional image
 	// ---------------------------------------------
+	var imageNode = null;
 	if (szId && szId.length){
 		szId = map.Tiles.getMasterId(szId);
 		var szIdImage = szId.split(":::")[0];
@@ -9490,7 +9408,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 		szObjId = szLayer+'::'+szSelection;
 	}
 	else{
-		layerItem = map.Layer.getLayerItemNodeOfNode(infoShape);
+		var layerItem = map.Layer.getLayerItemNodeOfNode(infoShape);
 		if ( layerItem ){
 			szObjId = layerItem.getAttributeNS(null,"id");
 		}
@@ -9832,6 +9750,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 
 		// inform map user
 		try{
+			var userGroup;
 			if ( (userGroup = map.User.onInfoDisplayExtend(null,szId,newText.parentNode,position)) ){
 				 userGroup = newText.appendChild(userGroup);
 				 userGroup.fu.setPosition(map.Scale.normalX(5),contentBox.height);
@@ -9843,6 +9762,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 
 	// inform htmlgui user
 	try{
+		var userGroup;
 		if ( (userGroup = HTMLWindow.ixmaps.htmlgui_onInfoDisplayExtend(SVGDocument,szObjId)) ){
 			 userGroup = infoWorkspace.appendChild(userGroup);
 			 userGroup.fu = new Methods(userGroup);
@@ -9926,7 +9846,7 @@ function doDisplayInfoDelayed(){
 	}
 	else{
 		for ( var i=0; i<__stackedInfoShapeA.length; i++){
-			displayInfo(null,__stackedInfoShapeA[i],(i==0)?"":"add");
+			displayInfo(null,__stackedInfoShapeA[i],(i===0)?"":"add");
 		}
 		__stackedInfoShapeA.length = 0;
 	}
@@ -9934,7 +9854,7 @@ function doDisplayInfoDelayed(){
 /**
  * helper to format values (to show within the info display)
  */
-__formatInfoValue = function(szValue){
+var __formatInfoValue = function(szValue){
 	if ( szValue.match(/E+/) ){
 		var szValueA =  szValue.split('E+');
 		var nMantisse = parseFloat(szValueA[0]);
@@ -9964,7 +9884,7 @@ __formatInfoValue = function(szValue){
  * @param textArray			the text for all cells of the grid as array of strings
  * @param nColumns			the number of columns to create
  */
-createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumns,fontHeight,styleArray,bgStyle) {
+var createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumns,fontHeight,styleArray,bgStyle) {
 
 	var lines = Math.ceil(textArray.length/nColumns);
 	var fontheight   = fontHeight?fontHeight:12;
@@ -9980,7 +9900,7 @@ createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumn
 	var newGroup = map.Dom.newGroup(targetGroup,groupName);
 	// create field rect for the values
 	var fBgPattern = SVGDocument.getElementById("TextLinesBgPattern");
-	szStyle = bgStyle?bgStyle:"fill:#ffffff;stroke:"+(szTextGridStyle.match(/background/)?"1":"none");
+	var szStyle = bgStyle?bgStyle:"fill:#ffffff;stroke:"+(szTextGridStyle.match(/background/)?"1":"none");
 
 	// finally create the text 
 	var newBgA = new Array(0);
@@ -10000,7 +9920,7 @@ createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumn
 	for (c=0;c<nColumns;c++ ){
 		var dy = map.Scale.normalY(lineheight);
 		for (i=0;i<lines;i++){
-			if ( nColumns > 1 && c==0 && !fBgPattern && szTextGridStyle.match(/background/) && (!szTextGridStyle.match(/alternate/)||i%2) ){
+			if ( nColumns > 1 && c===0 && !fBgPattern && szTextGridStyle.match(/background/) && (!szTextGridStyle.match(/alternate/)||i%2) ){
 				//newBgA[i] = map.Dom.newShape('rect',newxGroup,0,map.Scale.normalY((i)*lineheight+2)+yOffset,100,map.Scale.normalY(lineheight-1),"fill:#f0f0f0;stroke:none;opacity:1.0");
 			}
 			var newLine = map.Dom.newText(newxGroup,0,dy,"font-family:arial;font-size:"+map.Scale.normalY(fontheight)+"px;fill:"+szInfoBodyColor+"",textArray[i+c*lines]);
@@ -10010,7 +9930,7 @@ createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumn
 			nodeA[i][c] = newLine;
 			
 			newLA[i] = newLine;
-			if (nColumns > 1 && c==0 && !fBgPattern){
+			if (nColumns > 1 && c===0 && !fBgPattern){
 				if (szTextGridStyle.match(/firstsmall/)){
 					newLine.style.setProperty("font-size",String(map.Scale.normalY(fontheight*0.9))+"px","");
 				}
@@ -10025,7 +9945,7 @@ createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumn
 			if ( styleArray && styleArray[i+c*lines] ){
 				try	{
 					var stylePropArray = __getStyleArray(styleArray[i+c*lines]);
-					for ( a in stylePropArray ){
+					for ( var a in stylePropArray ){
 						newLine.style.setProperty(a,stylePropArray[a],"");
 					}
 				}
@@ -10039,7 +9959,7 @@ createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumn
 		}
 
 		var actWidth = map.Dom.getBox(newxGroup).width;
-		if ( szTextGridStyle.match(/firstright/) && c== 0 ){
+		if ( szTextGridStyle.match(/firstright/) && c === 0 ){
 			for (i=0;i<lines;i++){
 				newLA[i].setAttribute("transform","matrix(1 0 0 1 "+(xOffset+actWidth)+" "+yOffset+")");
 				newLA[i].style.setProperty("text-anchor","end","");
@@ -10048,7 +9968,7 @@ createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumn
 		}else{
 			xOffset = actWidth + map.Scale.normalX(fontheight) + map.Scale.normalX(5);
 		}
-		if (c==0 ){
+		if ( c === 0 ){
 			var bgWidth = xOffset;
 		}
 	}
@@ -10070,7 +9990,7 @@ createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumn
 		dY += maxY+map.Scale.normalY(2);
 	}
 
-	bBox = map.Dom.getBox(newxGroup);
+	var bBox = map.Dom.getBox(newxGroup);
 	for (i=0;i<lines;i++){
 		if (newBgA[i]){
 			if ( szTextGridStyle.match(/full/) ){
@@ -10213,7 +10133,7 @@ function displayScale(evt,szPosition){
 		}
 	}
 
-	if ( nBarMaxWidth == 0 ){
+	if ( nBarMaxWidth === 0 ){
 		nBarMaxWidth = map.Scale.bBox.width/3/map.Scale.normalX(1);
 	}
 
@@ -10455,7 +10375,7 @@ Map.Legend.prototype = new Map();
 Map.Legend.prototype.init = function(evt){
 
 	// GR 13.04.2010
-	if (this.blockRecursion == true) {return;}
+	if (this.blockRecursion === true) {return;}
 
 	var scaleHeight = map.Scale.mapPosition.x?map.Scale.normalY(10):map.Scale.normalY(60);
 	var scrollBarWidth = 10;
@@ -11017,9 +10937,9 @@ Map.Legend.prototype.execLegendMouseClick = function(evt,clickNode,szThemeId,szA
 			}
 			__checkCollapsable(clickNode,'expand');
 			break;
-
+		/**
 		case 'minus':
-			opacity = featureNode.style.getPropertyValue('opacity');
+			var opacity = featureNode.style.getPropertyValue('opacity');
 			opacity = opacity !== "" ? Number(opacity) : 1.0;
 			if ( opacity > 0 ){
 				opacity -= 0.1;
@@ -11035,7 +10955,7 @@ Map.Legend.prototype.execLegendMouseClick = function(evt,clickNode,szThemeId,szA
 				featureNode.style.setProperty('opacity',String(opacity),"");
 			}
 			break;
-
+		**/	
 		case 'setactive':
 			activateTheme(szThemeId);
 			if (!szMapToolType.match(/select/)){
@@ -11072,9 +10992,9 @@ Map.Legend.prototype.execLegendMouseClickOnItem = function(evt,clickNode,szId){
 	_TRACE("szOnActivate="+szOnActivate);
 	
 	if ( szOnActivate && szOnActivate.length ){
-		szIdA = szId.split(':');
-		szAction = szIdA[1];
-		szItem = szIdA[szIdA.length-1];
+		var szIdA = szId.split(':');
+		var szAction = szIdA[1];
+		var szItem = szIdA[szIdA.length-1];
 		_TRACE(szAction);
 		switch (szAction){
 			case 'off':
@@ -11087,7 +11007,6 @@ Map.Legend.prototype.execLegendMouseClickOnItem = function(evt,clickNode,szId){
 				catch (e){
 				}
 				this.lastItemObjectA[szItem] = null;
-				lastItemObject = null;
 				break;
 
 			case 'on':
@@ -11190,7 +11109,7 @@ Map.Legend.prototype.execLegendMouseClickOnTiles = function(evt,clickNode,szThem
 Map.Legend.prototype.setLegendCheckBox = function(evt,szId,szState){
 	_TRACE("setLegendCheckBox(evt,"+szId+","+szState+")");
 	if ( szId.match(/legend/)){
-		szIdA = szId.split(':');
+		var szIdA = szId.split(':');
 		szId = "legend:off";
 		for ( var i=2; i<szIdA.length; i++ ){
 			szId += ":"+szIdA[i];
@@ -11302,7 +11221,7 @@ function __checkCollapsable(targetNode,szAction){
 						}
 						break;
 					case 'expand':
-						if ( !(legendNodesA.item(i).getAttributeNS(szMapNs,"state") == 'collapsed') && 
+						if (  (legendNodesA.item(i).getAttributeNS(szMapNs,"state") != 'collapsed') && 
 						     !(legendNodesA.item(i).getAttributeNS(null,"id").match(/placeholder/)) ) {
 							break;
 						}
@@ -11363,7 +11282,7 @@ function __checkCollapsable(targetNode,szAction){
 
 // initialize   
 
-zoomAndPanHistory = new History();
+var zoomAndPanHistory = new History();
 
 // initialize highlighting                                    
 highLightList = new HighLight();

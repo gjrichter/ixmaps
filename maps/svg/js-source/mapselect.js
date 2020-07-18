@@ -12,13 +12,24 @@ $Id: mapselect.js 9 2007-08-25 16:39:35Z Guenter Richter $
 Copyright (c) Guenter Richter
 $Log: mapselect.js,v $
 **********************************************************************/
-mapSelection = null;
+var mapSelection = null;
 /** 
  * @fileoverview This file provides the classes for map select functions<br>
  * (select by map tool, shape, buffers)
  * @author Guenter Richter guenter.richter@medienobjekte.de
  * @version 1.1 
  */
+/* jshint funcscope:true, evil:true, eqnull:true, loopfunc:true, shadow: true, laxcomma: true, laxbreak: true, expr: true, sub: true */
+/* globals
+	window, alert, setTimeout, _TRACE,
+	szMapNs, Methods, MapObject, HighLight, activeSelection, 
+	SVGDocument, HTMLWindow, getMatrix, setMatrix, SVGPopupGroup, SVGToolsGroup, SVGFixedGroup, SVGMessageGroup,
+	Map, map, thisversion, box, point, Button, MapTool, setMapTool, szMapToolType, InfoContainer, mapToolList, highLightList, 
+	displayMessage, clearMessage, executeWithMessage, displayInfoDelayed, displayScale, createTextGrid, __getStyleObj, getActiveTheme,
+	loadSVGIncludes, bookmarkList, fInitLegendOff, fPreserveMapRatio, fPendingNewGeoBounds, fFroozeDynamicContent, zoomAndPanHistory,
+	nNormalFontSize, htmlgui_prettyPrintXML, __doGetPolygonSurface, antiZoomAndPanList, szTextGridStyle, __formatValue, DonutCharts
+	
+	*/
 
 /**
  * Create a new Selections instance.  
@@ -202,7 +213,7 @@ MapSelection.prototype.initValues = function(){
 			_TRACE("Selection: get nodes of theme: "+ this.szThemesA[i]);
 			var layerObj = map.Layer.getLayerObj(this.szThemesA[i]);
 			if (layerObj) {
-				if ( !layerObj.szSelection || layerObj.szSelection.length == 0 ){
+				if ( !layerObj.szSelection || layerObj.szSelection.length === 0 ){
 					continue;
 				}
 				this.szThemeType = layerObj.szType;
@@ -217,10 +228,10 @@ MapSelection.prototype.initValues = function(){
 				}
 				// renderer dependent subgroups ??
 				if ( (layerObj.nRenderer&1) && layerObj.szRenderer && layerObj.szRenderer.length ){
-					for ( k=0; k<tileRootNodesA.length; k++ ){
+					for ( var k=0; k<tileRootNodesA.length; k++ ){
 						var rootNode = tileRootNodesA[k];
 						var rendererRootNodesA = rootNode.childNodes;
-						for ( r=0; r<rendererRootNodesA.length; r++ ){
+						for ( var r=0; r<rendererRootNodesA.length; r++ ){
 							if (rendererRootNodesA.item(r).nodeType == 1 && rendererRootNodesA.item(r).hasChildNodes()){
 								this.themeRootNodesA[this.themeRootNodesA.length] = rendererRootNodesA.item(r);
 							}
@@ -233,7 +244,7 @@ MapSelection.prototype.initValues = function(){
 				}
 			}
 		}
-		if ( this.themeRootNodesA.length == 0 ){
+		if ( this.themeRootNodesA.length === 0 ){
 		_TRACE("error: no active layer");
 			return false;
 		}
@@ -289,7 +300,7 @@ MapSelection.prototype.initValues = function(){
 		var mapTheme = map.Themes.activeBuffer;
 		if ( mapTheme != null ){
 			_TRACE(mapTheme.szThemesA[0]);
-			var nodeA = new Array();
+			var nodeA = [];
 			var rootGroup = mapTheme.chartGroup;
 			var childsA = rootGroup.getElementsByTagName('path');
 			var childsB = rootGroup.getElementsByTagName('circle');
@@ -301,7 +312,7 @@ MapSelection.prototype.initValues = function(){
 				nodeA[nodeA.length] = childsB.item(i);
 			}
 			_TRACE(nodeA.length);
-			this.selectCenterA = new Array();
+			this.selectCenterA = [];
 			for ( i=0; i<nodeA.length; i++){
 				this.selectCenterA[this.selectCenterA.length] = map.Scale.getMapOffset(nodeA[i]);
 			}
@@ -325,7 +336,7 @@ MapSelection.prototype.initValues = function(){
 		// case III: selection by user drawn shape (rect or circle)
 		// --------------------------------------------------------
 
-		this.selectCenterA = new Array();
+		this.selectCenterA = [];
 		_TRACE("???? ---- "+this.szSelectShape);
 		var bufferNode = SVGDocument.getElementById(this.szSelectShape);
 		if ( !bufferNode ){
@@ -341,7 +352,7 @@ MapSelection.prototype.initValues = function(){
 			this.selectCenterA[this.selectCenterA.length] = map.Scale.getMapPosition(ptPos.x,ptPos.y);
 			ptPos = map.Scale.getMapPosition(ptPos.x,ptPos.y);
 			this.selectBufferSize = bufferNode.getAttributeNS(null,"r");
-			if (this.selectBufferSize == 0){
+			if (this.selectBufferSize === 0){
 				return false;
 			}
 			// from widget to canvas
@@ -359,7 +370,7 @@ MapSelection.prototype.initValues = function(){
 			ptPos = map.Scale.getMapPosition(ptPos.x+nWidth/2,ptPos.y+nHeight/2);
 			this.selectBufferSizeX = nWidth/2;
 			this.selectBufferSizeY = nHeight/2;
-			if (this.selectBufferSizeX == 0 || this.selectBufferSizeY == 0){
+			if (this.selectBufferSizeX === 0 || this.selectBufferSizeY === 0){
 				return false;
 			}
 			// from widget to canvas
@@ -472,7 +483,7 @@ MapSelection.prototype.nextThemeNode = function(nIndex){
 	}
 
 	// initialize at the beginning with the first root node 
-	if ( nIndex == 0 ){
+	if ( nIndex === 0 ){
 		this.nRootIndex = 0;
 		this.actNode = this.themeRootNodesA[this.nRootIndex].firstChild;
 		return this.actNode;
@@ -503,7 +514,7 @@ MapSelection.prototype.nextThemeNode = function(nIndex){
 function myclone(object){
 	if ( object ){
 		var newObj = (object instanceof Array) ? [] : {};
-		for (i in object) {
+		for (var i in object) {
 			if (i == 'clone'){
 				continue;
 			}
@@ -536,7 +547,7 @@ MapSelection.prototype.selectShapes = function(startIndex){
 
 	_TRACE("== MapTheme.selectShapes("+startIndex+")===> "+(this.szId));
 
-	if ( !startIndex || startIndex == 0 ){
+	if ( !startIndex || startIndex === 0 ){
 		startIndex = 0;
 
 		this.testA = new Array(0);
@@ -800,7 +811,7 @@ MapSelection.prototype.selectShapes = function(startIndex){
 							// if only one value and this is zero, and not allowe -> continue
 							if ( activeThemeItem.nValuesA.length == 1 ){
 								if ( isNaN(activeThemeItem.nValuesA[0]) ||
-									 (activeThemeItem.nValuesA[0] == 0 & 
+									 (activeThemeItem.nValuesA[0] === 0 & 
 									 !map.Themes.activeTheme.szFlag.match(/ZEROISVALUE/)) 
 									){
 									continue;
@@ -828,8 +839,8 @@ MapSelection.prototype.selectShapes = function(startIndex){
 								this.nSum100 += activeThemeItem.nValue100;
 							}
 							if ( map.Themes.activeTheme.szFlag.match(/CATEGORICAL/) ){
-								for ( v=0;v<activeThemeItem.nValuesA.length;v++ ){
-									for ( p=0;p<this.partsA.length;p++ ){
+								for ( var v=0;v<activeThemeItem.nValuesA.length;v++ ){
+									for ( var p=0;p<this.partsA.length;p++ ){
 										if ( activeThemeItem.nValuesA[v] == this.partsA[p].min){
 											this.partsA[p].nCount++;
 											this.partsA[p].nSum += activeThemeItem.nValuesA[v];
@@ -882,7 +893,7 @@ MapSelection.prototype.selectShapes = function(startIndex){
 			}
 		}
 	}
-	if ( this.nThemeItems == 0 ){
+	if ( this.nThemeItems === 0 ){
 		this.nThemeItems = this.nTested;
 	}
 	// GR test test test 
@@ -921,12 +932,12 @@ MapSelection.prototype.showInfo = function(fDone){
 
 	_TRACE("== MapSelection.showInfo("+this.szId+")===> ");
 
-	if ( this.nCount == 0 ){
+	if ( this.nCount === 0 ){
 		displayMessage("Selection: no values found !",1000);
 		this.remove();
 		return;
 	}
-	if ( this.nSelected == 0 ){
+	if ( this.nSelected === 0 ){
 		displayMessage("Selection is empty !",1000);
 		this.remove();
 		return;
@@ -1078,7 +1089,7 @@ MapSelection.prototype.showInfo = function(fDone){
 			this.itemA = new Array(0); 
 			// GR 08.02.2009 !! .addItemValues changes 1. parameter 
 			var tmpOrigValuesSumA = new Array(0);
-			for ( x=0;x<this.nOrigValuesSumA.length;x++ ){
+			for ( var x=0;x<this.nOrigValuesSumA.length;x++ ){
 				tmpOrigValuesSumA[x] = this.nOrigValuesSumA[x];
 			}
 			this.addItemValues("selection",tmpOrigValuesSumA,this.nSum100);
@@ -1143,7 +1154,7 @@ MapSelection.prototype.showInfo = function(fDone){
 					this.szOverviewChart = this.activeTheme.szOverviewChart;
 					this.drawChart = this.activeTheme.drawChart;
 					if ( this.getOverviewChart ){
-						posGroup = map.Dom.newGroup(infoWorkspace,"");
+						var posGroup = map.Dom.newGroup(infoWorkspace,"");
 						chartGroup = map.Dom.newGroup(posGroup,"");
 						chartsA.push(posGroup);
 						var oldszFlag = this.szFlag;
@@ -1457,9 +1468,9 @@ function __chartArrayReformat(chartsA,nLineOff,nCols){
 	for ( var i=0; i<chartsA.length; i++ ) {
 		var chartGroup = chartsA[i]; 
 		var chartBox = chartGroup.fu.getBox(); 
-		if ( i==0 ){
+		if ( i === 0 ){
 			nPosX = map.Scale.normalX(2)-(0?nMaxX:0);
-		}else if ( nCols && (i%nCols == 0) ){
+		}else if ( nCols && (i%nCols === 0) ){
 			nPosY += map.Scale.normalX(20)+nMaxHeight;
 			nPosX = map.Scale.normalX(2)-chartBox.x;
 			nMaxHeight = 0;

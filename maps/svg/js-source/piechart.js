@@ -19,11 +19,17 @@ $Log: piechart.js,v $
  * @version 1.1 
  */
 
+/* jshint funcscope:true, evil:true, eqnull:true, loopfunc:true, shadow: true, laxcomma: true, laxbreak: true, expr: true, sub: true*/
+/* globals 
+	window,
+	map, szMapNs, ColorScheme
+	*/
+
 /* ........................................................................................* 
  *  API for constructor of object DonutChart ( makes script loadable; see ScriptLoader() ) * 
  * ........................................................................................*/ 
 
-	DonutCharts = new _DonutCharts();
+var	DonutCharts = new _DonutCharts();
 /**
  * This is the api class for the Class: DonutChart  
  * @constructor
@@ -259,7 +265,7 @@ DonutChart.prototype.realize = function(){
 
 	// here we go
 
-	nMaxAngle = this.szStyle.match(/HALF/)?180:360;
+	var nMaxAngle = this.szStyle.match(/HALF/)?180:360;
 
 	var nAngle = 0;
 	var nGapAngle = 0;
@@ -587,10 +593,12 @@ function _crc_drawDonut(targetDocument, targetGroup,mX, mY, nRadOuter, nRadInner
 			_crc_drawInnerWall(targetDocument, targetGroup,mX, mY, nRadOuter, nRadInner, nHeight, nStartAngle, nEndAngle, szColor2 ,szColorLine, nWidthLine);
 		}
 	}
+	
+	var newPath;
 
 	// start face of donut
 	if ( szStyle.match(/3D/) && nStartAngle>180 ) {
-		szPathD = "";
+		var szPathD = "";
 		szPathD += pathMoveToCirclePoint(mX,mY-nHeight,nRadOuter,nStartAngle);
 		szPathD += pathLineToCirclePoint(mX,mY-nHeight,nRadInner,nStartAngle);
 		szPathD += pathLineToCirclePoint(mX,mY        ,nRadInner,nStartAngle);
@@ -604,7 +612,7 @@ function _crc_drawDonut(targetDocument, targetGroup,mX, mY, nRadOuter, nRadInner
 
 	// end face of donut
 	if ( szStyle.match(/3D/) && nEndAngle<180 ) {
-		szPathD = "";
+		var szPathD = "";
 		szPathD += pathMoveToCirclePoint(mX,mY-nHeight,nRadOuter,nEndAngle);
 		szPathD += pathLineToCirclePoint(mX,mY-nHeight,nRadInner,nEndAngle);
 		szPathD += pathLineToCirclePoint(mX,mY        ,nRadInner,nEndAngle);
@@ -681,13 +689,13 @@ function _crc_drawInnerWall(targetDocument, targetGroup,mX, mY, nRadOuter, nRadI
 	if ( nStartAngle>90 && nStartAngle<270 && nEndAngle<270 ){
 		return;
 	}
-	szPathD = "";
+	var szPathD = "";
 	szPathD += pathMoveToCirclePoint	(mX,mY-nHeight,nRadInner,nStartAngle);
 	szPathD += pathDrawArc				(mX,mY-nHeight,nRadInner,nStartAngle,nEndAngle);
 	szPathD += pathLineToCirclePoint	(mX,mY        ,nRadInner,nEndAngle);
 	szPathD += pathDrawArcCounterClock	(mX,mY        ,nRadInner,nEndAngle,nStartAngle);
 	szPathD += pathLineToCirclePoint	(mX,mY-nHeight,nRadInner,nStartAngle);
-	newPath	= _crc_constructNode('path',targetDocument,targetGroup,{
+	var newPath	= _crc_constructNode('path',targetDocument,targetGroup,{
 					d:		szPathD,
 					style:	"stroke:"+szColorLine+";fill:"+szColor2+";stroke-width:"+nWidthLine+";"}
 					);
@@ -716,13 +724,13 @@ function _crc_drawOuterWall(targetDocument, targetGroup,mX, mY, nRadOuter, nRadI
 	if ( nnStartAngle > nnEndAngle ){
 		return;
 	}
-	szPathD = "";
+	var szPathD = "";
 	szPathD += pathMoveToCirclePoint	(mX,mY-nHeight,nRadOuter,nnStartAngle);
 	szPathD += pathDrawArc				(mX,mY-nHeight,nRadOuter,nnStartAngle,nnEndAngle);
 	szPathD += pathLineToCirclePoint	(mX,mY        ,nRadOuter,nnEndAngle);
 	szPathD += pathDrawArcCounterClock	(mX,mY        ,nRadOuter,nnEndAngle,nnStartAngle);
 	szPathD +=pathLineToCirclePoint	(mX,mY-nHeight,nRadOuter,nnStartAngle);
-	newPath	= _crc_constructNode('path',targetDocument,targetGroup,{
+	var newPath	= _crc_constructNode('path',targetDocument,targetGroup,{
 					d:		szPathD,
 					style:	"stroke:"+szColorLine+";fill:"+szColor2+";stroke-width:"+nWidthLine+";"}
 					);
@@ -912,7 +920,7 @@ function pathDrawArcCounterClock(nX, nY, nRadius, nStartAngle, nEndAngle){
 			if ( i==qubicA.length-1 && ii == 1 ){
 				continue;
 			}
-			if ( ii == 0 ){
+			if ( ii === 0 ){
 				szInvers += ' Q'+pointA[ii];
 			}
 			else{

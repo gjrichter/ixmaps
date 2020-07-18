@@ -26,6 +26,18 @@ $Log: mapapi.js,v $
  * @version 1.1 
  */
 
+/* jshint funcscope:true, evil:true, eqnull:true, loopfunc:true, shadow: true, laxcomma: true, laxbreak: true, expr: true */
+/* globals
+	window, alert, setTimeout,
+	szMapNs, Methods, MapObject,
+	SVGDocument, HTMLWindow, getMatrix, setMatrix, SVGPopupGroup, SVGToolsGroup, SVGFixedGroup, SVGMessageGroup,
+	Map, map, thisversion, box, point, Button, MapTool, setMapTool, szMapToolType, InfoContainer, mapToolList, highLightList, 
+	displayMessage, displayInfoDelayed, displayScale, createTextGrid,
+	loadSVGIncludes, bookmarkList, fInitLegendOff, fPreserveMapRatio, fPendingNewGeoBounds, fFroozeDynamicContent, zoomAndPanHistory,
+	nNormalFontSize, htmlgui_prettyPrintXML, __doGetPolygonSurface
+	
+	*/
+
 /**
  * Create a new Map.Api instance.  
  * @class It provides methods to call map functions
@@ -119,12 +131,12 @@ Map.Api.prototype.setMapLayer = function(szLayerObj){
 		return;
 	}
 	var layerObj = JSON.parse(szLayerObj);
-	for ( l in layerObj ){
+	for ( var l in layerObj ){
 		if ( layerObj[l].display && (layerObj[l].display == "none") ){
 			this.switchLayer(String(l),false);
 		}
 		if ( layerObj[l].off ){
-			for ( c in layerObj[l].off ){
+			for ( var c in layerObj[l].off ){
 				this.switchLayer(l+"::"+layerObj[l].off[c],false);
 			}
 		}
@@ -132,7 +144,7 @@ Map.Api.prototype.setMapLayer = function(szLayerObj){
 			var layerA = this.getLayer();
 			var categoryA = layerA[l].categoryA;
 			if ( categoryA ){
-				for ( x in categoryA ){
+				for ( var x in categoryA ){
 					this.switchLayer(l+"::"+x,false);
 				}
 				for ( c in layerObj[l].on ){
@@ -725,7 +737,7 @@ Map.Api.prototype.displayMessage = function(szText,nTimeout,szFlag){
 Map.Api.prototype.flipLegend = function(){
 	// flip map
 	var matrixA = getMatrix(this.map.Scale.offsetNode);
-	if ( matrixA[4] == 0 ){
+	if ( matrixA[4] === 0 ){
 		matrixA[4] = this.map.Scale.viewBox.width-this.map.Scale.bBox.width;
 	}
 	else{
@@ -733,13 +745,13 @@ Map.Api.prototype.flipLegend = function(){
 	}
 	setMatrix(this.map.Scale.offsetNode,matrixA);
 	this.map.Scale	 = new Map.Scale();
-	this.map.Viewport = new Map.Viewport(evt);
+	this.map.Viewport = new Map.Viewport();
 	// flip legend
 	var SVGDoc = SVGDocument;
 	var legendGroup  = SVGDoc.getElementById("legend:group");
 	if ( legendGroup ){
 		matrixA = getMatrix(legendGroup);
-		if ( matrixA[4] == 0 ){
+		if ( matrixA[4] === 0 ){
 			var bBox = this.map.Dom.getBox(legendGroup);
 			matrixA[4] = this.map.Scale.mapPosition.x+this.map.Scale.bBox.width;
 		}
@@ -747,8 +759,8 @@ Map.Api.prototype.flipLegend = function(){
 			matrixA[4] = 0;
 		}
 	setMatrix(legendGroup,matrixA);
-	displayScale(evt,'bottom');
-	this.map.Toolbar.refresh(evt);
+	displayScale(null,'bottom');
+	this.map.Toolbar.refresh();
 	}
 };
 /**
@@ -889,7 +901,7 @@ Map.Api.prototype.printActualEnvelope = function(){
 	var rectArea = this.map.Zoom.getBox();
 	var pt1 = this.map.Scale.getMapCoordinate(rectArea.x,rectArea.y);
 	var pt2 = this.map.Scale.getMapCoordinate(rectArea.x+rectArea.width,rectArea.y+rectArea.height);
-	szPrint =  "<ENVELOPE minx=\""+pt1.x+"\"\n";
+	var szPrint =  "<ENVELOPE minx=\""+pt1.x+"\"\n";
 	szPrint += "          maxx=\""+pt2.x+"\"\n";
 	szPrint += "          miny=\""+pt2.y+"\"\n";
 	szPrint += "          maxy=\""+pt1.y+"\" name=\"Initial_Extent\" />";
@@ -897,7 +909,7 @@ Map.Api.prototype.printActualEnvelope = function(){
 		htmlgui_prettyPrintXML("Actual zoom Envelope (for SVGGIS XML)",szPrint+"\n");
 	}
 	catch (e){
-		alert(szEnvelope);
+		alert(szPrint);
 	}
 };
 /**
@@ -958,6 +970,8 @@ Map.Api.prototype.createInfoBubble = function(objNode,szTextA,nColumns){
 									,"remove");
 		buttonObj.setPosition(bBox.width,this.map.Scale.normalY(9));
 		bBox.width += this.map.Scale.normalY(9);
+		
+		var szPeek = null;
 
 		if ( newPosition.y == position.y+offset.y ){
 			szPeek = "top";
@@ -1057,7 +1071,7 @@ Map.Api.prototype.createInfoContainer = function(szId,szTextA,nColumns,xPos,yPos
 		var newText = createTextGrid(SVGDocument,infoWorkspace,szId+":more:textgrid",szTextA,2);
 		this.map.Dictionary.applyToNode(newText);
 		newInfo.reformat();
-		this.map.Event.stopMouseEvent(evt);
+		this.map.Event.stopMouseEvent();
 		return newInfo;
 	}
 };
@@ -1088,7 +1102,7 @@ Map.Api.prototype.getShapePoints = function(objNode){
 		var ptOff = new point(0,0);
 		var szD = objNode.getAttributeNS(null,"d");
 		szD = szD.substr(1,szD.length-2);
-		szDA = szD.split(' ');
+		var szDA = szD.split(' ');
 		for ( var i=0; i<szDA.length; i++){
 			if ( (szDA[i]=='l') || (szDA[i]=='L') ){
 				fMode = szDA[i];
@@ -1121,7 +1135,7 @@ Map.Api.prototype.getShapeCoordinates = function(objNode){
 			var mapPos = null;
 			var mapCoord = null;
 			var ptCoordA = new Array(0);
-			for ( a in ptPointA ){
+			for ( var a in ptPointA ){
 				mapPos   = this.map.Scale.getMapPosition(ptPointA[a].x,ptPointA[a].y);
 				mapCoord = this.map.Scale.getMapCoordinate(mapPos.x,mapPos.y);
 				ptCoordA[ptCoordA.length] = new point(mapCoord.x,mapCoord.y);
@@ -1160,7 +1174,7 @@ Map.Api.prototype.getShape = function(szId,targetGroup,szFlag){
             cloneNode.fu = new Methods(cloneNode);
             shapeNode.fu = new Methods(shapeNode);
             var box = shapeNode.fu.getBox();
-            var scale = Math.min(4000/box.width,4000/box.height)
+            var scale = Math.min(4000/box.width,4000/box.height);
             cloneNode.fu.setPosition(-box.x*scale,-box.y*scale-3000);
             cloneNode.fu.scale(scale,scale);
             cloneNode.style.setProperty("stroke-width",20/scale+"px");
@@ -1620,8 +1634,8 @@ Map.Api.prototype.getShapeMetadataArray = function(objNode){
 		szTitles = this.map.Dom.getAttributeByNodeOrParents(mapObj.objNode.parentNode,szMapNs,"info");
 	}
 	if ( szTitles && szData ){
-		szTitleA = szTitles.split("|");
-		szDataA  = szData.split("|");
+		var szTitleA = szTitles.split("|");
+		var szDataA  = szData.split("|");
 		if ( szTitleA.length && szDataA.length ){
 			var dataArray = new Array(0);
 			for ( var i=0; i<szTitleA.length; i++){
@@ -1674,4 +1688,4 @@ Map.Api.prototype.clearHighlight = function(){
  */
 Map.Api.prototype.getLayerLegendSVG= function(layerName){
 	alert(layerName);
-}
+};

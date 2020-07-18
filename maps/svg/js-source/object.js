@@ -1,4 +1,9 @@
-var loadedobject = new Array(100)
+/* jshint funcscope:true, evil:true, eqnull:true, loopfunc:true, shadow: true, laxcomma: true, laxbreak: true, expr: true, sub: true*/
+/* globals 
+	window,
+	movieobject, moviename, loadobject, nextobject, do_zoom_level
+	*/
+var loadedobject = new Array(100);
 var anzobjects = 0;
 var first_object_level = 15;
 var first_clear_level = 15;
@@ -20,7 +25,7 @@ function initialize_loadobject()
    	position_object(loadobject,"/object");
 	display_object(loadobject,"/object");
 	init_object(loadobject,"/object");
-    if ( loadobject.nextobject != 0 )
+    if ( loadobject.nextobject !== 0 )
 		load_object(loadobject.nextobject);
 	else
 		fLoadingObject = 0;		
@@ -28,7 +33,7 @@ function initialize_loadobject()
 function init_loadobject() 
     {		 
 	init_object(loadobject,"/object");
-    if ( loadobject.nextobject != 0 )
+    if ( loadobject.nextobject !== 0 )
 		load_object(loadobject.nextobject);
 	else
 		fLoadingObject = 0;		
@@ -116,7 +121,7 @@ function init_object(theObject,name)
 	}
 function remove_object(level)
     {
-    for ( nr = 0; nr < anzobjects; nr++ ) 
+    for ( var nr = 0; nr < anzobjects; nr++ ) 
    	   {
 	   if ( level == "_level"+eval(loadedobject[nr].level) )
 	   	   {
@@ -127,7 +132,7 @@ function remove_object(level)
 	}	
 function remove_allobjects()
    {		 
-   for ( nr = 0; nr < anzobjects; nr++ ) 
+   for ( var nr = 0; nr < anzobjects; nr++ ) 
    	   {
    	   if ( loadedobject[nr].level != -1 && loadedobject[nr].level >= first_clear_level )
   	   	  movieobject(moviename).LoadMovie(loadedobject[nr].level,"swf/basics/clear.swf");
@@ -137,8 +142,9 @@ function remove_allobjects()
    }	
 function actualize_allobjects() 
    {		 
-   for ( nr = 0; nr < anzobjects; nr++ )
+   for ( var nr = 0; nr < anzobjects; nr++ )
    	   {
+	   var theObject;
 	   if ( (loadedobject[nr].level != -1) && (theObject = loadedobject[nr]) && theObject.act )		 
        	  {
    		  theObject.act.funct(theObject.level,theObject.act.node,theObject.act.xml);

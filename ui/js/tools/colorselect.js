@@ -45,7 +45,8 @@
 		colorSchemesA['density1']	= "#FFFDD8,#B5284B,3colors,#FCBA6C";
 		colorSchemesA['density2']	= "#FFFFFF,#BC0225,3colors,#FC8C3D";
 		colorSchemesA['density3']	= "#FFEDA0,#800026,3colors,#FC5E2A";
-		colorSchemesA['density4']	= "#D1EC6E,#F7C025,null,null";
+		colorSchemesA['density4']	= "#FEE5D9,#A50F15,3colors,#FB6A4A";
+		colorSchemesA['density5']	= "#D1EC6E,#F7C025,null,null";
 
 		colorSchemesA['filler1']		= "#eeeeee,#eeeeee,#eeeeee,#eeeeee";
 

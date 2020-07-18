@@ -14,11 +14,17 @@ $Source : tooltip.js,v $
  * @version 1.0 
  */
 
+/* jshint funcscope:true, evil:true, eqnull:true, loopfunc:true, shadow: true, laxcomma: true, laxbreak: true, expr: true, sub: true*/
+/* globals 
+	window, document, setTimeout, clearTimeout, event,
+	map, szMapNs, ColorScheme
+	*/
+
 /* ...................................................................* 
  *  global vars                                                       * 
  * ...................................................................*/
  
-var xBump=yBump=10;
+var xBump,yBump=10;
 var MSIE=document.all;
 var NS6=document.getElementById&&!document.all;
 var tipTimeout = null;
@@ -31,7 +37,7 @@ var tipTimeout = null;
 document.write("<div id=\"ttip\" style=\"display:none;position:absolute;max-width:200px;\"><\/div>");
 
 if(MSIE||NS6){
-	ttipObj=document.all?document.all["ttip"]:document.getElementById?document.getElementById("ttip"):"";
+	var ttipObj=document.all?document.all["ttip"]:document.getElementById?document.getElementById("ttip"):"";
 }
 
 function MSIEBodyReturn(){
@@ -53,11 +59,11 @@ function doShowTip(ttipText){
 
 function MoveTip(e){
 	document.onmousemove=null;
-	xPos=(NS6)?e.pageX:event.x+MSIEBodyReturn().scrollLeft;
-	yPos=(NS6)?e.pageY:event.y+MSIEBodyReturn().scrollTop;
-	lEdge=(xBump<0)?xBump*(-1):-1000;
-	rEdge=MSIE&&!window.opera?MSIEBodyReturn().clientWidth-event.clientX-xBump:window.innerWidth-e.clientX-xBump-20;
-	bEdge=MSIE&&!window.opera?MSIEBodyReturn().clientHeight-event.clientY-yBump:window.innerHeight-e.clientY-yBump-20;
+	var xPos=(NS6)?e.pageX:event.x+MSIEBodyReturn().scrollLeft;
+	var yPos=(NS6)?e.pageY:event.y+MSIEBodyReturn().scrollTop;
+	var lEdge=(xBump<0)?xBump*(-1):-1000;
+	var rEdge=MSIE&&!window.opera?MSIEBodyReturn().clientWidth-event.clientX-xBump:window.innerWidth-e.clientX-xBump-20;
+	var bEdge=MSIE&&!window.opera?MSIEBodyReturn().clientHeight-event.clientY-yBump:window.innerHeight-e.clientY-yBump-20;
 	if(rEdge<ttipObj.offsetWidth){
 		ttipObj.style.left=MSIE?MSIEBodyReturn().scrollLeft+event.clientX-ttipObj.offsetWidth+"px":window.pageXOffset+e.clientX-ttipObj.offsetWidth+"px";
 	}

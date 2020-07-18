@@ -9,6 +9,12 @@ $Id: mapuser.js 5 2007-03-01 15:17:28Z Guenter Richter $
  * <br>Please take this file as a prototype of user defined functions. It holds an empty template for every function.
  */
 
+/* jshint funcscope:true, evil:true, eqnull:true, loopfunc:true, shadow: true, laxcomma: true, laxbreak: true, expr: true, sub: true*/
+/* globals 
+	document, window, alert, _TRACE, setTimeout, HTMLWindow,
+	Map, map, thisversion, szMapNs, SVGDocument, SVGRootElement, SVGPopupGroup, 
+	htmlgui_prettyPrintXML, doDomViewer
+	*/
 
 Map.User = function(){
 };
@@ -32,7 +38,7 @@ Map.User.prototype.printARCXML = function(objNode){
 
 		if ( ptList ){
 
-			szPrint = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+			var szPrint = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 
 			szPrint += "<ARCXML version=\"1.1\">\n";
 			szPrint += " "+"<CONFIG>\n";
@@ -52,7 +58,7 @@ Map.User.prototype.printARCXML = function(objNode){
 			szPrint += " "+" "+" "+" "+" "+"<SIMPLEPOLYGONSYMBOL fillcolor=\"0,0,255\" boundarycolor=\"0,0,0\" filltransparency=\"0.5\"/>\n";
 			szPrint += " "+" "+" "+" "+" "+"<POLYGON>\n";
 			szPrint += " "+" "+" "+" "+" "+" "+"<RING>\n";
-			for ( a in ptList ){
+			for ( var a in ptList ){
 				szPrint += " "+" "+" "+" "+" "+" "+" "+"<POINT x=\""+ptList[a].x+"\" y=\""+ptList[a].y+"\" />\n";
 			}
 			szPrint += " "+" "+" "+" "+" "+" "+"</RING>\n";
@@ -85,7 +91,7 @@ Map.User.prototype.printGML = function(objNode){
 		var ptEnvelopeA = map.Api.getActualEnvelopeCoordinates();
 		var ptList = map.Api.getShapeCoordinates(objNode);
 		if ( ptList ){
-			szPrint =  "<?xml version='1.0' encoding='UTF-8'?>\n";
+			var szPrint =  "<?xml version='1.0' encoding='UTF-8'?>\n";
 			szPrint += " "+"<gml:FeatureCollection\n";
 			szPrint += " "+" "+"xmlns:gml='http:"+"/"+"/"+"www.opengis.net/gml'\n";
 			szPrint += " "+" "+"xmlns:xlink='http:"+"/"+"/"+"www.w3.org/1999/xlink'>\n";
@@ -95,7 +101,7 @@ Map.User.prototype.printGML = function(objNode){
 			szPrint += " "+" "+" "+"<gml:outerBoundaryIs>\n";
 			szPrint += " "+" "+" "+" "+"<gml:LinearRing>\n";
 			szPrint += " "+" "+" "+" "+" "+"<gml:coordinates>\n";
-			for ( a in ptList ){
+			for ( var a in ptList ){
 				szPrint += " "+" "+" "+" "+" "+" "+ptList[a].x+","+ptList[a].y+"\n";
 			}
 			szPrint += " "+" "+" "+" "+" "+"</gml:coordinates>\n";

@@ -19,6 +19,14 @@ $Log: mapquery.js,v $
  * @version 1.1 
  */
 
+/* jshint funcscope:true, evil:true, eqnull:true, loopfunc:true, shadow: true, laxcomma: true, laxbreak: true, expr: true, sub: true*/
+/* globals 
+	document, window, alert, _TRACE, setTimeout,
+	Map, map, thisversion, szMapNs, SVGDocument, SVGRootElement, SVGPopupGroup, 
+	point, box, getMatrix, setMapTool,
+	displayMessage, _activeTheme, _activeItem, displayInfo, displayInfoDelayed, clearThemes, highLightList
+	*/
+
 // .............................................................................
 // Query  (search in attributes and texts)     
 // .............................................................................
@@ -51,7 +59,7 @@ else{
  * return list with all themes within the map
  */
 Map.Query.prototype.xgetThemes = function(){
-	if (this.themesA.length == 0 && SVGDocument){
+	if (this.themesA.length === 0 && SVGDocument){
 		var mapNode   = SVGDocument.getElementById("mapzoomandpan");
 		if (mapNode){
 			var featureNodes = mapNode.childNodes;
@@ -72,7 +80,7 @@ Map.Query.prototype.xgetThemes = function(){
  * @return list with all themes within the map
  */
 Map.Query.prototype.getThemes = function(){
-	if (this.themesA.length == 0 && SVGDocument){
+	if (this.themesA.length === 0 && SVGDocument){
 		var themeNodesA = SVGDocument.getElementsByTagNameNS(szMapNs,"theme");
 		if (themeNodesA){
 			for (var i=0;i<themeNodesA.length;i++){
@@ -87,7 +95,7 @@ Map.Query.prototype.getThemes = function(){
  * return list with all themes within the map^which have an info attribute
  */
 Map.Query.prototype.getThemesWithInfo = function(){
-	if (this.infoThemesA.length == 0 && SVGDocument){
+	if (this.infoThemesA.length === 0 && SVGDocument){
 		var themeNodesA = SVGDocument.getElementsByTagNameNS(szMapNs,"theme");
 		if (themeNodesA){
 			for (var i=0;i<themeNodesA.length;i++){
@@ -104,7 +112,7 @@ Map.Query.prototype.getThemesWithInfo = function(){
  * return list with all themes within the map^which have a selection attribute
  */
 Map.Query.prototype.getThemesWithSelection = function(){
-	if (this.infoThemesA.length == 0 && SVGDocument){
+	if (this.infoThemesA.length === 0 && SVGDocument){
 		var themeNodesA = SVGDocument.getElementsByTagNameNS(szMapNs,"theme");
 		if (themeNodesA){
 			for (var i=0;i<themeNodesA.length;i++){
@@ -169,9 +177,9 @@ Map.Query.prototype.getValuesOfFieldAndTheme = function(szTheme,szField,nMaxCoun
 
 		if (themeNode == null){
 			var themeNodesA = map.Tiles.getTileNodes(szTheme);
-			for ( t=0; t<themeNodesA.length; t++){
+			for ( var t=0; t<themeNodesA.length; t++){
 				var tileFieldsA = this.getValuesOfFieldAndTheme(themeNodesA[t].getAttributeNS(null,"id"),szField,nMaxCount);
-				for ( f=0; f<tileFieldsA.length ;f++ ){
+				for ( var f=0; f<tileFieldsA.length ;f++ ){
 					fieldsA[fieldsA.length] = tileFieldsA[f];
 				}
 				if ((nMaxCount -= tileFieldsA.length) < 0 ){
@@ -251,7 +259,7 @@ Map.Query.prototype.getSelectionValuesOfTheme = function(szTheme,nMaxCount){
 	var valuesA = new Array(0);
 	var i;
 	if ( szTheme == null ){
-		return fieldsA;
+		return valuesA;
 	}
 	if ( !nMaxCount ){
 		nMaxCount = 100000;
@@ -263,9 +271,9 @@ Map.Query.prototype.getSelectionValuesOfTheme = function(szTheme,nMaxCount){
 		}else{
 			var themeNodesA = new Array(themeNode);
 		}
-		for ( t=0; t<themeNodesA.length; t++){
+		for ( var t=0; t<themeNodesA.length; t++){
 			var childsA = themeNodesA[t].getElementsByTagName('g');
-			for ( tt=0; tt<childsA.length; tt++){
+			for ( var tt=0; tt<childsA.length; tt++){
 				var szId = map.Tiles.getMasterId(childsA.item(tt).getAttributeNS(null,"id"));
 				var szIdA = szId.split(":");
 				valuesA.push(szIdA.pop());
@@ -293,8 +301,8 @@ Map.Query.prototype.getValueOfFieldAndItem = function(szId,szField){
 		}
 		if (itemNode){
 			var szValues = itemNode.getAttributeNS(szMapNs,"info");
-			if ( !szValues || szValues.length == 0 ){
-				childsA = itemNode.childNodes;
+			if ( !szValues || szValues.length === 0 ){
+				var childsA = itemNode.childNodes;
 				for ( var i=0;i<childsA.length;i++ ){
 					if (childsA.item(i).nodeType == 1 ){
 						szValues = childsA.item(i).getAttributeNS(szMapNs,"info");
@@ -443,7 +451,7 @@ Map.Query.prototype.searchItem = function(szSearch,szMethod,szThemes){
 			}
 			if ( fMatch ){
 				var szInfo = nodeA[i].getAttributeNS(szMapNs,"info") || nodeA[i].getAttributeNS(szMapNs,"tooltip");
-				if ( szInfo==null || szInfo.length == 0 ){
+				if ( szInfo==null || szInfo.length === 0 ){
 					szInfo = nodeA[i].parentNode.getAttributeNS(szMapNs,"info") || nodeA[i].parentNode.getAttributeNS(szMapNs,"tooltip");
 				}
 				var infoA = szInfo.split('|');
@@ -523,7 +531,7 @@ Map.Query.prototype.searchItemAdvanced = function(szQuery,szTheme){
 	var i,ii;
 	var nIndex;
 
-	if (this.searchRecursion==0){
+	if (this.searchRecursion === 0){
 		this.foundNodesA.length = 0;
 		this.szThemesA = new Array(szTheme);
 	}
@@ -599,7 +607,7 @@ Map.Query.prototype.searchItemAdvanced = function(szQuery,szTheme){
 		if (themeNode == null){
 			var themeNodesA = map.Tiles.getTileNodes(szTheme);
 			this.searchRecursion++;
-			for ( t=0; t<themeNodesA.length; t++){
+			for ( var t=0; t<themeNodesA.length; t++){
 				this.searchItemAdvanced(szQuery,themeNodesA[t].getAttributeNS(null,"id"));
 			}
 			this.searchRecursion=0;
@@ -619,23 +627,23 @@ Map.Query.prototype.searchItemAdvanced = function(szQuery,szTheme){
 			if (childsA && childsA.length){
 				infoA = childsA.item(0).getAttributeNS(szMapNs,"info");
 			}
-			if (infoA == null || infoA.length == 0){
+			if (infoA == null || infoA.length === 0){
 				childsA = themeNode.getElementsByTagName('use');
 			}
 			if (childsA && childsA.length){
 				infoA = childsA.item(0).getAttributeNS(szMapNs,"info");
 			}
-			if (infoA == null || infoA.length == 0){
+			if (infoA == null || infoA.length === 0){
 				childsA = themeNode.getElementsByTagName('g');
 			}
 			for ( i=0;i<childsA.length;i++ ){
 				if (childsA.item(i).nodeType == 1 ){
 					infoA = childsA.item(i).getAttributeNS(szMapNs,"info").split('|');
 
-					anzParts = thisQuery.partA.length;
+					var anzParts = thisQuery.partA.length;
 					for (var p=0; p<anzParts; p++){
-						var fOk = true;
-						anzConditions = thisQuery.partA[p].conditionA.length;
+						var fOK = true;
+						var anzConditions = thisQuery.partA[p].conditionA.length;
 						for (var c=0; c<anzConditions; c++){
 							nIndex = szFieldsA[thisQuery.partA[p].conditionA[c].szTopic];
 							switch(thisQuery.partA[p].conditionA[c].szOperator){
@@ -646,7 +654,7 @@ Map.Query.prototype.searchItemAdvanced = function(szQuery,szTheme){
 								case '<>': fOK = (Number(infoA[nIndex]) != thisQuery.partA[p].conditionA[c].szValue); break;
 								case '>=': fOK = (Number(infoA[nIndex]) >= thisQuery.partA[p].conditionA[c].szValue); break;
 								}
-							if (fOK == false){
+							if (fOK === false){
 								break;
 							}
 						}
@@ -673,8 +681,8 @@ Map.Query.prototype.searchItemByAttribute = function(szAttribute,szValue){
 	this.foundNodesA.length = 0;
 	var nodeA = new Array(0);
 
-	childsA = SVGRootElement.getElementsByTagName('path');
-	for ( i=0; i<childsA.length; i++){
+	var childsA = SVGRootElement.getElementsByTagName('path');
+	for ( var i=0; i<childsA.length; i++){
 		nodeA[nodeA.length] = childsA.item(i);
 	}
 	childsA = SVGRootElement.getElementsByTagName('use');
@@ -688,7 +696,7 @@ Map.Query.prototype.searchItemByAttribute = function(szAttribute,szValue){
 	for ( i=0; i<nodeA.length; i++){
 		if ( nodeA[i].getAttributeNS(null,szAttribute) == szValue ){
 			var szInfo = nodeA[i].getAttributeNS(szMapNs,"info");
-			if ( szInfo==null || szInfo.length == 0 ){
+			if ( szInfo==null || szInfo.length === 0 ){
 				szInfo = nodeA[i].parentNode.getAttributeNS(szMapNs,"info");
 			}
 			var infoA = szInfo.split('|');
@@ -696,7 +704,7 @@ Map.Query.prototype.searchItemByAttribute = function(szAttribute,szValue){
 		}
 		if ( nodeA[i].getAttributeNS(szMapNs,szAttribute) == szValue ){
 			var szInfo = nodeA[i].getAttributeNS(szMapNs,"info");
-			if ( szInfo==null || szInfo.length == 0 ){
+			if ( szInfo==null || szInfo.length === 0 ){
 				szInfo = nodeA[i].parentNode.getAttributeNS(szMapNs,"info");
 			}
 			var infoA = szInfo.split('|');
@@ -750,7 +758,7 @@ Map.Query.prototype.execGotoFoundItem = function(nIndex,mode,newZoom){
 				var pEnd   = new point(-100000,-100000);
 				for ( i=0; i<this.foundNodesA.length; i++){
 					bBox = map.Dom.getBox(this.foundNodesA[i].node);
-					if ( bBox.width == 0 || bBox.height == 0 ){
+					if ( bBox.width === 0 || bBox.height === 0 ){
 						var nodeMatrixA = getMatrix(this.foundNodesA[i].node);
 						bBox.x += nodeMatrixA[4]; 
 						bBox.y += nodeMatrixA[5]; 
@@ -822,7 +830,7 @@ Map.Query.prototype.execGotoFoundItem = function(nIndex,mode,newZoom){
 		// position to found shape
 		bBox = map.Dom.getBox(foundNode);
 		bBox = new box(bBox.x,bBox.y,bBox.width,bBox.height);
-		if ( bBox.width == 0 || bBox.height == 0 ){
+		if ( bBox.width === 0 || bBox.height === 0 ){
 			var zoomBox = map.Zoom.getBox();
 			nodeMatrixA = getMatrix(foundNode);
 			bBox.x += nodeMatrixA[4]; 

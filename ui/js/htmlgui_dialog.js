@@ -344,10 +344,6 @@ $Log: htmlgui.js,v $
 
 	ixmaps.getShareUrl = function(szType){
 
-		var szAloneUrl = null;
-		var szEmbedUrl = null;
-		var szPopoutUrl = null;
-
 		// GR 30.04.2015 try to call explicit functions to get the share urls 
 		// ------------------------------------------------------------------
 		var szEditUrl   = ixmaps.getEditUrl  ?ixmaps.getEditUrl()  :null;

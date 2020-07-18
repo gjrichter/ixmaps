@@ -19,6 +19,14 @@ $Log: htmlgui.js,v $
  * @version 1.1 
  */
 
+/* jshint funcscope:true, evil:true, eqnull:true, loopfunc:true, shadow: true, laxcomma: true,
+   laxbreak: true, expr: true, sub: true, scripturl: true */
+/* globals 
+	window, document,
+	movieobject, moviename, loadobject, nextobject, anzobjects, loadedobject, zoomname, map_zoomframe_level, _level, map_pan_level,
+	map_extent
+	*/
+
 /** 
  * @namespace ixmaps
  */
@@ -812,7 +820,7 @@ $Log: htmlgui.js,v $
 		} else {
 			$("#map-overlay").html("").hide();
 		}
-	}
+	};
 	
 	/**
 	 * display title
@@ -828,7 +836,7 @@ $Log: htmlgui.js,v $
 			szHtml = "<div style='position:relative;left:100px;top:10px;font-style:arial,helvetica;font-size:22px'>"+szTitle+"</div>";
 		}
 		this.setMapOverlayHTML(szHtml);
-	}
+	};
 
 	// -----------------------------------
 	// show/hide HTML map
@@ -938,7 +946,7 @@ $Log: htmlgui.js,v $
 	ixmaps.setOptions = function (opt) {
 		if (opt) {
 			var szFeatures = "";
-			for (i in opt) {
+			for (var i in opt) {
 				if ((typeof (i) == "string") && (i.match(/syncMap/i))) {
 					this.fSyncMap = ((typeof (opt[i]) == "string") ? (opt[i] == "true") : opt[i]);
 				} else
@@ -1021,7 +1029,7 @@ $Log: htmlgui.js,v $
 		// GR 10.01.2019 new theme object data{} --> old JSON structure -> object style 
 		//
 		if (theme.data) {
-			for (i in theme.data) {
+			for (var i in theme.data) {
 				if (i == "obj") {
 					theme.style["dbtable"] = theme.data[i];
 				} else
@@ -1388,7 +1396,7 @@ $Log: htmlgui.js,v $
 		} catch (e) {
 			return null;
 		}
-	}
+	};
 
 	/**
 	 * start theme clip
@@ -1402,7 +1410,7 @@ $Log: htmlgui.js,v $
 		} catch (e) {
 			return null;
 		}
-	}
+	};
 
 	/**
 	 * set theme clip frame
@@ -1417,7 +1425,7 @@ $Log: htmlgui.js,v $
 		} catch (e) {
 			return null;
 		}
-	}
+	};
 
 	/**
 	 * bext theme clip frame
@@ -1431,7 +1439,7 @@ $Log: htmlgui.js,v $
 		} catch (e) {
 			return null;
 		}
-	}
+	};
 		
 	
 	// -----------------------------
@@ -1743,7 +1751,7 @@ $Log: htmlgui.js,v $
 		if (__mapsEmbedA == null) {
 			__mapsEmbedA = new Array(0);
 			var embedsA = window.document.embeds;
-			for (a in embedsA) {
+			for (var a in embedsA) {
 				if (a.match(/SVG/)) {
 					__mapsEmbedA[a] = a;
 					__mapsEmbedded++;
@@ -2026,7 +2034,7 @@ $Log: htmlgui.js,v $
 			d[xA[0]] = xA[1];
 		}
 		var szResult = "";
-		for (i in d) {
+		for (var i in d) {
 			szResult += i + ":" + d[i] + ";";
 		}
 		return "map.Api.setMapFeatures('" + szResult + "');";

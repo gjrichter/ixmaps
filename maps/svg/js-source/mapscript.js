@@ -20,6 +20,14 @@ $Log: mapscript.js,v $
  * @version 1.1 
  */
 
+/* jshint funcscope:true, evil:true, eqnull:true, loopfunc:true, shadow: true, laxcomma: true, laxbreak: true, expr: true, sub: true */
+/* globals 
+	document, HTMLDocument, navigator, contextMenu, XMLHttpRequest,
+	setTimeout, clearTimeout, alert, window, setMapTool, console, TRACE, _TRACE, _ERROR,
+	displayScale, viewBox, viewBoxScale,
+	TextField, InfoContainer, _removeInfo, Button
+	*/
+
 /* ...................................................................* 
  *  global vars                                                       * 
  * ...................................................................*/ 
@@ -37,10 +45,19 @@ var SVGToolsGroup   = null;
 var SVGThemeGroup   = null;
 var SVGFixedGroup   = null;
 var SVGPopupGroup   = null;
+var SVGNotifyGroup  = null;
 var SVGMessageGroup = null;
 var SVGMenuGroup    = null;
 var SVGTltipGroup   = null;
 var SVGHiddenGroup  = null;
+var SVGTempGroup  	= null;
+
+var SVGWidth = null;
+var SVGHeight = null;
+var SVGViewBox = null;
+var SVGOrigViewBoxString = null;
+var EmbedWidth = null;
+var EmbedHeight = null;
 
 var fTransparentMap = false;
 var fClipMap = true;
@@ -213,7 +230,7 @@ var highLightList = null;
  * @throws 
  * @return A new Map
  */
-Map = function(){
+var Map = function(){
 	/** flag: initialization in progress */
 	this.fInitializing = false;
 	/** holds the subclass for event handling */
@@ -306,7 +323,7 @@ Map.prototype.setFeatures = function(szFeatures){
 	this.szFeatures = (this.szFeatures || "") + ";" + szFeatures;
 	var fOldCheckLabelOverlap = fCheckLabelOverlap;
 	var featuresA = szFeatures.split(';');
-	for ( i in featuresA ){
+	for ( var i in featuresA ){
 		var szAttA = featuresA[i].split(':');
 		switch (szAttA[0]){
 			case "featurescaling":
@@ -608,7 +625,7 @@ Map.prototype.isInitializing = function(){
  * @return true or false
  */
 Map.prototype.isIdle = function(){
-	if ( !this.isInitializing() && !this.isLoading() && (this.actionA.length == 0) && (this.initActionA.length == 0) ){
+	if ( !this.isInitializing() && !this.isLoading() && (this.actionA.length === 0) && (this.initActionA.length === 0) ){
 		return true;
 	}
 	return false;
@@ -673,7 +690,7 @@ Map.prototype.pushInitAction = function(szAction,szMessage){
  */
 Map.prototype.popAction = function(){
 	_TRACE("--- map.popAction() "+ this.actionA.length +" ["+ this.actionA[0]+"]");
-	if ( this.actionA.length == 0 ){
+	if ( this.actionA.length === 0 ){
 		//clearMessage();
 		return;
 	}
@@ -721,7 +738,7 @@ Map.prototype.popAction = function(){
  */
 Map.prototype.popInitAction = function(){
 	_TRACE("--- map.popInitAction()");
-	if ( this.initActionA.length == 0 ){
+	if ( this.initActionA.length === 0 ){
 		map.npopActionWaitInit = 0;
 		map.popAction();
 		return;
@@ -750,7 +767,7 @@ Map.prototype.popInitAction = function(){
  * @return true, if version is ok
  */
 Map.prototype.checkVersion = function(szVersion){
-	if ( szVersion == null || szVersion != this.version ){
+	if ( szVersion === null || szVersion != this.version ){
 		return false;
 	}
 	return true;
@@ -830,7 +847,7 @@ Map.prototype.setOpacity = function(nValue,szMode){
 			this.nOpacity = nValue;
 		}else{
 			var szOpacity = canvasNode.style.getPropertyValue("opacity");
-			if ( szOpacity == null || szOpacity.length == 0 ){
+			if ( szOpacity === null || szOpacity.length === 0 ){
 				szOpacity = "1";
 			}
 			var nOpacity = parseFloat(szOpacity);
@@ -848,7 +865,7 @@ Map.prototype.toggleOpacity = function(){
 	var canvasNode = SVGDocument.getElementById("maplayer");
 	if ( canvasNode ){
 		var szOpacity = canvasNode.style.getPropertyValue("opacity");
-		if ( szOpacity == null || szOpacity.length == 0 ){
+		if ( szOpacity === null || szOpacity.length === 0 ){
 			szOpacity = "1";
 		}
 		var nOpacity = parseFloat(szOpacity);
@@ -882,7 +899,7 @@ Map.prototype.loadMap = function(szUrl){
 			HTMLWindow.ixmaps.loadingMap = szUrl;
 		} catch(e){}
 		if ( szUrl.match(/http/)){
-			szUrlA = szUrl.split(/\//);
+			var szUrlA = szUrl.split(/\//);
 			szUrlA.splice(-1);
 			szUrl = szUrlA.join("/");
 			this.mapRoot = szUrl + "/";
@@ -1554,8 +1571,8 @@ Map.Dom.prototype.newText = function(targetGroup,x,y,s,szText){
 	if ( fCreatTextLink && szText.substr(0,7) == szHTTP ){
 		return this.newTextLink(targetGroup,x,y,s,szText);
 	}
-	nT = this.constructNode('text',targetGroup,{x:String(x),y:String(y),style:s});
-	atext = this.targetDocument.createTextNode(szText);
+	var nT = this.constructNode('text',targetGroup,{x:String(x),y:String(y),style:s});
+	var atext = this.targetDocument.createTextNode(szText);
 	nT.appendChild(atext);
 	return nT;
 };
@@ -1575,8 +1592,8 @@ Map.Dom.prototype.newTSpan = function(targetGroup,s,szText){
 	if (!szText){
 		var szText="(undefined)";
 	}
-	nT = this.constructNode('tspan',targetGroup,{style:s});
-	atext = this.targetDocument.createTextNode(szText);
+	var nT = this.constructNode('tspan',targetGroup,{style:s});
+	var atext = this.targetDocument.createTextNode(szText);
 	nT.appendChild(atext);
 	return nT;
 };
@@ -1594,11 +1611,11 @@ Map.Dom.prototype.newTextOnPath = function(targetGroup,szPathId,szText,s,offset)
 		szText = "(undefined)";
 	}
 	szText = String(szText);
-	nT = this.constructNode('text',targetGroup,{style:s});
-	nTP = this.constructNode('textPath',targetGroup,{style:s});
+	var nT = this.constructNode('text',targetGroup,{style:s});
+	var nTP = this.constructNode('textPath',targetGroup,{style:s});
 	nTP.setAttributeNS(szXlink,"xlink:href","#"+szPathId);
 	nTP.setAttributeNS(null,"startOffset",offset);
-	atext = this.targetDocument.createTextNode(szText);
+	var atext = this.targetDocument.createTextNode(szText);
 	nTP.appendChild(atext);
 	nT.appendChild(nTP);
 	return nT;
@@ -1615,14 +1632,14 @@ Map.Dom.prototype.newTextOnPath = function(targetGroup,szPathId,szText,s,offset)
  * @return the created text link element
  */
 Map.Dom.prototype.newTextLink = function(targetGroup,x,y,s,szText,szLink){
-	nL = this.constructNode('a',targetGroup);
+	var nL = this.constructNode('a',targetGroup);
 	nL.setAttributeNS(szXlink,"xlink:href",(szLink?szLink:szText));
 	nL.setAttributeNS(null,"target",szLinkTarget);
 	if (szText && (szText.length > 30)){
 		szText = szText.substr(0,29) + " ...";
 	}
-	nT = this.constructNode('text',nL,{x:String(x),y:String(y),style:s});
-	atext = this.targetDocument.createTextNode(szText);
+	var nT = this.constructNode('text',nL,{x:String(x),y:String(y),style:s});
+	var atext = this.targetDocument.createTextNode(szText);
 	nT.appendChild(atext);
 	nT.style.setProperty("fill","blue","");
 	nT.style.setProperty("text-decoration","underline","");
@@ -1675,7 +1692,7 @@ Map.Dom.prototype.wrapText = function(textNode,nMaxWidth){
  * @return an array with the found nodes
  */
 Map.Dom.prototype.getAllIds = function(objNode,nRecursion){
-	if ( nRecursion == null ){
+	if ( nRecursion === null ){
 		this.idList.length = 0;
 	}
 	if ( objNode && objNode.hasChildNodes() ){
@@ -1739,7 +1756,7 @@ Map.Dom.prototype.getAttributeByNodeOrParents = function(objNode,szNspace,szAttN
 	var szId = null;
 	while ( objNode && (objNode.nodeType == 1) ){
 		szId = objNode.getAttributeNS(szNspace,szAttName);
-		if ( (szId == null) || (szId.length == 0) ){
+		if ( (szId === null) || (szId.length === 0) ){
 			objNode = objNode.parentNode;
 		}
 		else{
@@ -2269,7 +2286,7 @@ Map.Scale.prototype.formatSurfaceString = function(nQMeter){
 	else{
 		szValue = String(Math.round(nQMeter*1000)/1000)+" m2";
 	}
-	szValueA = szValue.split(".");
+	var szValueA = szValue.split(".");
 	if (szValueA.length > 1){
 		szValue = szValueA[0]+','+szValueA[1];
 	}
@@ -2352,7 +2369,7 @@ Map.Scale.prototype.getMapCoordinateUTM = function(x,y){
  */
 Map.Scale.prototype.getMapPositionOfUTM = function(x,y,szDatum,szUtmZone){
 
-	ptOff = _UTMtoLL(szDatum, x, y,szUtmZone);
+	var ptOff = _UTMtoLL(szDatum, x, y,szUtmZone);
 	ptOff = map.Scale.getMapCoordinateOfLatLon(ptOff.y,ptOff.x);
 	var nX  = (ptOff.x-map.Scale.minBoundX)/map.Scale.mapUnitsPPX - map.Scale.mapOffset.x;
 	var nY  = map.Scale.bBox.height - (ptOff.y-map.Scale.minBoundY)/map.Scale.mapUnitsPPY - map.Scale.mapOffset.y;
@@ -2367,7 +2384,7 @@ Map.Scale.prototype.getMapPositionOfUTM = function(x,y,szDatum,szUtmZone){
  */
 Map.Scale.prototype.getMapPositionOfLatLon = function(lat,lon){
 
-	ptOff = map.Scale.getMapCoordinateOfLatLon(lat,lon);
+	var ptOff = map.Scale.getMapCoordinateOfLatLon(lat,lon);
 	var nX  = (ptOff.x-map.Scale.minBoundX)/map.Scale.mapUnitsPPX - map.Scale.mapOffset.x;
 	var nY  = map.Scale.bBox.height - (ptOff.y-map.Scale.minBoundY)/map.Scale.mapUnitsPPY - map.Scale.mapOffset.y;
 	return {x:nX,y:nY}; // new point(nX,nY);
@@ -2537,7 +2554,7 @@ Map.Scale.prototype.clipWidgetObjectToSVG = function(objNode,ptPos,ptOffset,bBox
 		bBox = map.Dom.getBox(objNode);
 	}
 	if (objNode.getAttributeNS(null,"clip-path")){
-		szClipPath = objNode.getAttributeNS(null,"clip-path");
+		var szClipPath = objNode.getAttributeNS(null,"clip-path");
 		if (szClipPath.match(/url/) ){
 			szClipPath = szClipPath.substr(5,szClipPath.length-6);
 			var clipPathNode = SVGDocument.getElementById(szClipPath);
@@ -2995,7 +3012,7 @@ Map.Scale.prototype.normalizeElements = function(targetGroup,regExMatch,nNormalS
 
 				var bBox = map.Dom.getBox(symbolObj);
 				// if we can't get the box, make temporary use element and trry again (for firefox!)
-				if ( bBox.width == 0 ){
+				if ( bBox.width === 0 ){
 					var cNode = map.Dom.constructNode('use',SVGTempGroup,{'xlink:href':'#'+szId});
 					bBox = map.Dom.getBox(cNode);
 				}
@@ -3074,28 +3091,28 @@ Map.Scale.prototype.rotatePoint = function(pPoint,nDir){
 Map.Scale.prototype.createWidgetStyles = function(){
 
 	if ( typeof(szContainerTitle) != 'string' ){
-		szContainerTitle =	"font-family:arial;font-size:12px;fill:#444444;pointer-events:none;";
+		var szContainerTitle =	"font-family:arial;font-size:12px;fill:#444444;pointer-events:none;";
 	}
 	if ( typeof(szInfoContainerTitle) != 'string' ){
-		szInfoContainerTitle =	szContainerTitle;
+		var szInfoContainerTitle =	szContainerTitle;
 	}
 	if ( typeof(szDescription) != 'string' ){
-		szDescription =		"font-family:arial;font-size:10px;fill:#888888;font-weight:bold;font-style:italic;pointer-events:none;";
+		var szDescription =		"font-family:arial;font-size:10px;fill:#888888;font-weight:bold;font-style:italic;pointer-events:none;";
 	}
 	if ( typeof(szSnippet) != 'string' ){
-		szSnippet =		"font-family:arial;font-size:11px;fill:#555555;;pointer-events:none;";
+		var szSnippet =		"font-family:arial;font-size:11px;fill:#555555;;pointer-events:none;";
 	}
 	if ( typeof(szSummary) != 'string' ){
-		szSummary =			"font-family:arial;font-size:10px;fill:#444444;pointer-events:none;";
+		var szSummary =			"font-family:arial;font-size:10px;fill:#444444;pointer-events:none;";
 	}
 	if ( typeof(szNote) != 'string' ){
-		szNote =			"font-family:arial;font-size:11px;fill:darkgrey;font-style:italic;stroke:none;pointer-events:none;";
+		var szNote =			"font-family:arial;font-size:11px;fill:darkgrey;font-style:italic;stroke:none;pointer-events:none;";
 	}
 	if ( typeof(szValues) != 'string' ){
-		szValues =			"font-family:arial;font-size:10px;fill:#798697;font-style:normal;stroke:none;pointer-events:none;";
+		var szValues =			"font-family:arial;font-size:10px;fill:#798697;font-style:normal;stroke:none;pointer-events:none;";
 	}
 	
-	this.tStyle = new Object();
+	this.tStyle = {};
 
 	this.tStyle.ContainerTitle = this.createTextObject(szContainerTitle);
 	this.tStyle.InfoContainerTitle = this.createTextObject(szInfoContainerTitle);
@@ -3110,9 +3127,7 @@ Map.Scale.prototype.createWidgetStyles = function(){
  */
 Map.Scale.prototype.createTextObject = function(szTextStyle){
 
-	nFontHeight = this.normalY(10);
-
-	var tObject = new Object();
+	var tObject = {};
 
 	tObject.szStyle  = __scaleStyleString(szTextStyle,this.normalY(1));
 	tObject.nFontHeight = __getFontHeightfromStyleString(tObject.szStyle);
@@ -3126,7 +3141,7 @@ Map.Scale.prototype.createTextObject = function(szTextStyle){
  */
 Map.Scale.prototype.getScaleParam = function(){
 
-	var scaleParam = new Object();
+	var scaleParam = {};
 
 	if ( this.nFeatureScaling && (this.nFeatureScaling != 1) ){
 		scaleParam.featureScaling = this.nFeatureScaling;
@@ -3191,14 +3206,14 @@ Map.Scale.prototype.setScaleParam = function(obj){
 // helper for positioning and scaling of SVG elements       
 // .................................................................... 
 
-matrixRegExp=/matrix\(([^,]*)\)/;
-matrixRegExp1=/matrix\(([^,]*)\)/;
-matrixRegExp2=/matrix\(([0-9., -e]*)\)/;
-translateRegExp1=/translate\(([^,]*)\)/;
-translateRegExp2=/translate\(([0-9., -e]*)\)/;
-rotateRegExp=/rotate\(([0-9]*)\)/;
+var matrixRegExp=/matrix\(([^,]*)\)/;
+var matrixRegExp1=/matrix\(([^,]*)\)/;
+var matrixRegExp2=/matrix\(([0-9., -e]*)\)/;
+var translateRegExp1=/translate\(([^,]*)\)/;
+var translateRegExp2=/translate\(([0-9., -e]*)\)/;
+var rotateRegExp=/rotate\(([0-9]*)\)/;
 
-urlRegExp=/url\(#([a-zA-Z0-9\-\.\_\:]*)\)/;
+var urlRegExp=/url\(#([a-zA-Z0-9\-\.\_\:]*)\)/;
 
 /**
  * get the transform matrix of the given node as Array(6)
@@ -3435,7 +3450,7 @@ box.prototype.scale = function(nFactor) {
  * @return true or false
  */
 box.prototype.check = function() {
-	if ( isNaN(x) || isNaN(y) || isNaN(width) || isNaN(height) ){
+	if ( isNaN(this.x) || isNaN(this.y) || isNaN(this.width) || isNaN(this.height) ){
 		return false;
 	}
 	return true;
@@ -3490,9 +3505,9 @@ function MapObject(nodeObj){
 	// must have an id !
 	/** the id of the mapObject @type string */
 	this.szId = "";
-	while(this.szId == "" && nodeObj.parentNode && nodeObj.nodeType == 1 ) {
+	while(this.szId === "" && nodeObj.parentNode && nodeObj.nodeType == 1 ) {
 		this.szId = nodeObj.getAttributeNS(null,'id');
-		if ( (typeof this.szId != "string" ) || (this.szId == "") || (this.szId.match(/noobject/)) ){
+		if ( (typeof this.szId != "string" ) || (this.szId === "") || (this.szId.match(/noobject/)) ){
 			nodeObj = nodeObj.parentNode;
 			this.szId = "";
 		}
@@ -3708,7 +3723,7 @@ Methods.prototype.isContained = function(objNode){
  * @param szExtend the string to add to all ids found 
  */
 Methods.prototype.extendAllIds = function(szExtend){
-	map.Dom.extendAllIds(objNode,szExtend);
+	map.Dom.extendAllIds(this.objNode,szExtend);
 };
 
 
@@ -3744,9 +3759,9 @@ Map.CSS = function(styleNodes){
  */
 Map.CSS.prototype.getStyleString = function(){
 	var szStyles = "";
-	for (a in this.stylesA ){
+	for (var a in this.stylesA ){
 		szStyles += ' .' + a + '{';
-		for ( s in this.stylesA[a] ){
+		for ( var s in this.stylesA[a] ){
 			szStyles += s+':'+ this.stylesA[a][s] + ';';
 		}
 		szStyles += '}';
@@ -3921,7 +3936,7 @@ function __getFontHeightfromStyleString(szStyle){
 	var szStyleA = szStyle.split(';');
 	for ( var i=0; i<szStyleA.length;i++){
 		if ( szStyleA[i].match(/font-size/) ){
-			styleA=szStyleA[i].split(':');
+			var styleA=szStyleA[i].split(':');
 			return parseFloat(styleA[1]);
 		} 
 	}
@@ -4075,7 +4090,7 @@ AntiZoomAndPan.prototype.setDisplay = function(evt,state){
  */
 AntiZoomAndPan.prototype.initAntiZoomPattern = function(evt,rootNode){
 
-	if (rootNode == null){
+	if (rootNode === null){
 		rootNode = SVGDocument;
 	}
 	if (evt){
@@ -4084,7 +4099,7 @@ AntiZoomAndPan.prototype.initAntiZoomPattern = function(evt,rootNode){
 
 	// clone pattern
 	var nodeA = rootNode.getElementsByTagName('pattern');
-	if (nodeA == null || nodeA.length == 0 ){
+	if (nodeA === null || nodeA.length === 0 ){
 		return;
 	}
 	var nMaxP = nodeA.length;
@@ -4107,12 +4122,12 @@ AntiZoomAndPan.prototype.initAntiZoomPattern = function(evt,rootNode){
  */
 AntiZoomAndPan.prototype.initAntiZoomSymbols = function(evt,rootNode){
 
-	if (rootNode == null){
+	if (rootNode === null){
 		return;
 	}
 	// clone pattern
 	var nodeA = rootNode.getElementsByTagName('g');
-	if (nodeA == null || nodeA.length == 0 ){
+	if (nodeA === null || nodeA.length === 0 ){
 		return;
 	}
 	var nMaxP = nodeA.length;
@@ -4286,11 +4301,11 @@ function clearThemes(){
  * highlight theme 
  * @param szTheme the name of the theme to be activated
  */
- __highlightedTheme = null;
+var __highlightedTheme = null;
 function highlightTheme(mapObj){
 
 	while ( mapObj && (mapObj.objNode.nodeName != 'g') && mapObj.objNode.parentNode ){
-		if ( (mapObj = new MapObject(mapObj.objNode.parentNode)) == null ){
+		if ( (mapObj = new MapObject(mapObj.objNode.parentNode)) === null ){
 			return;
 		}
 	}
@@ -4345,7 +4360,7 @@ function displayTooltip(evt,infoShape){
 		var szText = (infoShape.getAttributeNS(szMapNs,"tooltip") || "");
 		// add parents tooltips until 'g' element
 		while ( (infoShape = infoShape.parentNode) != null ){
-			if ( !(infoShape.nodeName == 'g') ){
+			if ( (infoShape.nodeName != 'g') ){
 				break;
 			}
 			var szXText = infoShape.getAttributeNS(szMapNs,"tooltip");
@@ -4473,7 +4488,7 @@ function killTooltip(){
  * @throws 
  * @return A new Dictionary Object
  */
-Dictionary = function() {
+var Dictionary = function() {
 	this.szDictionary = [];
 };
 // realize the dictionary here, to have it ready
@@ -4553,7 +4568,7 @@ function displayMessage(szMessage,nTimeout,fAlert){
 		return;
 	}
 
-	if ( (typeof(szMessage) != 'string') || (szMessage.length == 0) ){
+	if ( (typeof(szMessage) != 'string') || (szMessage.length === 0) ){
 		SVGMessageGroup.fu.clear();
 		return;
 	}
@@ -4735,7 +4750,7 @@ function displayProgressBarOld(nActual,nMaximal,szMessage,nTimeout,szCancel,nEla
 		var actRect = map.Dom.newShape('rect',workspaceNode,nXoff,nYoff,nActual*nStep,nHeight,"fill:#3787D7;stroke:none;");
 
 		if ( szCancel ){
-			buttonObj = new Button(workspaceNode,"","BUTTON",'#delete_button'
+			var buttonObj = new Button(workspaceNode,"","BUTTON",'#delete_button'
 							,szCancel
 							,""
 							,"cancel operation");
@@ -5011,7 +5026,7 @@ function executeWithProgressBar(szFu,nActual,nMaximal,szMessage,szCancel,nElapse
 }
 
 function __doGetPolygonSurface(ptList,fWidget){
-	for ( a in ptList ){
+	for ( var a in ptList ){
 		if (fWidget){
 			// get lan lon coordinates
 			var mapPos   = map.Scale.getMapPosition(ptList[a].x,ptList[a].y);
@@ -5029,7 +5044,7 @@ function __doGetPolygonSurface(ptList,fWidget){
 	var nArea = 0;
 	var nCalc = 0;
 	ptList[ptList.length] = ptList[0];
-	for ( i=0; i<ptList.length-1; i++ ){
+	for ( var i=0; i<ptList.length-1; i++ ){
 		nCalc = ((ptList[i].x*ptList[i+1].y) - (ptList[i+1].x*ptList[i].y));
 		nArea += nCalc;
 	}
@@ -5037,7 +5052,7 @@ function __doGetPolygonSurface(ptList,fWidget){
 }
 function __doGetPolygonCenter(ptList){
 	var ptCenter = new point(0,0);
-	for ( a in ptList ){
+	for ( var a in ptList ){
 		ptCenter.x += ptList[a].x;
 		ptCenter.y += ptList[a].y;
 	}
@@ -5052,7 +5067,7 @@ function __doGetPolygonCenter(ptList){
  * @return an object of the kind: object.name = value
  */
 function __getStyleObj(szStyle){
-	if ( szStyle == null || szStyle.length < 2 ){
+	if ( szStyle === null || szStyle.length < 2 ){
 		return null;
 	}
 	try{
@@ -5084,7 +5099,7 @@ function __getStyleObj(szStyle){
  * @return an object of the kind: object.name = value
  */
 function __getStyleArray(szStyle){
-	if ( szStyle == null || szStyle.length < 2 ){
+	if ( typeof(szStyle) == "undefined" || szStyle == null || szStyle.length < 2 ){
 		return null;
 	}
 	try{
@@ -5161,7 +5176,7 @@ function __formatValue(nValue,nPrecision,szFlag){
 	if ( !isFinite(nValue) || !isFinite(nPrecision) ){
 		return String(nValue);
 	}
-	if ( nValue == 0 ){
+	if ( nValue === 0 ){
 		return String(nValue);
 	}
 	if ( nValue > 1000000000000 ){
@@ -5182,7 +5197,7 @@ function __formatValue(nValue,nPrecision,szFlag){
 
 	// GR 02.12.2011 make that low values do not collapse to 0
 	if ( (nValue > 0.0000001) && (nPrecision > 0) ){
-		while ( nValue.toFixed(nPrecision) == 0 ){
+		while ( nValue.toFixed(nPrecision) === 0 ){
 			nPrecision++;
 		}
 	}
@@ -5190,7 +5205,7 @@ function __formatValue(nValue,nPrecision,szFlag){
 	// GR 11.03.2009 fix precision before CEIL or FLOOR to avoid JS errors eg. 0.0000000000003
 	nValue = nValue.toFixed(nPrecision+1);
 
-	nClipDecimal = Math.pow(10,nPrecision);
+	var nClipDecimal = Math.pow(10,nPrecision);
 	if (szFlag && szFlag.match(/CEIL/)){
 		nValue = Math.ceil(nValue*nClipDecimal)/nClipDecimal;
 	}else
@@ -5270,7 +5285,7 @@ function __maptheme_formatpart(nPart,szLeading){
 	if (nPart<10){
 		szPart += szLeading;
 	}
-	if (nPart==0){
+	if (nPart===0){
 		szPart += szLeading;
 	}
 	else{
@@ -5402,7 +5417,7 @@ function SVGLoader(){
 			this.loadScripts(targetGroup);
 			try{
 				antiZoomAndPanList.initAntiZoomPattern(null,targetGroup);
-				map.Layer.initPatternScaling(evt,targetGroup);
+				map.Layer.initPatternScaling(null,targetGroup);
 			}
 			catch (e){
 			}
@@ -5442,7 +5457,7 @@ function SVGLoader(){
 		};
 		CallbackHandler.prototype.initLogo = function(targetGroup){
 			var logoGroup  = SVGDocument.getElementById("mapbackground:logo");
-			if ( logoGroup == null ){
+			if ( logoGroup === null ){
 				logoGroup = map.Dom.newGroup(SVGDocument.getElementById("mapbackground"),"mapbackground:logo");
 			}
 			if (logoGroup){
@@ -5647,7 +5662,7 @@ function SVGLoaderTiles(){
 	 * @param  targetGroup the target SVG group; content of the loaded document will be added as a new child to this group
 	 */
     this.isStacked = function(szUrl, svgDocument, targetGroup){
-		for ( i=0; i<this.stackA.length; i++ ){
+		for ( var i=0; i<this.stackA.length; i++ ){
 			if (this.stackA[i].szUrl == szUrl ){
 				if ( this.stackA[i].svgDocument == svgDocument &&
 					 this.stackA[i].targetGroup == targetGroup ) {
@@ -5715,7 +5730,7 @@ function SVGLoaderTiles(){
 
 			if ( map && map.Layer ){
 				// switch layer
-				for ( a in map.Layer.listA ){
+				for ( var a in map.Layer.listA ){
 					var layerItem = map.Layer.listA[a];
 					if ( typeof(layerItem.nState) != "undefined" ){
 						_TRACE("layer report:"+layerItem.szName+" "+layerItem.nState);
@@ -5725,7 +5740,7 @@ function SVGLoaderTiles(){
 						map.Layer.switchLayerByFeature(szTheme,layerItem.nState);
 					}
 					// switch sublayer (categories)
-					for ( c in layerItem.categoryA ){
+					for ( var c in layerItem.categoryA ){
 						var szTile = targetGroup.getAttributeNS(null,"id");
 						var szTheme = layerItem.szName+"#"+szTile.substr(szTile.length-6,6)+"::"+c;
 						map.Layer.switchLayerByFeature(szTheme,layerItem.categoryA[c].display=='inline');
@@ -5742,16 +5757,16 @@ function SVGLoaderTiles(){
 					var nodeA = null;
 					// adapt styles to scaling --------------------------------------
 					nodeA = targetGroup.getElementsByTagName('g');
-					for ( n=0; n<nodeA.length;n++){
+					for ( var n=0; n<nodeA.length;n++){
 						var szStyle = nodeA.item(n).getAttributeNS(null,"style");
 						if (szStyle && szStyle.length){
-							szNewStylesValue = __scaleStyleString(szStyle,map.Layer.nFeatureScale*map.Scale.nLineScaling);
+							var szNewStylesValue = __scaleStyleString(szStyle,map.Layer.nFeatureScale*map.Scale.nLineScaling);
 							nodeA.item(n).setAttributeNS(null,"style",szNewStylesValue);
 							targetGroup.setAttributeNS(szMapNs,"deltaTBD","1");
 							// GR 27.06.2014
 							targetGroup.setAttributeNS(szMapNs,"scale",String(map.Layer.nFeatureScale*map.Scale.nLineScaling));
 						}
-						childA = nodeA.item(n).childNodes;
+						var childA = nodeA.item(n).childNodes;
 						for ( c=0; c<childA.length;c++){
 							if ( childA.item(c).nodeName == "text" ){
 								var szStyle = childA.item(c).getAttributeNS(null,"style");
@@ -5772,7 +5787,7 @@ function SVGLoaderTiles(){
 				// build node cache --------------------------------------
 				map.Themes.addToThemeNodesCache(targetGroup);
 				// all tiles loaded, actualize themes --------------------
-				if ( (this.parent.nPending + this.parent.stackA.length) == 0 ){
+				if ( (this.parent.nPending + this.parent.stackA.length) === 0 ){
 					map.Themes.actualizeActiveTheme(true);
 				}
 			}
@@ -5889,7 +5904,7 @@ function SVGLoaderMap(){
 	 * @param  targetGroup the target SVG group; content of the loaded document will be added as a new child to this group
 	 */
     this.isStacked = function(szUrl, svgDocument, targetGroup){
-		for ( i=0; i<this.stackA.length; i++ ){
+		for ( var i=0; i<this.stackA.length; i++ ){
 			if (this.stackA[i].szUrl == szUrl ){
 				if ( this.stackA[i].svgDocument == svgDocument &&
 					 this.stackA[i].targetGroup == targetGroup ) {
@@ -6097,9 +6112,9 @@ JSLoaderPool.prototype.add = function(loaderObj){
  */
 JSLoaderPool.prototype.evalScripts = function(){
 
-	if ( this.isLoading() == false ){
+	if ( this.isLoading() === false ){
 
-		for ( i=0; i<this.loaderA.length; i++ ){
+		for ( var i=0; i<this.loaderA.length; i++ ){
 			var loader = this.loaderA[i];
 			for(var ii=0; ii<loader.loadedScripts.length; ii++){
 				if ( !this.isScriptLoaded(loader.szUrl) ){
@@ -6345,7 +6360,7 @@ function getData(szUrl,getDataCallback) {
 
 	// call getURL() if available, case ASV3, ASV6 and Batik
 	if (window.getURL) {
-		getURL(szUrl,getDataCallback);
+		window.getURL(szUrl,getDataCallback);
 	}
 	// call XMLHttpRequest() if available, case MozillaSVG
 	else if (window.XMLHttpRequest) {
@@ -6460,7 +6475,7 @@ function _LLtoUTM(szRefEllipsoid, nLat, nLon, UTMZone ){
     var nLongOriginRad = nLongOrigin * _deg2rad;
 
     // compute the UTM Zone from the latitude and longitude
-    szUTMZone = String(nZoneNumber+_UTMLetterDesignator(nLat));
+    var szUTMZone = String(nZoneNumber+_UTMLetterDesignator(nLat));
     var eccPrimeSquared = (eccSquared)/(1-eccSquared);
     var N = a/Math.sqrt(1-eccSquared*Math.sin(nLatRad)*Math.sin(nLatRad));
     var T = Math.tan(nLatRad)*Math.tan(nLatRad);
@@ -6668,7 +6683,7 @@ var CENTRAL_MERIDIAN = 0;
 function _LLtoWinkelTripel(nLat, nLon)
 {
 	/* Convert lon/lat to Winkel Tripel x/y */
-	var C, D, x1, x2, y1, y2;
+	var C, D, x1, x2, y1, y2, x, y;
 	
 	if ((nLon - CENTRAL_MERIDIAN) < -180.0) nLon = -180.0 + CENTRAL_MERIDIAN;
 	if ((nLon - CENTRAL_MERIDIAN) >  180.0) nLon =  180.0 + CENTRAL_MERIDIAN;
@@ -6680,7 +6695,7 @@ function _LLtoWinkelTripel(nLat, nLon)
 	/* Fist find Aitoff x/y */
 	
 	D = Math.acos (Math.cos (nLat) * Math.cos (nLon));
-	if (D == 0.0)
+	if (D === 0.0)
 		x1 = y1 = 0.0;
 	else {
 		C = Math.sin (nLat) / Math.sin (D);

@@ -1,3 +1,9 @@
+/* jshint funcscope:true, evil:true, eqnull:true, loopfunc:true, shadow: true, laxcomma: true, laxbreak: true, expr: true, sub: true*/
+/* globals 
+	window, document,
+	movieobject, moviename, loadobject, nextobject, anzobjects, loadedobject, zoomname, map_zoomframe_level, _level, map_pan_level,
+	map_extent
+	*/
 var zoom = 1;
 var xoff = 0;
 var yoff = 0;
@@ -12,7 +18,7 @@ function set_zoom(newzoom,newxoff,newyoff)
   zoom=newzoom;
 xoff=newxoff;
  yoff=newyoff;
-if ( zoomframe == 0 && zoomname )
+if ( zoomframe === 0 && zoomname )
    movieobject(zoomname).LoadMovie(1,"swf/basics/zoomframe640x480.swf");
 else
 do_zoom();
@@ -20,8 +26,8 @@ do_zoom();
 function change_zoom(value)
 {
   zoom += value*Math.ceil(zoom/10);
-if ( value == 0 || zoom < 1 ) zoom = 1;
-if ( zoomframe == 0 && zoomname )
+if ( value === 0 || zoom < 1 ) zoom = 1;
+if ( zoomframe === 0 && zoomname )
    movieobject(zoomname).LoadMovie(1,"swf/basics/zoomframe640x480.swf");
 else
 do_zoom();
@@ -57,8 +63,9 @@ else
   movieobject(moviename).TSetProperty(_level(map_pan_level),7,0);
   do_zoom_level("_level0/");
 do_zoom_level("_level1/");
-  for ( nr = 0; nr < anzobjects; nr++ )
+  for ( var nr = 0; nr < anzobjects; nr++ )
      {
+  var level = null;
   if ( (level = loadedobject[nr].level) != -1 )
       do_zoom_level("_level"+eval(level));
   }
@@ -92,17 +99,18 @@ if ( args == 'up' )
   yoff -= 10;
 if ( args == 'down' )
   yoff += 10;
-if ( zoomframe == 0 && zoomname )
+if ( zoomframe === 0 && zoomname )
    movieobject(zoomname).LoadMovie(1,"swf/basics/zoomframe.swf");
 else
 do_zoom();
 }
 function do_map_zoomframe()
   {  
-xanf = parseFloat(movieobject(moviename).GetVariable(_level(map_zoomframe_level)+":startx"));
-yanf = parseFloat(movieobject(moviename).GetVariable(_level(map_zoomframe_level)+":starty"));
-  xend = parseFloat(movieobject(moviename).GetVariable(_level(map_zoomframe_level)+":endx"));
-yend = parseFloat(movieobject(moviename).GetVariable(_level(map_zoomframe_level)+":endy"));
+var xanf = parseFloat(movieobject(moviename).GetVariable(_level(map_zoomframe_level)+":startx"));
+var yanf = parseFloat(movieobject(moviename).GetVariable(_level(map_zoomframe_level)+":starty"));
+var xend = parseFloat(movieobject(moviename).GetVariable(_level(map_zoomframe_level)+":endx"));
+var yend = parseFloat(movieobject(moviename).GetVariable(_level(map_zoomframe_level)+":endy"));
+var delta;
 if ( (delta = Math.max(xend-xanf,yend-yanf)) > 20/zoom )
    { 
    xoff = eval(xanf+((xend-xanf)/2));

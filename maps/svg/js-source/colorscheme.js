@@ -19,6 +19,19 @@ $Log: colorscheme.js,v $
  * @version 1.1 
  */
 
+/* jshint funcscope:true, evil:true, eqnull:true, loopfunc:true, shadow: true, laxcomma: true, laxbreak: true, expr: true, sub: true */
+/* globals
+	window, alert, setTimeout,
+	Methods, MapObject,
+	SVGDocument, HTMLWindow, getMatrix, setMatrix, SVGPopupGroup, SVGToolsGroup, SVGFixedGroup, SVGMessageGroup,
+	Map, map, thisversion, box, point, Button, MapTool, setMapTool, szMapToolType, InfoContainer, mapToolList, highLightList, 
+	displayMessage, displayInfoDelayed, displayScale, createTextGrid,
+	loadSVGIncludes, bookmarkList, fInitLegendOff, fPreserveMapRatio, fPendingNewGeoBounds, fFroozeDynamicContent, zoomAndPanHistory,
+	nNormalFontSize, htmlgui_prettyPrintXML, __doGetPolygonSurface
+	
+	*/
+
+
 if ( typeof(szMapNs) == "undefined" ){
 	var szMapNs = "http:"+"/"+"/"+"www.medienobjekte.de";
 }
@@ -1074,7 +1087,7 @@ var __tableauColors = new Array(
 	"#d7b5a6"
 	);
 
-var __colorPaletteA = new Array();
+var __colorPaletteA = [];
 __colorPaletteA["office"]  = __officeColors;
 __colorPaletteA["mineral"] = __mineralColors;
 __colorPaletteA["pastel"]  = __pastelColors;
@@ -1095,7 +1108,7 @@ function _circ_createPaletteColorScheme(szPalette,nColors,nOffset){
 	if ( nOffset+nColors <= colorPalette.length ){
 		return colorPalette.slice(nOffset,nOffset+nColors);
 	}else{
-		var xA = new Array();
+		var xA = [];
 		for ( var i=0; i<nColors; i++ ){
 			xA.push(colorPalette[(nOffset+i)%colorPalette.length]);
 		}
@@ -1134,14 +1147,14 @@ var __colWheel = new Array(12);
 	__colWheel['330'] = new Array(204,0,153,	330, 100, 80);
 	__colWheel['345'] = new Array(229,0,102,	345, 100, 90);
 
-var __varPresets = new Array();
+var __varPresets = [];
 __varPresets['default'] = new Array( -1,-1, 1,-0.7, 0.25,1, 0.5,1 );
 __varPresets['pastel'] = new Array( 0.5,-0.9, 0.5,0.5, 0.1,0.9, 0.75,0.75 );
 __varPresets['soft'] = new Array( 0.3,-0.8, 0.3,0.5, 0.1,0.9, 0.5,0.75 );
 __varPresets['hard'] = new Array( 1,-1, 1,-0.6, 0.1,1, 0.6,1 );
 __varPresets['light'] = new Array( 0.25,1, 0.5,0.75, 0.1,1, 0.5,1 );
 __varPresets['pale'] = new Array( 0.1,-0.85, 0.1,0.5, 0.1,1, 0.1,0.75 );
-__varPresets['work'] = new Array();
+__varPresets['work'] = [];
 
 // helper
 
@@ -1169,8 +1182,8 @@ function __rgb2hex(r,g,b) {
 // color class
 
 function Color(H) {
-	this.S = new Array();
-	this.V = new Array();
+	this.S = [];
+	this.V = [];
 	this.setBaseColor(H);
 }
 
