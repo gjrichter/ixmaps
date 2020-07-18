@@ -155,9 +155,16 @@
 			tooltip.style.display = "none";
 		}
 
+        var oldTarget = null;
+        var oldOpacity = null;
+        
 		ixmaps.onMouseOver = function() {
 			var szTooltip = null;
-			var source = event.target;
+			var source = oldTarget = event.target;
+            
+            oldOpacity = oldOpacity || source.style.getPropertyValue("fill-opacity");
+            source.style.setProperty("fill-opacity","1");
+            
 			while (!szTooltip && source) {
 				szTooltip = source.getAttribute("tooltip");
 				time = new Date(Number(source.getAttribute("time")));
@@ -172,6 +179,8 @@
 		};
 
 		ixmaps.onMouseOut = function() {
+            oldTarget.style.setProperty("fill-opacity",oldOpacity);
+            oldTarget = oldOpacity = null;
 			hideTooltip();
 		};
 

@@ -326,7 +326,7 @@
 				__sliderRange = uMax-uMin;
 			}else
 			for ( a in themeObj.itemA ){
-				var uTime = new Date(themeObj.itemA[a].szTime).getTime();
+				var uTime = new Date(themeObj.itemA[a].szTime).getTime() || themeObj.itemA[a].szTime;
 				uMax = Math.max(uMax,uTime);
 				uMin = Math.min(uMin,uTime);
 			}
@@ -523,7 +523,7 @@
 			var slider = document.getElementById("myRange");
 			// Update the current slider value (each time you drag the slider handle)
 			slider.oninput = function() {
-				var x = new Date(Number(this.value));
+				var x = new Date(Number(this.value)) || this.value;
 				if (this.value == uMin ){
 					ixmaps.setThemeTimeFrame(null,null,uMin, uMax);
 					$("#time-span").html("");
@@ -531,6 +531,10 @@
 					var uDay = 1000*60*60*24;
 					var range = uDay;
 					var days = (uMax-uMin)/uDay;
+                    // values are not uTime values, but simple numeric sequenze
+                    if (uMax < uDay){
+                        range = 1;
+                    }else
 					if (days > 120){
 						range = 1000*60*60*24*28;
 					}else
@@ -543,6 +547,9 @@
 					}else{
 						ixmaps.setThemeTimeFrame(null,null,this.value,Number(this.value)+Number(range));
 					}
+					if (range == 1){
+						$("#time-span").html(String(this.value));
+                    }else
 					if (range < uDay){
 						$("#time-span").html(x.toLocaleDateString()+"-"+x.toLocaleTimeString());
 					}else{
