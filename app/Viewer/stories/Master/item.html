@@ -169,7 +169,7 @@
 				szTooltip = source.getAttribute("tooltip");
 				time = new Date(Number(source.getAttribute("time")));
 				if ((time != "Invalid Date") && time.getTime() ){
-					szTooltip += "<br>"+time.toLocaleDateString();
+					szTooltip += "<br><span style='font-size:0.8em;line-height:0.5em;color:#cccccc'>"+time.toLocaleDateString()+"</span>";
 				}
 				source = source.parentNode;
 			}
@@ -451,7 +451,7 @@
 					}
 				}
 
-				if (data.length > 1) {
+				if (data && (data.length > 1)) {
 					szHtml += "</br>";
 					szHtml += "</br>";
 					szHtml += "</br>";
