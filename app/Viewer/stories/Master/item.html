@@ -169,7 +169,7 @@
 				szTooltip = source.getAttribute("tooltip");
 				time = new Date(Number(source.getAttribute("time")));
 				if ((time != "Invalid Date") && time.getTime() ){
-					szTooltip += "<br><span style='font-size:0.8em;line-height:0.5em;color:#cccccc'>"+time.toLocaleDateString()+"</span>";
+					szTooltip = "<span style='font-size:0.8em;line-height:0.5em;color:#cccccc'>"+time.toLocaleDateString()+"</span><br>" + szTooltip;
 				}
 				source = source.parentNode;
 			}
@@ -392,7 +392,7 @@
 				// ---------------------------------------
 				var data = ixmaps.getData('map', szId);
 
-				if (data) {
+				if ( 0 && data ) {
 
 					var szTitle = data.nome || "";
 
@@ -449,6 +449,10 @@
 					} else {
 						szHtml += "<br><br>";
 					}
+				}else{
+					szHtml += "<div style='padding-top:1.5em;padding-bottom:1em;overflow:auto'>";
+					szHtml += "</div><div class='item-list' style='background:rgba(0,0,0,0.04)'>";
+					szHtml += "</div></div>";
 				}
 
 				if (data && (data.length > 1)) {
