@@ -13203,6 +13203,9 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		this.chart.szLineColor = cColor.textColor;
 	}
 
+	// GR 21.07.2020 width of a PLOT
+	this.nXLen = (this.partsA.length / (this.nGridX || 1)); 
+	
 	// GR 30.11.2016 calcolate scale to fit PLOT into grid
 	// 
 	if (this.szFlag.match(/PLOT/) && (this.szFlag.match(/GRIDSIZE/) || this.szFlag.match(/AUTOSIZE/))) {
@@ -17269,32 +17272,22 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								if (newShapeBg) {
 									newShapeBg.fu.setPosition(nAxis, (-nPValue) * nScale);
 								}
+								
+								// remove some value displays to create readable chart
 								if (newText && newText.parentNode) {
-									if (0 && this.szXaxisA && this.szXaxisA.length) {
-										if (this.szXaxisA[i] && this.szXaxisA[i].length && (this.szXaxisA[i] == " ")) {
-											newText.parentNode.removeChild(newText);
-										}
-									}else{
-										/**
-										if ( nPValue < nPLastValue ){	
-											newText.parentNode.removeChild(newText);
-										}else
-										**/
-										var nXLen = (nPartsA.length / (this.nGridX || 1)); 
-										if ( nXLen > 10 ){
-                                            var nModulo = Math.floor(nXLen/5);  
-											var ai = Math.floor(i/(this.nGridX||1));
-											if ( ((ai % nModulo) || (ai > nXLen-5)) && (ai != nXLen-1) ){
-												if (!this.szXaxisA || !this.szXaxisA.length) {
-													newText.parentNode.removeChild(newText);
-												}else
-												if (!this.szXaxisA[ai] || !this.szXaxisA[ai].length || (this.szXaxisA[ai] == " ")) {
-													newText.parentNode.removeChild(newText);
-												}
+									if ( this.nXLen > 10 ){
+										var nModulo = Math.floor(this.nXLen/5);  
+										var ai = Math.floor(i/(this.nGridX||1));
+										if ( (ai != 0) && (ai != this.nXLen-1) ){
+											if (!this.szXaxisA || !this.szXaxisA.length) {
+												newText.parentNode.removeChild(newText);
+											}else
+											if (!this.szXaxisA[ai] || !this.szXaxisA[ai].length || (this.szXaxisA[ai] == " ")) {
+												newText.parentNode.removeChild(newText);
 											}
 										}
-										nPLastValue = nPValue;
 									}
+									nPLastValue = nPValue;
 
 									if (szFlag.match(/LINES/) && ((this.nGridX == null) || (this.nGridX <= 1) || (szFlag.match(/STACKED/)))) {
 										newText.fu.setPosition(nAxis - map.Scale.normalX(nChartSize / 4), (-nPValue) * nScale + map.Scale.normalY(nChartSize / 4) / (this.nGridX || 1));
@@ -17325,7 +17318,12 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 											if (plotShape) {
 												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
 												plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
-												plotShape.setAttributeNS(szMapNs, "tooltip", this.formatValue(nValue, this.szValueDecimals || 2) + this.szUnit + " " + (this.szLabelA ? (this.szLabelA[nClass % (this.nGridX || 1000000)]) : ""));
+												if ( this.nXLen < 25 ){
+													var v = this.formatValue(this.plot_last_areaValue[yi], this.szValueDecimals || 2) + "..." + this.formatValue(nValue, this.szValueDecimals || 2);
+												}else{
+													var v = this.formatValue(nValue, this.szValueDecimals || 2);
+												}
+												plotShape.setAttributeNS(szMapNs, "tooltip", v + this.szUnit + " " + (this.szLabelA ? (this.szLabelA[nClass % (this.nGridX || 1000000)]) : ""));
 												plotShape.setAttributeNS(szMapNs, "time", String(uTime));
 
 												if (this.szFlag.match(/\bFADE\b/)) {
