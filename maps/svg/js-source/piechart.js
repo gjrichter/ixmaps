@@ -29,7 +29,7 @@ $Log: piechart.js,v $
  *  API for constructor of object DonutChart ( makes script loadable; see ScriptLoader() ) * 
  * ........................................................................................*/ 
 
-var	DonutCharts = new _DonutCharts();
+DonutCharts = new _DonutCharts();
 /**
  * This is the api class for the Class: DonutChart  
  * @constructor

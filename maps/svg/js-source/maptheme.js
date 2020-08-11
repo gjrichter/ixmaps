@@ -13204,7 +13204,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 	}
 
 	// GR 21.07.2020 width of a PLOT
-	this.nXLen = (this.partsA.length / (this.nGridX || 1)); 
+	this.nXLen = (this.nMaxA.length / (this.nGridX || 1)); 
 	
 	// GR 30.11.2016 calcolate scale to fit PLOT into grid
 	// 
@@ -17279,7 +17279,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 										var nModulo = Math.floor(this.nXLen/5);  
 										var ai = Math.floor(i/(this.nGridX||1));
 										if ( (ai != 0) && (ai != this.nXLen-1) ){
-											if (!this.szXaxisA || !this.szXaxisA.length) {
+											if (!this.szXaxisA || !this.szXaxisA.length || ((this.nXLen > 100)&&(ai >= this.nXLen-5))) {
 												newText.parentNode.removeChild(newText);
 											}else
 											if (!this.szXaxisA[ai] || !this.szXaxisA[ai].length || (this.szXaxisA[ai] == " ")) {
@@ -17319,7 +17319,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
 												plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
 												if ( this.nXLen < 25 ){
-													var v = this.formatValue(this.plot_last_areaValue[yi], this.szValueDecimals || 2) + "..." + this.formatValue(nValue, this.szValueDecimals || 2);
+													var v = this.formatValue(this.plot_last_areaValue[yi], this.szValueDecimals || 2) + " ... " + this.formatValue(nValue, this.szValueDecimals || 2);
 												}else{
 													var v = this.formatValue(nValue, this.szValueDecimals || 2);
 												}
@@ -17353,10 +17353,15 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 											}
 										} else {
 											plotShape = map.Dom.newShape('line', plotGroup, this.plot_last_position[yi].x, this.plot_last_position[yi].y, nAxis, (-nPValue) * nScale, "stroke:" + (this.szLineColor || szColor) + ";stroke-width:" + map.Scale.normalX(this.nLineWidth || 3) + ";stroke-linecap:round;");
+											if ( this.nXLen < 25 ){
+												var v = this.formatValue(this.plot_last_areaValue[yi], this.szValueDecimals || 2) + " ... " + this.formatValue(nValue, this.szValueDecimals || 2);
+											}else{
+												var v = this.formatValue(nValue, this.szValueDecimals || 2);
+											}
 											if (plotShape) {
 												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
 												plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
-												plotShape.setAttributeNS(szMapNs, "tooltip", this.formatValue(nValue, this.szValueDecimals || 2) + this.szUnit + " " + (this.szLabelA ? (this.szLabelA[nClass % (this.nGridX || 1000000)]) : ""));
+												plotShape.setAttributeNS(szMapNs, "tooltip", v + this.szUnit + " " + (this.szLabelA ? (this.szLabelA[nClass % (this.nGridX || 1000000)]) : ""));
 												plotShape.setAttributeNS(szMapNs, "time", String(uTime));
 											}
 											try {
