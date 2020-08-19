@@ -809,7 +809,8 @@
 			if ( __olditemclick(szId) ){
 				return true;
 			}else{
-                if (szId.match(/mapbackground:eventrect/)){
+ 				console.log("click II");
+               if (szId.match(/mapbackground:eventrect/)){
                     $("#switchinfobutton").hide();
                 }else{
 					if (ixmaps.loadedProject.map.item){
