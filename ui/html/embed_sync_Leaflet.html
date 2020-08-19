@@ -805,16 +805,13 @@
 
 		var __olditemclick = ixmaps.htmlgui_onItemClick;
 		ixmaps.htmlgui_onItemClick = function(szId){
-			console.log(__olditemclick);
 			if ( 0 && __olditemclick(szId) ){
 				return true;
 			}else{
- 				console.log("click II");
                if (szId.match(/mapbackground:eventrect/)){
                     $("#switchinfobutton").hide();
                 }else{
 					if (ixmaps.loadedProject.map.item){
-						console.log(ixmaps.loadedProject.map.item);
 						ixmaps.szMapItemId = szId;
 						window.idialog = this.openDialog(null,'item','./tools/item.html','Item info','50,50',450,660);
 						ixmaps.onDialogClose = function(){
