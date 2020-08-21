@@ -805,7 +805,7 @@
 
 		var __olditemclick = ixmaps.htmlgui_onItemClick;
 		ixmaps.htmlgui_onItemClick = function(szId){
-			if ( 0 && __olditemclick(szId) ){
+			if ( __olditemclick(szId) ){
 				return true;
 			}else{
                if (szId.match(/mapbackground:eventrect/)){
