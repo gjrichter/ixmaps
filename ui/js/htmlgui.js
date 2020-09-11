@@ -3074,6 +3074,10 @@ $Log: htmlgui.js,v $
 			project.required = ixmaps.loadedProject.required;
 		}
 		
+		if (ixmaps.loadedProject && ixmaps.loadedProject.map.localize) {
+			project.map.localize = ixmaps.loadedProject.map.localize;
+		}
+		
 		project.themes = themeDefA;
 		project.layerMask = layerObj;
 

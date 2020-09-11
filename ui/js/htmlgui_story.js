@@ -220,6 +220,11 @@ $Log: htmlgui_story.js,v $
 			return;
 		}
 		$('#story-board').hide();
+		
+		if (!ixmaps.fSidebar) {
+			ixmaps.toggleSidebar();
+			ixmaps.fSidebar = false;
+		}
 
 		var target = $('#story-tool');
 		
@@ -320,7 +325,7 @@ $Log: htmlgui_story.js,v $
 			if (opt && opt.frame) {
 				// GR 14.09.2017 load story on map ready
 				// -------------------------------------
-				var width = parseInt($("#sidebar").css("width")) - ixmaps.overlap / 2;
+				var width = ixmaps.sidebarWidth;
 				var height = parseInt($("#sidebar").css("height"));
 				target.html("<iframe id='embed-tool' src=\"" + szStoryRoot + szUrl + "\" " +
 					" style='border:0;margin:0px;width:" + width + "px;height:" + height + "px;pointer-events:all' /><a href='javascript:ixmaps.hideStoryTool()' class='hide-story-tool-button' ><span style='font-size:24px;color:#aaaaaa;vertical-align:10px'><i class='fa fa-times fa-fw' ></i></span></a>");
@@ -340,10 +345,6 @@ $Log: htmlgui_story.js,v $
 					$('#story-tool').fadeIn("slow");
 				});
 
-				if (!ixmaps.fSidebar) {
-					ixmaps.toggleSidebar();
-					ixmaps.fSidebar = false;
-				}
 			}
 			ixmaps.fStoryTool = true;
 		}

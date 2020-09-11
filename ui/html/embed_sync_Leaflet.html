@@ -376,7 +376,9 @@
 
 			if ($(document).getUrlParam('appid')) {
 				ixmaps.szAppId = $(document).getUrlParam('appid');
-				ixmaps.setAppId($(document).getUrlParam('appid'));
+				try {
+					ixmaps.setAppId($(document).getUrlParam('appid'));
+				} catch (e) {}
 			}
 
 			// --------------------------
@@ -808,12 +810,17 @@
 			if ( __olditemclick(szId) ){
 				return true;
 			}else{
-               if (szId.match(/mapbackground:eventrect/)){
+                if (szId.match(/mapbackground:eventrect/)){
                     $("#switchinfobutton").hide();
                 }else{
+					var szItemUrl = "./tools/item.html";
+					if ( ixmaps.loadedProject.map.item && (ixmaps.loadedProject.map.item != "html") )  {
+						szItemUrl = ixmaps.loadedProject.map.item;
+						szItemUrl = szItemUrl.replace("../../../..","../..");
+					}
 					if (ixmaps.loadedProject.map.item){
 						ixmaps.szMapItemId = szId;
-						window.idialog = this.openDialog(null,'item','./tools/item.html','Item info','50,50',450,660);
+						window.idialog = this.openDialog(null,'item',szItemUrl,'Item info','50,50',480,660);
 						ixmaps.onDialogClose = function(){
 							ixmaps.embeddedSVG.window.map.Api.clearHighlight();
 							ixmaps.embeddedSVG.window.map.Api.clearAllOverlays();

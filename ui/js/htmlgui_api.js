@@ -2064,6 +2064,7 @@ $Log: htmlgui_api.js,v $
 		if ( ixmaps.parentApi != ixmaps ){
 			return ixmaps.parentApi.htmlgui_onItemClick(szId);
 		}
+		return false;
 	};
 
 	ixmaps.htmlgui_onInfoDisplay = function(szId){
@@ -2347,6 +2348,10 @@ $Log: htmlgui_api.js,v $
 		loadSidebar: function(szUrl){
 			ixmaps.loadSidebar(this.szMap,szUrl);
 			return this;
+		},
+		
+		getData: function(szItem){
+			return ixmaps.getData(this.szMap,szItem);
 		}
 
 	};

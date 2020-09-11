@@ -158,14 +158,21 @@
 			tooltip.style.display = "none";
 		}
 
+        var oldTarget = null;
+        var oldOpacity = null;
+        
 		ixmaps.onMouseOver = function() {
 			var szTooltip = null;
-			var source = event.target;
+			var source = oldTarget = event.target;
+            
+            oldOpacity = oldOpacity || source.style.getPropertyValue("fill-opacity");
+            source.style.setProperty("fill-opacity","1");
+            
 			while (!szTooltip && source) {
 				szTooltip = source.getAttribute("tooltip");
 				time = new Date(Number(source.getAttribute("time")));
 				if ((time != "Invalid Date") && time.getTime() ){
-					szTooltip += "<br>"+time.toLocaleDateString();
+					szTooltip = "<span style='font-size:0.8em;line-height:0.5em;color:#cccccc'>"+time.toLocaleDateString()+"</span><br>" + szTooltip;
 				}
 				source = source.parentNode;
 			}
@@ -175,6 +182,8 @@
 		};
 
 		ixmaps.onMouseOut = function() {
+            oldTarget.style.setProperty("fill-opacity",oldOpacity);
+            oldTarget = oldOpacity = null;
 			hideTooltip();
 		};
 
@@ -413,6 +422,16 @@
 					}
 					szHtml += "</table>";
 
+
+					szHtml += "</div>";
+					szHtml += "</section>";
+					
+				}else{
+					
+					szHtml = "<section>";
+					szHtml += "<div style='margin:1em 1em 1em 0.5em'>";
+
+					szHtml += "<p>" + (themeObj.szDescription||"") + "</p><br>";
 
 					szHtml += "</div>";
 					szHtml += "</section>";
