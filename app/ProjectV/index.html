@@ -1,21 +1,25 @@
 <!DOCTYPE html> 
-<html> 
-<head> 
-	<meta charset="UTF-8">
-	<title>ixmaps</title>
-	
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html lang="en">
+<!--<![endif]-->
 
-	<link rel="shortcut icon" href="../../ui/images/ixmaps_logo.png">
+<head>
+	<meta charset="utf-8">
+	<title>ixmaps project viewer</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link rel="shortcut icon" href="../../ui/resources/images/ixmaps_logo.png">
+
 </head>
 
-
-<body style="margin:0px;padding:0px;overflow:hidden;">
+<body style="margin:0px;padding:0px;overflow:hidden">
 
 	<!-- Container -->
-	<div id="container" style="margin:0px;padding:0px;margin-left:auto;margin-right:auto;overflow:hidden" >
-
-		<!-- Credits -->
+	<div id="container" style="margin:0px;padding:0px;margin-left:auto;margin-right:auto;overflow:hidden">
 
 		<!-- Content -->
 		<div id="map-div" style="overflow:hidden;">
@@ -35,35 +39,40 @@
 	<script type="text/javascript" src = "../../ui/js/htmlgui_api.js"></script>
 
 	<script>
-
-	__ui	= "../../ui/html/main_sync_story_frame.html?basemap=ll&maptype=CartoDB - Positron&themelegend=0"; 
-	__map	= "";
-	__story = "../../app/ProjectV/stories/Master/index.html";
-	__bound = "";
-	__attribute = "powered by <a href='https://www.ixmaps.com' target='_blank' style='color:#0E77B2'>iXMaps</a>";
-
 	__resize = function(){
-			$("#map-frame").attr("height",window.innerHeight+"px");
-			$("#map-frame").attr("width",window.innerWidth+"px");
+			$("#map").attr("height",window.innerHeight+"px");
+			$("#map").attr("width",window.innerWidth+"px");
 	}
 	$(document).ready(function() {
 
 			__resize();
 
-			// is there a bookmark to execute at load ?
-			if ( $(document).getUrlParam('bookmark') ){
-				x = $(document).getUrlParam('bookmark');
-				__bound = decodeURIComponent(((typeof(x)!="string")?x.join(""):x));
-			}
-			if ( $(document).getUrlParam('maptype') ){
-				__maptype = $(document).getUrlParam('maptype');
-			}
-
+			// is there a project to load into the viewer ?
 			if ($(document).getUrlParam('project')) {
-				__story += ("?project=" + $(document).getUrlParam('project'));
 				ixmaps.project = $(document).getUrlParam('project');
 			}
+			
+			// is there a story to load into the viewer ?
+			if ($(document).getUrlParam('story')) {
+				ixmaps.story = $(document).getUrlParam('story');
+			}
+			
+			// is there a story to load into the viewer ?
+			if ($(document).getUrlParam('layout')) {
+				ixmaps.layout = $(document).getUrlParam('layout');
+			}
+			
+			// is there a sidebar width ?
+			if ($(document).getUrlParam('sidebar')) {
+				ixmaps.sidebar = $(document).getUrlParam('sidebar');
+			}
 
+			// is there a bookmark to execute at load ?
+			if ($(document).getUrlParam('bookmark')) {
+				x = $(document).getUrlParam('bookmark');
+				ixmaps.bookmark = decodeURIComponent(((typeof(x) != "string") ? x.join("") : x));
+			}
+			
 			// tools suppressed ?
 			ixmaps.tools = true;
 			if ($(document).getUrlParam('tools') == "0" ||
