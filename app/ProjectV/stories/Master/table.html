@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>DataTables example - Row selection (multiple rows)</title>
+	<link rel="shortcut icon" type="image/png" href="/media/images/favicon.png">
+	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="http://www.datatables.net/rss.xml">
+	<link rel="stylesheet" type="text/css" href="/media/css/site-examples.css?_=6e5593ad4c5375eef5d919cfc10a0a54">
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+	<style type="text/css" class="init">
+	<style type="text/css">
+		table {
+			width: 100%;
+		}
+		table.dataTable thead th{
+			border: #dddddd solid 1px;
+		}
+		table.dataTable tr.even{
+			background: #f8f8f8;
+		}
+		table.dataTable tr.odd{
+			background: #ffffff;
+		}
+		table.dataTable tr.even td.sorting_1 {
+			background-color: #ededed;
+		}
+		table.dataTable tr.odd td.sorting_1 {
+			background-color: #f8f8f8;
+		}
+		tfoot input.search_init {
+			font-size: 0.9em;
+		}
+		th {
+			text-align: left;
+			vertical-align: top;
+			border: #dddddd solid 1px;
+			border-bottom: #dddddd solid 1px;
+		}
+		td {
+			text-align: left;
+			border: #dddddd solid 1px;
+			border-bottom: #dddddd solid 1px;
+			white-space: nowrap;
+		}
+		body {
+			font: 12px/16px Helvetica; Helvetica Neue; Arial;
+			color: #333333;
+			background:#fff;
+			overflow:auto;
+			width:100%;
+			height:100%;
+			padding-top: 3em;
+			margin: 2px;
+		}
+		textarea {
+			width:90%;
+			font-size: 9px;
+		}
+		.dataTables_wrapper .dataTables_filter input {
+			margin-left: 0.5em;
+			margin-bottom: 0.5em;
+			margin-right: 0.2em;
+		}
+		.dataTables_paginate {
+			margin-top: 0em;
+		}
+		.paginate_button {
+			padding: 0.5em
+		}
+		.ftdataname {
+			left: 10px;
+			top: 15px;
+			font: 18px/24px Helvetica; Helvetica Neue; Arial;
+		}
+		/* Track */
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.1); 
+			-webkit-border-radius: 0px;
+			border-radius: 0px;
+		}
+		/* Handle */
+		::-webkit-scrollbar-thumb {
+			-webkit-border-radius: 0px;
+			border-radius: 0px;
+			background: rgba(232,232,232,0.6); 
+			-webkit-box-shadow: inset 0 0 0px rgba(0,0,0,0.1); 
+		}
+		::-webkit-scrollbar-thumb:window-inactive {
+			background: rgba(222,222,222,0.4); 
+		}
+		.fw-body {
+			background-color: white;
+		}
+
+		th {
+			padding:1em;
+		}
+		td {
+			padding:0.75em;
+		}
+		.even td {
+			background-color:#f8f8f8;
+		}
+		.odd td {
+			background-color:#f8f8f8;
+		}
+
+	</style>
+</head>
+<body class="wide comments example" style="background:white;">
+
+	<a name="top" id="top"></a>
+	<div class="fw-container">
+		<div class="fw-body">
+			<div id="title" >
+			</div>
+			<div class="content" style="overflow:auto">
+				<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>
+			</div>
+			<div id="footer" >
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="/media/js/site.js?_=a25d93b0b2ef7712783f57407f987734">
+	</script>
+	<script type="text/javascript" src="/media/js/dynamic.php?comments-page=examples%2Fapi%2Fselect_row.html" async>
+	</script>
+	<script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-1.12.4.js">
+	</script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js">
+	</script>
+	<script type="text/javascript" class="init">
+	
+		// ===========================================
+		//
+		// !! get ixmaps api from story parent/opener
+		//
+		// ===========================================
+
+		var ixmaps = null;
+		if ( window.opener ){
+			ixmaps = window.opener.ixmaps;
+		}else
+		if ( parent ){
+			ixmaps = parent.window.ixmaps;
+		}
+		else{
+			alert("error: missing parent window for themes !");
+		}
+
+		$(document).ready(function() {
+            
+  			var themeObj =	ixmaps.getThemeObj();
+
+			var szTable  = "test"; 
+			var tableObj = eval("ixmaps.embeddedSVG.window."+(themeObj.coTable||"themeDataObj"));
+
+			var numRows = tableObj.records.length;
+			var numCols = tableObj.fields.length;
+
+			$('#example').html("<h2 style='margin-left:1.5em;color:#ddd'> loading table data ("+numRows+" records) ...</h2>");
+
+			setTimeout("makeTable()",100);
+		} );
+
+		var makeTable = function() {
+			
+			$('#example').html("");
+ 
+            var themeObj =	ixmaps.getThemeObj();
+ 
+			var szTable  = "test"; 
+			var tableObj = eval("ixmaps.embeddedSVG.window."+(themeObj.coTable||"themeDataObj"));
+
+			var numRows = tableObj.records.length;
+			var numCols = tableObj.fields.length;
+
+			// GR 23.02.2018 show only rows which are on the map
+			// -------------------------------------------------
+			var records = [];
+			var mapItem = [];
+			for ( i in themeObj.indexA ){
+				if ( themeObj.itemA[themeObj.indexA[i]].dbIndex ){
+					records.push(tableObj.records[themeObj.itemA[themeObj.indexA[i]].dbIndex]);
+					mapItem.push(themeObj.indexA[i]);
+				}
+				if ( themeObj.itemA[themeObj.indexA[i]].dbIndexA ){
+					for ( a in themeObj.itemA[themeObj.indexA[i]].dbIndexA ) {
+						records.push(tableObj.records[themeObj.itemA[themeObj.indexA[i]].dbIndexA[a]]);
+						mapItem.push(themeObj.indexA[i]);
+					}
+				}
+			}
+			var columns = [];
+			for ( i=0; i<numCols; i++ ){
+				columns.push( {"title": tableObj.fields[i].id} );			
+			}
+
+			
+			if ( records.length > 1000 ){
+
+				// simple table
+				// -------------------------------------------------
+
+				var columns = "<tr>";
+				for ( i in tableObj.fields ){
+					columns += "<th>"+tableObj.fields[i].id+"&nbsp;&nbsp;&nbsp;&nbsp;</th>";
+				}
+				columns += "</tr>";
+
+				var maxrows = Math.min(records.length,17);
+				for ( r=0; r<= maxrows; r++ ){
+					columns += r%2?"<tr class='odd'>":"<tr class='even'>";
+					for ( i in tableObj.fields ){
+						columns += "<td nowrap>"+records[r][i]+"&nbsp;</td>";
+					}
+					columns += "</tr>";
+				}
+
+				$('#example').html(columns);
+
+				$('#footer').append("<div style='padding:0.5em'>1-17 of "+records.length+" records</div>");
+
+				return;
+			}
+
+			// use DataTable
+			// -------------------------------------------------
+
+			//var table = $('#example').DataTable();
+			table = $('#example').DataTable( {
+				"data": records,
+				"columns": columns,
+				"select":true,
+				"scrollX": true,
+				"scrollCollapse": true,
+				"lengthChange": false,
+				"scrollY":        window.innerHeight-200,
+				"scrollCollapse": true,
+				"paging":         false
+				} );   
+
+			$('#example tbody').on( 'click', 'tr', function () {
+				$(this).toggleClass('selected');
+				console.log( table.rows('.selected') );
+				var rows = table.rows('.selected')[0];
+				var szItems = "";
+				for ( i in rows ){
+					console.log(rows[i]);
+					console.log(mapItem[rows[i]]);
+					szItems += ((szItems.length?"|":"") + mapItem[rows[i]]);
+				}
+				console.log(szItems);
+				ixmaps.embeddedApi.embeddedSVG.window.map.Api.clearHighlightThemeItems(themeObj.szId);
+				ixmaps.embeddedApi.embeddedSVG.window.map.Api.highlightThemeItems(themeObj.szId,szItems,"|");
+
+			} );
+
+			$('#button').click( function () {
+				console.log(table);
+				alert( table.rows('.selected').data().length +' row(s) selected' );
+			} );
+
+			table.on( 'select', function ( e, dt, type, indexes ) {
+				if ( type === 'row' ) {
+					var data = table.rows( indexes ).data().pluck( 'id' );
+					alert(data);
+				}
+			} );
+
+
+		};
+
+
+	</script>
+
+
+
+</body>
+</html>

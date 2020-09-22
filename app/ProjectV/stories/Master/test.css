@@ -1,0 +1,83 @@
+		.read-md {
+			max-width:800px;
+			margin: 0em 0em 0em 0em;
+		}
+
+		.avatar {
+			position: absolute;
+			top: 0;
+			right: 100%;
+			border-radius: 4px;
+		}
+
+		.gist-readme {
+			line-height: 1.5em;
+			max-width: 720px;
+			max-height: 1000000vh;
+		}
+
+		.gist-id,
+		pre,
+		code,
+		textarea {
+			font-family: "Menlo", monospace;
+			line-height: normal;
+		}
+
+		.gist-id {
+			line-height: 0;
+		}
+
+		.title {
+			margin-bottom: 2.5em;
+		}
+
+		.gist {
+			float: left;
+			margin-right: 1em;
+		}
+
+		.source {
+			border-left: solid #ddd 2px;
+			padding-left: 2em;
+		}
+
+		pre {
+			tab-size: 2;
+			border: 0;
+			white-space: pre-wrap;       /* css-3 */
+			white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+			white-space: -pre-wrap;      /* Opera 4-6 */
+			white-space: -o-pre-wrap;    /* Opera 7 */
+			word-wrap: break-word;       /* Internet Explorer 5.5+ */
+			xxbackground-color: #f8f8f8;
+			margin-top: 1.5em;
+			margin-bottom: 1.5em;
+			padding: 0.5rem 0.3125rem ;
+		}
+
+		pre code {
+			background-color: transparent;
+			border: 0;
+			padding: 0;
+		}
+		pre code.hljs {
+			display: block;
+			padding: 1em;
+		}
+		code.hljs {
+			display: inline;
+			padding: 0 0.5em;
+			border: solid #ddd 0.5px;
+			border-radius: 0.1em;
+			background-color: #f8f8f8;
+		}
+		blockquote {
+			color: #aaa;
+			font-size: 1em;
+			font-weight: normal;
+			font-style: italic;
+			margin-left: 0em;
+			padding-left:1em;
+			border-left: solid #ddd 4px;
+		}

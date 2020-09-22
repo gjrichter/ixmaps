@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<SVGGIS version="1.1">
+  <CONFIG>
+    <MAP>
+      <PROPERTIES>
+        <LEGEND>
+
+					<!-- singioli frazioni -->
+
+					<!-- Frazione organica -->
+
+          <LEGENDITEM type="theme" id="P1" name="FORSU (totale)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Frazione organica (t/a)','',
+																						'type:CHART|BAR|3D|VOLUME|QUANTILE|SUM;
+																						 colorscheme:7,#ffffff,#CF8E14,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;units:tonnellate;normalsizevalue:10000;
+																						 snippet:tonnellate annuale totale ',
+																						'Frazione Organica del Rifiuto Solido Urbano')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="FORSU (%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Frazione organica (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHOROPLETHE|QUANTILE|DOPACITYMAX|ZEROISVALUE;
+																						 dopacitypow: 0.5;
+																						 dopacityscale: 2;
+																						 colorscheme:7,#ffffff,#CF8E14,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:percentuale',
+																						'Frazione Organica del Rifiuto Solido Urbano')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="FORSU (pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Frazione organica (t/a)','PR Residenti',
+																						'type:CHART|PIE|3D|QUANTILE|FRACTION|HEIGHT;scale:0.5;
+																						 colorscheme:7,#ffffff,#CF8E14,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;
+																						 snippet:kg pro capite',
+																						'Frazione Organica del Rifiuto Solido Urbano')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="FORSU (+-%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Frazione organica (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE;maxshadow:2000;
+																						 colorscheme:7,#888888,#CF8E14,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:deviazione dalla media',
+																						'Frazione Organica del Rifiuto Solido Urbano')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="FORSU (+-pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Frazione organica (t/a)','PR Residenti',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE|LOG|FRACTION;maxshadow:2000;
+																						 colorscheme:7,#888888,#CF8E14,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;units:%;
+																						 snippet:deviazione dalla media',
+																						'Frazione Organica del Rifiuto Solido Urbano')"
+					/>
+
+					<!-- Sfalci e potature -->
+
+          <LEGENDITEM type="theme" id="P1" name="Verde (totale)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Sfalci e potature (t/a)','',
+																						'type:CHART|BAR|3D|VOLUME|QUANTILE|SUM;
+																						 colorscheme:7,#ffffff,#389932,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;units:tonnellate;normalsizevalue:10000;
+																						 snippet:tonnellate annuale totale ',
+																						'Sfalci e potature')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Verde (%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Sfalci e potature (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHOROPLETHE|QUANTILE|DOPACITYMAX|ZEROISVALUE;
+																						 dopacitypow: 0.5;
+																						 dopacityscale: 5;
+																						 colorscheme:7,#ffffff,#389932,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:percentuale',
+																						'Sfalci e potature')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Verde (pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Sfalci e potature (t/a)','PR Residenti',
+																						'type:CHART|PIE|3D|QUANTILE|FRACTION|HEIGHT;scale:0.5;
+																						 colorscheme:7,#ffffff,#389932,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;
+																						 snippet:kg pro capite',
+																						'Sfalci e potature')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Verde (+-%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Sfalci e potature (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE;maxshadow:2000;
+																						 colorscheme:7,#888888,#389932,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:deviazione dalla media',
+																						'Sfalci e potature')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Verde (+-pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Sfalci e potature (t/a)','PR Residenti',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE|LOG|FRACTION;maxshadow:2000;
+																						 colorscheme:7,#888888,#389932,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;units:%;
+																						 snippet:deviazione dalla media',
+																						'Sfalci e potature')"
+					/>
+
+					<!-- Vetro -->
+
+          <LEGENDITEM type="theme" id="P1" name="Vetro (totale)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Vetro (t/a)','',
+																						'type:CHART|BAR|3D|VOLUME|QUANTILE|SUM;
+																						 colorscheme:7,#ffffff,#7BFECD,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;units:tonnellate;normalsizevalue:10000;
+																						 snippet:tonnellate annuale totale ',
+																						'Vetro')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Vetro (%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Vetro (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHOROPLETHE|QUANTILE|DOPACITYMAX|ZEROISVALUE;
+																						 dopacitypow: 0.5;
+																						 dopacityscale: 1.5;
+																						 colorscheme:7,#ffffff,#7BFECD,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:percentuale',
+																						'Vetro')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Vetro (pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Vetro (t/a)','PR Residenti',
+																						'type:CHART|PIE|3D|QUANTILE|FRACTION|HEIGHT;scale:0.5;
+																						 colorscheme:7,#ffffff,#7BFECD,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;
+																						 snippet:kg pro capite',
+																						'Vetro')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Vetro (+-%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Vetro (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE;maxshadow:2000;
+																						 colorscheme:7,#888888,#7BFECD,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:deviazione dalla media',
+																						'Vetro')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Vetro (+-pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Vetro (t/a)','PR Residenti',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE|LOG|FRACTION;maxshadow:2000;
+																						 colorscheme:7,#888888,#7BFECD,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;units:%;
+																						 snippet:deviazione dalla media',
+																						'Vetro')"
+					/>
+
+					<!-- Carta e cartone -->
+
+          <LEGENDITEM type="theme" id="P1" name="Carta e cartone (totale)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Carta e cartone (t/a)','',
+																						'type:CHART|BAR|3D|VOLUME|QUANTILE|SUM;
+																						 colorscheme:7,#ffffff,#FFEC1C,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;units:tonnellate;normalsizevalue:10000;
+																						 snippet:tonnellate annuale totale ',
+																						'Carta e cartone')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Carta e cartone (%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Carta e cartone (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHOROPLETHE|QUANTILE|DOPACITYMAX|ZEROISVALUE;
+																						 dopacitypow: 0.5;
+																						 dopacityscale: 2;
+																						 colorscheme:7,#ffffff,#FFEC1C,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:percentuale',
+																						'Carta e cartone')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Carta e cartone (pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Carta e cartone (t/a)','PR Residenti',
+																						'type:CHART|PIE|3D|QUANTILE|FRACTION|HEIGHT;scale:0.5;
+																						 colorscheme:7,#ffffff,#FFEC1C,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;
+																						 snippet:kg pro capite',
+																						'Carta e cartone')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Carta e cartone (+-%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Carta e cartone (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE;maxshadow:2000;
+																						 colorscheme:7,#888888,#FFEC1C,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:deviazione dalla media',
+																						'Carta e cartone')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Carta e cartone (+-pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Carta e cartone (t/a)','PR Residenti',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE|LOG|FRACTION;maxshadow:2000;
+																						 colorscheme:7,#888888,#FFEC1C,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;units:%;
+																						 snippet:deviazione dalla media',
+																						'Carta e cartone')"
+					/>
+
+					<!-- Plastica -->
+
+          <LEGENDITEM type="theme" id="P1" name="Plastica (totale)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Plastica (t/a)','',
+																						'type:CHART|BAR|3D|VOLUME|QUANTILE|SUM;
+																						 colorscheme:7,#ffffff,#FFCE52,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;units:tonnellate;normalsizevalue:10000;
+																						 snippet:tonnellate annuale totale ',
+																						'Plastica')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Plastica (%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Plastica (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHOROPLETHE|QUANTILE|DOPACITYMAX|ZEROISVALUE;
+																						 dopacitypow: 0.3;
+																						 dopacityscale: 25;
+																						 colorscheme:7,#ffffff,#FFCE52,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:percentuale',
+																						'Plastica')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Plastica (pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Plastica (t/a)','PR Residenti',
+																						'type:CHART|PIE|3D|QUANTILE|FRACTION|HEIGHT;scale:0.5;
+																						 colorscheme:7,#ffffff,#FFCE52,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;
+																						 snippet:kg pro capite',
+																						'Plastica')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Plastica (+-%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Plastica (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE;maxshadow:2000;
+																						 colorscheme:7,#888888,#FFCE52,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:deviazione dalla media',
+																						'Plastica')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Plastica (+-pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Plastica (t/a)','PR Residenti',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE|LOG|FRACTION;maxshadow:2000;
+																						 colorscheme:7,#888888,#FFCE52,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;units:%;
+																						 snippet:deviazione dalla media',
+																						'Plastica')"
+					/>
+
+					<!-- Metalli e contenitori metallici -->
+
+          <LEGENDITEM type="theme" id="P1" name="Metalli e contenitori metallici (totale)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Metalli e contenitori metallici (t/a)','',
+																						'type:CHART|BAR|3D|VOLUME|QUANTILE|SUM;
+																						 colorscheme:7,#ffffff,#C0C0C2,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;units:tonnellate;normalsizevalue:10000;
+																						 snippet:tonnellate annuale totale ',
+																						'Metalli e contenitori metallici')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Metalli e contenitori metallici (%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Metalli e contenitori metallici (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHOROPLETHE|QUANTILE|DOPACITYMAX|ZEROISVALUE;
+																						 dopacitypow: 0.5;
+																						 dopacityscale: 2;
+																						 colorscheme:7,#ffffff,#C0C0C2,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:percentuale',
+																						'Metalli e contenitori metallici')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Metalli e contenitori metallici (pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Metalli e contenitori metallici (t/a)','PR Residenti',
+																						'type:CHART|PIE|3D|QUANTILE|FRACTION|HEIGHT;scale:0.5;
+																						 colorscheme:7,#ffffff,#C0C0C2,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;
+																						 snippet:kg pro capite',
+																						'Metalli e contenitori metallici')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Metalli e contenitori metallici (+-%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Metalli e contenitori metallici (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE;maxshadow:2000;
+																						 colorscheme:7,#888888,#C0C0C2,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:deviazione dalla media',
+																						'Metalli e contenitori metallici')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Metalli e contenitori metallici (+-pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Metalli e contenitori metallici (t/a)','PR Residenti',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE|LOG|FRACTION;maxshadow:2000;
+																						 colorscheme:7,#888888,#C0C0C2,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;units:%;
+																						 snippet:deviazione dalla media',
+																						'Metalli e contenitori metallici')"
+					/>
+
+					<!-- Multi materiale -->
+
+          <LEGENDITEM type="theme" id="P1" name="Multi materiale (totale)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Multi materiale (t/a)','',
+																						'type:CHART|BAR|3D|VOLUME|QUANTILE|SUM;
+																						 colorscheme:7,#ffffff,#288FF7,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;units:tonnellate;normalsizevalue:10000;
+																						 snippet:tonnellate annuale totale ',
+																						'Multi materiale')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Multi materiale (%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Multi materiale (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHOROPLETHE|QUANTILE|DOPACITYMAX|ZEROISVALUE;
+																						 dopacitypow: 0.5;
+																						 dopacityscale: 2;
+																						 colorscheme:7,#ffffff,#288FF7,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:percentuale',
+																						'Multi materiale')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Multi materiale (pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Multi materiale (t/a)','PR Residenti',
+																						'type:CHART|PIE|3D|QUANTILE|FRACTION|HEIGHT;scale:0.5;
+																						 colorscheme:7,#ffffff,#288FF7,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;
+																						 snippet:kg pro capite',
+																						'Multi materiale')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Multi materiale (+-%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Multi materiale (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE;maxshadow:2000;
+																						 colorscheme:7,#888888,#288FF7,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:deviazione dalla media',
+																						'Multi materiale')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Multi materiale (+-pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Multi materiale (t/a)','PR Residenti',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE|LOG|FRACTION;maxshadow:2000;
+																						 colorscheme:7,#888888,#288FF7,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;units:%;
+																						 snippet:deviazione dalla media',
+																						'Multi materiale')"
+					/>
+
+					<!-- Ingombranti e Raee avviati a recupero -->
+
+          <LEGENDITEM type="theme" id="P1" name="RAEE (totale)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Ingombranti e Raee avviati a recupero (t/a)','',
+																						'type:CHART|BAR|3D|VOLUME|QUANTILE|SUM;
+																						 colorscheme:7,#ffffff,#FF0D0D,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;units:tonnellate;normalsizevalue:10000;
+																						 snippet:tonnellate annuale totale ',
+																						'Ingombranti e Raee avviati a recupero')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="RAEE (%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Ingombranti e Raee avviati a recupero (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHOROPLETHE|QUANTILE|DOPACITYMAX|ZEROISVALUE;
+																						 dopacitypow: 0.5;
+																						 dopacityscale: 2;
+																						 colorscheme:7,#ffffff,#FF0D0D,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:percentuale',
+																						'Ingombranti e Raee avviati a recupero')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="RAEE (pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Ingombranti e Raee avviati a recupero (t/a)','PR Residenti',
+																						'type:CHART|PIE|3D|QUANTILE|FRACTION|HEIGHT;scale:0.5;
+																						 colorscheme:7,#ffffff,#FF0D0D,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;
+																						 snippet:kg pro capite',
+																						'Ingombranti e Raee avviati a recupero')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="RAEE (+-%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Ingombranti e Raee avviati a recupero (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE;maxshadow:2000;
+																						 colorscheme:7,#888888,#FF0D0D,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:deviazione dalla media',
+																						'Ingombranti e Raee avviati a recupero')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="RAEE (+-pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Ingombranti e Raee avviati a recupero (t/a)','PR Residenti',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE|LOG|FRACTION;maxshadow:2000;
+																						 colorscheme:7,#888888,#FF0D0D,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;units:%;
+																						 snippet:deviazione dalla media',
+																						'Ingombranti e Raee avviati a recupero')"
+					/>
+
+
+					<!-- Legno -->
+
+          <LEGENDITEM type="theme" id="P1" name="Legno (totale)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Legno (t/a)','',
+																						'type:CHART|BAR|3D|VOLUME|QUANTILE|SUM;
+																						 colorscheme:7,#ffffff,#F5E2A4,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;units:tonnellate;normalsizevalue:10000;
+																						 snippet:tonnellate annuale totale ',
+																						'Legno')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Legno (%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Legno (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHOROPLETHE|QUANTILE|DOPACITYMAX|ZEROISVALUE;
+																						 dopacitypow: 0.5;
+																						 dopacityscale: 3;
+																						 colorscheme:7,#ffffff,#F5E2A4,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:percentuale',
+																						'Legno')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Legno (pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Legno (t/a)','PR Residenti',
+																						'type:CHART|PIE|3D|QUANTILE|FRACTION|HEIGHT;scale:0.5;
+																						 colorscheme:7,#ffffff,#F5E2A4,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;
+																						 snippet:kg pro capite',
+																						'Legno')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Legno (+-%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Legno (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE;maxshadow:2000;
+																						 colorscheme:7,#888888,#F5E2A4,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:deviazione dalla media',
+																						'Legno')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Legno (+-pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Legno (t/a)','PR Residenti',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE|LOG|FRACTION;maxshadow:2000;
+																						 colorscheme:7,#888888,#F5E2A4,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;units:%;
+																						 snippet:deviazione dalla media',
+																						'Legno')"
+					/>
+
+
+					<!-- Tessili -->
+
+          <LEGENDITEM type="theme" id="P1" name="Tessili (totale)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Tessili (t/a)','',
+																						'type:CHART|BAR|3D|VOLUME|QUANTILE|SUM;
+																						 colorscheme:7,#ffffff,#DC686E,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;units:tonnellate;normalsizevalue:10000;
+																						 snippet:tonnellate annuale totale ',
+																						'Tessili')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Tessili (%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Tessili (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHOROPLETHE|QUANTILE|DOPACITYMAX|ZEROISVALUE;
+																						 dopacitypow: 0.33;
+																						 dopacityscale: 75;
+																						 colorscheme:7,#ffffff,#DC686E,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:percentuale',
+																						'Tessili')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Tessili (pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Tessili (t/a)','PR Residenti',
+																						'type:CHART|PIE|3D|QUANTILE|FRACTION|HEIGHT;scale:0.5;
+																						 colorscheme:7,#ffffff,#DC686E,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;
+																						 snippet:kg pro capite',
+																						'Tessili')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Tessili (+-%)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Tessili (t/a)','PT Produzione Totale (t/a)[RT+ALTRI]',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE;maxshadow:2000;
+																						 colorscheme:7,#888888,#DC686E,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 snippet:deviazione dalla media',
+																						'Tessili')"
+					/>
+          <LEGENDITEM type="theme" id="P1" name="Tessili (+-pro capite)"
+						icon="barchart_icon"    onactivate="map.Api.newMapTheme('Comuni_2011','Tessili (t/a)','PR Residenti',
+																						'type:CHART|BAR|POINTER|OFFSETMEAN|DOMINANT|SIZE|LOG|FRACTION;maxshadow:2000;
+																						 colorscheme:7,#888888,#DC686E,dynamic,cold;
+																						 dbtable:rifiuti csv url(../../data/dati-produzione-rifiuti-2014-deliberati-refine.csv);
+																						 lookupfield:ISTAT;titlefield:COMUNE;
+																						 weights:1000;units:%;
+																						 snippet:deviazione dalla media',
+																						'Tessili')"
+					/>
+
+
+
+
+
+	       </LEGEND>
+      </PROPERTIES>
+    </MAP>
+  </CONFIG>
+</SVGGIS>
