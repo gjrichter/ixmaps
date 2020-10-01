@@ -159,6 +159,12 @@
         var oldOpacity = null;
         
 		ixmaps.onMouseOver = function() {
+			
+			if (oldTarget){
+				oldTarget.style.setProperty("fill-opacity",oldOpacity);
+				oldTarget = oldOpacity = null;
+			}
+			
 			var szTooltip = null;
 			var source = oldTarget = event.target;
             
@@ -179,8 +185,10 @@
 		};
 
 		ixmaps.onMouseOut = function() {
-            oldTarget.style.setProperty("fill-opacity",oldOpacity);
-            oldTarget = oldOpacity = null;
+			if (oldTarget){
+				oldTarget.style.setProperty("fill-opacity",oldOpacity);
+				oldTarget = oldOpacity = null;
+			}
 			hideTooltip();
 		};
 
@@ -392,7 +400,7 @@
 				// ---------------------------------------
 				var data = ixmaps.getData('map', szId);
 
-				if ( 0 && data ) {
+				if ( data ) {
 
 					var szTitle = data.nome || "";
 

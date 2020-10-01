@@ -599,7 +599,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 							szHtml += '<button type="button" class="btn btn-block btn-secondary "><span style="margin-left:0.5em;float:left;white-space:normal;text-align:left">' + szText + '</span><span class="badge badge-primary badge-pill pull-right" style="top:0.1em;right:0.2em;" onmouseover=\'' + szHighlight + '\' onmouseout=\'' + szClearHighlight + '\'>' + szCount + '</span></button>';
                             
                             var nWidth = (100/nMaxCount*nCount);
-                            if ( !isNaN(nWidth) && (nWidth<100) && (facetsA[i].uniqueValues > 2) ) {
+                            if ( !isNaN(nWidth) && (nWidth<100) && (facetsA[i].uniqueValues > 1) ) {
                                 szHtml += '<div style="position:relative;top:0.25em;left:0.1em;background:rgba(208,208,208,1);line-height:0.4em;width:'+nWidth+'%;border-radius:0 0.5em 0.5em 0">&nbsp;</div>';                               
                                 }
                                 
@@ -638,16 +638,15 @@ window.ixmaps.data = window.ixmaps.data || {};
 			$("#" + x.id + "histogram").css("margin-left", ($("#" + x.id).prev().offset().left + $("#" + x.id).prev().width()) + "px");
 
 			var nStep = ((x.max - x.min) == x.ticks)?1:Math.min(1, Math.pow(10, Math.floor(Math.log((x.max - x.min) / 100))));
-
 			var mySlider = $("#" + x.id).slider({
 				step: nStep,
 				tooltip_split: true,
 				tooltip_position: "bottom",
 				scale: (x.scale == "LOG") ? 'logarithmic' : 'linear'
 			}).on("slideStop", function () {
-				__setRangeFilter(x.field, $(this).context.value, $(this).attr("data-slider-min"), $(this).attr("data-slider-max"));
+				__setRangeFilter(x.field, $(this).attr("value"), $(this).attr("data-slider-min"), $(this).attr("data-slider-max"));
 			}).on("slide", function () {
-				__makeHistogram($(this).attr("id"), $(this).context.value);
+				__makeHistogram($(this).attr("id"), $(this).attr("value"));
 			});
 		});
 
@@ -911,28 +910,57 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 				// more than 50 unique values
 
-				if (fNumeric) {
+				if ( fNumeric ) {
+					if ( u.length > 3 ) {
 
-					// if numeric data, make min/max range filter
-					// ------------------------------------------
-					a = mydata.column(fields[i]).values();
-					var min = Number.MAX_VALUE;
-					var max = (-Number.MAX_VALUE);
-					var fNaN = false
-					a = a.map(function (x) {
-						x = __scanValue(x);
-						min = Math.min(min, x);
-						max = Math.max(max, x);
-						return (x);
-					});
-					var facet = {};
-					facet.id = fields[i];
-					facet.min = min; //a[0];
-					facet.max = max; //a[a.length-1];
-					facet.data = a;
-					facet.uniqueValues = u.length;
-					facet.type = "numeric";
-					facetsA.push(facet);
+						// if more than 3 values, make min/max range filter
+						// ------------------------------------------
+						a = mydata.column(fields[i]).values();
+						var min = Number.MAX_VALUE;
+						var max = (-Number.MAX_VALUE);
+						var fNaN = false
+						a = a.map(function (x) {
+							x = __scanValue(x);
+							min = Math.min(min, x);
+							max = Math.max(max, x);
+							return (x);
+						});
+						var facet = {};
+						facet.id = fields[i];
+						facet.min = min; //a[0];
+						facet.max = max; //a[a.length-1];
+						facet.data = a;
+						facet.uniqueValues = u.length;
+						facet.type = "numeric";
+						facetsA.push(facet);
+						
+					}else{
+						
+						// make input field to define filter 
+						// ------------------------------------------
+						var facet = {};
+						facet.id = fields[i];
+						facet.type = "list";
+						if (u.length < 200) {
+							// add value list
+							// ---------------
+							facet.values = u;
+							var valuesCount = {};
+							var nCount = 0;
+							a.forEach(function (x) {
+								valuesCount[x] = (valuesCount[x] || 0) + 1;
+								nCount++;
+							});
+							u.sort(function (a, b) {
+								return ((valuesCount[a] < valuesCount[b]) ? 1 : -1);
+							});
+							facet.nCount = nCount;
+							facet.valuesCount = valuesCount;
+							facet.uniqueValues = u.length;
+						}
+						facetsA.push(facet);
+						
+					}
 
 					console.log("...... numeric");
 
