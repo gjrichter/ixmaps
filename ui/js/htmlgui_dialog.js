@@ -428,6 +428,10 @@ $Log: htmlgui.js,v $
 
 	};
 
+	ixmaps.popOutEmbed = function(fFlag,szTemplateUrl){
+		window.open(ixmaps.getShareUrl("embed"));
+	};
+
 	ixmaps.popOutView = function(fFlag,szTemplateUrl){
 		window.open(ixmaps.getShareUrl("view"));
 	};
