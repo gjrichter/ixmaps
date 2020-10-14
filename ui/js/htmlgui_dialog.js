@@ -424,6 +424,8 @@ $Log: htmlgui.js,v $
 				return szPViewUrl;
 			case "edit":
 				return szEditUrl;
+			case "embed":
+				return szEmbedUrl;
 		}
 
 	};
