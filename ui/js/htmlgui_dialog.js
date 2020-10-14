@@ -404,10 +404,10 @@ $Log: htmlgui.js,v $
 				szProject = JSON.stringify(ixmaps.loadedProject);
 			}
 		}
-		var szQuery = "&project=" + szProject;
+		var szQuery = "&legend=1&project=" + szProject;
 		// if szProject is JSON, encode URI
 		if (szProject.match(/\{/)){
-			var szQuery = "&project=" + encodeURIComponent(szProject);
+			var szQuery = "&legend=1&project=" + encodeURIComponent(szProject);
 		}
 
 		szEmbedUrl  = szEmbedUrl || (szTemplateEmbed + szQuery);
