@@ -339,7 +339,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 
 		/** Stamen Design */
 
-		__addTileLayer("http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png", {
+		__addTileLayer("https://stamen-tiles-{S}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png", {
 			name: "Stamen - toner",
 			myname: "Stamen - toner",
 			minZoom: 2,
@@ -347,7 +347,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			subdomains: ['a','b','c','d']
 		});
 
-		__addTileLayer("http://{s}.tile.stamen.com/toner-lite/{z}/{x}/{y}.png", {
+		__addTileLayer("https://stamen-tiles-{S}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png", {
 			name: "Stamen - toner-lite",
 			myname: "Stamen - toner-lite",
 			minZoom: 2,
@@ -355,21 +355,21 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			subdomains: ['a','b','c','d']
 		});
 
-		__addTileLayer("http://{s}.tile.stamen.com/toner-hybrid/{z}/{x}/{y}.png", {
+		__addTileLayer("https://stamen-tiles-{S}.a.ssl.fastly.net/toner-hybrid/{z}/{x}/{y}.png", {
 			name: "Stamen - toner-hybrid",
 			myname: "Stamen - toner-hybrid",
 			minZoom: 2,
 			attribution: "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, under <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a>. Data by <a href='http://openstreetmap.org'>OpenStreetMap</a>, under <a href='http://creativecommons.org/licenses/by-sa/3.0'>CC BY SA</a>.",
 			subdomains: ['a','b','c','d']
 		});
-		__addTileLayer("http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.png", {
+		__addTileLayer("https://stamen-tiles-{S}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png", {
 			name: "Stamen - watercolor",
 			myname: "Stamen - watercolor",
 			minZoom: 2,
 			attribution: "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, under <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a>. Data by <a href='http://openstreetmap.org'>OpenStreetMap</a>, under <a href='http://creativecommons.org/licenses/by-sa/3.0'>CC BY SA</a>.",
 			subdomains: ['a','b','c','d']
 		});
-		__addTileLayer("http://{s}.tile.stamen.com/terrain/{z}/{x}/{y}.png", {
+		__addTileLayer("https://stamen-tiles-{S}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png", {
 			name: "Stamen - terrain",
 			myname: "Stamen - terrain",
 			minZoom: 2,
