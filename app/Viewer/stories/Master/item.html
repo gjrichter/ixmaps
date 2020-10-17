@@ -204,9 +204,11 @@
 		 * @type void
 		 */
 		ixmaps.makeChartHTML = function(szId, szTargetDiv) {
-
-			var __themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
-
+			
+			var __themeObj = ixmaps.getThemeObj();
+			if (szId.match(/chart/)){
+				__themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
+			}
 			if (!__themeObj) {
 				return;
 			}
@@ -218,7 +220,7 @@
 
 			var szHtml = "";
 			szHtml += "<div id='chart-title' style='font-size:1.2em;font-weight:300;padding:1em;margin-bottom:-1em'></div>";
-			szHtml += "<div id='chartDiv' style='margin:1em;height:400px;width:400px;overflow:hidden'><svg width='400' height='400' viewBox='-500 -3500 5000 5000'><g id='getchartmenutarget' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();' style='pointer-events:all'></g></svg></div>";
+			szHtml += "<div id='chartDiv' style='margin:1em;width:400px;overflow:hidden'><svg width='400' height='400' viewBox='-500 -3500 5000 5000'><g id='getchartmenutarget' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();' style='pointer-events:all'></g></svg></div>";
 			$("#" + szTargetDiv).append(szHtml);
 
 			// draw the chart by theme api call 
@@ -366,6 +368,8 @@
 		//
 		// ===================================
 		// ===================================
+		
+		var showData = false;
 
 		ixmaps.makeItemContent = function() {
 
@@ -391,7 +395,7 @@
 			var themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
 
 			if (szId.match(/chart/i)) {
-
+				
 				// item is part of a theme, so show chart 
 				// ---------------------------------------
 				ixmaps.makeChartHTML(szId, "chart-div");
@@ -400,7 +404,7 @@
 				// ---------------------------------------
 				var data = ixmaps.getData('map', szId);
 
-				if ( data ) {
+				if ( data && showData ) {
 
 					var szTitle = data.nome || "";
 
@@ -457,18 +461,23 @@
 					} else {
 						szHtml += "<br><br>";
 					}
+					
+					if ( (data.length > 1)) {
+						szHtml += "</br>";
+						szHtml += "</br>";
+						szHtml += "</br>";
+						szHtml += "&nbsp;";
+					}
+
 				}else{
-					szHtml += "<div style='padding-top:1.5em;padding-bottom:1em;overflow:auto'>";
-					szHtml += "</div><div class='item-list' style='background:rgba(0,0,0,0.04)'>";
-					szHtml += "</div></div>";
+					if (data && (data.length > 1)) {
+						szHtml += "<div style='padding:2em 0.5em 0em 1.5em;color:#aaa'> " + data.length + " items aggregated </div>";
+					} 
+					szHtml += "<div style='padding:1.5em;padding-bottom:1em;overflow:auto;pointer-events:all'>";
+					szHtml += "<a href='#' title='show data' onclick=\"showData=true;ixmaps.makeItemContent()\">...</a>"
+					szHtml += "</div>";
 				}
 
-				if (data && (data.length > 1)) {
-					szHtml += "</br>";
-					szHtml += "</br>";
-					szHtml += "</br>";
-					szHtml += "&nbsp;";
-				}
 			} else {
 
 				// item is a map shape 
@@ -520,9 +529,9 @@
 				// --------------------------
 				var szHtml = "";
 				if (!themeObj) {
-					szHtml += "<div style='margin-top:1em;background:#ffffff;width:100%;padding:1.5em;overflow:auto'>";
-					szHtml += "<h4>" + (szLayerName) + "</h4>";
-					szHtml += "<h3>" + (szItemName) + "</h3>";
+					szHtml += "<div style='margin-top:1em;color:#888888;background:#ffffff;width:100%;padding:1.5em;overflow:auto'>";
+					szHtml += "<h5 style='font-size:1.3em'>" + (szLayerName) + "</br>";
+					szHtml += "" + (szItemName) + "</h5>";
 					szHtml += "</div>";
 				} else {
 					szHtml += "<div style='background:#ffffff;width:100%;'>&nbsp;";
@@ -540,7 +549,7 @@
 
 				// list data
 				// ----------
-				if (data && !(themeObj && !themeObj.fShowData)) {
+				if ( data && showData && !(themeObj && !themeObj.fShowData)) {
 					var maxHeight = ($("#result-div").innerHeight());
 					szHtml += "<div style='background:#f8f8f8;width:100%;padding:1.5em;height:" + (maxHeight - 50) + "px;overflow:auto'>";
 					szHtml += "<table>"
@@ -550,6 +559,10 @@
 						}
 					}
 					szHtml += "</table>";
+					szHtml += "</div>";
+				}else{
+					szHtml += "<div style='margin-top: -1em;padding:0 1.5em 1em 1.5em;overflow:auto;background:#ffffff;pointer-events:all'>";
+					szHtml += "<a href='#' title='show data' onclick=\"showData=true;ixmaps.makeItemContent()\">...</a>"
 					szHtml += "</div>";
 				}
 
