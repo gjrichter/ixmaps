@@ -516,7 +516,7 @@ window.ixmaps = window.ixmaps || {};
 			var szHtml = "";
 
 			if (!description) {
-				szHtml += "<h3 id='map-legend-title'>Map Layer";
+				szHtml += "<h3 id='map-legend-title' style='margin-top:0.5em;'>Map Layer";
 				szHtml += "</h3>";
 			} else {
 				szHtml += "<div style='height:0.5em;'></div>";
