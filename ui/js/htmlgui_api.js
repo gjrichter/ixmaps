@@ -2453,6 +2453,9 @@ $Log: htmlgui_api.js,v $
 			if ( opt.tools ){
 				szUrl += "&tools="+(opt.tools?"1":"0");
 			}
+			if ( opt.footer ){
+				szUrl += "&footer="+(opt.footer?"1":"0");
+			}
 			if ( opt.silent ){
 				szUrl += "&silent="+(opt.silent?"1":"0");
 			}
