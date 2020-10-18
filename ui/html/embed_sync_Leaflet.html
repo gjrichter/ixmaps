@@ -159,7 +159,7 @@
 		</div>
         
 		<!-- fullscreen button -->
-		<div id="map-bottom" class="map-overlay" style="position:absolut;top:93%;right:10px;z-index:100000;display:inline;">
+		<div id="map-popout-button" class="map-overlay" style="position:absolut;top:93%;right:10px;z-index:100000;display:none;">
 			<div style="padding:0.5em;background-color:rgba(255,255,255,0.7);border:solid black 0.1px;border-radius:0.5em;">
 			<a href="javascript:ixmaps.popOutEmbed()" style="text-decoration:none"><i class="icon icon-context icon-enlarge2" title="Layer" tabindex="-1" style="font-size:2em;color:#888888" ></i></a>
 			</div>	
@@ -538,6 +538,7 @@
 
 			if ($(document).getUrlParam('footer')) {
 				$("#map-footer").show();
+				$("#map-popout-button").show();
 				ixmaps.footer = 20;
 			}
 
