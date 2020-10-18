@@ -633,6 +633,10 @@
 				__setInputMode(mode);
 			}
 
+			// set sync mode ?
+			
+			ixmaps.fSyncMap = $(document).getUrlParam('sync') ? ($(document).getUrlParam('sync') == "true") : true;
+
 			ixmaps.setAutoSwitchInfo(true);
 
 			// is there a bookmark to execute at load ? 
