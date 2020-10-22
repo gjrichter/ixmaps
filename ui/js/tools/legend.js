@@ -1094,8 +1094,8 @@ window.ixmaps.legend = window.ixmaps.legend || {};
         szHtml += "</div>";
 
         if (themeObj.szDescription) {
-           szHtml += "<div style='height:0em'></div>";
-           szHtml += "<p id='map-legend-description'>" + (themeObj.szDescription || "") + "</p>";
+           szHtml += "<div style='height:0em;'></div>";
+           szHtml += "<div id='map-legend-description' style='pointer-events:all'>" + (themeObj.szDescription || "") + "</div>";
         } else {
             szHtml += "<div style='height:0.4em'></div>";
         }
@@ -1125,7 +1125,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			var actualFrame = themeObj.nActualFrame;
 			var szFrameText = themeObj.szXaxisA[themeObj.nActualFrame];
 			szHtml += "<h4 style='margin-top:0.5em;margin-bottom:0.5em'>frame <span id='time-span'>"+szFrameText+"</span></h4>";
-			szHtml += "<div style='margin-left:-0.2em;margin-bottom:0.9em'>"
+			szHtml += "<div style='margin-left:-0.2em;margin-bottom:0.9em;pointer-events:all'>"
 			if(themeObj.fClipPause){
 				szHtml += "<a id='clipbutton' href='javascript:ixmaps.legend.toggleClipState(true);' title='start clip'>";
 				szHtml += "<i id='clipbuttonicon' class='fa fa-play fa-fw' style='color:#666666;'></i>";
