@@ -492,7 +492,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                     // simple one line legend item
                     // ---------------------------
 
-                    szHtml += "<div style='margin-top:0em;margin-bottom:0em'>";
+                    szHtml += "<div style='margin-top:0.2em;margin-bottom:0em'>";
 
                     szHtml += "<span style='line-height:5px'>";
                     szHtml += "<a class='legend-color-button' style='pointer-events:all'  href='#' title='click to see'>";
@@ -504,10 +504,10 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                             szHtml += "<span style='background:" + colorA[sortA[i].color] + ";border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:0.5em'>";
                         }
                     } else {
-                        szHtml += "<span style='background:" + colorA[sortA[i].color] + ";opacity:0.7;font-size:1em;border-radius:1em;margin-right:1em;'>";
+                        szHtml += "<span style='background:" + colorA[sortA[i].color] + ";opacity:0.7;font-size:1em;border-radius:1em;margin-right:1em;width:1em;'>";
                     }
 
-                    szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;";
+                    szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp";
 
                     szHtml += "</span>";
                     szHtml += "</a>";
