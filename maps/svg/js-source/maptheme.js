@@ -6408,6 +6408,10 @@ MapTheme.prototype.realizeDone = function () {
 		this.refreshTimeout = setTimeout(function(){map.Themes.refreshTheme(this.szId);}, this.nRefreshTimeout);
 	}
 	if (this.szFlag.match(/\bCLIP\b/)) {
+		if (this.szFlag.match(/\bPAUSE\b/)) {
+			this.removeDefinitionFromFlag("PAUSE");
+			this.fClipPause = true;
+		}
 		if (this.clipTimeout) {
 			clearTimeout(this.clipTimeout);
 		}
@@ -16775,10 +16779,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						textOnTopGroup = textOnTopGroup || map.Dom.newGroup(chartGroup, this.szId + ":" + a + ":textchartontop");
 						nFontSize = 4 + (0.5 * nPartsA.length / (this.nGridX ? (this.nGridX * 2) : 1));
 						var scalefont = Math.log(nPartsA.length)/3;
-						newText = this.createTextLabel(SVGDocument, textOnTopGroup, "", szText, nFontSize * scalefont, "", "rgba(255,255,255,0)", cColor.lowColor, "GLOW");
+						newText = this.createTextLabel(SVGDocument, textOnTopGroup, "", szText, nFontSize * scalefont, "", "rgba(255,255,255,0.3)", cColor.lowColor, "GLOW");
 						newText.setAttributeNS(null, "opacity", "0.9");
 						//textOnTopGroup.fu.setPosition(-map.Scale.normalX(nFontSize) * 1.7, - map.Scale.normalY(nFontSize) * 0.3 / (this.nGridX||1) );
-						textOnTopGroup.fu.setPosition(-map.Scale.normalX(nFontSize) * 1.7, - map.Scale.normalY(5/(this.nGridX||1)) );
+						textOnTopGroup.fu.setPosition(-map.Scale.normalX(nFontSize* scalefont) * 0.7, - map.Scale.normalY(5/(this.nGridX||1)) );
 					} else
 					if (szFlag.match(/ZOOM/) && !szFlag.match(/SEQUENCE/)) { // && (nFontSize<map.Scale.normalX(6)) ){
 						szTextColor = "black";
@@ -17170,8 +17174,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 									
 									var nPlotScale = nPartsA.length / (this.nGridX || 1);
 
-									var nScaleFontSize = map.Scale.normalX(Math.max(nPartsA.length / (this.nGridX || 1), 10));
-									nScaleFontSize *= (szFlag.match(/ZOOM/) ? 0.8 : 1);
+									var nScaleFontSize = map.Scale.normalX(Math.max(nPartsA.length / (this.nGridX || 1), 3));
+									nScaleFontSize *= (szFlag.match(/ZOOM/) ? 1 : 1);
 
 									// make plot lines and fill in a special group below the plot symbols 
 									var plotGroup = map.Dom.newGroup(shapeGroup, "");
@@ -17284,6 +17288,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 											}else
 											if (!this.szXaxisA[ai] || !this.szXaxisA[ai].length || (this.szXaxisA[ai] == " ")) {
 												newText.parentNode.removeChild(newText);
+											}else{
+												newShape.fu.scaleBy(4,4	);
 											}
 										}
 									}
