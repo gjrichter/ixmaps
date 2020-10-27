@@ -276,7 +276,7 @@ $Log: htmlgui.js,v $
 	};
 
 	ixmaps.popupProject = function(position){
-		this.openDialog(null,'projects','./tools/project_save.html','Save actual map & theme as project',position||'200,103',550,580);
+		this.openDialog(null,'projects','./tools/project_save.html','Save actual map & theme as project',position||'200,103',550,620);
 	};
 
 	ixmaps.popupThemeEditor = function(position){
