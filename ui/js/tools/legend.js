@@ -785,7 +785,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
         }
        if (fLegendCompact &&
 		   themeObj.szFlag.match(/CLIP/)){
-       		return ixmaps.legend.makeColorLegendHTMLCompact(szId, szLegendId);
+       		return "";
 	   }
        if (fLegendCompact &&
             themeObj.partsA.length >= 5 &&
@@ -1124,7 +1124,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			var clipFrames = themeObj.nClipFrames;
 			var actualFrame = themeObj.nActualFrame;
 			var szFrameText = themeObj.szXaxisA[themeObj.nActualFrame];
-			szHtml += "<h4 style='margin-top:0.5em;margin-bottom:0.5em'>frame <span id='time-span'>"+szFrameText+"</span></h4>";
+			szHtml += "<h3 style='margin-top:0.8em;margin-bottom:0.2em'><span id='time-span'>"+szFrameText+"</span></h3>";
 			szHtml += "<div style='margin-left:-0.2em;margin-bottom:0.9em;pointer-events:all'>"
 			if(themeObj.fClipPause){
 				szHtml += "<a id='clipbutton' href='javascript:ixmaps.legend.toggleClipState(true);' title='start clip'>";
@@ -1135,7 +1135,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 				szHtml += "<i id='clipbuttonicon' class='fa fa-pause fa-fw' style='color:#666666;vertical-align:-10%'></i>";
 				szHtml += "</a>";
 			}
-			szHtml += "<input type='range' min='"+0+"' max='"+(clipFrames-1)+"' value='"+actualFrame+"' class='slider' id='myRange' style='margin-left:2em;width:50%;margin-top:-1em'>";
+			szHtml += "<input type='range' min='"+0+"' max='"+(clipFrames-1)+"' value='"+actualFrame+"' class='slider' id='myRange' style='margin-left:2em;width:50%;margin-top:-1em;margin-bottom:0.5em'>";
 			szHtml += "</div>"
 			
 			ixmaps.legend.toggleClipState = function(state){
