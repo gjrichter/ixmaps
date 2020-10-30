@@ -2131,7 +2131,7 @@
               },
               "markclasses": {
                 "$id": "#/properties/themes/items/properties/style/properties/markclasses",
-                "type": "string",
+                "type": "array",
                 "title": "The Markclasses Schema",
                 "default": "",
                 "examples": [
