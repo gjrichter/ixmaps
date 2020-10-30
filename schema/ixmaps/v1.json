@@ -1563,7 +1563,7 @@
               },
               "linecolor": {
                 "$id": "#/properties/themes/items/properties/style/properties/linecolor",
-                "type": "string",
+                "type": ["array","string"],
                 "title": "The Linecolor Schema",
                 "default": "",
                 "examples": [
