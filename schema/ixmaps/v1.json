@@ -148,7 +148,6 @@
             "objectscaling",
             "labelscaling",
             "flushChartDraw",
-            "flushPaintShape",
             "mapopacity",
             "basemapopacity"
           ],
