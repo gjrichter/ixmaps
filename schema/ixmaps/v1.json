@@ -628,7 +628,7 @@
               "colorscheme",
               "dbtable",
               "lookupfield",
-              "title",
+              "title"
             ],
             "properties": {
               "type": {
