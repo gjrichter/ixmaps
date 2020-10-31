@@ -498,9 +498,7 @@
         "required": [
           "layer",
           "field",
-          "field100",
-          "data",
-          "style"
+           "style"
         ],
         "properties": {
           "layer": {
