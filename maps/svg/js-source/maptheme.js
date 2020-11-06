@@ -1602,7 +1602,7 @@ Map.Themes.prototype.loadExternalData = function (szData, fRefresh, themeObj) {
 					this.fWaitforData = true;
 					themeObj.fWaitingforData = true;
 
-					clearMessage();
+					//clearMessage();
 					HTMLWindow.ixmaps.htmlgui_loadExternalData(themeObj.coTableUrl, {
 						"theme": themeObj,
 						"type": themeObj.coTableType,
@@ -13499,8 +13499,10 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					var dy = (x) / 50 * (nBow || 5);
 				}
 
-				x = x - (x / (len) * map.Scale.normalX(ll) * this.nChartGroupScaleY * this.nScale);
-				y = y - (y / (len) * map.Scale.normalX(ll) * this.nChartGroupScaleY * this.nScale);
+				if (this.szFlag.match(/\bPOINTER|ARROW\b/)) {
+					x = x - (x / (len) * map.Scale.normalX(ll) * this.nChartGroupScaleY * this.nScale * (this.nMarkerSize || 1));
+					y = y - (y / (len) * map.Scale.normalX(ll) * this.nChartGroupScaleY * this.nScale * (this.nMarkerSize || 1));
+				}
 				var x0 = 0;
 				var y0 = 0;
 				if (this.szFlag.match(/\bGAP\b/)) {
@@ -13673,7 +13675,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					});
 				}
 
-				if (this.szFlag.match(/\bPOINTER\b/)) {
+				if (this.szFlag.match(/\bPOINTER|ARROW\b/)) {
 					var tmpDefs = map.Dom.newNode('defs', shapeGroup);
 					var myMarker = map.Dom.constructNode('marker', tmpDefs, {
 						"id": this.szId + ":" + selectionId + ":chartgroup" + ":ArrowMarker",
@@ -15664,10 +15666,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				// GR 16.04.2013 needed for label background
 				var szText = this.formatValue(nValue, this.szValueDecimals || (((nValue < 1) || (nMaxValue <= 1)) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
 				// GR 05.05.2014 make a positive sign, if positive value is result of a diff operation
-				if ((nValue === 0) && (this.szFlag.match(/DIFFERENCE/) || this.szFlag.match(/RELATIVE/))) {
+				if ((nValue === 0) && (this.szFlag.match(/DIFFERENCE/) || this.szFlag.match(/RELATIVE/) || this.szFlag.match(/SIGN/))) {
 					szText = "+-" + szText;
 				}else
-				if ((nValue > 0) && (this.szFlag.match(/DIFFERENCE/) || this.szFlag.match(/RELATIVE/))) {
+				if ((nValue > 0) && (this.szFlag.match(/DIFFERENCE/) || this.szFlag.match(/RELATIVE/) || this.szFlag.match(/SIGN/))) {
 					szText = "+" + szText;
 				}
 				var nFontHeight = Math.min(nRadius * 0.8, nRadius * (3.4 / szText.length));
@@ -15707,6 +15709,12 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					if (this.szValueField && this.itemA[a].szValue) {
 						// GR 25.05.2015 explizit value display field
 						szText = this.formatValue(__scanValue(this.itemA[a].szValue), this.szValueDecimals || ((this.itemA[a].szValue < 1) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
+						if ((nValue === 0) && (this.szFlag.match(/DIFFERENCE/) || this.szFlag.match(/RELATIVE/) || this.szFlag.match(/\bSIGN\b/))) {
+							szText = "+/-" + szText;
+						}else
+						if ((nValue > 0) && (this.szFlag.match(/DIFFERENCE/) || this.szFlag.match(/RELATIVE/) || this.szFlag.match(/\bSIGN\b/))) {
+							szText = "+" + szText;
+						}
 					} else
 					if (szFlag.match(/CATEGORICAL/) && this.szLabelA) {
 						szText = this.szLabelA[nValue - 1] || "?";

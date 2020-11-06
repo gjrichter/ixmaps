@@ -9595,6 +9595,9 @@ doDisplayInfo = function(xPos,yPos,szMode){
 			if ( chartTheme && chartTheme.itemA[szShapeId] && chartTheme.itemA[szShapeId].szTitle ){
 				szInfoTitle = chartTheme.itemA[szShapeId].szTitle;
 			}
+			if ( chartTheme && chartTheme.itemA[szShapeId] && chartTheme.itemA[szShapeId].dbIndexA && chartTheme.itemA[szShapeId].dbIndexA.length ){
+				szInfoTitle = chartTheme.itemA[szShapeId].dbIndexA.length + " " +map.Dictionary.getLocalText("items aggregated");
+			}
 			if ( chartTheme && chartTheme.itemA[szShapeId] && chartTheme.itemA[szShapeId].szSelectionId2 && (chartTheme.itemA[szShapeId].szSelectionId2 != "undefined") ){
 				szInfoTitle += " ==> " + chartTheme.itemA[szShapeId].szSelectionId2;
 			}
