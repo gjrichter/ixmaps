@@ -4365,7 +4365,8 @@ function displayTooltip(evt,infoShape){
 			}
 			var szXText = infoShape.getAttributeNS(szMapNs,"tooltip");
 			if ( szXText && szXText.length ){
-				szText += (szText.length?String.fromCharCode(32,160):"") + szXText;
+				szText = szXText;
+				//szText += (szText.length?String.fromCharCode(32,160):"") + szXText;
 			}
 		}
 		if (szText && szText.length ){

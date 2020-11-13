@@ -9413,7 +9413,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 			szObjId = layerItem.getAttributeNS(null,"id");
 		}
 	}
-	var szInfoTitle = map.Label.getLabel(szObjId);
+	var szInfoTitle = (map.Label.getLabel(szObjId)||" ").replace(/\<br\>/g," ");
 
 	// GR 13.05.2016 if no title yet, try to get it from the active theme
 	if ( map.Themes.activeTheme ){
@@ -9492,7 +9492,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 						var nYpos = map.Scale.tStyle.Description.nFontHeight*0.9;
 
 						var szTextStyle = __scaleStyleString(map.Scale.tStyle.Description.szStyle,1); 
-						var szTitle = objTheme.szTitle;
+						var szTitle = (objTheme.szTitle||" ").replace(/\<br\>/g," ");
 						map.Dom.newText(infoWorkspace,map.Scale.normalX(nIndent),contentBox.height+nYpos,szTextStyle,szTitle);
 
 						if ( objTheme.szFlag.match(/CHART/) ){
@@ -9624,10 +9624,13 @@ doDisplayInfo = function(xPos,yPos,szMode){
 					var nYpos = chartBox.y+chartBox.height+map.Scale.normalY(nIndent);
 
 					// add title
+					var szTitle = (chartTheme.szTitle||" ").replace(/\<br\>/," \n ");
 					var szTextStyle = __scaleStyleString(map.Scale.tStyle.Description.szStyle,0.5); 
 					nYpos += map.Scale.tStyle.Description.nFontHeight*0.25 + map.Scale.normalY(1);
-					map.Dom.newText(chartGroup,chartBox.x,nYpos,szTextStyle,chartTheme.szTitle);
+					var newTitle = map.Dom.newText(chartGroup,chartBox.x,nYpos,szTextStyle,szTitle);
 					nYpos += map.Scale.tStyle.Description.nFontHeight*1 + map.Scale.normalY(1);
+					
+					map.Dom.wrapText(newTitle,chartBox.width);
 					// add snippet
 					/**
 					if (chartTheme.itemA[szShapeId].szSnippet || chartTheme.szSnippet){

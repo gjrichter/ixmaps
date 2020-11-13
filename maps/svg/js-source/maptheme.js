@@ -195,7 +195,7 @@ var themeStyleTranslateA = [
 	,{ style: "declutterupper"	,obj: "szDeclutterUpper"  }
 	,{ style: "valuescale"		,obj: "nValueScale"  }
 	,{ style: "minvaluesize"	,obj: "nValueSizeMin"  }
-	,{ style: "valuedecimals"	,obj: "szValueDecimals" }
+	,{ style: "valuedecimals"	,obj: "nValueDecimals" }
 	,{ style: "fadevaluepow"	,obj: "szFadeValuePow"  }
 	,{ style: "fadenegative"	,obj: "nFadeNegative"  }
 	,{ style: "centerpart"		,obj: "szCenterPart"  }
@@ -1113,7 +1113,7 @@ Map.Themes.prototype.parseStyle = function (mapTheme, styleObj) {
 		}
 		// GR 18.01.2015 define number of decimals for value display
 		if (__isdef(styleObj.valuedecimals)) {
-			mapTheme.szValueDecimals = styleObj.valuedecimals;
+			mapTheme.nValueDecimals = styleObj.valuedecimals;
 		}
 		// GR 19.06.2013 define power for calculating label fading 
 		if (__isdef(styleObj.fadevaluepow)) {
@@ -3535,7 +3535,7 @@ Map.Themes.prototype.doChangeThemeStyle = function (szId, szStyle, szFlag) {
 				mapTheme.fRedraw = true;
 			}
 			if (__isdef(styleObj.valuedecimals)) {
-				mapTheme.szValueDecimals = styleObj.valuedecimals;
+				mapTheme.nValueDecimals = styleObj.valuedecimals;
 				//				mapTheme.fRealize = true;
 				mapTheme.fRedraw = true;
 			}
@@ -4072,7 +4072,7 @@ Map.Themes.prototype.getChart = function (szId, targetGroup, szFlag, mapTheme) {
 				var szValueText = mapTheme.szLabelA[nValue - 1];
 			} else {
 				var nDez = ((mapTheme.nMax-mapTheme.nMin) < 10) ? 2 : 0;
-				var szValueText = mapTheme.formatValue(nValue, (mapTheme.szValueDecimals||nDez)) + mapTheme.szUnit;
+				var szValueText = mapTheme.formatValue(nValue, (mapTheme.nValueDecimals||nDez)) + mapTheme.szUnit;
 			}
 			
 			if (mapTheme.szFlag.match(/CLIP/) && mapTheme.szXaxisA ){
@@ -4175,30 +4175,30 @@ Map.Themes.prototype.getSummary = function (szId, mapTheme) {
 		mapTheme.szUnits100 = mapTheme.szUnits100 || "";
 
 		if (mapTheme.szFlag.match(/RELATIVE/) || mapTheme.szFlag.match(/DIFFERENCE/)) {
-			return map.Dictionary.getLocalText("Relative to") + ": " + String(mapTheme.formatValue(mapTheme.itemA[szId].nValue100, mapTheme.szValueDecimals || 0)) + " " + (mapTheme.szUnits100 || "");
+			return map.Dictionary.getLocalText("Relative to") + ": " + String(mapTheme.formatValue(mapTheme.itemA[szId].nValue100, mapTheme.nValueDecimals || 0)) + " " + (mapTheme.szUnits100 || "");
 		} else if (mapTheme.itemA[szId].nSize) {
 			if (mapTheme.szAggregation.match(/sum/)) {
-				return map.Dictionary.getLocalText("Counted") + ": " + String(mapTheme.formatValue(mapTheme.itemA[szId].nSize, mapTheme.szValueDecimals || 0)) + " " + (mapTheme.szUnits100 || "");
+				return map.Dictionary.getLocalText("Counted") + ": " + String(mapTheme.formatValue(mapTheme.itemA[szId].nSize, mapTheme.nValueDecimals || 0)) + " " + (mapTheme.szUnits100 || "");
 			} else {
-				//return map.Dictionary.getLocalText("Total") + ": " + String(mapTheme.formatValue(mapTheme.itemA[szId].nSize, mapTheme.szValueDecimals || 0)) + " " + (mapTheme.szUnits100 || "");
+				//return map.Dictionary.getLocalText("Total") + ": " + String(mapTheme.formatValue(mapTheme.itemA[szId].nSize, mapTheme.nValueDecimals || 0)) + " " + (mapTheme.szUnits100 || "");
 			}
 		} else {
 			if (nMySum != mapTheme.itemA[szId].nValue100) {
-				return String(__formatValue(nMySum, 2)) + " / " + String(mapTheme.formatValue(mapTheme.itemA[szId].nValue100, mapTheme.szValueDecimals || 0)) + " " + (mapTheme.szUnits100 || "");
+				return String(__formatValue(nMySum, 2)) + " / " + String(mapTheme.formatValue(mapTheme.itemA[szId].nValue100, mapTheme.nValueDecimals || 0)) + " " + (mapTheme.szUnits100 || "");
 			} else {
-				//return map.Dictionary.getLocalText("Total") + ": " + String(mapTheme.formatValue(nMySum, mapTheme.szValueDecimals || 0)) + " " + (mapTheme.szUnits100 || "");
+				//return map.Dictionary.getLocalText("Total") + ": " + String(mapTheme.formatValue(nMySum, mapTheme.nValueDecimals || 0)) + " " + (mapTheme.szUnits100 || "");
 			}
 		}
 	} else if (mapTheme.itemA[szId].nSize) {
 		if (mapTheme.szFlag.match(/CATEGORICAL/) && (mapTheme.itemA[szId].nValuesA.length == 1) && mapTheme.szValueField) {
 			return mapTheme.szLabelA[mapTheme.itemA[szId].nValuesA[0] - 1];
 		} else {
-			//return map.Dictionary.getLocalText("Total") + ": " + String(mapTheme.formatValue(mapTheme.itemA[szId].nSize, mapTheme.szValueDecimals || 0)) + " " + (mapTheme.szSizeValueUnits || "");
+			//return map.Dictionary.getLocalText("Total") + ": " + String(mapTheme.formatValue(mapTheme.itemA[szId].nSize, mapTheme.nValueDecimals || 0)) + " " + (mapTheme.szSizeValueUnits || "");
 		}
 	} else if (mapTheme.itemA[szId].nAlpha) {
-		return map.Dictionary.getLocalText("Alpha value") + ": " + String(mapTheme.formatValue(mapTheme.itemA[szId].nAlpha, mapTheme.szValueDecimals || 0)) + " " + (mapTheme.szAlphaValueUnits || "");
+		return map.Dictionary.getLocalText("Alpha value") + ": " + String(mapTheme.formatValue(mapTheme.itemA[szId].nAlpha, mapTheme.nValueDecimals || 0)) + " " + (mapTheme.szAlphaValueUnits || "");
 	} else if (mapTheme.szFlag.match(/SUM/) && !mapTheme.szFlag.match(/SEQUENCE/) && !mapTheme.szFlag.match(/\bCLIP\b/)) {
-		//		return map.Dictionary.getLocalText("Value:")+" "+String(mapTheme.formatValue(nMySum,mapTheme.szValueDecimals || 0))+mapTheme.szUnits;
+		//		return map.Dictionary.getLocalText("Value:")+" "+String(mapTheme.formatValue(nMySum,mapTheme.nValueDecimals || 0))+mapTheme.szUnits;
 	}
 	return null;
 };
@@ -10793,6 +10793,9 @@ MapTheme.prototype.paintMap = function (startIndex) {
 								paintShape.setAttributeNS(szMapNs, "tooltip", this.formatValue(nValue, 2) + this.szUnit); //+"  ["+this.szTitle+"] "+Math.ceil(nValue*this.itemA[a].nValue100*0.01)+"  total="+this.itemA[a].nValue100);
 							} else {
 								paintShape.setAttributeNS(szMapNs, "tooltip", this.formatValue(nValue, 2) + this.szUnit); //+"  ["+this.szTitle+"]");
+								
+								paintShape.setAttributeNS(szMapNs, "tooltip", this.itemA[a].szTitle + " " + this.formatValue(nValue, 2) + this.szUnit);
+								
 							}
 							// dynamic alpha / opacity
 							// -----------------------
@@ -12493,7 +12496,7 @@ MapTheme.prototype.labelShape = function (shapeNode, szColor, nValue) {
 			if (typeof (nValue) == "string") {
 				var szValue = nValue;
 			} else {
-				var szValue = this.formatValue(nValue, this.szValueDecimals || 0) + (this.szUnit.match(/\%/) ? "%" : "");
+				var szValue = this.formatValue(nValue, this.nValueDecimals || 0) + (this.szUnit.match(/\%/) ? "%" : "");
 			}
 
 			var szTColor = "#ffffff";
@@ -13620,12 +13623,12 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					//var tPath = map.Dom.newTextOnPath(shapeGroup,pathId,this.itemA[a].nSize,"font-family:arial;font-size:"+(Math.sqrt(this.itemA[a].nSize)*0.002)+"px;fill:#888888;baseline-shift:-25%","40%");
 					var nFontSize = Math.min(len,(Math.sqrt(this.itemA[a].nSize)/(Math.sqrt(this.nNormalSizeValue || this.nMaxSize) )) * this.nValueScale );
 					nFontSize = 24 * map.Scale.normalX(nFontSize) * this.nChartGroupScaleY * this.nScale;
-					var szText = (this.formatValue(this.itemA[a].nSize, this.szValueDecimals || (this.itemA[a].nSize < 1 ? 2 : 0), "ROUND") + this.szUnit);
+					var szText = (this.formatValue(this.itemA[a].nSize, this.nValueDecimals || (this.itemA[a].nSize < 1 ? 2 : 0), "ROUND") + this.szUnit);
 					var tPath = map.Dom.newTextOnPath(shapeGroup,pathId,szText,"font-family:arial;font-size:"+nFontSize+"px;fill:"+this.chart.szColor+";stroke:#ffffff;stroke-width:"+(nLineWidth/10)+"px;baseline-shift:-35%","40%");
 				}
 				
 				shapeGroup.setAttributeNS(szMapNs, "class", (typeof (this.itemA[a].nClass) != "undefined") ? this.itemA[a].nClass : String(this.itemA[a].nValuesA[0] - 1));
-				shapeGroup.setAttributeNS(szMapNs, "tooltip", this.formatValue(this.itemA[a].nSize, this.szValueDecimals || (this.itemA[a].nSize < 1 ? 2 : 0), "ROUND") + this.szUnit);
+				shapeGroup.setAttributeNS(szMapNs, "tooltip", this.formatValue(this.itemA[a].nSize, this.nValueDecimals || (this.itemA[a].nSize < 1 ? 2 : 0), "ROUND") + this.szUnit);
 
                 // make time stamp
                 // -----------------
@@ -13694,7 +13697,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				}
 
 				shapeGroup.setAttributeNS(szMapNs, "class", (typeof (this.itemA[a].nClass) != "undefined") ? this.itemA[a].nClass : String(this.itemA[a].nValuesA[0] - 1));
-				shapeGroup.setAttributeNS(szMapNs, "tooltip", this.formatValue(this.itemA[a].nSize, this.szValueDecimals || (this.itemA[a].nSize < 1 ? 2 : 0), "ROUND") + this.szUnit);
+				shapeGroup.setAttributeNS(szMapNs, "tooltip", this.formatValue(this.itemA[a].nSize, this.nValueDecimals || (this.itemA[a].nSize < 1 ? 2 : 0), "ROUND") + this.szUnit);
 
 				shapeGroup.fu.setMatrix([1, 0, 0, 1, p1.x, p1.y]);
 			}
@@ -15097,7 +15100,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
                                               ,nHeight
                                               ,szColor
                                               ,0
-                                              ,(this.szAggregation && this.szAggregation.match(/sum/)) ? this.formatValue(nPartsA[nI], this.szValueDecimals || (nPartsA[nI] < 1 ? 2 : 0), "ROUND") + szUnit : this.formatValue(nPartsA[nI], this.szValueDecimals || (nPartsA[nI] < 1 ? 2 : 0), "ROUND") + szUnit, szLabel);
+                                              ,(this.szAggregation && this.szAggregation.match(/sum/)) ? this.formatValue(nPartsA[nI], this.nValueDecimals || (nPartsA[nI] < 1 ? 2 : 0), "ROUND") + szUnit : this.formatValue(nPartsA[nI], this.nValueDecimals || (nPartsA[nI] < 1 ? 2 : 0), "ROUND") + szUnit, szLabel);
 				donutPart.nClass = nI;
 
 				// GR 03.03.2019 new, donut/startburst part will be directed to the position of the source of the aggregated data
@@ -15138,7 +15141,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				circle.setAttributeNS(szMapNs, "tooltip", this.szLabelA ? (this.szLabelA[this.nCenter] + ": " + nPartsA[this.nCenter] + this.szUnit + "") : (nPartsA[this.nCenter] + this.szUnit));
 			}
 			if (szFlag.match(/CENTERVALUE/) || szFlag.match(/ZOOM/) || (szFlag.match(/VALUES/) && !this.fHideValues)) {
-				var szText = this.formatValue(this.nCenterValue, this.szValueDecimals || (((this.nCenterSize < 1) || (nMaxValue < 10)) ? 0 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
+				var szText = this.formatValue(this.nCenterValue, this.nValueDecimals || (((this.nCenterSize < 1) || (nMaxValue < 10)) ? 0 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
 				var cColor = __maptheme_getChartColors(szColor);
 				var szTextColor = cColor.textColor;
 				var nFontSize = String(Math.min(nRadius * 0.8, nRadius * (3.3 / szText.length)) * this.nValueScale);
@@ -15664,7 +15667,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			} else
 			if (szFlag.match(/LABEL/)) {
 				// GR 16.04.2013 needed for label background
-				var szText = this.formatValue(nValue, this.szValueDecimals || (((nValue < 1) || (nMaxValue <= 1)) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
+				var szText = this.formatValue(nValue, this.nValueDecimals || (((nValue < 1) || (nMaxValue <= 1)) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
 				// GR 05.05.2014 make a positive sign, if positive value is result of a diff operation
 				if ((nValue === 0) && (this.szFlag.match(/DIFFERENCE/) || this.szFlag.match(/RELATIVE/) || this.szFlag.match(/SIGN/))) {
 					szText = "+-" + szText;
@@ -15708,7 +15711,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					var szText = null;
 					if (this.szValueField && this.itemA[a].szValue) {
 						// GR 25.05.2015 explizit value display field
-						szText = this.formatValue(__scanValue(this.itemA[a].szValue), this.szValueDecimals || ((this.itemA[a].szValue < 1) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
+						szText = this.formatValue(__scanValue(this.itemA[a].szValue), this.nValueDecimals || ((this.itemA[a].szValue < 1) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
 						if ((nValue === 0) && (this.szFlag.match(/DIFFERENCE/) || this.szFlag.match(/RELATIVE/) || this.szFlag.match(/\bSIGN\b/))) {
 							szText = "+/-" + szText;
 						}else
@@ -15719,7 +15722,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					if (szFlag.match(/CATEGORICAL/) && this.szLabelA) {
 						szText = this.szLabelA[nValue - 1] || "?";
 					} else {
-						szText = this.formatValue(nValue, this.szValueDecimals || (((nValue < 1) || (nMaxValue <= 1)) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
+						szText = this.formatValue(nValue, this.nValueDecimals || (((nValue < 1) || (nMaxValue <= 1)) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
 						// GR 05.05.2014 make a positive sign, if positive value is result of a diff operation
 						if ((nValue === 0) && (this.szFlag.match(/DIFFERENCE/) || this.szFlag.match(/RELATIVE/) || this.szFlag.match(/\bSIGN\b/))) {
 							szText = "+/-" + szText;
@@ -15881,7 +15884,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		// group to host text value
 		// ---------------------------
 		var shapeTextGroup = null;
-		if (szFlag.match(/VALUES/)) {
+		if (szFlag.match(/VALUES|AXIS/)) {
 			shapeTextGroup = map.Dom.newGroup(shapeGroup, this.szId + ":" + a + ":textgroup");
 		}
 
@@ -16310,11 +16313,11 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 									setRotate(newText, -45);
 								}
 							}
-							if (szFlag.match(/AXIS/) && this.szXaxisA) {
+							if (szFlag.match(/AXIS/) && this.szXaxisA && (!this.fHideValues || szFlag.match(/ZOOM/))) {
 								var cColor = __maptheme_getChartColors(szColor);
 								szLineColor = cColor.textColor;
 								var szAxisText = this.szXaxisA[i];
-								var newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:arial;font-size:" + String(nRadius / 2) + "px;text-anchor:start;baseline-shift:-90%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", szAxisText);
+								var newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:arial;font-size:" + String(nRadius) + "px;text-anchor:start;baseline-shift:-90%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", szAxisText);
 								newText.fu.setPosition(nIndex * nRadius * 2 + map.Scale.normalX(2), nRadius + map.Scale.normalX(1));
 								if (nPartsA.length > 1) {
 									setRotate(newText, 45);
@@ -16650,7 +16653,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							newShape = map.Dom.newShape('path', shapeGroup, "M -" + nRadius + "," + 0 + " l " + A + ",-" + B + " " + C + "," + 0 + " " + A + "," + B + " -" + A + "," + B + " -" + C + "," + 0 + " -" + A + ",-" + B + " z", "fill:" + szColor + ";stroke:" + szLineColor + ";stroke-width:" + nLineWidth + ";");
 							break;
 						case "label":
-							var szText = this.formatValue(tValue, this.szValueDecimals || (((tValue < 1) || (nMaxValue <= 1)) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
+							var szText = this.formatValue(tValue, this.nValueDecimals || (((tValue < 1) || (nMaxValue <= 1)) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
 							if (szFlag.match(/TEXTONLY/)) {
 								szTextColor = __maptheme_getChartColors(szColor).textColor;
 								nFontSize = String(Math.max(Math.min(nRadius * 0.8, map.Scale.normalX(500)), map.Scale.normalX(2)));
@@ -16768,12 +16771,12 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 					var szText = tValue;
 					if (!isNaN(tValue)) {
-						szText = this.formatValue(tValue, this.szValueDecimals || "") + (this.szUnit.length <= 5 ? this.szUnit : "");
+						szText = this.formatValue(tValue, this.nValueDecimals || "") + (this.szUnit.length <= 5 ? this.szUnit : "");
 					}
 
 					// GR 21.09.2016 valuate 'biggest' text of theme to decide font-size
 					var nAllMaxValueText = Math.max(nAllMaxValue, this.nMax);
-					var szMaxText = this.formatValue(nAllMaxValueText, this.szValueDecimals || "") + (this.szUnit.length <= 5 ? this.szUnit : "");
+					var szMaxText = this.formatValue(nAllMaxValueText, this.nValueDecimals || "") + (this.szUnit.length <= 5 ? this.szUnit : "");
 					var szMaxTextLength = Math.max((tValue.length || 0) + 1, szMaxText.length);
 
 					var cColor = __maptheme_getChartColors(szColor);
@@ -16782,7 +16785,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					var nFontSize = String(Math.min(nMaxRadius * 1, nMaxRadius * (((szSymbol == "hexagon") ? 2.7 : 3.2) / szMaxTextLength)));
 					nFontSize *= nRadius / nMaxRadius * this.nValueScale;
 
-					if (szFlag.match(/ZOOM/) && szFlag.match(/LINES/) && ((this.nGridX == null) || (this.nGridX <= 1) || (szFlag.match(/STACKED/)))) {
+					if (szFlag.match(/ZOOM/) && szFlag.match(/LINES/) && !szFlag.match(/INLINETEXT/) && ((this.nGridX == null) || (this.nGridX <= 1) || (szFlag.match(/STACKED/)))) {
 						szTextColor = "black";
 						textOnTopGroup = textOnTopGroup || map.Dom.newGroup(chartGroup, this.szId + ":" + a + ":textchartontop");
 						nFontSize = 4 + (0.5 * nPartsA.length / (this.nGridX ? (this.nGridX * 2) : 1));
@@ -16826,7 +16829,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								if (this.szValueField && szFlag.match(/2VALUES/)) {
 									newText = map.Dom.newText(shapeGroup, 0, -nFontSize * 0.2, "font-family:arial;font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szText);
 									var nFontSize2 = Math.min(nFontSize * 0.8, 120); // * ((szFlag.match(/ZOOM/))?2:1);
-									var szValue = this.formatValue(nValue, this.szValueDecimals || 0) + this.szUnit;
+									var szValue = this.formatValue(nValue, this.nValueDecimals || 0) + this.szUnit;
 									newText2 = map.Dom.newText(shapeGroup, 0, (nFontSize - nFontSize2 * 0.2), "font-family:arial;font-size:" + nFontSize2 + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szValue);
 								} else {
 									newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:arial;font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szText);
@@ -17302,7 +17305,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 										}
 									}
 									nPLastValue = nPValue;
-
+									
+									if ( szFlag.match(/\bINLINETEXT\b/) ){
+										newText.fu.setPosition(nAxis, (-nPValue) * nScale);
+									}else
 									if (szFlag.match(/LINES/) && ((this.nGridX == null) || (this.nGridX <= 1) || (szFlag.match(/STACKED/)))) {
 										newText.fu.setPosition(nAxis - map.Scale.normalX(nChartSize / 4), (-nPValue) * nScale + map.Scale.normalY(nChartSize / 4) / (this.nGridX || 1));
 										newText.fu.scale(1.5,1.5);
@@ -17333,9 +17339,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
 												plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
 												if ( this.nXLen < 25 ){
-													var v = this.formatValue(this.plot_last_areaValue[yi], this.szValueDecimals || 2) + " ... " + this.formatValue(nValue, this.szValueDecimals || 2);
+													var v = this.formatValue(this.plot_last_areaValue[yi], this.nValueDecimals || 2) + " ... " + this.formatValue(nValue, this.nValueDecimals || 2);
 												}else{
-													var v = this.formatValue(nValue, this.szValueDecimals || 2);
+													var v = this.formatValue(nValue, this.nValueDecimals || 2);
 												}
 												plotShape.setAttributeNS(szMapNs, "tooltip", v + this.szUnit + " " + (this.szLabelA ? (this.szLabelA[nClass % (this.nGridX || 1000000)]) : ""));
 												plotShape.setAttributeNS(szMapNs, "time", String(uTime));
@@ -17363,14 +17369,14 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 											plotShape = map.Dom.newShape('line', plotGroup, this.plot_last_position[yi].x, this.plot_last_position[yi].y, nAxis, (-nPValue) * nScale, "stroke:" + szColor + ";stroke-width:" + map.Scale.normalX(szFlag.match(/STACKED/) ? 1 : (this.nLineWidth || 3)) + ";stroke-linecap:" + linecap + ";");
 											if (plotShape) {
 												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
-												plotShape.setAttributeNS(szMapNs, "tooltip",  this.formatValue(nValue, this.szValueDecimals || 2) + this.szUnit + " " + (this.szLabelA ? (this.szLabelA[nClass % (this.nGridX || 1000000)]) : ""));
+												plotShape.setAttributeNS(szMapNs, "tooltip",  this.formatValue(nValue, this.nValueDecimals || 2) + this.szUnit + " " + (this.szLabelA ? (this.szLabelA[nClass % (this.nGridX || 1000000)]) : ""));
 											}
 										} else {
 											plotShape = map.Dom.newShape('line', plotGroup, this.plot_last_position[yi].x, this.plot_last_position[yi].y, nAxis, (-nPValue) * nScale, "stroke:" + (this.szLineColor || szColor) + ";stroke-width:" + map.Scale.normalX(this.nLineWidth || 3) + ";stroke-linecap:round;");
 											if ( this.nXLen < 25 ){
-												var v = this.formatValue(this.plot_last_areaValue[yi], this.szValueDecimals || 2) + " ... " + this.formatValue(nValue, this.szValueDecimals || 2);
+												var v = this.formatValue(this.plot_last_areaValue[yi], this.nValueDecimals || 2) + " ... " + this.formatValue(nValue, this.nValueDecimals || 2);
 											}else{
-												var v = this.formatValue(nValue, this.szValueDecimals || 2);
+												var v = this.formatValue(nValue, this.nValueDecimals || 2);
 											}
 											if (plotShape) {
 												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
@@ -17961,7 +17967,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				nValueSum += nValue;
 				nTextValue = nValueSum;
 			}
-			var szValue = this.formatValue(nValue, this.szValueDecimals || 2);
+			var szValue = this.formatValue(nValue, this.nValueDecimals || 2);
 
 			// special case where we calcolate the deviation from mean/median
 			// --------------------------------------------------------------
@@ -17977,7 +17983,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				nValue = (isFinite(nValue) && !isNaN(nValue)) ? nValue : 0;
 				nTextValue = nValue;
 				nMax = 100;
-				szValue = this.formatValue(nValue, this.szValueDecimals || 2);
+				szValue = this.formatValue(nValue, this.nValueDecimals || 2);
 				if (nValue > 0) {
 					szValue = "+" + szValue;
 				}
@@ -17988,7 +17994,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				nValue = (isFinite(nValue) && !isNaN(nValue)) ? nValue : 0;
 				nTextValue = nValue;
 				nValue *= 100;
-				szValue = this.formatValue(nValue, this.szValueDecimals || 2);
+				szValue = this.formatValue(nValue, this.nValueDecimals || 2);
 				if (nValue > 0) {
 					szValue = "+" + szValue;
 				}
@@ -18132,7 +18138,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					var donut = DonutCharts.newChart(SVGDocument, barShape, nPosX + nWidth / 2, 0, nWidth / 2, 0);
 					donut.setStyle("3D");
 					donut.addStyle("SILENT");
-					donut.addPart(100, nValue * nStep * 2 - (szFlag.match(/SPACED/) ? (nWidth / 2) : nWidth / 5), nColor, 0, (this.szAggregation && this.szAggregation.match(/sum/)) ? this.formatValue(nPartsA[nI], this.szValueDecimals || (nPartsA[nI] < 5 ? 1 : 0), "ROUND") + this.szUnit : this.formatValue(nPartsA[nI], this.szValueDecimals || (nPartsA[nI] < 5 ? 1 : 0), "ROUND") + this.szUnit, this.formatValue(nPartsA[nI], 2) + this.szUnit + szLabel);
+					donut.addPart(100, nValue * nStep * 2 - (szFlag.match(/SPACED/) ? (nWidth / 2) : nWidth / 5), nColor, 0, (this.szAggregation && this.szAggregation.match(/sum/)) ? this.formatValue(nPartsA[nI], this.nValueDecimals || (nPartsA[nI] < 5 ? 1 : 0), "ROUND") + this.szUnit : this.formatValue(nPartsA[nI], this.nValueDecimals || (nPartsA[nI] < 5 ? 1 : 0), "ROUND") + this.szUnit, this.formatValue(nPartsA[nI], 2) + this.szUnit + szLabel);
 					donut.realize();
 				}
 
@@ -18355,7 +18361,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				// ------------------------
 				if (szFlag.match(/VALUES/) && (nTextSize > 0) && !(this.nGridX && (this.partsA.length / this.nGridX > 2))) {
 
-					var szText = this.formatValue(nTextValue, this.szValueDecimals || ((this.nMax <= 1) ? 1 : 0));
+					var szText = this.formatValue(nTextValue, this.nValueDecimals || ((this.nMax <= 1) ? 1 : 0));
 					if (szFlag.match(/POINTER/) && (nTextValue > 0) && (this.nMin < 0 || szFlag.match(/OFFSETMEAN/) || szFlag.match(/OFFSETMEDIAN/) || this.szFlag.match(/\bSIGN\b/))) {
 						szText = "+" + szText;
 					}
