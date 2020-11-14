@@ -6331,6 +6331,9 @@ MapTheme.prototype.realizeNextClipFrame = function () {
 		this.chartPosA = [];
 		this.posItemA = [];
 		this.fRedraw = true;
+		if (this.nMaxCharts) {
+			this.unpaintMap();
+		}
 		this.chartMap();
 	} else {
 		this.paintMap();
