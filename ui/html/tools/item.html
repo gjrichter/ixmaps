@@ -395,36 +395,45 @@
 				var data = ixmaps.getData(szId);
 
 				if (data) {
-					szHtml = "<section>";
-					szHtml += "<div style='margin:1em 1em 1em 0.5em'>";
-
-					//szHtml += "<h2><b>" + data[0]['country'] + "</b></h2>";
-					// header
-					szHtml += "<p>" + (themeObj.szDescription||"<div style='color:#dddddd;'>values:</div>") + "</p><br>";
-					//szHtml += "<h1>Overall <b>" + data[0]['mean_overall'] + "</b>/100</h1>";
-
-					var max = themeObj.szFieldsA.length;
-
-					szHtml += "<table>";
-					for (var i = 0; i < max; i++) {
-						
-						if ( themeObj.nGridX ){
-							if ( i%themeObj.nGridX == 0){
-								szHtml += "<tr><td style='border-bottom:0'>&nbsp;</td></tr>";
-							}
+					if (data.length > 1) {
+						if (themeObj.szFlag.match(/MEAN/)){
+							szHtml += "<div style='padding:1em 0.5em 0em 1.5em;color:#444'>values are the <b>mean</b> of <b>" + data.length + " </b> aggregated items</div>";
+						}else{
+							szHtml += "<div style='padding:1em 0.5em 0em 1.5em;color:#444'>values are the <b>sum</b> of <b>" + data.length + " </b> aggregated items</div>";
 						}
+					} else {
 
-						szHtml += "<tr>";
-						szStyle = 'color:' + themeObj.colorScheme[i % (themeObj.nGridX || 1)];
-						szHtml += "<td>" + themeObj.szFieldsA[i] + "</td><td><b><span style='" + szStyle + "'>" + data[0][themeObj.szFieldsA[i]] + "</span></b> "+themeObj.szUnits+"</td>";
-						szHtml += "</tr>";
-						
+						szHtml = "<section>";
+						szHtml += "<div style='margin:1em 1em 1em 0.5em'>";
+
+						//szHtml += "<h2><b>" + data[0]['country'] + "</b></h2>";
+						// header
+						szHtml += "<p>" + (themeObj.szDescription||"<div style='color:#dddddd;'>values:</div>") + "</p><br>";
+						//szHtml += "<h1>Overall <b>" + data[0]['mean_overall'] + "</b>/100</h1>";
+
+						var max = themeObj.szFieldsA.length;
+
+						szHtml += "<table>";
+						for (var i = 0; i < max; i++) {
+
+							if ( themeObj.nGridX ){
+								if ( i%themeObj.nGridX == 0){
+									szHtml += "<tr><td style='border-bottom:0'>&nbsp;</td></tr>";
+								}
+							}
+
+							szHtml += "<tr>";
+							szStyle = 'color:' + themeObj.colorScheme[i % (themeObj.nGridX || 1)];
+							szHtml += "<td>" + themeObj.szFieldsA[i] + "</td><td><b><span style='" + szStyle + "'>" + data[0][themeObj.szFieldsA[i]] + "</span></b> "+themeObj.szUnits+"</td>";
+							szHtml += "</tr>";
+
+						}
+						szHtml += "</table>";
+
+
+						szHtml += "</div>";
+						szHtml += "</section>";
 					}
-					szHtml += "</table>";
-
-
-					szHtml += "</div>";
-					szHtml += "</section>";
 					
 				}else{
 					

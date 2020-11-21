@@ -556,6 +556,7 @@
 				}
 				if ($(document).getUrlParam('align') == "right") {
 					ixmaps.legendAlign = "right";
+					$(".map-legend").attr("data-align","right")
 					$("#onmapbuttondiv").css("left", "");
 					$("#onmapbuttondiv").css("right", "60px");
 					$(".map-legend").css("right", "25px");
