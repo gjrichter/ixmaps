@@ -1046,23 +1046,25 @@
 
 			$(".hljs-attr").attr("onMouseOver", "showTooltip(event,$(this).text())");
 			$(".hljs-attr").attr("onMouseOut", "hideTooltip()");
+			
+			for ( i in project.themes ){
+				if (project.themes[i].style.dbtableExt) {
 
-			if (project.themes[0].style.dbtableExt) {
-				
-				$("#filelist").append("<p style='margin-left:1em;margin-right:-2em'>with:</p>");
-				
-				$("#filelist").append("<p style='margin-left:2em;margin-right:-2em'><code>"+
-								"\"dbtable\":\""+project.themes[0].style.dbtable+"\"</br>"+
-								"\"dbtableType\":\""+project.themes[0].style.dbtableType+"\"</br>"+
-								"\"dbtableExt\":\""+project.themes[0].style.dbtableExt+"\"</br>");
-				$("#filelist").append("</code></p>");
-				
-				$("#filelist").append("<p style='margin-left:1em;margin-right:-2em'>The project refers to the <b>data provider function:</b>");
-				$("#filelist").append("<p style='margin-left:2em;margin-right:-2em'>ixmaps.<b><span style='background-color:yellow'>"+project.themes[0].style.dbtable+"</span></b></p>");
+					$("#filelist").append("<p style='margin-left:1em;margin-right:-2em'>with:</p>");
 
-				$("#filelist").append("<p style='margin-left:1em;margin-right:-2em'><b>defined</b> in the following <b>JavaScript file</b> and marked in <span style='background-color:yellow'>yellow</span>:</p>");
-				
-				__showFile((project.themes[0].style.dbtableExt.match(/http/) ? "" : "../../") + project.themes[0].style.dbtableExt,project.themes[0].style.dbtable);
+					$("#filelist").append("<p style='margin-left:2em;margin-right:-2em'><code>"+
+									"\"dbtable\":\""+project.themes[i].style.dbtable+"\"</br>"+
+									"\"dbtableType\":\""+project.themes[i].style.dbtableType+"\"</br>"+
+									"\"dbtableExt\":\""+project.themes[i].style.dbtableExt+"\"</br>");
+					$("#filelist").append("</code></p>");
+
+					$("#filelist").append("<p style='margin-left:1em;margin-right:-2em'>The project refers to the <b>data provider function:</b>");
+					$("#filelist").append("<p style='margin-left:2em;margin-right:-2em'>ixmaps.<b><span style='background-color:yellow'>"+project.themes[i].style.dbtable+"</span></b></p>");
+
+					$("#filelist").append("<p style='margin-left:1em;margin-right:-2em'><b>defined</b> in the following <b>JavaScript file</b> and marked in <span style='background-color:yellow'>yellow</span>:</p>");
+
+					__showFile((project.themes[i].style.dbtableExt.match(/http/) ? "" : "../../") + project.themes[i].style.dbtableExt,project.themes[i].style.dbtable);
+				}
 			}
 
 		};
