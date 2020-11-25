@@ -3,7 +3,7 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Corruptiuon Perceptiuon Index - ixmaps story</title>
+	<title>Project Viewer - ixmaps story</title>
 	<meta name="author" content="ixmaps" />
 	<meta name="description" content="ixmaps story" />
 	<meta name="keywords" content="ixmaps,corruption,map" />
@@ -1048,8 +1048,21 @@
 			$(".hljs-attr").attr("onMouseOut", "hideTooltip()");
 
 			if (project.themes[0].style.dbtableExt) {
-				$("#filelist").append("<h2 style='margin-left:1em;margin-right:-2em'><b>The project refers to an external data processor:</h2>");
-				__showFile((project.themes[0].style.dbtableExt.match(/http/) ? "" : "../../") + project.themes[0].style.dbtableExt,"");
+				
+				$("#filelist").append("<p style='margin-left:1em;margin-right:-2em'>with:</p>");
+				
+				$("#filelist").append("<p style='margin-left:2em;margin-right:-2em'><code>"+
+								"\"dbtable\":\""+project.themes[0].style.dbtable+"\"</br>"+
+								"\"dbtableType\":\""+project.themes[0].style.dbtableType+"\"</br>"+
+								"\"dbtableExt\":\""+project.themes[0].style.dbtableExt+"\"</br>");
+				$("#filelist").append("</code></p>");
+				
+				$("#filelist").append("<p style='margin-left:1em;margin-right:-2em'>The project refers to the <b>data provider function:</b>");
+				$("#filelist").append("<p style='margin-left:2em;margin-right:-2em'>ixmaps.<b><span style='background-color:yellow'>"+project.themes[0].style.dbtable+"</span></b></p>");
+
+				$("#filelist").append("<p style='margin-left:1em;margin-right:-2em'><b>defined</b> in the following <b>JavaScript file</b> and marked in <span style='background-color:yellow'>yellow</span>:</p>");
+				
+				__showFile((project.themes[0].style.dbtableExt.match(/http/) ? "" : "../../") + project.themes[0].style.dbtableExt,project.themes[0].style.dbtable);
 			}
 
 		};
@@ -1168,6 +1181,8 @@
 
 					$("#" + id + "").text(String(result));
 					hljs.highlightBlock($("#" + id)[0]);
+				
+					highlightSearch(id,szTitle);					
 
 				});
 		};
@@ -1266,7 +1281,12 @@
 		});
 		
 		
-		
+		function highlightSearch(szTextId,szSearch) { 
+			var e = document.getElementById(szTextId).innerHTML;
+			var x = e.split(szSearch);
+			e = x.join("<span style='background-color:yellow'>"+szSearch+"</span>");
+			document.getElementById(szTextId).innerHTML = e;
+		}		
 		
 
 	</script>
