@@ -230,7 +230,7 @@ DonutChart.prototype.realize = function(){
 		if ( nSum != 100 ){
 			if ( this.szStyle.match(/AUTOCOMPLETE/) && (nSum < 100) ){
 				var compl = Math.floor((100-nSum)*100000)/100000;
-				this.addPart(compl,this.partsA[0]?this.partsA[0].nHeight:0,"#eeeeee",0,"");
+				this.addPart(compl,this.partsA[0]?this.partsA[0].nHeight:0,this.szNoDataColor||"#eeeeee",0,"");
 			}else{
 				for ( var i=0;i<this.partsA.length;i++ ){
 					this.partsA[i].nPercent = this.partsA[i].nPercent/nSum*100;

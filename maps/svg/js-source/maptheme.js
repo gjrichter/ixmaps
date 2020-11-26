@@ -6024,6 +6024,23 @@ MapTheme.prototype.getDefinitionObject = function () {
 };
 
 /**
+ * set the theme definition object
+  */
+MapTheme.prototype.set = function (styleObj) {
+
+	map.Themes.parseStyle(this,styleObj);
+};
+
+/**
+ * set the theme definition object
+ * long form of function name 
+ */
+MapTheme.prototype.setDefinitionObject = function (styleObj) {
+
+	map.Themes.parseStyle(this,styleObj);
+};
+
+/**
  * initialize the map theme values
  */
 MapTheme.prototype.initValues = function () {
@@ -6193,6 +6210,16 @@ MapTheme.prototype.realize_analyze = function () {
  * realize the map theme
  */
 MapTheme.prototype.realize_draw = function () {
+	
+	
+	var layerInfo = map.Layer.getLayerObj(this.szThemesA[0]);
+	if (layerInfo) {
+		this.szShapeType = layerInfo.szType;
+		if (this.szShapeType == "line" && this.szOrigFlag.match(/BUFFER/)) {
+			this.szShapeType += "+buffer";
+		}
+	}
+
 
 	_TRACE("===========================> ");
 	_TRACE("  MapTheme.realize_draw() ");
@@ -7181,10 +7208,18 @@ MapTheme.prototype.getSelectionId = function (szTheme, j) {
 			if (szId.match(/MultiPoint/)) {
 				this.fSelection = "MultiPoint";
 			} else
-				// GR 22.05.2015 geo-json point definition
-				if (szId.match(/Point/)) {
-					this.fSelection = "MultiPoint";
-				}
+			// GR 22.05.2015 geo-json point definition
+			if (szId.match(/Point/)) {
+				this.fSelection = "MultiPoint";
+			} else
+			// GR 22.05.2015 geo-json line definition
+			if (szId.match(/LineString/)) {
+				this.fSelection = "LineString";
+			} else
+			// GR 22.05.2015 geo-json line definition
+			if (szId.match(/MultiLineString/)) {
+				this.fSelection = "MultiLineString";
+			}
 		}
 
 		// GR 21.03.2019 second position (selection) field
@@ -7223,7 +7258,11 @@ MapTheme.prototype.getSelectionId = function (szTheme, j) {
 
 	// b) selection by geoJson geometry
 	// ------------------------------
-	if (this.fSelection == "MultiPoint") {
+	if (this.fSelection == "Point" || 
+		this.fSelection == "MultiPoint" ||
+		this.fSelection == "LineString" ||
+		this.fSelection == "MultiLineString" 
+	   ) {
 
 		szId = this.objTheme.dbRecords[j][this.objTheme.nFieldSelectionIndex];
 		var szMA = null;
@@ -7656,7 +7695,11 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 				if (this.fSelection == "LatLon") {
 					ptPos = map.Scale.getMapPositionOfLatLon(parseFloat(String(this.objTheme.dbRecords[j][this.nSelection_0]).replace(/\,/g, ".")), parseFloat(String(this.objTheme.dbRecords[j][this.nSelection_1]).replace(/\,/g, ".")));
 				} else
-				if (this.fSelection == "MultiPoint") {
+				if (this.fSelection == "Point" || 
+					this.fSelection == "MultiPoint" ||
+					this.fSelection == "LineString" ||
+					this.fSelection == "MultiLineString" 
+				   ) {
 					szId = this.objTheme.dbRecords[j][this.objTheme.nFieldSelectionIndex];
 					var szMA = szId.match(positionRegExp);
 					ptPos = map.Scale.getMapPositionOfLatLon(parseFloat(szMA[2]), parseFloat(szMA[1]));
@@ -8001,7 +8044,11 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 			ptPos = map.Scale.getMapPositionOfLatLon(parseFloat(String(this.objTheme.dbRecords[j][this.nSelection_0]).replace(/\,/g, ".")), parseFloat(String(this.objTheme.dbRecords[j][this.nSelection_1]).replace(/\,/g, ".")));
 			szId = ptPos ? (String(ptPos.x) + ',' + String(ptPos.y)) : "";
 		} else
-		if (this.fSelection == "MultiPoint") {
+		if (this.fSelection == "Point" || 
+			this.fSelection == "MultiPoint" ||
+			this.fSelection == "LineString" ||
+			this.fSelection == "MultiLineString" 
+		   ) {
 			szId = this.objTheme.dbRecords[j][this.objTheme.nFieldSelectionIndex];
 			var szMA = szId.match(positionRegExp);
 			ptPos = map.Scale.getMapPositionOfLatLon(parseFloat(szMA[2]), parseFloat(szMA[1]));
@@ -8050,7 +8097,11 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 				ptPos2 = map.Scale.getMapPositionOfLatLon(parseFloat(String(this.objTheme.dbRecords[j][this.nSelection2_0]).replace(/\,/g, ".")), parseFloat(String(this.objTheme.dbRecords[j][this.nSelection2_1]).replace(/\,/g, ".")));
 				szId2 = ptPos ? (String(ptPos.x) + ',' + String(ptPos.y)) : "";
 			} else
-			if (this.fSelection == "MultiPoint") {
+			if (this.fSelection == "Point" || 
+				this.fSelection == "MultiPoint" ||
+				this.fSelection == "LineString" ||
+				this.fSelection == "MultiLineString" 
+			   ) {
 				szId2 = this.objTheme.dbRecords[j][this.objTheme.nFieldSelection2Index];
 				var szMA = szId.match(positionRegExp);
 				ptPos2 = map.Scale.getMapPositionOfLatLon(parseFloat(szMA[2]), parseFloat(szMA[1]));
@@ -10983,7 +11034,7 @@ MapTheme.prototype.paintMap = function (startIndex) {
 		this.nMissingRangeCount = 0;
 		this.nMissingPositionCount = 0;
 		this.nActualFrame = 0;
-		setTimeout(function(){map.Themes.executeContinue();}, 250);
+		setTimeout(function(){map.Themes.executeContinue();}, 1000);
 
 	} else {
 		this.unlabelMap();
@@ -11052,7 +11103,7 @@ MapTheme.prototype.paintShape = function (shapeNode, szColor, nValue, nClass) {
 
 	switch (this.szShapeType) {
 		case "line":
-			shapeNode.setAttributeNS(null, "style", "stroke:" + szColor + ";" + this.szStyle);
+			shapeNode.setAttributeNS(null, "style", "fill:none;stroke:" + szColor + ";" + this.szStyle);
 			break;
 		case "line+buffer":
 			var szId = shapeNode.getAttributeNS(null, "id");
@@ -12624,8 +12675,9 @@ MapTheme.prototype.createChartGroup = function (objectGroup) {
 		return;
 	}
 	
-	if (this.szFlag.match(/FEATURES/)) {
+	if (this.szFlag.match(/FEATURE/)) {
 		this.chartGroup = map.Dom.newGroup(objectGroup, this.szId + ":featuregroup");
+		map.Layer.listA[this.szThemesA[0]] = new Map.Layer.Item(null);
 	}else{
 		this.chartGroup = map.Dom.newGroup(objectGroup, this.szId + ":chartgroup");
 	}
@@ -13399,10 +13451,125 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		var ptNull = new point(0, 0);
 
 		// GR 28.02.2019 only position
-		// ------------------------------------------------
+		// GR 26.11.2020 added geojson features LineString, MultiLineString e Polygon 
+		// ------------------------------------------------------------------------------
 		if (this.szFlag.match(/POSITION|FEATURE/)) {
 			shapeGroup = map.Dom.newGroup(this.chartGroup, a);
-			shapeGroup.fu.setMatrix([this.nChartGroupScaleX, 0, 0, this.nChartGroupScaleY, ptOff.x, ptOff.y]);
+			
+			// table with position fields or geojson Point
+			if (!this.objTheme.dbRecords[this.itemA[a].dbIndex][this.objTheme.nFieldSelectionIndex]){
+				shapeGroup.fu.setMatrix([this.nChartGroupScaleX, 0, 0, this.nChartGroupScaleY, ptOff.x, ptOff.y]);
+				continue;
+			}
+			
+			var json = JSON.parse(this.objTheme.dbRecords[this.itemA[a].dbIndex][this.objTheme.nFieldSelectionIndex]);
+
+			// geojson Point
+			// -------------		
+			if ( json.type == "Point" ){
+				map.Layer.listA[this.szThemesA[0]].szType = "point";
+				shapeGroup.fu.setMatrix([this.nChartGroupScaleX, 0, 0, this.nChartGroupScaleY, ptOff.x, ptOff.y]);
+				
+				this.chartGroup.style.setProperty("fill", "none");
+				this.chartGroup.style.setProperty("stroke", this.chart.szColor||"red");
+				this.chartGroup.style.setProperty("stroke-width", map.Scale.normalX(5));
+				this.chartGroup.style.setProperty("stroke-opacity", this.fillOpacity || 1);
+				
+				var shape = map.Dom.newShape('circle', shapeGroup, 0, 0, map.Scale.normalX(0.0001));
+			}
+			
+			// geojson LineString
+			// ------------------		
+			if ( json.type == "LineString" ){
+				
+				map.Layer.listA[this.szThemesA[0]].szType = "line";
+				
+				this.chartGroup.style.setProperty("fill", "none");
+				this.chartGroup.style.setProperty("stroke", this.szLineColor||"red");
+				this.chartGroup.style.setProperty("stroke-width", map.Scale.normalX(this.nLineWidth||1)*this.nChartGroupScaleY);
+				this.chartGroup.style.setProperty("stroke-opacity", "1");
+				this.chartGroup.style.setProperty("stroke-linecap", "butt");
+				this.chartGroup.style.setProperty("stroke-linejoin", "round");
+
+				var d = "M"+ptOff.x+","+ptOff.y+" l";
+				var ptAct = new point(ptOff.x, ptOff.y);
+				var coordinatesA = json.coordinates;
+				for (i in coordinatesA){
+					var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[i][1],coordinatesA[i][0]);
+					d += (pt.x-ptAct.x) +','+ (pt.y-ptAct.y) +" ";
+					ptAct = new point(pt.x, pt.y);
+				}
+				
+				var shape = map.Dom.newShape('path', shapeGroup, d, "");
+				shapeGroup.setAttributeNS(szMapNs, "ixmaps:center", "x:"+ptOff.x +",y:"+ ptOff.y);
+			}
+			
+			// geojson MultiLineString
+			// -----------------------		
+			if ( json.type == "MultiLineString" ){
+				
+				map.Layer.listA[this.szThemesA[0]].szType = "line";
+
+				this.chartGroup.style.setProperty("fill", "none");
+				this.chartGroup.style.setProperty("stroke", this.szLineColor||"red");
+				this.chartGroup.style.setProperty("stroke-width", map.Scale.normalX(this.nLineWidth||1)*this.nChartGroupScaleY);
+				this.chartGroup.style.setProperty("stroke-opacity", "1");
+				this.chartGroup.style.setProperty("stroke-linecap", "butt");
+				this.chartGroup.style.setProperty("stroke-linejoin", "round");
+
+				var linesA = json.coordinates;
+				for (i in linesA){
+					var coordinatesA = linesA[i];
+					var ptAct = new point(ptOff.x, ptOff.y);
+					
+					var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[0][1],coordinatesA[0][0]);
+					var d = "M"+(pt.x) +','+ (pt.y) +" l";
+					ptAct = new point(pt.x, pt.y);
+					
+					for (ii in coordinatesA){
+						var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[ii][1],coordinatesA[ii][0]);
+						d += (pt.x-ptAct.x) +','+ (pt.y-ptAct.y) +" ";
+						ptAct = new point(pt.x, pt.y);
+					}
+					var shape = map.Dom.newShape('path', shapeGroup, d, "");
+					shapeGroup.setAttributeNS(szMapNs, "ixmaps:center", "x:"+ptOff.x +",y:"+ ptOff.y);
+				}
+			}
+
+			// geojson Polygon
+			// ---------------		
+			if ( json.type == "Polygon" ){
+				
+				map.Layer.listA[this.szThemesA[0]].szType = "polygon";
+
+				this.chartGroup.style.setProperty("fill", this.chart.szColor||"white");
+				this.chartGroup.style.setProperty("fill-opacity", "0.1");
+				this.chartGroup.style.setProperty("stroke", this.szLineColor||"red");
+				this.chartGroup.style.setProperty("stroke-width", map.Scale.normalX(this.nLineWidth||1)*this.nChartGroupScaleY);
+				this.chartGroup.style.setProperty("stroke-opacity", "1");
+				this.chartGroup.style.setProperty("stroke-linecap", "butt");
+				this.chartGroup.style.setProperty("stroke-linejoin", "round");
+
+				var linesA = json.coordinates;
+				for (i in linesA){
+					var coordinatesA = linesA[i];
+					var ptAct = new point(ptOff.x, ptOff.y);
+					
+					var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[0][1],coordinatesA[0][0]);
+					var d = "M"+(pt.x) +','+ (pt.y) +" l";
+					ptAct = new point(pt.x, pt.y);
+					
+					for (ii in coordinatesA){
+						var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[ii][1],coordinatesA[ii][0]);
+						d += (pt.x-ptAct.x) +','+ (pt.y-ptAct.y) +" ";
+						ptAct = new point(pt.x, pt.y);
+					}
+					d += " z";
+					var shape = map.Dom.newShape('path', shapeGroup, d, "");
+					shapeGroup.setAttributeNS(szMapNs, "ixmaps:center", "x:"+ptOff.x +",y:"+ ptOff.y);
+				}
+			}
+
 			continue;
 			// ------------------------------------------------
 		}
@@ -13427,7 +13594,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 			// ------------------------------------------------
 		}
 
-		// GR 10.08.2018 most simple rappresentation
+		// GR 10.08.2018 most simple rappresentation QUAD
 		// ------------------------------------------------
 		if (this.szFlag.match(/\bQUAD\b/)) {
 			shapeGroup = map.Dom.newGroup(this.chartGroup, this.szId + ":" + selectionId + ":chart");
@@ -14030,7 +14197,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 						// 
 						if (this.szFlag.match(/TITLE/) && this.szTitleField && (!this.nTitleUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nTitleUpper))) {
 
-							var nFontSize = Math.max(map.Scale.normalX(0.9), Math.min(bBox.width / 6.6, map.Scale.normalX(6 / this.nScale)));
+							var nFontSize = Math.max(map.Scale.normalX(0.9), Math.min(bBox.width / 10, map.Scale.normalX(100 / this.nScale)));
 							if (this.szFlag.match(/GRIDSIZE/)) {
 								nFontSize = Math.max(bBox.width / 10, map.Scale.normalX(6));
 							}
@@ -14991,6 +15158,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		// GR 14.04.2011
 		if (szFlag.match(/AUTOCOMPLETE/)) {
 			donut.addStyle("AUTOCOMPLETE");
+			donut.szNoDataColor = this.szNoDataColor||"#eeeeee";
 		}
 		// GR 20.02.2014
 		if (szFlag.match(/BIGTOTOP/)) {
@@ -17257,7 +17425,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 										if (this.szXaxisA && this.szXaxisA.length) {
 											for (var s = 0; s < this.szXaxisA.length; s++) {
-												if (this.szXaxisA[s].length && (this.szXaxisA[s] != " ")) {
+												if ((this.szXaxisA[s].length && (this.szXaxisA[s] != " ")) || s==0 || s == this.szXaxisA.length-1) {
 													map.Dom.newShape('line', gridGroup, nStep * s, 100, nStep * s, -(nMaxValue - nMinValue) * nScale, "stroke:#888888;stroke-opacity:0.4;stroke-width:" + (map.Scale.normalX(0.05*this.szXaxisA.length)) + ";stroke-dasharray:"+(6*this.szXaxisA.length)+" "+(3*this.szXaxisA.length)+";");
 													map.Dom.newText(gridGroup, nStep * s, (nScaleFontSize * 1.5), "font-family:arial;font-size:" + nScaleFontSize + "px;text-anchor:middle;fill:#888888;stroke:none;pointer-events:none;", this.szXaxisA[s]);
 												}
@@ -17296,7 +17464,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 									if ( this.nXLen > 10 ){
 										var nModulo = Math.floor(this.nXLen/5);  
 										var ai = Math.floor(i/(this.nGridX||1));
-										if ( (ai != 0) && (ai != this.nXLen-1) ){
+										if ( (ai != 0) && (ai != this.nXLen-2) ){
 											if (!this.szXaxisA || !this.szXaxisA.length || ((this.nXLen > 100)&&(ai >= this.nXLen-5))) {
 												newText.parentNode.removeChild(newText);
 											}else
@@ -19035,6 +19203,13 @@ MapTheme.prototype.getNodePosition = function (a) {
 		}
 		if (sNode) {
 			if (this.szShapeType.match(/line/)) {
+				var szCenter = sNode.getAttributeNS(szMapNs, "center");
+				if (szCenter && szCenter.length > 2) {
+					var szCenterA = szCenter.split(',');
+					var bBox = new box(Number(szCenterA[0].split(':')[1]), Number(szCenterA[1].split(':')[1]), 0, 0);
+				} else {
+					var bBox = map.Dom.getBox(sNode);
+				}
 				var bBox = map.Dom.getBox(sNode);
 			} else {
 				var szCenter = sNode.getAttributeNS(szMapNs, "center");

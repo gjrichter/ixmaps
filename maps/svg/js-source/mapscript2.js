@@ -2585,8 +2585,10 @@ Map.Layer.prototype.doObjectScaling = function(newScale){
 		var objectGroup = map.Layer.objectGroup;
 		var nodeA = objectGroup.childNodes;
 		for ( var i=0; i<nodeA.length;i++){
-			// features have no visible objects
+			// features have lines/borders to scale by stroke-width
 			if( nodeA.item(i).getAttributeNS(null,"id").match(/featuregroup/) ){
+				var strokeWidth = nodeA.item(i).style.getPropertyValue("stroke-width")*nDeltaX;
+				nodeA.item(i).style.setProperty("stroke-width",  String(strokeWidth));
 				continue;
 			}
 			if (antiZoomAndPanList.isContained(nodeA.item(i))){
@@ -8744,7 +8746,7 @@ TextField.prototype.setPosition = function(x,y){
  * @param nMaxHeight [optional] maximal height, if content exeeds this, a vertical scrollbar is created
  * @param nScrollBarWidth [optional] space of the scrollbars created, (default 10 pixel)
  */
-var ScrollArea = function(evt,targetGroup,szTemplate,nMaxWidth,nMaxHeight,nScrollBarWidth){
+ScrollArea = function(evt,targetGroup,szTemplate,nMaxWidth,nMaxHeight,nScrollBarWidth){
 
 	/** maximal width @type int */
 	this.nMaxWidth = nMaxWidth?nMaxWidth:100;
@@ -9890,7 +9892,7 @@ var __formatInfoValue = function(szValue){
  * @param textArray			the text for all cells of the grid as array of strings
  * @param nColumns			the number of columns to create
  */
-var createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumns,fontHeight,styleArray,bgStyle) {
+createTextGrid = function(targetDocument,targetGroup,groupName,textArray,nColumns,fontHeight,styleArray,bgStyle) {
 
 	var lines = Math.ceil(textArray.length/nColumns);
 	var fontheight   = fontHeight?fontHeight:12;
