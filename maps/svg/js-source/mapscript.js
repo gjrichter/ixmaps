@@ -906,7 +906,8 @@ Map.prototype.loadMap = function(szUrl){
 		}else{
 			this.mapRoot = "";
 		}
-		map.Themes = new Map.Themes();
+		this.clearAll();
+		//map.Themes = new Map.Themes();
 		map.Dom.clearGroup(map.Layer.objectGroup);
 	}
 };

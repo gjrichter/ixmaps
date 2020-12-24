@@ -683,6 +683,14 @@ Map.Api.prototype.getMapThemeItemPosition = function(szId,szItemId){
 	return null;
 };
 /**
+ * zoom to map item
+ * @param szItemId the id of the map item
+ * @void
+ */
+Map.Api.prototype.zoomMapToItem = function(szItemId){
+	this.map.Zoom.doZoomMapToItem(szItemId);
+};
+/**
  * get the chart one theme item or overview
  * @param szId the name of the theme
  * @return a string with the field name (or null)

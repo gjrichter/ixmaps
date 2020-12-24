@@ -1454,6 +1454,15 @@ $Log: htmlgui_api.js,v $
 	};
 
 	/**
+	 * zoom to map item
+	 * @param {String} szItemId the id of the map item
+	 * @return void
+	 */
+	ixmaps.zoomMapToItem = function (szMap,szItemId) {
+		this.dispatchToEmbeddedApi(szMap,"zoomMapToItem",[szItemId]);
+	};
+
+	/**
 	 * dispatch on window resize event 
 	 * @param {String} szMap the name of the embedded map
 	 * @param {Object} box a bounding given in x,y,width,height
@@ -2258,6 +2267,10 @@ $Log: htmlgui_api.js,v $
 	};
 	ixmaps.mapApi.prototype = {
 
+		setMapTypeId: function(szMapTypeId){
+			ixmaps.setMapTypeId(this.szMap,szMapTypeId);
+		},
+		
 		setBounds: function(bounds){
 			ixmaps.setBounds(this.szMap,bounds);
 		},

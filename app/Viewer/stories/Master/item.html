@@ -393,7 +393,8 @@
 
 			var szId = ixmaps.szMapItemId;
 			var themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
-
+			showData = themeObj?(themeObj.fShowData?true:showData):showData;
+			
 			if (szId.match(/chart/i)) {
 				
 				// item is part of a theme, so show chart 
@@ -413,7 +414,7 @@
 					szHtml += "<div style='padding-top:1.5em;padding-bottom:1em;overflow:auto'>";
 
 					if (data.length > 1) {
-						szHtml += "<div style='padding:1em 0.5em 0em 1.5em;color:#aaa'> data of " + data.length + " aggregated items</div>";
+						szHtml += "<div style='padding:1em 0.5em 0em 1.5em;color:#aaa'> data of <b>" + data.length + " aggregated items</b></div>";
 					} else //{
 						//    szHtml += "<div style='padding:1em 0.5em 0em 1.5em;color:#aaa'> data of " + data.length + " item</div>";
 						//}

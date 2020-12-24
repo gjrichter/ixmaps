@@ -1141,6 +1141,31 @@ Map.Zoom.prototype.doZoomMapToLayer = function(szLayerName){
 	}
 };
 /**
+ * execute map zoom to the box of an arbitrary map item
+ * @param szId the item id (SVG id)
+ */
+Map.Zoom.prototype.doZoomMapToItem = function(szId){
+	_TRACE("---- ************ ----- doZoomMapToItem -------------------");
+
+	if ( fPendingNewGeoBounds ){
+		fPendingNewGeoBounds = false;
+		return;
+	}
+
+	var ItemNode = SVGDocument.getElementById(szId);
+	var bBox = map.Dom.getBox(ItemNode);
+	var ptOffset = map.Scale.getMapOffset(ItemNode);
+	bBox.x += ptOffset.x;
+	bBox.y += ptOffset.y;
+	var allBox = new box(bBox.x,bBox.y,bBox.width,bBox.height);
+
+	if ( allBox.width && allBox.height && allBox.width < map.Scale.bBox.width && allBox.height < map.Scale.bBox.height ){
+		if ( !map.Zoom.doSetAreaByParentMap(allBox) ){
+			map.Zoom.setNewArea(allBox);
+		}
+	}
+};
+/**
  * execute map sync to bounds given in Lat/Lon
  * @param latSW the latitude  of the South West point
  * @param lonSW the longitude of the North East point

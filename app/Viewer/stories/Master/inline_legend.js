@@ -363,7 +363,7 @@ ixmaps.legend = ixmaps.legend || {};
                     });
                 } else
                 if (themeObj.partsA[i] && typeof (themeObj.partsA[i].nSum) != "undefined") {
-                    if (themeObj.szFlag.match(/SUM/)) {
+                    if (themeObj.szFlag.match(/SUM/) && !themeObj.szFlag.match(/COUNT/)) {
                         sortA.push({
                             index: i,
                             color: (themeObj.szFlag.match(/INVERT/) ? (nRows - i - 1) : ic),
@@ -380,7 +380,8 @@ ixmaps.legend = ixmaps.legend || {};
                         sortA.push({
                             index: i,
                             color: (themeObj.szFlag.match(/INVERT/) ? (nRows - i - 1) : ic),
-                            count: (themeObj.partsA[i].nCount)
+                           	count: themeObj.exactCountA[i] //(themeObj.partsA[i].nCount)
+                            //count: (themeObj.partsA[i].nCount)
                         });
                     }
                 } else {
@@ -980,6 +981,9 @@ ixmaps.legend = ixmaps.legend || {};
 		
         // check whether to make compact (one line) legend 
         // -----------------------------------------------
+        if (themeObj.szFlag.match(/CLIP/)) {
+            return ixmaps.legend.makeColorLegendHTMLCompact(szId, szLegendId);
+        }
         if ((themeObj.partsA.length == 1) &&
             themeObj.szFlag.match(/DOPACITY/) &&
             !themeObj.szFlag.match(/CATEGORICAL/)) {

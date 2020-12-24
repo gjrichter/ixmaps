@@ -581,10 +581,10 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		mapTypeTranslate ["satellite"]	= "NOKIA OVI - satellite";
 		mapTypeTranslate ["terrain"]	= "ArcGIS - Topo";
 		mapTypeTranslate ["pale"]		= "CloudMade - pale dawn";
-		mapTypeTranslate ["gray"]		= "CloudMade - grey";
-		mapTypeTranslate ["grey"]		= "CloudMade - grey";
-		mapTypeTranslate ["white"]		= "CloudMade - white";
-		mapTypeTranslate ["dark"]		= "CloudMade - dark";
+		mapTypeTranslate ["gray"]		= "grey";
+		mapTypeTranslate ["grey"]		= "grey";
+		mapTypeTranslate ["white"]		= "white";
+		mapTypeTranslate ["dark"]		= "dark";
 		mapTypeTranslate ["BW"]			= "Stamen - toner-lite";
 
 	htmlMap_setMapTypeId = function(szMapType){
@@ -592,7 +592,9 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			// here we select the layer we want to be active
 			// ------------------------------------------------
 			if ( lastLeafletLayer ){
-				LMap.removeLayer(ixmaps.layers[lastLeafletLayer]);
+				try{
+					LMap.removeLayer(ixmaps.layers[lastLeafletLayer]);
+				} catch (e){}
 			}
 			lastLeafletLayer = mapTypeTranslate[szMapType]||szMapType;
 			LMap.addLayer(ixmaps.layers[mapTypeTranslate[szMapType]||szMapType]);

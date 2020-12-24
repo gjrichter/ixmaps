@@ -219,7 +219,7 @@
 
 		// make legend colors 
         // a table of colors, label and values
-        if ( !themeObj.szFlag.match(/\bCLIP\b/) )
+        if ( 1 || !themeObj.szFlag.match(/\bCLIP\b/) )
 		if ( ixmaps.legend.makeColorLegendHTML ){
             var maxLegendHeight = themeObj.szFlag.match(/SIMPLELEGEND|COMPACTLEGEND|MINILEGEND/)?200:400;
 			szHtml += "<div class='color-legend-scroll' style='margin-top:1em;margin-bottom:0em;max-height:"+maxLegendHeight+"px;overflow:auto'>";
@@ -334,11 +334,16 @@
 
 			var uDay = 1000*60*60*24;
 			var days = (uMax-uMin)/uDay;
-
+			
 			szHtml += "<div class='btn-group btn-group-toggle' data-toggle='buttons' style='margin-left:-0.6em;margin-top:0.5em'>";
 			szHtml += "  <label class='btn btn-secondary' onclick='javascript:__sliderRange=1000*60*60*24;'>";
 			szHtml += "	<input type='radio' name='options' id='option1'> day";
 			szHtml += "  </label>";
+			if ( days < 2 ){
+				szHtml += "  <label class='btn btn-secondary' onclick='javascript:__sliderRange=1000*60*60;'>";
+				szHtml += "	<input type='radio' name='options' id='option1'> hour";
+				szHtml += "  </label>";
+			}
 			if ( days > 13 ){
 				szHtml += "  <label class='btn btn-secondary' onclick='javascript:__sliderRange=1000*60*60*24*7;'>";
 				szHtml += "	<input type='radio' name='options' id='option1'> week";
@@ -943,7 +948,7 @@
 			return;
 		}
 
-		var szHtml  = '<div id="map-legend-body" class="map-legend-body" style="margin-top:-1em;margin-bottom:0.5em;font-size:11px"></div>';
+		var szHtml  = '<div id="map-legend-body" class="map-legend-body" style="margin-top:-1em;margin-bottom:0em;font-size:11px"></div>';
 		
 		if ( !$("#externalLegend")[0]){
 			createTab("externalLegend","Info");

@@ -457,7 +457,9 @@ $Log: htmlgui.js,v $
 
 		// GR 31.01.2018 if requested map == original SVG map and we have a loaded map, so reload the original map
 		if ((szUrl == this.szUrlSVG) && this.loadedMap) {
-			$(ixmaps.svgObject).attr('src', ixmaps.szUrlSVG);
+			// GR 22.12.2020 we must clear the map to get the user informed of deleted themes
+			ixmaps.clearAll();
+			setTimeout(function(){$(ixmaps.svgObject).attr('src', ixmaps.szUrlSVG)},"100");
 			delete this.loadedMap;
 			return;
 		}
@@ -474,7 +476,7 @@ $Log: htmlgui.js,v $
 		}
 
 		if (this.szUrlSVG == szUrl) {
-
+			
 			// call user defined method on map ready
 			// --------------------------------------------------------
 			if (this.callback) {
@@ -1428,7 +1430,7 @@ $Log: htmlgui.js,v $
 	};
 
 	/**
-	 * bext theme clip frame
+	 * next theme clip frame
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
 	 * @param {String} szThemeId the id of the theme received on create
 	 * @return void
@@ -1441,6 +1443,15 @@ $Log: htmlgui.js,v $
 		}
 	};
 		
+
+	/**
+	 * zoom to map item
+	 * @param {String} szItemId the id of the map item
+	 * @return void
+	 */
+	ixmaps.zoomMapToItem = function (szItemId) {
+		ixmaps.embeddedSVG.window.map.Api.zoomMapToItem(szItemId);
+	};
 	
 	// -----------------------------
 	// html button handler
@@ -2497,7 +2508,7 @@ $Log: htmlgui.js,v $
 									}
 								}
 							}
-							if (!fLoading) {
+							if (0 && !fLoading) {
 								ixmaps.showLoadingArrayStop();
 							}
 						},
@@ -2836,6 +2847,7 @@ $Log: htmlgui.js,v $
 						delete ixmaps.embeddedSVG.window.themeDataObj;
 					}
 					**/
+					this.htmlgui_synchronizeMap(false, false);					
 
 					if (project.themes) {
 						for (i in project.themes) {
@@ -2903,7 +2915,7 @@ $Log: htmlgui.js,v $
 				} else
 			if (project.themes && !szFlag.match(/maponly/i)) {
 				for (i in project.themes) {
-					ixmaps.newTheme("project", project.themes[i], (i == 0) ? "clear" : "");
+					ixmaps.newTheme("project", project.themes[i], (i == 0 && !szFlag.match(/add/i)) ? "clear" : "");
 				}
 			} else
 			if (project.theme && !szFlag.match(/maponly/i)) {
