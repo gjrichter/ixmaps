@@ -17116,7 +17116,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								'xlink:href': szSymbol
 							});
 							newSymbol.setAttributeNS(null,"x",String(map.Scale.normalX(-nChartSize/2)));
-							newSymbol.setAttributeNS(null,"y",String(map.Scale.normalY(-nChartSize)));
+							newSymbol.setAttributeNS(null,"y",String(map.Scale.normalY(-nChartSize/2)));
 							newSymbol.setAttributeNS(null,"width",String(map.Scale.normalX(nChartSize)));
 							newSymbol.setAttributeNS(null,"height",String(map.Scale.normalY(nChartSize)));
 						}else{
@@ -17139,7 +17139,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							'xlink:href': szSymbol
 						});
 						newShape.setAttributeNS(null,"x",String(map.Scale.normalX(-nChartSize/2)));
-						newShape.setAttributeNS(null,"y",String(map.Scale.normalY(-nChartSize)));
+						newShape.setAttributeNS(null,"y",String(map.Scale.normalY(-nChartSize/2)));
 						newShape.setAttributeNS(null,"width",String(map.Scale.normalX(nChartSize)));
 						newShape.setAttributeNS(null,"height",String(map.Scale.normalY(nChartSize)));
 					}else{
