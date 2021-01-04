@@ -181,7 +181,8 @@ MapSelection.prototype.initValues = function(){
 	this.nSelectedArea = 0;
 
 	// selection on charts --> 'generic'
-	if ( map.Themes.activeTheme.szFlag.match(/CHART/) && !map.Themes.activeTheme.szFlag.match(/MULTIPLE/)){
+	this.activeTheme = map.Themes.getTheme("selectme");
+	if ( this.activeTheme.szFlag.match(/CHART/) && !this.activeTheme.szFlag.match(/MULTIPLE/)){
 		this.szThemes = "generic";
 	}
 
@@ -194,7 +195,7 @@ MapSelection.prototype.initValues = function(){
 		// a) selection on generic theme and not on layer 		
 		// ----------------------------------------------------------
 
-		var themeObj = map.Themes.activeTheme;
+		var themeObj = this.activeTheme;
 		if ( themeObj.filterNodesA && (themeObj.filterNodesA != this.szSelectShape) ){
 			this.themeRootNodesA =  myclone(themeObj.filterNodesA);
 		}else{
@@ -344,7 +345,18 @@ MapSelection.prototype.initValues = function(){
 		}
 		bufferNode.fu = new Methods(bufferNode);
 
-		if ( this.szFlag.match(/circle/)){
+		if ( this.szFlag.match(/shape/)){
+			
+			var ptPos = bufferNode.fu.getPosition();
+			var bBox  = bufferNode.fu.getBox();
+			console.log(ptPos);
+			console.log(bBox);
+			this.selectionCenter = new point(bBox.x+bBox.width/2,bBox.y+bBox.height/2);
+			this.selectCenterA[this.selectCenterA.length] = this.selectionCenter;
+			this.selectBufferSize = Math.max(bBox.width/2,bBox.height/2);
+			this.selectBufferSize /= map.Scale.nZoomScale;
+		}
+		else if ( this.szFlag.match(/circle/)){
 			var ptPos = bufferNode.fu.getPosition();
 			ptPos.x = Number(bufferNode.getAttributeNS(null,"cx"));
 			ptPos.y = Number(bufferNode.getAttributeNS(null,"cy"));
@@ -458,6 +470,11 @@ MapSelection.prototype.realizeDone = function(){
 MapSelection.prototype.redraw = function(){
 };
 /**
+ * remove values of the map theme
+ */
+MapSelection.prototype.removeValues = function(){
+};
+/**
  * disable the map selection
  */
 MapSelection.prototype.disable = function(){
@@ -556,10 +573,11 @@ MapSelection.prototype.selectShapes = function(startIndex){
 		this.exactCountA = new Array(0);
 		this.exactSizeA = new Array(0);
 
-		// if there is an active Theme, prepare statistics
-		if ( map.Themes.activeTheme && (this.szThemesA[0]+" == "+map.Themes.activeTheme.szThemesA[0])){
-
+		if ( !this.activeTheme ){
 			this.activeTheme = map.Themes.activeTheme;
+		}
+		// if there is an active Theme, prepare statistics
+		if ( this.activeTheme && (this.szThemesA[0]+" == "+this.activeTheme.szThemesA[0])){
 
 			this.nPartsA   = myclone(this.activeTheme.nPartsA);
 			this.partsA   = myclone(this.activeTheme.partsA);
@@ -602,7 +620,7 @@ MapSelection.prototype.selectShapes = function(startIndex){
 			this.nMinSize = Number.MAX_VALUE;
 			this.nMaxSize = -Number.MAX_VALUE;
 			this.nSumSize = 0;
-			for ( var k=0;k<map.Themes.activeTheme.szFieldsA.length;k++){
+			for ( var k=0;k<this.activeTheme.szFieldsA.length;k++){
 				this.nOrigValuesSumA[k] = 0;
 				this.nValuesSumA[k] = 0;
 				this.nValuesMinA[k] = Number.MAX_VALUE;
@@ -791,15 +809,15 @@ MapSelection.prototype.selectShapes = function(startIndex){
 					_TRACE("! "+this.nSelected+"/"+this.nTested+" "+themeNode.nodeName+" "+themeNode.getAttributeNS(null,"id")+" items:"+themeNode.childNodes.length);
 					}
 					
-					if ( map.Themes.activeTheme ){
-
+					if ( this.activeTheme ){
+						
 						var activeThemeItemA = new Array(0);
 
-						if ( map.Themes.activeTheme.itemA[szMasterId] ){
-							activeThemeItemA.push(map.Themes.activeTheme.itemA[szMasterId]);
+						if ( this.activeTheme.itemA[szMasterId] ){
+							activeThemeItemA.push(this.activeTheme.itemA[szMasterId]);
 						}else{
-							if ( map.Themes.activeTheme.posItemA[szMasterId] ){
-								activeThemeItemA = map.Themes.activeTheme.posItemA[szMasterId];
+							if ( this.activeTheme.posItemA[szMasterId] ){
+								activeThemeItemA = this.activeTheme.posItemA[szMasterId];
 							}
 						}
 						
@@ -812,7 +830,7 @@ MapSelection.prototype.selectShapes = function(startIndex){
 							if ( activeThemeItem.nValuesA.length == 1 ){
 								if ( isNaN(activeThemeItem.nValuesA[0]) ||
 									 (activeThemeItem.nValuesA[0] === 0 & 
-									 !map.Themes.activeTheme.szFlag.match(/ZEROISVALUE/)) 
+									 !this.activeTheme.szFlag.match(/ZEROISVALUE/)) 
 									){
 									continue;
 								}
@@ -838,7 +856,7 @@ MapSelection.prototype.selectShapes = function(startIndex){
 							if ( activeThemeItem.nValue100 ){
 								this.nSum100 += activeThemeItem.nValue100;
 							}
-							if ( map.Themes.activeTheme.szFlag.match(/CATEGORICAL/) ){
+							if ( this.activeTheme.szFlag.match(/CATEGORICAL/) ){
 								for ( var v=0;v<activeThemeItem.nValuesA.length;v++ ){
 									for ( var p=0;p<this.partsA.length;p++ ){
 										if ( activeThemeItem.nValuesA[v] == this.partsA[p].min){
@@ -852,7 +870,7 @@ MapSelection.prototype.selectShapes = function(startIndex){
 									}
 								}
 							}else
-							if ( map.Themes.activeTheme.szFlag.match(/SEQUENCE/) || map.Themes.activeTheme.szFlag.match(/CHART/) ){
+							if ( this.activeTheme.szFlag.match(/SEQUENCE/) || this.activeTheme.szFlag.match(/CHART/) ){
 								for ( p=0;p<this.partsA.length;p++ ){
 									this.partsA[p].nCount++;
 									this.partsA[p].nSum += activeThemeItem.nValuesA[p];
@@ -923,6 +941,10 @@ MapSelection.prototype.selectShapes = function(startIndex){
 	this.fShowProgressBar = false;
 	clearMessage();
 
+	if ( HTMLWindow.ixmaps.htmlgui_onSelection(this.szId) ){
+		return null;
+	}
+	
 	this.showInfo(true);
 };
 /**

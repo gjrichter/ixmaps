@@ -1696,4 +1696,23 @@ Map.Api.prototype.clearHighlight = function(){
  */
 Map.Api.prototype.getLayerLegendSVG= function(layerName){
 	alert(layerName);
+};			
+
+/**
+ * create a new selection of theme items by a given shape, buffer
+ * @param {String} szThemeId the id of the theme with map items to select
+ * @param {String} szSelectShape the id of the selection shape
+ * @param {String} szStyle one of "circle","square","shape"
+ * @param {String} szTitle an optional title 
+ * @return void
+ */
+Map.Api.prototype.newMapSelection = function(szThemes,szSelectShape,szStyle,szTitle){
+	map.Selections.newSelection(szThemes,szSelectShape,szStyle,szTitle);
 };
+
+
+
+
+
+
+

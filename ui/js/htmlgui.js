@@ -1443,6 +1443,19 @@ $Log: htmlgui.js,v $
 		}
 	};
 		
+	/**
+	 * create a selection of theme items by a given shape, buffer
+	 * @param {String} szThemeId the id of the theme with map items to select
+	 * @param {String} szSelectShape the id of the selection shape
+	 * @param {String} szStyle one of "circle","square","shape"
+	 * @param {String} szTitle an optional title 
+	 * @return void
+	 */
+	ixmaps.newSelection = function (szThemes,szSelectShape,szStyle,szTitle) {
+		try {
+			ixmaps.embeddedSVG.window.map.Api.newMapSelection(szThemes,szSelectShape,szStyle,szTitle);
+		} catch (e) {}
+	};
 
 	/**
 	 * zoom to map item
@@ -1882,6 +1895,12 @@ $Log: htmlgui.js,v $
 	ixmaps.htmlgui_onInfoDisplay = function (szId) {
 		if (ixmaps.parentApi != ixmaps) {
 			return ixmaps.parentApi.htmlgui_onInfoDisplay(szId);
+		}
+	};
+
+	ixmaps.htmlgui_onSelection = function (szId) {
+		if (ixmaps.parentApi != ixmaps) {
+			return ixmaps.parentApi.htmlgui_onSelection(szId);
 		}
 	};
 
@@ -2440,7 +2459,9 @@ $Log: htmlgui.js,v $
 	// -----------------------------
 	// D A T A    L O A D E R 
 	// -----------------------------
-
+	
+	var __lastOptionName = null;
+	
 	/**
 	 * Is called by the svg map script to load external data from FusionTable, GeoRSS, GeoJson, ...
 	 * @param szUrl where to find the data
@@ -2508,8 +2529,10 @@ $Log: htmlgui.js,v $
 									}
 								}
 							}
-							if (0 && !fLoading) {
+							if (!fLoading && __lastOptionName && (options.name == __lastOptionName) ) {
 								ixmaps.showLoadingArrayStop();
+							}else{
+								__lastOptionName = options.name;
 							}
 						},
 						error: function (jqxhr, settings, exception) {

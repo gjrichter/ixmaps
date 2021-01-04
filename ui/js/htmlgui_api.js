@@ -1185,6 +1185,18 @@ $Log: htmlgui_api.js,v $
 	};
 
 	/**
+	 * create a selection of theme items by a given shape, buffer
+	 * @param {String} szThemeId the id of the theme with map items to select
+	 * @param {String} szSelectShape the id of the selection shape
+	 * @param {String} szStyle one of "circle","square","shape"
+	 * @param {String} szTitle an optional title 
+	 * @return void
+	 */
+	ixmaps.newSelection = function (szMap,szThemeId,szSelectShape,szStyle,szTitle) {
+		this.dispatchToEmbeddedApi(szMap,"newSelection",[szThemeId,szSelectShape,szStyle,szTitle]);
+	};
+
+	/**
 	 * loadExternalData
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
 	 * @param {String} szUrl the URL of the external data to be loaded
@@ -2076,6 +2088,13 @@ $Log: htmlgui_api.js,v $
 		return false;
 	};
 
+	ixmaps.htmlgui_onSelection = function(szId){
+		if ( ixmaps.parentApi != ixmaps ){
+			return ixmaps.parentApi.htmlgui_onSelection(szId);
+		}
+		return false;
+	};
+
 	ixmaps.htmlgui_onInfoDisplay = function(szId){
 		if ( ixmaps.parentApi != ixmaps ){
 			return ixmaps.parentApi.htmlgui_onInfoDisplay(szId);
@@ -2339,6 +2358,11 @@ $Log: htmlgui_api.js,v $
 
 		changeThemeStyle: function(szTheme,style,flag){
 			ixmaps.changeThemeStyle(this.szMap,szTheme,style,flag);
+			return this;
+		},
+
+		removeTheme: function(szTheme){
+			ixmaps.removeTheme(this.szMap,szTheme);
 			return this;
 		},
 

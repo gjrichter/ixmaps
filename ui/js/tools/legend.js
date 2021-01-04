@@ -491,39 +491,44 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                     // ---------------------------
                     // simple one line legend item
                     // ---------------------------
+					
+					if (themeObj.szFlag.match(/CLIP/)){
+						
+					}else{
 
-                    szHtml += "<div style='margin-top:0.2em;margin-bottom:0em'>";
+						szHtml += "<div style='margin-top:0.2em;margin-bottom:0em'>";
 
-                    szHtml += "<span style='line-height:5px'>";
-                    szHtml += "<a class='legend-color-button' style='pointer-events:all'  href='#' title='click to see'>";
+						szHtml += "<span style='line-height:5px'>";
+						szHtml += "<a class='legend-color-button' style='pointer-events:all'  href='#' title='click to see'>";
 
-                    if ((colorA[sortA[i].color] == "none") || (themeObj.szLineColor && themeObj.nLineWidth)) {
-                        if (themeObj.fillOpacity < 0.1) {
-                            szHtml += "<span style='background:none;border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:0.5em'>";
-                        } else {
-                            szHtml += "<span style='background:" + colorA[sortA[i].color] + ";border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:0.5em'>";
-                        }
-                    } else {
-                        szHtml += "<span style='background:" + colorA[sortA[i].color] + ";opacity:0.7;font-size:1em;border-radius:1em;margin-right:1em;width:1em;'>";
-                    }
+						if ((colorA[sortA[i].color] == "none") || (themeObj.szLineColor && themeObj.nLineWidth)) {
+							if (themeObj.fillOpacity < 0.1) {
+								szHtml += "<span style='background:none;border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:0.5em'>";
+							} else {
+								szHtml += "<span style='background:" + colorA[sortA[i].color] + ";border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:0.5em'>";
+							}
+						} else {
+							szHtml += "<span style='background:" + colorA[sortA[i].color] + ";opacity:0.7;font-size:1em;border-radius:1em;margin-right:1em;width:1em;'>";
+						}
 
-                    szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp";
+						szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp";
 
-                    szHtml += "</span>";
-                    szHtml += "</a>";
-                    szHtml += "</span>";
-                    var szLabel = labelA[sortA[i].index];
-                    szHtml += "<span class='theme-legend' >";
-                    szHtml += "<a class='theme-button' style='pointer-events:all' href='#' title='click to see'>";
-                    szHtml += "<span title='" + szLabel + "' style=''>";
-                    szHtml += "<span>";
-                    szHtml += szLabel;
-                    szHtml += "</span>";
-                    szHtml += "</span>";
-                    szHtml += "</a>";
-                    szHtml += "</span>";
+						szHtml += "</span>";
+						szHtml += "</a>";
+						szHtml += "</span>";
+						var szLabel = labelA[sortA[i].index];
+						szHtml += "<span class='theme-legend' >";
+						szHtml += "<a class='theme-button' style='pointer-events:all' href='#' title='click to see'>";
+						szHtml += "<span title='" + szLabel + "' style=''>";
+						szHtml += "<span>";
+						szHtml += szLabel;
+						szHtml += "</span>";
+						szHtml += "</span>";
+						szHtml += "</a>";
+						szHtml += "</span>";
 
-                    szHtml += "</div>";
+						szHtml += "</div>";
+					}
 
 
                 } else {
@@ -786,10 +791,13 @@ window.ixmaps.legend = window.ixmaps.legend || {};
         if (themeObj.szFlag.match(/VECTOR/) && themeObj.szLineColor && 0 ) {
             return ("<span style='display:inline-block;background:" + themeObj.szLineColor + ";font-size:0.1em;width:350px'>&nbsp;</span>");
         }
-
         // check whether to make compact (one line) legend 
         // -----------------------------------------------
-        if (themeObj.szFlag.match(/CLIP/)) {
+        if (fLegendCompact &&
+		   themeObj.szFlag.match(/CLIP/)){
+       		return "";
+	   }
+       if (themeObj.szFlag.match(/CLIP/)) {
             return ixmaps.legend.makeColorLegendHTMLCompact(szId, szLegendId);
         }
         if ((themeObj.partsA.length == 1) &&

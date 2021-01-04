@@ -851,6 +851,15 @@
 			}
 		}
 
+		var __oldSelection = ixmaps.htmlgui_onSelection;
+		ixmaps.htmlgui_onSelection = function(szId){
+			if ( __oldSelection(szId) ){
+				return true;
+			}
+			return false;
+		}
+
+
 		// -------------------------------------------
 		// search tool 
 		// ------------------------------------------- 

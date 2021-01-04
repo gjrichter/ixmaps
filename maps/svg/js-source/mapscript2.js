@@ -8952,7 +8952,7 @@ map.removeAllHighlights = function(){
  * @throws 
  * @return A new HighLight Object
  */
-var HighLight = function(){
+HighLight = function(){
 	/** array that holds all actual {@link HighLightItem} objects @type array */
 	this.itemA = new Array(0);
 	allHighLights[allHighLights.length] = this;

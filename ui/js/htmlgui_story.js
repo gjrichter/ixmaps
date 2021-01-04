@@ -390,7 +390,29 @@ $Log: htmlgui_story.js,v $
 
 		ixmaps.fStoryTool = false;
 	}
+	
+	// adapt iframe height from embed rendered height
+	// will be called from story tool script
+	// ----------------------------------------------------------------------
+	ixmaps.resizeStoryToolFrame = function() {
+		// give time to render
+		setTimeout('ixmaps.doresizeStoryToolFrame()',1);
+	}
+	ixmaps.doresizeStoryToolFrame = function() {
+		var the_height = window.document.getElementById('embed-tool').contentWindow.document.body.scrollHeight;
+		the_height += 40;
+		if ( the_height > 100 ){
+			//the_height = Math.min(the_height,630);
+			//the_height -= 20;
+			window.document.getElementById('story-tool').style.height= the_height+"px";
 
+			window.document.getElementById('story-tool').style.overflow= "hidden";
+			// set border radius !!
+			window.document.getElementById('story-tool').style["border-radius"] = "0.5em";
+			window.document.getElementById('story-tool').style["border"] = "solid #ddd 0px";
+		}
+	};
+		
 	// -----------------------------------
 	// deprecated functions
 	// remain for compatibility reasons
