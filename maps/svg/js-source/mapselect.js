@@ -181,7 +181,7 @@ MapSelection.prototype.initValues = function(){
 	this.nSelectedArea = 0;
 
 	// selection on charts --> 'generic'
-	this.activeTheme = map.Themes.getTheme("selectme");
+	this.activeTheme = map.Themes.getTheme("selectme") || map.Themes.getTheme();
 	if ( this.activeTheme.szFlag.match(/CHART/) && !this.activeTheme.szFlag.match(/MULTIPLE/)){
 		this.szThemes = "generic";
 	}
