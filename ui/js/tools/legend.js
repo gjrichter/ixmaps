@@ -492,7 +492,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                     // simple one line legend item
                     // ---------------------------
 					
-					if (themeObj.szFlag.match(/CLIP/)){
+					if (themeObj.szFlag.match(/\bCLIP\b/)){
 						
 					}else{
 
@@ -794,10 +794,10 @@ window.ixmaps.legend = window.ixmaps.legend || {};
         // check whether to make compact (one line) legend 
         // -----------------------------------------------
         if (fLegendCompact &&
-		   themeObj.szFlag.match(/CLIP/)){
+		   themeObj.szFlag.match(/\bCLIP\b/)){
        		return "";
 	   }
-       if (themeObj.szFlag.match(/CLIP/)) {
+       if (themeObj.szFlag.match(/\bCLIP\b/)) {
             return ixmaps.legend.makeColorLegendHTMLCompact(szId, szLegendId);
         }
         if ((themeObj.partsA.length == 1) &&
@@ -806,7 +806,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
             return ixmaps.legend.makeColorLegendHTMLCompact(szId, szLegendId);
         }
        if (fLegendCompact &&
-		   themeObj.szFlag.match(/CLIP/)){
+		   themeObj.szFlag.match(/\bCLIP\b/)){
        		return "";
 	   }
        if (fLegendCompact &&

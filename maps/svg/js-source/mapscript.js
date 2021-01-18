@@ -359,7 +359,7 @@ Map.prototype.setFeatures = function(szFeatures){
 					fCheckLabelOverlap = true;
 					fCheckLabelSpace = true;
 					fCheckLabelSqueeze = true;
-					fKillOverlappingLabel = false;
+					fKillOverlappingLabel = true;
 					fCheckLabelOnlyOne = false;
 					if ( szAttA[1].match(/CHECKSPACE/) ){
 						fCheckLabelSpace = true;
@@ -370,6 +370,9 @@ Map.prototype.setFeatures = function(szFeatures){
 					if ( szAttA[1].match(/NOREPOSITIONING/) ){
 						fCheckLabelOverlap = true;
 						fKillOverlappingLabel = true;
+					}
+					if ( szAttA[1].match(/NOREMOVE/) ){
+						fKillOverlappingLabel = false;
 					}
 					if ( szAttA[1].match(/CHECKOVERLAP/) ){
 						fCheckLabelOverlap = true;
@@ -5965,7 +5968,11 @@ function SVGLoaderMap(){
 					oldNode.parentNode.removeChild(oldNode);
 				}else
 				if (newNode){
-					SVGRootElement.appendChild(newNode);
+					if (newNode.parentNode.nodeName == "defs"){
+						SVGRootElement.appendChild(newNode.parentNode);
+					}else{
+						SVGRootElement.appendChild(newNode);
+					}
 				}else
 				if (oldNode){
 					oldNode.parentNode.removeChild(oldNode);

@@ -326,9 +326,9 @@
 				__sliderRange = uMax-uMin;
 			}else
 			for ( a in themeObj.itemA ){
-				var uTime = new Date(themeObj.itemA[a].szTime).getTime() || themeObj.itemA[a].szTime;
-				uMax = Math.max(uMax,uTime);
-				uMin = Math.min(uMin,uTime);
+				var uTime = new Date(themeObj.itemA[a].szTime).getTime() || 0;
+				uMax = Math.max(uMax,uTime||uMax);
+				uMin = Math.min(uMin,uTime||uMin);
 			}
 	  		szHtml += "<input type='range' min='"+uMin+"' max='"+uMax+"' value='0' class='slider' id='myRange'>";
 

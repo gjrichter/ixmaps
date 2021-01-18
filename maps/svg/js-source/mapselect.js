@@ -225,7 +225,7 @@ MapSelection.prototype.initValues = function(){
 					_TRACE("Selection: get tile nodes of theme: "+ this.szThemesA[i]);
 					tileRootNodesA = map.Tiles.getTileNodes(this.szThemesA[i]);
 				}else{
-					tileRootNodesA[0] = SVGDocument.getElementById(this.szThemesA[i]);
+					tileRootNodesA[0] = SVGDocument.getElementById(layerObj.szName);
 				}
 				// renderer dependent subgroups ??
 				if ( (layerObj.nRenderer&1) && layerObj.szRenderer && layerObj.szRenderer.length ){

@@ -1982,7 +1982,7 @@ Map.Layer.prototype.switchScaleDependentLayer = function(evt,targetGroup){
 	// if we have css styles defined, switch layer by css class definition
 	// -------------------------------------------------------------------
 	var szStylesValue = "";
-	if ( map.Scale.CSSStyleNodes && fSwitchByCSS ){
+	if ( map.Scale.CSSStyleNodes && map.Scale.CSSStyleNodes.firstChild.nextSibling && fSwitchByCSS ){
 		var styleNodes = map.Scale.CSSStyleNodes; 
 		szStylesValue = styleNodes.firstChild.nextSibling.nodeValue;
 
@@ -3750,6 +3750,7 @@ Map.Label.prototype.collectCheckOverlap = function(){
 		}
 
 		var layerItem = map.Layer.listA[aA[aI]];
+
 		if ( layerItem.szFlag.match(/tiled/) ){ // && (layerItem.nRenderer & (4|8)) ){
 			if ( !tilesDone ){
 				tilesDone = true;
@@ -4105,14 +4106,18 @@ Map.Label.prototype.execCheckLabelOverlappingOne = function(nIndex){
 					map.Tiles.getMasterId(cItem.szId) != map.Tiles.getMasterId(this.checkOvlA[j].szId) && 
 					__checkOverlapBox(boxA,boxB) ){
 					// if nDone, than we have more than one problem, so kill the label
-					if ( fKillOverlappingLabel || nDone ){
+					if ( nDone ){
 						if ( (boxB.height < boxA.height) && 
 							 (cItem.refBox || !this.checkOvlA[j].refBox) ){
 							this.checkOvlA[j].bBox = null;
-							this.checkOvlA[j].setDisplay("none");
+							if (fKillOverlappingLabel){
+								this.checkOvlA[j].setDisplay("none");
+							}
 						}else{
-							cItem.setDisplay("none");
 							cItem.bBox = null;
+							if (fKillOverlappingLabel){
+								cItem.setDisplay("none");
+							}
 						}
 						break;
 					}

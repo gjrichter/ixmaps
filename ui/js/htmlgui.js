@@ -2500,6 +2500,36 @@ $Log: htmlgui.js,v $
 				// a) data is loaded by a specific data provider function
 				// -------------------------------------------------------
 				if (options.type == "ext") {
+					if (eval("ixmaps." + options.name)){
+						options.setData = ixmaps.setExternalData;
+						var fLoading = false;
+
+						try {
+							eval("fLoading = ixmaps." + options.name + "(options.theme,options)");
+						} catch (e) {
+							try {
+								eval("fLoading = ixmaps.parentApi." + options.name + "(options.theme,options)");
+							} catch (e) {
+								try {
+									eval("fLoading = ixmaps.parentApi.parentApi." + options.name + "(options.theme,options)");
+								} catch (e) {
+									try {
+										eval("fLoading = ixmaps.queryData(options.theme,options)");
+									} catch (e) {
+										ixmaps.showLoadingArrayStop();
+										ixmaps.hideLoading();
+										ixmaps.error("external data function: '" + options.name + "' not defined !", 2000);
+									}
+								}
+							}
+						}
+						if (!fLoading && __lastOptionName && (options.name == __lastOptionName) ) {
+							ixmaps.showLoadingArrayStop();
+						}else{
+							__lastOptionName = options.name;
+						}
+						return;
+					}
 					$.ajax({
 						type: "GET",
 						url: options.ext,
@@ -2575,8 +2605,8 @@ $Log: htmlgui.js,v $
 						.realize(function (dataA) {
 
 							ixmaps.showLoadingArrayStop();
-							ixmaps.showLoading("processing data ...");
-							//ixmaps.hideLoading();
+							//ixmaps.showLoading("processing data ...");
+							ixmaps.hideLoading();
 
 							var themeDataObj = dataA[0];
 
@@ -2829,7 +2859,7 @@ $Log: htmlgui.js,v $
 
 		if (project) {
 			
-			if ((typeof (project.map) != "string") && !szFlag.match(/themeonly/i)) {
+			if ((typeof (project.map) != "string") && !szFlag.match(/themeonly|add|replace/i)) {
 
 				ixmaps.loadedProject = project;
 				try {
@@ -2870,7 +2900,7 @@ $Log: htmlgui.js,v $
 						delete ixmaps.embeddedSVG.window.themeDataObj;
 					}
 					**/
-					this.htmlgui_synchronizeMap(false, false);					
+					ixmaps.htmlgui_synchronizeMap(false, false);					
 
 					if (project.themes) {
 						for (i in project.themes) {
@@ -2899,7 +2929,7 @@ $Log: htmlgui.js,v $
 				}
 			} else
 				// old project JSON format without 
-				if (project.map && !szFlag.match(/themeonly/i)) {
+				if (project.map && !szFlag.match(/themeonly|add|replace/i)) {
 
 					ixmaps.loadedProject = project;
 					ixmaps.parentApi.setLoadedProject(project);
@@ -2938,7 +2968,12 @@ $Log: htmlgui.js,v $
 				} else
 			if (project.themes && !szFlag.match(/maponly/i)) {
 				for (i in project.themes) {
-					ixmaps.newTheme("project", project.themes[i], (i == 0 && !szFlag.match(/add/i)) ? "clear" : "");
+					if ( project.themes[i].style.name && szFlag.match(/replace/i) ){
+						ixmaps.removeTheme(project.themes[i].style.name);
+						setTimeout(function(){ixmaps.newTheme("project", project.themes[i],"")},"1000");
+					}else{
+						ixmaps.newTheme("project", project.themes[i], (i == 0 && !szFlag.match(/add/i)) ? "clear" : "");
+					}
 				}
 			} else
 			if (project.theme && !szFlag.match(/maponly/i)) {

@@ -981,7 +981,7 @@ ixmaps.legend = ixmaps.legend || {};
 		
         // check whether to make compact (one line) legend 
         // -----------------------------------------------
-        if (themeObj.szFlag.match(/CLIP/)) {
+        if (themeObj.szFlag.match(/\bCLIP\b/)) {
             return ixmaps.legend.makeColorLegendHTMLCompact(szId, szLegendId);
         }
         if ((themeObj.partsA.length == 1) &&

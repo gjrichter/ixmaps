@@ -1049,19 +1049,29 @@
 			
 			for ( i in project.themes ){
 				if (project.themes[i].style.dbtableExt) {
+					
+					var szHTml = "";
 
-					$("#filelist").append("<p style='margin-left:1em;margin-right:-2em'>with:</p>");
+					szHTml += "<div style='font-size:0.9em;background:#f8f8f8;padding:0.5em 1em'>";
+					
+					szHTml += "<p style='margin-left:1em;margin-right:-2em'>with:</p>";
 
-					$("#filelist").append("<p style='margin-left:2em;margin-right:-2em'><code>"+
+					szHTml += "<p style='margin-left:2em;margin-right:-2em'><code>"+
 									"\"dbtable\":\""+project.themes[i].style.dbtable+"\"</br>"+
 									"\"dbtableType\":\""+project.themes[i].style.dbtableType+"\"</br>"+
-									"\"dbtableExt\":\""+project.themes[i].style.dbtableExt+"\"</br>");
-					$("#filelist").append("</code></p>");
+									"\"dbtableExt\":\""+project.themes[i].style.dbtableExt+"\"</br>";
+					szHTml += "</code></p>";
 
-					$("#filelist").append("<p style='margin-left:1em;margin-right:-2em'>The projects themes["+i+"] refers to the <b>data provider function:</b>");
-					$("#filelist").append("<p style='margin-left:2em;margin-right:-2em'>ixmaps.<b><span style='background-color:yellow'>"+project.themes[i].style.dbtable+"</span></b></p>");
+					szHTml += "<p style='margin-left:1em;margin-right:-2em'>The projects themes["+i+"] refers to the data provider function:";
+					szHTml += "<p style='margin-left:2em;margin-right:-2em'>ixmaps.<b><span style=''>"+project.themes[i].style.dbtable+"</span></b></p>";
 
-					$("#filelist").append("<p style='margin-left:1em;margin-right:-2em'><b>defined</b> in the following <b>JavaScript file</b> and marked in <span style='background-color:yellow'>yellow</span>:</p>");
+					szHTml += "<p style='margin-left:1em;margin-right:-2em'>defined in the following <b>JavaScript file</b> and marked in <span style='background-color:yellow'>yellow</span>:</p>";
+
+					szHTml += "</div>";
+					
+					$("#filelist").append(szHTml);
+					
+					$("#filelist").append("<div style='height:1em'></div>");
 
 					__showFile((project.themes[i].style.dbtableExt.match(/http/) ? "" : "../../") + project.themes[i].style.dbtableExt,project.themes[i].style.dbtable);
 				}

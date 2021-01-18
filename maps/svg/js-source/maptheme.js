@@ -8575,8 +8575,8 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 				nValueSum: 0
 			};
 
-			this.itemA[szId].szSelectionId = String(szSelectionId);
-			this.itemA[szId].szSelectionId2 = String(szSelectionId2);
+			this.itemA[szId].szSelectionId = String(szThemeLayer + "::" +szSelectionId);
+			this.itemA[szId].szSelectionId2 = String(szThemeLayer + "::" +szSelectionId2);
 			this.itemA[szId].nSize = nValueSize || 0;
 			this.itemA[szId].ptPos = ptPos;
 			this.itemA[szId].ptPos2 = ptPos2;
@@ -11692,7 +11692,10 @@ MapTheme.prototype.markClass = function (nClass, nStep) {
 							tilesNodesA[j].setAttributeNS(szMapNs, "themestyle", tilesNodesA[j].getAttributeNS(null, "style"));
 							tilesNodesA[j].setAttributeNS(null, "style", tilesNodesA[j].getAttributeNS(szMapNs, "origthemestyle"));
 							// GR 11.11.2011 look for value node
-							var szId = tilesNodesA[j].firstChild.nextSibling.getAttribute("id") || tilesNodesA[j].getAttribute("id");
+							var szId = tilesNodesA[j].getAttribute("id");
+							if (tilesNodesA[j].firstChild.nextSibling){
+								szId = tilesNodesA[j].firstChild.nextSibling.getAttribute("id") || szId;
+							}
 							var nNode = SVGDocument.getElementById(szId + "L");
 							if (nNode) {
 								nNode.setAttributeNS(szMapNs, "display", nNode.style.getPropertyValue("display"));
@@ -11822,7 +11825,10 @@ MapTheme.prototype.unmarkClass = function (nClass) {
 						tilesNodesA[j].setAttributeNS(null, "style", szThemeStyle);
 						tilesNodesA[j].removeAttributeNS(szMapNs, "themestyle");
 						// GR 11.11.2011 look for value node
-						var szId = tilesNodesA[j].firstChild.nextSibling.getAttribute("id") || tilesNodesA[j].getAttribute("id");
+						var szId = tilesNodesA[j].getAttribute("id");
+						if (tilesNodesA[j].firstChild.nextSibling){
+							szId = tilesNodesA[j].firstChild.nextSibling.getAttribute("id") || szId;
+						}
 						var nNode = SVGDocument.getElementById(szId + "L");
 						if (nNode) {
 							nNode.style.setProperty("display", nNode.getAttributeNS(szMapNs, "display"), "");
@@ -12826,10 +12832,13 @@ MapTheme.prototype.createChartGroup = function (objectGroup) {
 	}
 	
 	if (this.szFlag.match(/FEATURE/)) {
-		this.chartGroup = map.Dom.newGroup(objectGroup, this.szId + ":featuregroup");
+		this.chartGroup = map.Dom.newGroup(map.Layer.layerNode, this.szThemesA[0]);
+						  map.Dom.newGroup(map.Layer.layerNode, this.szThemesA[0] + ":label");
 		map.Layer.listA[this.szThemesA[0]] = new Map.Layer.Item(null);
+		map.Layer.listA[this.szThemesA[0]].szName = this.szThemesA[0];
 		map.Layer.listA[this.szThemesA[0]].szHighlight = 
-			"fill:url(#DiagUp200000000);stroke:black;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;";
+			"fill:url(#DiagUp200000000);stroke:black;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;";
+		map.Layer.listA[this.szThemesA[0]].szSelection = this.szItemField;
 	}else{
 		this.chartGroup = map.Dom.newGroup(objectGroup, this.szId + ":chartgroup");
 	}
@@ -13392,7 +13401,9 @@ MapTheme.prototype.chartMap = function (startIndex) {
 
 		// GR 18.12.2020 clear charts here!
 		//
-		this.unpaintMap();
+		if (!this.szFlag.match(/DOT/)) {
+			this.unpaintMap();
+		}
 
 	}
 
