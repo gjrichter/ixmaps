@@ -777,7 +777,7 @@
 
 		$("#css-modifier-container").remove();
 
-		if ( szId.match(/dark/i) || szId.match(/black/i) ){
+		if ( szId.match(/dark/i) || szId.match(/black/i) || szId.match(/satellite/i) ){
 
 			$("#header").css("background","black");
 			$("#themeLegendDiv").css("background","none");
