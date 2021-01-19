@@ -281,7 +281,9 @@ $Log: htmlgui_story.js,v $
 
 		// make absolute story root, if we have a master story loaded
 		// ----------------------------------------------------------
-		szStoryRoot = (this.masterStoryRoot || "") + szStoryRoot;
+		if ( !szStoryRoot.match(/http/) ){
+			szStoryRoot = (this.masterStoryRoot || "") + szStoryRoot;
+		}
 
 		// if not story root yet, preset with SVG map root
 		// ----------------------------------------------------------------------------
@@ -331,7 +333,9 @@ $Log: htmlgui_story.js,v $
 					" style='border:0;margin:0px;width:" + width + "px;height:" + height + "px;pointer-events:all' /><a href='javascript:ixmaps.hideStoryTool()' class='hide-story-tool-button' ><span style='font-size:24px;color:#aaaaaa;vertical-align:10px'><i class='fa fa-times fa-fw' ></i></span></a>");
 			} else {
 				target.css("pointer-events", "all");
-				target.load(szStoryRoot + szUrl, function (response, status, xhr) {
+				// make content div for height
+				target.html("<div id='story-tool-content'></div>");
+				$('#story-tool-content').load(szStoryRoot + szUrl, function (response, status, xhr) {
 					if (status == "error") {
 						var msg = "Sorry but there was an error: ";
 						$("#story").append(msg + xhr.status + "<br><br> '" + szStoryRoot + szUrl + "'<br><br> " + xhr.statusText);
@@ -399,7 +403,11 @@ $Log: htmlgui_story.js,v $
 		setTimeout('ixmaps.doresizeStoryToolFrame()',1);
 	}
 	ixmaps.doresizeStoryToolFrame = function() {
-		var the_height = window.document.getElementById('embed-tool').contentWindow.document.body.scrollHeight;
+		if(window.document.getElementById('embed-tool')){
+			var the_height = window.document.getElementById('embed-tool').contentWindow.document.body.scrollHeight;
+		}else{
+			var the_height = ($('#story-tool-content').height());
+		}
 		the_height += 40;
 		if ( the_height > 100 ){
 			//the_height = Math.min(the_height,630);

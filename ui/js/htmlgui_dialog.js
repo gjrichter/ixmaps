@@ -129,7 +129,15 @@ $Log: htmlgui.js,v $
 		$("#"+szElement).parent().css("z-index","10000");
 		// load content
 		if ( typeof(szUrl) == "string" && szUrl.length ){
-			if ( (szUrl.substr(0,4) == "http") || (szUrl.substr(0,1) == ".") ){
+			if ( (szUrl.substr(0,4) == "http") ){
+				$("#"+szElement).load(szUrl, function (response, status, xhr) {
+					if (status == "error") {
+						var msg = "Sorry but there was an error: ";
+						$("#story").append(msg + xhr.status + "<br><br> '" + szStoryRoot + szUrl + "'<br><br> " + xhr.statusText);
+					}
+				});
+			}else
+			if ( (szUrl.substr(0,1) == ".") ){
 				$("#"+szElement)[0].innerHTML = 
 					"<div overflow=\"auto\">"+
 					"<iframe style=\"width:100%;height:"+(dialogHeight-115)+"px;\" id=\"dialogframe\" src=\""+szUrl+"\" frameborder=\"0\" marginwidth=\"0px\" />"+
