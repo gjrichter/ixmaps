@@ -112,26 +112,7 @@
 
 	</div>
 	
-	<script type="text/javascript" src="assets/plugins/jquery-1.7.1.min.js"></script>
-
 	<script type="text/javascript">
-		// ===========================================
-		//
-		// !! get ixmaps api from story parent/opener
-		//
-		// ===========================================
-
-		var ixmaps = null;
-		if (window.opener) {
-			ixmaps = window.opener.ixmaps;
-		} else
-		if (parent) {
-			ixmaps = parent.window.ixmaps;
-		} else {
-			alert("error: missing parent window for themes !");
-		}
-
-		ixmaps.initialized = true;
 
 		// ===================================
 		// define local functions
@@ -146,7 +127,7 @@
 				var tooltip = document.getElementById("tooltip");
 				tooltip.innerHTML = text;
 				tooltip.style.display = "block";
-				var left = 0; //parseInt(sidebar.style.getPropertyValue("left"));
+				var left = parseInt(sidebar.style.getPropertyValue("left"));
 				tooltip.style.left = evt.pageX - left - 20 + 'px';
 				tooltip.style.top = evt.pageY + 20 + 'px';
 			}
