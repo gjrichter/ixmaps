@@ -654,7 +654,7 @@
 				var data = ixmaps.getData('map',szId);
 				var szTitle = data?data.title:"";
 				ixmaps.szMapItemId = szId;
-				ixmaps.loadStoryTool(szItemUrl,{frame:true});
+				ixmaps.loadStoryTool(szItemUrl);
 				return true;
 			}
 			else{
@@ -663,7 +663,7 @@
 					return false;
 				}
 				ixmaps.szMapItemId = szId;
-				ixmaps.loadStoryTool(szItemUrl,{frame:true});
+				ixmaps.loadStoryTool(szItemUrl);
 				//ixmaps.embeddedSVG.window.map.Api.highlightItem(szId);
 				return true;
 			}
