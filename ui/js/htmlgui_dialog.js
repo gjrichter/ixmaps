@@ -563,10 +563,10 @@ $Log: htmlgui.js,v $
 	};
 
 	function changeCss(className, classValue) {
-		var cssMainContainer = $('#css-modifier-container');
+		var cssMainContainer = $('#css-modifier-container-dialog');
 
 		if (cssMainContainer.length == 0) {
-			var cssMainContainer = $('<style id="css-modifier-container"></style>');
+			var cssMainContainer = $('<style id="css-modifier-container-dialog"></style>');
 			cssMainContainer.appendTo($('head'));
 		}
 		cssMainContainer.append(className + " {" + classValue + "}\n");
@@ -578,9 +578,9 @@ $Log: htmlgui.js,v $
 			return;
 		}
 
-		$("#css-modifier-container").remove();
+		$("#css-modifier-container-dialog").remove();
 
-		if ( szId.match(/dark/i) || szId.match(/black/i) ){
+		if ( szId.match(/dark/i) || szId.match(/black/i) || szId.match(/satellite/i)){
 			$("#ixmap").css({"background":"black"});
 			$("#gmap").css({"background":"black"});
 			$("#story_board").css({"background":"black"});
