@@ -134,7 +134,7 @@ Map.Selections.prototype.newSelection = function(szThemes,szSelectShape,szStyle,
  * @return A new MapSelection object
  */
 function MapSelection(szThemes,szSelectShape,szFlag,szTitle) {
-
+	
 	var i;
 
 	/** number of shapes in the themes */
@@ -179,10 +179,13 @@ MapSelection.prototype.initValues = function(){
 	this.nThemeItems = 0;
 	this.nSelected = 0;
 	this.nSelectedArea = 0;
-
+	
 	// selection on charts --> 'generic'
-	this.activeTheme = map.Themes.getTheme("selectme") || map.Themes.getTheme();
-	if ( this.activeTheme.szFlag.match(/CHART/) && !this.activeTheme.szFlag.match(/MULTIPLE/)){
+	this.activeTheme = map.Themes.getTheme(this.szThemes) || map.Themes.getTheme();
+	// to detect selection on charts ! theme layer == selection layer !
+	if ( (this.activeTheme.szThemes == this.szThemes || this.activeTheme.szId == this.szThemes) && 
+		this.activeTheme.szFlag.match(/CHART/) &&
+		!this.activeTheme.szFlag.match(/MULTIPLE/)){
 		this.szThemes = "generic";
 	}
 
@@ -203,6 +206,7 @@ MapSelection.prototype.initValues = function(){
 		}
 		this.nCount = this.nNodes = this.nThemeItems = this.themeRootNodesA.length;
 		_TRACE(this.nCount+" nodes to check");
+		
 	}else{
 
 		// b) selection on layer items	
@@ -245,6 +249,7 @@ MapSelection.prototype.initValues = function(){
 				}
 			}
 		}
+
 		if ( this.themeRootNodesA.length === 0 ){
 		_TRACE("error: no active layer");
 			return false;
@@ -322,7 +327,6 @@ MapSelection.prototype.initValues = function(){
 
 			if ( !this.markGroup ){
 				this.markGroup = map.Dom.newGroup(map.Layer.objectGroup,this.szId+":markgroup");
-//				this.markGroup.getStyle.setProperty("pointer-events","none");
 			}
 			return true;
 		}
@@ -332,9 +336,24 @@ MapSelection.prototype.initValues = function(){
 			return false;
 		}
 	}
+	else
+	if ( this.szSelectShape == "mapbounds" ){
+		
+		// case III: selection by map bounds
+		// ----------------------------------
+		
+		var bBox = map.Zoom.getBox();
+		this.selectCenterA = [];
+		this.selectionCenter = new point(bBox.x,bBox.y);
+		this.selectCenterA.push(this.selectionCenter);
+		this.selectBufferSizeX = bBox.width;
+		this.selectBufferSizeY = bBox.height;
+		this.selectScale = 1; 
+		return true;
+	}
 	else{
-
-		// case III: selection by user drawn shape (rect or circle)
+		
+		// case IV: selection by user drawn shape (rect or circle)
 		// --------------------------------------------------------
 
 		this.selectCenterA = [];
@@ -349,8 +368,6 @@ MapSelection.prototype.initValues = function(){
 			
 			var ptPos = bufferNode.fu.getPosition();
 			var bBox  = bufferNode.fu.getBox();
-			console.log(ptPos);
-			console.log(bBox);
 			this.selectionCenter = new point(bBox.x+bBox.width/2,bBox.y+bBox.height/2);
 			this.selectCenterA[this.selectCenterA.length] = this.selectionCenter;
 			this.selectBufferSize = Math.max(bBox.width/2,bBox.height/2);
@@ -390,9 +407,6 @@ MapSelection.prototype.initValues = function(){
 			this.selectBufferSizeX	= this.selectBufferSizeX*matrixA[0];
 			this.selectBufferSizeY	= this.selectBufferSizeY*matrixA[0];
 		}
-		// from canvas to map scale
-		// this.selectBufferSize	= this.selectBufferSize*map.Scale.mapUnitsPPX;
-
 		this.selectScale = map.Scale.nZoomScale; 
 		if ( !this.markGroup ){
 			this.markGroup = map.Dom.newGroup(map.Layer.objectGroup,this.szId+":markgroup");
@@ -404,19 +418,12 @@ function __inRange(a,b,c,d){
 	if ( a && b && c ){
 		var nDeltaX = b.x-a.x;
 		var nDeltaY = b.y-a.y;
-		// nDeltaX = nDeltaX*map.Scale.mapUnitsPPX;
-		// nDeltaY = nDeltaY*map.Scale.mapUnitsPPY;
 		if (d){
 			return ((Math.abs(nDeltaX) <= c) && (Math.abs(nDeltaY) <= d) );
 		}else{
 			return (Math.sqrt(nDeltaX*nDeltaX+nDeltaY*nDeltaY) <= c);
 		}
 	}
-	/*
-		_TRACE(a.x+","+a.y+","+b.x+","+b.y+" = "+map.Scale.getDistanceInMeter(a.x,a.y,b.x,b.y));
-		nMeter = Math.sqrt(nDeltaX*nDeltaX+nDeltaY*nDeltaY);
-		return (map.Scale.getDistanceInMeter(a.x,a.y,b.x,b.y) <= c);
-	*/
 	return false;
 }
 /**
@@ -646,10 +653,6 @@ MapSelection.prototype.selectShapes = function(startIndex){
 				nSelectRadius = this.selectBufferSizeX*this.selectScale;
 				nSelectRadius2 = this.selectBufferSizeY*this.selectScale;
 			}
-//			_TRACE("nSelectRadius: "+nSelectRadius);
-//			alert("nSelectRadius: "+nSelectRadius);
-
-//			var zoomBox = map.Zoom.getBox();
 
 			for (i=startIndex; i<this.nNodes; i++){
 
@@ -660,6 +663,7 @@ MapSelection.prototype.selectShapes = function(startIndex){
 				}
 
 				if ( this.szThemes == "generic" ){
+					
 					var szMasterId = this.nextThemeNode(i);
 					this.nDoneCount++;
 					var fSelected = false;
@@ -679,26 +683,9 @@ MapSelection.prototype.selectShapes = function(startIndex){
 					if ( !themeNode || themeNode.nodeType != 1 ){
 						continue;
 					}
-//				_TRACE("? "+this.nDoneCount+"/"+this.nTested+" "+themeNode.nodeName+" "+themeNode.getAttributeNS(null,"id")+" items:"+themeNode.childNodes.length);
-					// exclude added buffer shapes
 					if ( themeNode.getAttributeNS(null,"id").match(/:paint/) ){
 						continue;
 					}
-
-					/***
-					if ( this.activeTheme ){
-						ptOff = this.activeTheme.getNodePosition(themeNode.getAttributeNS(null,"id"));
-						if ( !ptOff ){
-							continue;
-						}
-						if ( ptOff.x < zoomBox.x				||
-							 ptOff.x > zoomBox.x+zoomBox.width  ||
-							 ptOff.y < zoomBox.y				||
-							 ptOff.y > zoomBox.y+zoomBox.height ){
-							continue;
-						}
-					}
-					***/
 
 					// if tiled, process only one tile node for statistic 
 					var szMasterId = map.Tiles.getMasterId(themeNode.getAttributeNS(null,"id"));
@@ -739,35 +726,27 @@ MapSelection.prototype.selectShapes = function(startIndex){
 						}
 					}
 					else{
-						var szCenter = themeNode.getAttributeNS(szMapNs,"center");
-						if ( szCenter && szCenter.length > 2 ){
-							var szCenterA = szCenter.split(',');
-							themeCenter = new point( Number(szCenterA[0].split(':')[1]), Number(szCenterA[1].split(':')[1]) );
-						}
-						if ( !themeCenter ){
-							var bBox = map.Dom.getBox(themeNode);
-							themeCenter = new point( bBox.x, bBox.y );
-						}
-						if ( themeCenter ){
-							var ptMapOffset = map.Scale.getMapOffset(themeNode);
-							themeCenter.x += ptMapOffset.x;
-							themeCenter.y += ptMapOffset.y;
-
-							map.Scale.rotatePoint(themeCenter,-1);
-
-							for ( ii=0; ii<this.selectCenterA.length; ii++){
-								if ( __inRange(themeCenter,this.selectCenterA[ii],nSelectRadius,nSelectRadius2) ){
-									fSelected = true;
-									break;
-								}
-							}
+						var bBox = map.Dom.getBox(themeNode);
+						var ptMapOffset = map.Scale.getMapOffset(themeNode);
+						bBox.x += ptMapOffset.x;
+						bBox.y += ptMapOffset.y;
+						if ( bBox.x > this.selectCenterA[0].x+nSelectRadius ||
+							 bBox.y > this.selectCenterA[0].y+nSelectRadius2 ||
+							 bBox.x+bBox.width  < this.selectCenterA[0].x-nSelectRadius || 
+							 bBox.y+bBox.height < this.selectCenterA[0].y-nSelectRadius2 ){
+							fSelected = false;
+						}else{
+							fSelected = true;
 						}
 					}
 				}
-				// if selected, add to selection
-				// ------------------------------
+				
 				if ( fSelected ){
 
+					// ==============================
+					// if selected, add to selection
+					// ==============================
+				
 					if ( this.szThemes == "generic" ){
 
 						this.itemA[szMasterId] = null;
@@ -787,10 +766,6 @@ MapSelection.prototype.selectShapes = function(startIndex){
 									}
 								}
 							}
-							else{
-	//							this.highLightList.addItem(themeNode);
-	//							this.highLightList.lock();
-							}
 						}
 
 						// calculate selection statistics
@@ -798,7 +773,6 @@ MapSelection.prototype.selectShapes = function(startIndex){
 						var szArea = themeNode.getAttributeNS(szMapNs,"area");
 
 						// if tiled, process only one tile node for statistic 
-	//					var szMasterId = map.Tiles.getMasterId(themeNode.getAttributeNS(null,"id"));
 						if ( this.itemA && this.itemA[szMasterId]){
 							continue;
 						}
@@ -837,7 +811,6 @@ MapSelection.prototype.selectShapes = function(startIndex){
 							}
 							this.nCount++;
 							for ( k=0;k<activeThemeItem.nValuesA.length;k++ ){
-//								_TRACE(k+": "+activeThemeItem.nValuesA[k]);
 								if ( !isNaN(activeThemeItem.nValuesA[k]) ){
 									this.nOrigValuesSumA[k] += activeThemeItem.nOrigValuesA[k];
 									this.nValuesSumA[k] += activeThemeItem.nValuesA[k];
@@ -850,12 +823,20 @@ MapSelection.prototype.selectShapes = function(startIndex){
 									this.nMaxSize		 = Math.max(this.nMaxSize,activeThemeItem.nSize||this.nMaxSize);
 									this.nSumSize		 += activeThemeItem.nSize;
 								}
-//								_TRACE("Total:"+this.nValuesSumA[k]+' min:'+this.nValuesMinA[k]+' max:'+this.nValuesMaxA[k]);
-//								_TRACE("OrigTotal:"+this.nOrigValuesSumA[k]);
 							}
 							if ( activeThemeItem.nValue100 ){
 								this.nSum100 += activeThemeItem.nValue100;
 							}
+							if ( this.activeTheme.szFlag.match(/CATEGORICAL|AGGREGATE/) ){
+								console.log(activeThemeItem);
+								for ( var p=0;p<this.partsA.length;p++ ){
+									this.partsA[p].nCount += activeThemeItem.nValuesA[p];
+									this.partsA[p].nSum += activeThemeItem.nValuesA[p];
+									this.nSum += activeThemeItem.nValuesA[p];
+									this.nExactCount++;
+									this.exactSizeA[p] += activeThemeItem.nSize||1;
+								}
+							}else
 							if ( this.activeTheme.szFlag.match(/CATEGORICAL/) ){
 								for ( var v=0;v<activeThemeItem.nValuesA.length;v++ ){
 									for ( var p=0;p<this.partsA.length;p++ ){
@@ -940,7 +921,7 @@ MapSelection.prototype.selectShapes = function(startIndex){
 
 	this.fShowProgressBar = false;
 	clearMessage();
-
+	
 	if ( HTMLWindow.ixmaps.htmlgui_onSelection(this.szId) ){
 		return null;
 	}
@@ -980,7 +961,6 @@ MapSelection.prototype.showInfo = function(fDone){
 	if (this.widgetNode){
 		var newInfo = this.widgetNode;
 		newInfo.clear();
-//		this.widgetNode.remove();
 	}
 	else{
 		var newInfo = new InfoContainer(SVGDocument,SVGFixedGroup,szDisplayId+":movable",this.selectionCenter,new point(-map.Scale.normalX(55),map.Scale.normalY(50)),"fixed|pointer",szTitle);
@@ -1002,20 +982,6 @@ MapSelection.prototype.showInfo = function(fDone){
 	if ( this.szSelectShape == "activeBuffer" ){
 		var mapTheme = map.Themes.activeBuffer;
 		szSelectShape = mapTheme.szTitle;
-		/*** 
-		var textA = new Array(   map.Dictionary.getLocalText("layer")
-							,map.Dictionary.getLocalText("selected by")
-							,map.Dictionary.getLocalText("selected items")
-							,map.Dictionary.getLocalText("total items")
-							,map.Dictionary.getLocalText("percentual")
-							,this.szThemesA.length == 1?String(map.Layer.listA[this.szThemesA[0]].szLegendName):"(multiple)"
-							,String(szSelectShape)
-							,String(this.nSelected)
-							,String(this.nTested)
-							,String(__formatValue(100/this.nTested*this.nSelected,2)+" %")
-						);
-		nLineOff += 82;
-		**/
 		var textA = new Array(   map.Dictionary.getLocalText("layer")
 								,map.Dictionary.getLocalText("selected by")
 								,map.Dictionary.getLocalText("selected items")
@@ -1085,8 +1051,6 @@ MapSelection.prototype.showInfo = function(fDone){
 		nLineOff += 14;
 
 		map.Dom.newText(infoWorkspace,map.Scale.normalX(3),map.Scale.normalY(nLineOff),"font-family:arial;font-weight:bold;font-size:"+map.Scale.normalY(11)+"px;fill:#555555;pointer-events:none",map.Dictionary.getLocalText("Theme")+": "+this.activeTheme.szTitle);
-//		map.Dom.newText(infoWorkspace,map.Scale.normalX(3),map.Scale.normalY(nLineOff+21),"font-size:"+map.Scale.normalY(11)+"px;fill:#444444;pointer-events:none",this.activeTheme.szTitle);
-//		nLineOff += 24;
 		nLineOff += 8;
 
 		gridGroup = map.Dom.newGroup(infoWorkspace,"");
@@ -1367,8 +1331,6 @@ MapSelection.prototype.showInfo = function(fDone){
 				var nSelectionTotal = this.nSum100?this.nSum100:(this.activeTheme.szFlag.match(/CATEGORICAL/)?this.nExactCount:this.nSum);
 				var nTotal			= this.activeTheme.nSum100?this.activeTheme.nSum100:(this.activeTheme.szFlag.match(/CATEGORICAL/)?this.activeTheme.nExactCount:this.activeTheme.nSum);
 
-//				var textA = new Array(  "selection total",String(__formatValue(nSelectionTotal,2)) 
-//									);
 				var textA = new Array(   map.Dictionary.getLocalText("total of selection")
 										,String(__formatValue(nSelectionTotal,2)) + " (" + String(__formatValue(Number(nSelectionTotal)/Number(nTotal)*100,2))+" %)"
 									);
@@ -1412,8 +1374,6 @@ MapSelection.prototype.showInfo = function(fDone){
 			this.szFlag	   = this.activeTheme.szFlag;
 			this.szAggregation = this.activeTheme.szAggregation;
 
-///			var chartFrame = map.Dom.newShape('rect',infoWorkspace,0,0,map.Scale.normalX(500),map.Scale.normalY(500),"fill:lightgray;stroke:none");
-
 			if ( this.szOverviewChart ){
 				chartGroup = map.Dom.newGroup(infoWorkspace,"");
 				chartsA.push(chartGroup);
@@ -1456,7 +1416,6 @@ MapSelection.prototype.showInfo = function(fDone){
 	}
 	var szSummary = (this.nSelected+"("+this.nThemeItems+") = "+__formatValue(100/this.nThemeItems*this.nSelected,2)+"%");
 	_TRACE(szSummary);	
-//	map.Dom.newText(infoWorkspace,map.Scale.normalX(3),map.Scale.normalY(12+3),"font-size:"+map.Scale.normalY(12)+"px;fill:#444444;pointer-events:none",szSummary);
 
 	__chartArrayReformat(chartsA,map.Scale.normalX(nLineOff),2);
 
@@ -1500,7 +1459,6 @@ function __chartArrayReformat(chartsA,nLineOff,nCols){
 		nMaxHeight = Math.max(nMaxHeight,chartBox.height);
 
 		chartGroup.fu.setPosition(nPosX,nPosY);
-//		nPosX += chartBox.width+map.Scale.normalX(10);
 		nPosX += nMaxWidth-map.Scale.normalX(10);
 	}
 }

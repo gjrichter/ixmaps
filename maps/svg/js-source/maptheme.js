@@ -130,6 +130,8 @@ var themeStyleTranslateA = [
 	,{ style: "legendunits"		,obj: "szLegendUnits"  }
 	,{ style: "weights"			,obj: "szWeights"  }
 	,{ style: "align"			,obj: "szAlign"  }
+	,{ style: "offsetx"			,obj: "nOffsetX"  }
+	,{ style: "offsety"			,obj: "nOffsetY"  }
 
 	,{ style: "refreshtimeout"	,obj: "nRefreshTimeout"  }
 
@@ -821,6 +823,12 @@ Map.Themes.prototype.parseStyle = function (mapTheme, styleObj) {
 		}
 		if (__isdef(styleObj.align)) {
 			mapTheme.szAlign = styleObj.align;
+		}
+		if (__isdef(styleObj.offsetx)) {
+			mapTheme.nOffsetX = Number(styleObj.offsetx) || 0;
+		}
+		if (__isdef(styleObj.offsety)) {
+			mapTheme.nOffsetY = Number(styleObj.offsety) || 0;
 		}
 		if (__isdef(styleObj.units)) {
 			mapTheme.szUnits = styleObj.units;
@@ -13158,7 +13166,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 							if (this.nMaxA.length > 1) {
 								// multiple value charts like pies,stars, ...
 								for (i = 0; i < this.partsA.length; i++) {
-									this.partsA[i].nCount++;
+									this.partsA[i].nCount += (this.itemA[a].nCountA[i] && !isNaN(this.itemA[a].nCountA[i])) ? this.itemA[a].nCountA[i] : 0;
 									this.partsA[i].nSum += (this.itemA[a].nValuesA[i] && !isNaN(this.itemA[a].nValuesA[i])) ? this.itemA[a].nValuesA[i] : 0;
 								}
 							} else {
@@ -13536,6 +13544,12 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		this.chartGroup.style.setProperty("stroke-opacity", "1");
 		this.chartGroup.style.setProperty("stroke-linecap", "butt");
 		this.chartGroup.style.setProperty("stroke-linejoin", "round");
+		
+		var szInfo = "";
+		for ( var i=0; i<this.objTheme.dbFields.length-1; i++ ){
+			szInfo += (i?"|":"")+this.objTheme.dbFields[i].id;
+		}
+		this.chartGroup.setAttributeNS(szMapNs,"info",szInfo);
 	}
 	
 	// ---------------------------------
@@ -13657,6 +13671,14 @@ MapTheme.prototype.chartMap = function (startIndex) {
 			if (!json){
 				continue;
 			}
+			
+			var szInfo = "";
+			var data = this.objTheme.dbRecords[this.itemA[a].dbIndex];
+			for ( var i=0; i<data.length-1; i++ ){
+				szInfo += (i?"|":"")+data[i];
+			}
+			shapeGroup.setAttributeNS(szMapNs,"info",szInfo);
+			
 			// geojson Point
 			// -------------		
 			if ( json.type == "Point" ){
@@ -13718,6 +13740,9 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				map.Layer.listA[this.szThemesA[0]].szType = "polygon";
 				var linesA = json.coordinates;
 				var d = "";
+				var x = 0,
+					y = 0,
+					count = 0;
 				for (i in linesA){
 					var coordinatesA = linesA[i];
 					var ptAct = null;
@@ -13728,23 +13753,34 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					
 					for (ii in coordinatesA){
 						var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[ii][1],coordinatesA[ii][0]);
+						x += pt.x;
+						y += pt.y;
 						d += (pt.x-ptAct.x) +','+ (pt.y-ptAct.y) +" ";
 						ptAct = new point(pt.x, pt.y);
 					}
 					d += " z";
+					count += coordinatesA.length;
 				}
 				var shape = map.Dom.newShape('path', shapeGroup, d, "");
+				shapeGroup.setAttributeNS(szMapNs,"center","x:"+x/count+",y:"+y/count);
 			}
 
 			// geojson MultiPolygon
 			// --------------------		
 			if ( json.type == "MultiPolygon" ){
 				
+				var x = [], y = [], count = [];
+				
 				map.Layer.listA[this.szThemesA[0]].szType = "polygon";
 				var polygonA = json.coordinates;
 				for (var p in polygonA){
 					var linesA = polygonA[p];
 					var d = "";
+					
+					x[p] = 0;
+					y[p] = 0,
+					count[p] = 0;
+					
 					for (i in linesA){
 						var coordinatesA = linesA[i];
 						var ptAct = null;
@@ -13755,12 +13791,25 @@ MapTheme.prototype.chartMap = function (startIndex) {
 
 						for (ii in coordinatesA){
 							var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[ii][1],coordinatesA[ii][0]);
+							x[p] += pt.x;
+							y[p] += pt.y;
+							
 							d += (pt.x-ptAct.x) +','+ (pt.y-ptAct.y) +" ";
 							ptAct = new point(pt.x, pt.y);
 						}
 						d += " z";
+						count[p] += coordinatesA.length;
 					}
 					var shape = map.Dom.newShape('path', shapeGroup, d, "");
+				}
+				
+				// set center of biggest part
+				var pp = 0;
+				for ( p in count ){
+					if ( count[p] > pp ){
+						shapeGroup.setAttributeNS(szMapNs,"center","x:"+x[p]/count[p]+",y:"+y[p]/count[p]);
+						pp = count[p];
+					}
 				}
 			}
 
@@ -16977,6 +17026,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 				// make the symbol
 				// ----------------
+				
+				this.nSymbolScale = nRadius/map.Scale.normalX(nChartSize);
 
 				if (szSymbol == "circle" || szSymbol == "square" || szSymbol == "carot" || szSymbol == "diamond" || szSymbol == "triangle" || szSymbol == "hexagon" || szSymbol == "empty" || szSymbol == "label" || szSymbol == "cross") {
 					szLineColor = this.szLineColor || szLineColor;
@@ -19166,8 +19217,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 	if (!szFlag.match(/NORMSIZE/)) {
 
 		var ptNullOrig = new point(ptNull.x, ptNull.y);
-		ptNull.y = 0;
-		ptNull.x = 0;
+		
+		ptNull.x = map.Scale.normalX(this.nOffsetX || 0) * (this.nSymbolScale || 1);
+		ptNull.y = map.Scale.normalY(-this.nOffsetY || 0) * (this.nSymbolScale || 1);
 
 		if (this.szAlign) {
 			if (szFlag.match(/PLOT/) && !szFlag.match(/ZOOM/)) {
@@ -19201,7 +19253,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				if (this.szAlign.match(/center/)) {
 					ptNull.y = 0;
 				}
-				if (this.szAlign.match(/top/)) {
+				if (this.szAlign.match(/bottom/)) {
 					ptNull.y = (ptNullOrig.y ? ptNullOrig.y : map.Scale.normalX(nChartSize / 5));
 				}
 				if (this.szAlign.match(/above/)) {
@@ -19216,25 +19268,22 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				if (this.szAlign.match(/2below/)) {
 					ptNull.y -= map.Scale.normalX(nChartSize / 2);
 				}
-				if (this.szAlign.match(/bottom/)) {
+				if (this.szAlign.match(/top/)) {
 					ptNull.y = -(ptNullOrig.y ? ptNullOrig.y : map.Scale.normalX(nChartSize / 2));
 				}
-				if (this.szAlign.match(/2bottom/)) {
-					ptNull.y -= map.Scale.normalX(nChartSize / 2);
-				}
-				if (this.szAlign.match(/right/)) {
+				if (this.szAlign.match(/left/)) {
 					ptNull.x = -(ptNullOrig.y ? ptNullOrig.y : map.Scale.normalX(nChartSize / 2));
 				}
-				if (this.szAlign.match(/2right/)) {
+				if (this.szAlign.match(/2left/)) {
 					ptNull.x -= map.Scale.normalX(nChartSize / 2);
 				}
-				if (this.szAlign.match(/left/)) {
+				if (this.szAlign.match(/right/)) {
 					ptNull.x = (ptNullOrig.y ? ptNullOrig.y : map.Scale.normalX(nChartSize / 2));
 				}
-				if (this.szAlign.match(/2left/)) {
+				if (this.szAlign.match(/2right/)) {
 					ptNull.x += map.Scale.normalX(nChartSize / 2);
 				}
-				if (this.szAlign.match(/23left/)) {
+				if (this.szAlign.match(/23right/)) {
 					ptNull.x = map.Scale.normalX(nChartSize / 3);
 				}
 				if (this.szAlign.match(/baseline/)) {
