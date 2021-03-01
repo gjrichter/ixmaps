@@ -312,7 +312,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 		// theme data
 		// ------------------------------------
-		var szData = objThemeDefinition.style.dbtable;
+		var szData = objThemeDefinition.style.dbtable || objThemeDefinition.data.name;
 		var dataObj = eval("ixmaps.embeddedSVG.window." + (szData || "themeDataObj"));
 
 		// create data object from theme data
@@ -692,7 +692,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 		// theme data
 		// ------------------------------------
-		var szData = objThemeDefinition.style.dbtable;
+		var szData = objThemeDefinition.style.dbtable || objThemeDefinition.data.name;
 		var dataObj = eval("ixmaps.embeddedSVG.window." + (szData || "themeDataObj"));
 
 		// create data object from theme data

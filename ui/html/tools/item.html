@@ -85,7 +85,7 @@
 
 		th,
 		td {
-			border-bottom: 1px solid #ddd;
+			border-bottom: 0px solid #ddd;
 		}
 
 	</style>
@@ -247,7 +247,7 @@
 				SVGBox.y -= 30;
 				SVGBox.height += 60;
 
-				var size = __themeObj.szFlag.match(/PLOT|HORZ|PIE/) ? nHeight : nHeight/2;
+				var size = __themeObj.szFlag.match(/PLOT|HORZ|PIE/) ? nHeight : nHeight/3;
 				var width = size;
 				var height = size / SVGBox.width * SVGBox.height;
 
@@ -360,6 +360,20 @@
 
 		ixmaps.makeItemContent = function() {
 
+			var showData = false;
+			
+			var normal = "#888888";
+			var highLight = "#000000";
+			var highLightBg = "#e8e8e8";
+
+			if (ixmaps.getMapTypeId().match(/dark/i)) {
+				$("#container").css("background-color", "#333");
+				$("#container").css("color", "#ddd");
+				normal = "#aaaaaa";
+				highLight = "#ffffff";
+				highLightBg = "#808080";
+			}
+			
 			var szId = ixmaps.szMapItemId;
 
 			if (0 && !szId.match(/chart/i)) {
@@ -380,6 +394,7 @@
 			}
 
 			var themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
+			showData = themeObj?(themeObj.fShowData?true:showData):showData;
 			
 			if (szId.match(/chart/i)) {
 
@@ -393,64 +408,82 @@
 				// and data  
 				// ---------------------------------------
 				var data = ixmaps.getData(szId);
+				
 
-				if (data) {
+				if ( data && showData ) {
+
+					var szTitle = data.nome || "";
+
+					var suffix = "";
+
+					szHtml += "<div style='padding-top:1.5em;padding-bottom:1em;overflow:auto'>";
+
 					if (data.length > 1) {
-						if (themeObj.szFlag.match(/MEAN/)){
-							szHtml += "<div style='padding:1em 0.5em 0em 1.5em;color:#444'>values are the <b>mean</b> of <b>" + data.length + " </b> aggregated items</div>";
-						}else{
-							szHtml += "<div style='padding:1em 0.5em 0em 1.5em;color:#444'>values are the <b>sum</b> of <b>" + data.length + " </b> aggregated items</div>";
-						}
-					} else {
+						szHtml += "<div style='padding:1em 0.5em 0em 1.5em;color:#aaa'> data of <b>" + data.length + " aggregated items</b></div>";
+					} else
+					if (data.length > 50) {
+						szHtml += "<div style='padding:0 0.5em 0em 1.5em;color:#a00'> list limited to the first 50 items!</div>";
+					}
 
-						szHtml = "<section>";
-						szHtml += "<div style='margin:1em 1em 1em 0.5em'>";
+					for (d = 0; d < Math.min(50, data.length); d++) {
 
-						//szHtml += "<h2><b>" + data[0]['country'] + "</b></h2>";
-						// header
-						szHtml += "<p>" + (themeObj.szDescription||"<div style='color:#dddddd;'>values:</div>") + "</p><br>";
-						//szHtml += "<h1>Overall <b>" + data[0]['mean_overall'] + "</b>/100</h1>";
+						szHtml += "</div><div class='item-list' style='background:" + ((d % 2) ? "none" : "rgba(0,0,0,0.04)") + "'>";
 
-						var max = themeObj.szFieldsA.length;
-
-						szHtml += "<table>";
-						for (var i = 0; i < max; i++) {
-
-							if ( themeObj.nGridX ){
-								if ( i%themeObj.nGridX == 0){
-									szHtml += "<tr><td style='border-bottom:0'>&nbsp;</td></tr>";
-								}
+						szHtml += "<span style='border:solid #bbb 1px;border-radius:15px;padding:0.2em 0.5em'>" + (d + 1) + "</span>" + "<table>"
+						var dataObject = data[d];
+						for (i in dataObject) {
+							if ( (i == "geometry") ) {
+								continue;
 							}
-
-							szHtml += "<tr>";
-							szStyle = 'color:' + themeObj.colorScheme[i % (themeObj.nGridX || 1)];
-							szHtml += "<td>" + themeObj.szFieldsA[i] + "</td><td><b><span style='" + szStyle + "'>" + data[0][themeObj.szFieldsA[i]] + "</span></b> "+themeObj.szUnits+"</td>";
-							szHtml += "</tr>";
-
+							var value = dataObject[i];
+							var szValue = (isNaN(value) || value < 10000) ? String(value) : ixmaps.__formatValue(dataObject[i], 2, "SPACE");
+							if (szValue.match(/http:/) || szValue.match(/https:/)) {
+								if (szValue.match(/.jpg/) || szValue.match(/.png/)) {
+									szValue = "<img  src='" + szValue + "' style='max-width:100%'>";
+									szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
+								} else {
+									szValue = "<a  href='" + szValue + "' target='_blank' style='width:100px'>" + szValue + "</a>";
+									szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
+								}
+							} else {
+								if (!i.match(/------/)) {
+									if (i == themeObj.szSizeField ||
+										i == themeObj.szSymbolField ||
+										i == themeObj.szColorField ||
+										(themeObj.szFieldsA.indexOf(i) >= 0)
+									) {
+										szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' ><b>" + (i.replace(/\_/g, " ")) + "</b></td><td class='value' style='color:" + highLight + ";background:" + highLightBg + "'>" + szValue + suffix + "</td></tr>";
+									} else {
+										szHtml += "<tr><td></td><td class='label'>" + (i.replace(/\_/g, " ")) + "</td><td class='value' style='color:" + normal + "'>" + szValue + suffix + "</td></tr>";
+									}
+								} else {}
+							}
 						}
 						szHtml += "</table>";
-
-
-						szHtml += "</div>";
-						szHtml += "</section>";
+					}
+					szHtml += "</div>";
+					szHtml += "<div style='height:100px'></div>";
+					
+					if (data.length > 50) {
+						szHtml += "<div style='padding:0 0.5em 0em 1.5em;color:#444'> list limited to 50 items!<br>" + (data.length - 50) + " more items not shown!</div>";
+					} else {
+						szHtml += "<br><br>&nbsp;";
 					}
 					
+					if ( (data.length > 1)) {
+						szHtml += "</br>";
+						szHtml += "</br>";
+						szHtml += "</br>";
+						szHtml += "&nbsp;";
+					}
+
 				}else{
-					
-					szHtml = "<section>";
-					szHtml += "<div style='margin:1em 1em 1em 0.5em'>";
-
-					szHtml += "<p>" + (themeObj.szDescription||"") + "</p><br>";
-
+					if (data && (data.length > 1)) {
+						szHtml += "<div style='padding:2em 0.5em 0em 1.5em;color:#aaa'> " + data.length + " items aggregated </div>";
+					} 
+					szHtml += "<div style='padding:1.5em;padding-bottom:1em;overflow:auto;pointer-events:all'>";
+					szHtml += "<a style='text-decoration:none' href='#' title='show data' onclick=\"showData=true;ixmaps.makeItemContent()\">...</a>"
 					szHtml += "</div>";
-					szHtml += "</section>";
-				}
-
-				if (1) {
-					szHtml += "</br>";
-					szHtml += "</br>";
-					szHtml += "</br>";
-					szHtml += "&nbsp;";
 				}
 			} else {
 

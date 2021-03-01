@@ -303,11 +303,11 @@ ixmaps.legend = ixmaps.legend || {};
         var themeObj = ixmaps.getThemeObj(szId);
 		
         var colorA = themeObj.colorScheme;
-        var labelA = themeObj.szLabelA;
+        var labelA = themeObj.szFlag.match(/CATEGORICAL/) ? themeObj.szLabelA : themeObj.szOrigLabelA ;
 		
         // if color field defined, we collect the colors and make legend label here
         // -----------------------------------------------------------------------
-        if (themeObj.colorFieldA) {
+        if (!labelA && themeObj.colorFieldA) {
             labelA = [];
             for (a in themeObj.colorFieldA) {
                 labelA.push(a);
@@ -380,8 +380,8 @@ ixmaps.legend = ixmaps.legend || {};
                         sortA.push({
                             index: i,
                             color: (themeObj.szFlag.match(/INVERT/) ? (nRows - i - 1) : ic),
-                           	count: themeObj.exactCountA[i] //(themeObj.partsA[i].nCount)
-                            //count: (themeObj.partsA[i].nCount)
+                           	//count: themeObj.exactCountA[i] //(themeObj.partsA[i].nCount)
+                            count: (themeObj.partsA[i].nCount)
                         });
                     }
                 } else {
@@ -982,7 +982,7 @@ ixmaps.legend = ixmaps.legend || {};
         // check whether to make compact (one line) legend 
         // -----------------------------------------------
         if (themeObj.szFlag.match(/\bCLIP\b/)) {
-            return ixmaps.legend.makeColorLegendHTMLCompact(szId, szLegendId);
+            return ixmaps.legend.makeColorLegendHTMLLong(szId, szLegendId);
         }
         if ((themeObj.partsA.length == 1) &&
             themeObj.szFlag.match(/DOPACITY/) &&
@@ -1253,6 +1253,13 @@ ixmaps.legend = ixmaps.legend || {};
         __showLegendDialog(szLegendId);
     };
 
+    /**
+     * show item list sidebar 	
+      */
+	ixmaps.legend.showItemList = function(){
+		ixmaps.loadStoryTool('./list.html',{frame:true});
+ 	}
+	
     // redraw or hide legend  
     __switchLegendMode = function () {
         ixmaps.fLegendVisible = true;

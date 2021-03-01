@@ -493,9 +493,13 @@
 					             ixmaps.parentApi.embeddedApi.embeddedApi.bookmark ||
 					             null;
 
+                var szData    = ixmaps.parentApi.data || 
+								ixmaps.parentApi.parentApi.data || 
+								null;
+				
 				// show or hide project selection 
                 //
-                if ( szProject || szBookmark ) {
+                if ( szProject || szBookmark || szData ) {
                     $("#loadProject").hide();
                     $("#legend").hide();
                     $("#loadProjectButton").show();
@@ -560,6 +564,12 @@
 
 				$(".story-body").show();
                 
+  				// execute project, if defined in URL (?project=...)
+				// ----------------------------------------------------------------------
+                if ( szData ){
+					ixmaps.loadData("map",szData);
+				}
+
   				// execute project, if defined in URL (?project=...)
 				// ----------------------------------------------------------------------
                 if ( szProject ){
@@ -680,7 +690,7 @@
 				var data = ixmaps.getData('map',szId);
 				var szTitle = data?data.title:"";
 				ixmaps.szMapItemId = szId;
-				ixmaps.loadStoryTool(szItemUrl,{frame:true});
+				ixmaps.loadStoryTool(szItemUrl);
 				return true;
 			}
 			else{
@@ -689,7 +699,7 @@
 					return false;
 				}
 				ixmaps.szMapItemId = szId;
-				ixmaps.loadStoryTool(szItemUrl,{frame:true});
+				ixmaps.loadStoryTool(szItemUrl);
 				//ixmaps.embeddedSVG.window.map.Api.highlightItem(szId);
 				return true;
 			}

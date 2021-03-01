@@ -466,7 +466,7 @@
 				if ( fDark && (!themeObj.szLineColor || (themeObj.szLineColor == "black") || (themeObj.szLineColor == "#000000") || (themeObj.szLineColor == "RGB(0,0,0)")) ){
 					themeObj.szLineColor = "#888888";
 				}
-				if ( themeObj.szFlag.match(/EXACT/) ){
+				if ( themeObj.szFlag.match(/EXACT|CATEGORICAL/) ){
 					var ptNull = themeObj.drawChart($("#getchartmenutarget"+szLegendId)[0], null, 90, "CHART|PIE|DONUT|HALF|VALUES|EXACT|ORDER|SORT|SUM|AUTO100");
 				}else if ( themeObj.szFlag.match(/HALF/) ) {
 					var ptNull = themeObj.drawChart($("#getchartmenutarget"+szLegendId)[0], null, 90, "CHART|PIE|DONUT|HALF|VALUES|SUM" );
@@ -828,7 +828,7 @@
 			$("#themeLegendDiv").css("border","none");
 			$("#map-legend").css("background","rgba(255,255,255,0.75)");
 			$("legend").css("color","#222");
-			$(".story-body").css("background-color","rgba(255,255,255,0.3)");
+			$(".story-body").css("background-color","rgba(255,255,255,0)");
 			changeCss(".theme-legend-item", "border-bottom:#eee solid 1px" );
 			changeCss("a.theme-legend-item", "border-bottom:#eee solid 1px" );
 

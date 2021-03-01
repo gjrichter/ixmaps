@@ -1513,6 +1513,11 @@ window.ixmaps.legend = window.ixmaps.legend || {};
             changeCss(".loading-text", "color:#666");
        }
     };
+	
+	ixmaps.legend.showItemList = function(){
+   		ixmaps.legend.loadExternalLegend("../../ui/html/tools/list.html");
+	}
+	
 
     /**
      * end of namespace

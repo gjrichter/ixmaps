@@ -344,10 +344,10 @@ MapSelection.prototype.initValues = function(){
 		
 		var bBox = map.Zoom.getBox();
 		this.selectCenterA = [];
-		this.selectionCenter = new point(bBox.x,bBox.y);
+		this.selectionCenter = new point(bBox.x+bBox.width/2,bBox.y+bBox.height/2);
 		this.selectCenterA.push(this.selectionCenter);
-		this.selectBufferSizeX = bBox.width;
-		this.selectBufferSizeY = bBox.height;
+		this.selectBufferSizeX = bBox.width/2;
+		this.selectBufferSizeY = bBox.height/2;
 		this.selectScale = 1; 
 		return true;
 	}
@@ -426,6 +426,23 @@ function __inRange(a,b,c,d){
 	}
 	return false;
 }
+
+function __isPointInPoly(point, vs) {
+	// ray-casting algorithm based on
+    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+    var x = point.x, y = point.y;
+	var inside = false;
+    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+        var xi = vs[i].x, yi = vs[i].y;
+        var xj = vs[j].x, yj = vs[j].y;
+        
+        var intersect = ((yi > y) != (yj > y))
+            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+};
+
 /**
  * realize the map theme
  */
@@ -670,10 +687,19 @@ MapSelection.prototype.selectShapes = function(startIndex){
 					if ( this.szSelectShape == "queryresult" ){
 						fSelected = true;
 					}else{
-						for ( ii=0; ii<this.selectCenterA.length; ii++){
-							if ( __inRange(this.activeTheme.getNodePosition(szMasterId),this.selectCenterA[ii],nSelectRadius,nSelectRadius2) ){
-								fSelected = true;
-								break;
+						if ( this.szFlag.match(/shape/)){
+							// selection by arbitrary shape
+							var bufferNode = SVGDocument.getElementById(this.szSelectShape);
+							var ptPointA = map.Api.getShapePoints(bufferNode.firstChild);
+							fSelected = __isPointInPoly(this.activeTheme.getNodePosition(szMasterId),ptPointA);
+						}else{
+							// selection by rect or circle buffer
+							for ( ii=0; ii<this.selectCenterA.length; ii++){
+								if ( __inRange(this.activeTheme.getNodePosition(szMasterId),
+											   this.selectCenterA[ii],nSelectRadius,nSelectRadius2) ){
+									fSelected = true;
+									break;
+								}
 							}
 						}
 					}
@@ -730,13 +756,47 @@ MapSelection.prototype.selectShapes = function(startIndex){
 						var ptMapOffset = map.Scale.getMapOffset(themeNode);
 						bBox.x += ptMapOffset.x;
 						bBox.y += ptMapOffset.y;
+						// check testie box completely outside selection box
 						if ( bBox.x > this.selectCenterA[0].x+nSelectRadius ||
 							 bBox.y > this.selectCenterA[0].y+nSelectRadius2 ||
 							 bBox.x+bBox.width  < this.selectCenterA[0].x-nSelectRadius || 
 							 bBox.y+bBox.height < this.selectCenterA[0].y-nSelectRadius2 ){
+							// we are done
 							fSelected = false;
 						}else{
-							fSelected = true;
+							// check selection box completely inside testie box
+							if ( bBox.x < this.selectCenterA[0].x-nSelectRadius &&
+								 bBox.y < this.selectCenterA[0].y-nSelectRadius2 &&
+								 bBox.x+bBox.width  > this.selectCenterA[0].x+nSelectRadius && 
+								 bBox.y+bBox.height > this.selectCenterA[0].y+nSelectRadius2 ){
+								
+								// then check if selection center is within polygon
+								var childsA = themeNode.getElementsByTagName('path');
+								var ptPointA = map.Api.getShapePoints(childsA.item(0));
+								var offset = map.Scale.getMapOffset(themeNode);
+								for ( p in ptPointA ){
+									ptPointA[p].x += offset.x;
+									ptPointA[p].y += offset.y;
+								}
+								fSelected = __isPointInPoly(new point(this.selectCenterA[0].x,
+											  						  this.selectCenterA[0].y),ptPointA);
+ 							}else{
+								// check intersection of testie with selection box
+								// check if we find a testie point within the selection box
+								fSelected = false;
+								var childsA = themeNode.getElementsByTagName('path');
+								var ptPointA = map.Api.getShapePoints(childsA.item(0));
+								var offset = map.Scale.getMapOffset(themeNode);
+								for ( p in ptPointA ){
+									if ( ptPointA[p].x+offset.x <= this.selectCenterA[0].x+nSelectRadius &&
+										 ptPointA[p].y+offset.y <= this.selectCenterA[0].y+nSelectRadius2 &&
+										 ptPointA[p].x+offset.x >= this.selectCenterA[0].x-nSelectRadius && 
+										 ptPointA[p].y+offset.y >= this.selectCenterA[0].y-nSelectRadius2 ){
+										fSelected = true;
+										break;	
+									}
+								}
+							}
 						}
 					}
 				}
@@ -749,7 +809,7 @@ MapSelection.prototype.selectShapes = function(startIndex){
 				
 					if ( this.szThemes == "generic" ){
 
-						this.itemA[szMasterId] = null;
+						this.itemA[szMasterId] = this.activeTheme.itemA[szMasterId];
 						this.nSelected++;
 
 					}else{
@@ -827,11 +887,12 @@ MapSelection.prototype.selectShapes = function(startIndex){
 							if ( activeThemeItem.nValue100 ){
 								this.nSum100 += activeThemeItem.nValue100;
 							}
-							if ( this.activeTheme.szFlag.match(/CATEGORICAL|AGGREGATE/) ){
-								console.log(activeThemeItem);
+							if ( this.activeTheme.szFlag.match(/AGGREGATE/) && 
+							     this.activeTheme.szFlag.match(/CATEGORICAL/)){
+								console.log(activeThemeItem.nValuesA);
 								for ( var p=0;p<this.partsA.length;p++ ){
-									this.partsA[p].nCount += activeThemeItem.nValuesA[p];
-									this.partsA[p].nSum += activeThemeItem.nValuesA[p];
+									this.partsA[p].nCount += (activeThemeItem.nValuesA[p]?1:0);
+									this.partsA[p].nSum += activeThemeItem.nValuesA[p]||0;
 									this.nSum += activeThemeItem.nValuesA[p];
 									this.nExactCount++;
 									this.exactSizeA[p] += activeThemeItem.nSize||1;

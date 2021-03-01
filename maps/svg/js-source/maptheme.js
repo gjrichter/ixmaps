@@ -110,6 +110,7 @@ var themeStyleTranslateA = [
 	,{ style: "child"			,obj: "fChild" }
 	,{ style: "crsdatum"		,obj: "szCRSDatum" }
 	,{ style: "crsutmzone"		,obj: "szCRSUTMZone" }
+	,{ style: "server"			,obj: "szServer" }
 
 	//,{ style: "ranges"			,obj: "szRanges" }
 	,{ style: "ranges"			,obj: "szRangesA" ,type: "array" }
@@ -795,6 +796,9 @@ Map.Themes.prototype.parseStyle = function (mapTheme, styleObj) {
 		if (__isdef(styleObj.crsdatum)) {
 			mapTheme.szCRSDatum = styleObj.crsdatum;
 		}
+		if (__isdef(styleObj.server)) {
+			mapTheme.szServer = styleObj.server;
+		}
 		if (__isdef(styleObj.itemfield)) {
 			mapTheme.szItemField = styleObj.itemfield;
 		}
@@ -1426,6 +1430,12 @@ Map.Themes.prototype.getMapThemeDefinitionObj = function (szId) {
 	newObj.layer = themeObj.szThemes;
 	newObj.field = themeObj.szFields || "";
 	newObj.field100 = themeObj.szField100 || "";
+	
+	// GR 10.02.2021 new theme type WMS server has only one parameter 
+	if ( themeObj.szFlag.match(/\bWMS\b/) ){
+		newObj.style = {"type":"WMS","server":themeObj.szServer};
+		return newObj;
+	}
 
 	// GR 11.11.2019 make values array for CATEGORICAL themes is not exists but label are defined 
 	// label are created while loading and parsing data
@@ -5163,6 +5173,11 @@ Map.Themes.prototype.actualizeActiveTheme = function (nZoomChangeFactor) {
 		if (!this.themesA[i].fDone) {
 			continue;
 		}
+		if (this.themesA[i].szFlag.match(/WMS/)) {
+			this.themesA[i].fRealize = true;
+			executeWithMessage("map.Themes.execute()", "...", 100);
+			continue;
+		}
 		if (this.themesA[i].szFlag.match(/CHART/)) {
 			if (this.themesA[i].__fClipToGeoBounds) {
 				this.themesA[i].fRealize = true;
@@ -6238,6 +6253,71 @@ MapTheme.prototype.realize = function () {
 	_TRACE("== MapTheme.realize() ==> ");
 	_TRACE("========================> ");
 	_TRACE(" ");
+	
+	if (this.szFlag.match(/WMS/)) {
+		
+		if ( !this.chartGroup ){
+			this.chartGroup = map.Dom.newGroup(map.Layer.layerNode, this.szThemesA[0]);
+			map.Layer.listA[this.szThemesA[0]] = new Map.Layer.Item(null);
+			map.Layer.listA[this.szThemesA[0]].szName = this.szThemesA[0];
+		}
+		
+		var mapGeoBounds = map.Zoom.getBoundsOfMapInGeoBounds();
+		var width = map.Scale.viewBox.width/map.Zoom.nZoomX;
+		var height = map.Scale.viewBox.height/map.Zoom.nZoomY;
+		
+		var imageWidth  = map.Scale.bBox.width/20;
+		var imageHeight = map.Scale.bBox.height/20;
+		
+		if (this.nChartLower && (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nChartLower)) {
+			map.Dom.clearGroup(this.chartGroup);
+			return;
+		}
+		if (this.nChartUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nChartUpper)) {
+			map.Dom.clearGroup(this.chartGroup);
+			return;
+		}
+		var newShape = map.Dom.constructNode('image', this.chartGroup, {
+			'xlink:href': this.szServer+'?f=image&transparent=true&bbox='+
+			mapGeoBounds[0].x+','+
+			mapGeoBounds[0].y+','+
+			mapGeoBounds[1].x+','+
+			mapGeoBounds[1].y+'&bboxSR=4326&size='+
+			imageWidth+','+
+			imageHeight+'',
+			'x':-map.Scale.mapCenter.x/map.Zoom.nZoomX-width/2,
+			'y':-map.Scale.mapCenter.y/map.Zoom.nZoomY-height/2,
+			'style':'width:'+width+';height:'+height+''+";opacity:"+(this.nOpacity||0.8)+";pointer-events:none;"
+		});
+		/**
+		var newShape = map.Dom.constructNode('image', this.chartGroup, {
+			'xlink:href': 'https://image.discomap.eea.europa.eu/arcgis/rest/services/GioLandPublic/HRL_ImperviousnessDensity_2018/ImageServer/exportImage?f=image&renderingRule=%7B%22rasterFunction%22%3A%22IMD_MosaicSymbology.rft%22%7D&bbox='+
+			mapGeoBounds[0].x+'%2C'+
+			mapGeoBounds[0].y+'%2C'+
+			mapGeoBounds[1].x+'%2C'+
+			mapGeoBounds[1].y+'&imageSR=102100&bboxSR=4326&size='+
+			imageWidth+'%2C'+
+			imageHeight+'',
+			'x':-map.Scale.mapCenter.x/map.Zoom.nZoomX-width/2,
+			'y':-map.Scale.mapCenter.y/map.Zoom.nZoomY-height/2,
+			'style':'width:'+width+';height:'+height+''+";opacity:0.8;"
+		});
+		**/
+		
+		
+		
+		var childs = this.chartGroup.childNodes.length;
+		if ( (childs>1) && this.fDone ){
+			var szId = this.szId;
+			setTimeout(function(){
+				map.Themes.getTheme(szId).chartGroup.removeChild(map.Themes.getTheme(szId).chartGroup.firstChild);
+			},1000);
+		}
+		
+		this.fDone = true;
+		return;
+	}
+	
 
 	var x = new Date();
 
@@ -8569,7 +8649,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 			// make a new item in any case 
 			//
 			// ============================================
-
+			
 			// if item with id exists, make unique id by adding a random value 
 			if (this.itemA[szId]) {
 				szId += "*" + Math.random();
@@ -12611,7 +12691,7 @@ MapTheme.prototype.labelMap = function (startIndex) {
 				return;
 			}
 		}
-
+		
 		var a = this.indexA[nAi];
 
 		this.nDoneCount++;
@@ -13663,6 +13743,15 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				continue;
 			}
 			
+			var szGeo = this.objTheme.dbRecords[this.itemA[a].dbIndex][this.objTheme.nFieldSelectionIndex];
+			if (!szGeo.match(/coordinates/i)){
+				var ptOff = this.itemA[a].ptPos || this.getNodePosition(selectionId);
+				if ( ptOff ){
+					shapeGroup.fu.setMatrix([this.nChartGroupScaleX, 0, 0, this.nChartGroupScaleY, ptOff.x, ptOff.y]);
+				}
+				continue;
+			}
+			
 			// ------------------------------
 			// geojson features 
 			// ------------------------------
@@ -13697,7 +13786,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				map.Layer.listA[this.szThemesA[0]].szType = "line";
 				var coordinatesA = json.coordinates;
 				var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[0][1],coordinatesA[0][0]);
-				var d = "M"+pt.x+","+pt.y+" l";
+				var d = "M "+pt.x+","+pt.y+" l ";
 				var ptAct = new point(pt.x, pt.y);
 				for (i in coordinatesA){
 					var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[i][1],coordinatesA[i][0]);
@@ -13721,7 +13810,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					var ptAct = null;
 					
 					var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[0][1],coordinatesA[0][0]);
-					var d = "M"+(pt.x) +','+ (pt.y) +" l";
+					var d = "M "+(pt.x) +','+ (pt.y) +" l ";
 					ptAct = new point(pt.x, pt.y);
 					
 					for (ii in coordinatesA){
@@ -13748,7 +13837,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					var ptAct = null;
 					
 					var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[0][1],coordinatesA[0][0]);
-					d += "M"+(pt.x) +','+ (pt.y) +" l";
+					d += "M "+(pt.x) +','+ (pt.y) +" l ";
 					ptAct = new point(pt.x, pt.y);
 					
 					for (ii in coordinatesA){
@@ -13784,9 +13873,9 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					for (i in linesA){
 						var coordinatesA = linesA[i];
 						var ptAct = null;
-
+						
 						var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[0][1],coordinatesA[0][0]);
-						d += "M"+(pt.x) +','+ (pt.y) +" l";
+						d += "M "+(pt.x) +','+ (pt.y) +" l ";
 						ptAct = new point(pt.x, pt.y);
 
 						for (ii in coordinatesA){
@@ -16173,7 +16262,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					} else
 					if (szFlag.match(/LABEL/) || (nFontSize > map.Scale.normalX(1))) {
 						var nOpacity = this.nValueSizeMin ? (nFontSize / map.Scale.normalX(5)) : 1;
-						newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:arial;font-size:" + nFontSize + "px;font-weight:bold;text-anchor:middle;fill:" + szTextColor + ";opacity:" + nOpacity + ";stroke:none;pointer-events:none", szText);
+						newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:"+(this.szTextFont||"arial")+";font-size:" + nFontSize + "px;font-weight:bold;text-anchor:middle;fill:" + szTextColor + ";opacity:" + nOpacity + ";stroke:none;pointer-events:none", szText);
 					}
 				}
 				if (szFlag.match(/DTEXT/) && a && !szFlag.match(/ZOOM/)) {
@@ -16731,7 +16820,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							if (szFlag.match(/VALUES/)) {
 								var cColor = __maptheme_getChartColors(szColor);
 								szLineColor = cColor.textColor;
-								var newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:arial;font-size:" + String(nRadius / 2) + "px;text-anchor:start;baseline-shift:-90%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", szLabel);
+								var newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:"+(this.szTextFont||"arial")+";font-size:" + String(nRadius / 2) + "px;text-anchor:start;baseline-shift:-90%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", szLabel);
 								newText.fu.setPosition(nIndex * nRadius * 2, -nRadius - map.Scale.normalX(5));
 								if (nPartsA.length > 1) {
 									setRotate(newText, -45);
@@ -16741,7 +16830,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								var cColor = __maptheme_getChartColors(szColor);
 								szLineColor = cColor.textColor;
 								var szAxisText = this.szXaxisA[i];
-								var newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:arial;font-size:" + String(nRadius) + "px;text-anchor:start;baseline-shift:-90%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", szAxisText);
+								var newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:"+(this.szTextFont||"arial")+";font-size:" + String(nRadius) + "px;text-anchor:start;baseline-shift:-90%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", szAxisText);
 								newText.fu.setPosition(nIndex * nRadius * 2 + map.Scale.normalX(2), nRadius + map.Scale.normalX(1));
 								if (nPartsA.length > 1) {
 									setRotate(newText, 45);
@@ -16753,7 +16842,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							if (szFlag.match(/VALUES/) && (!this.fHideValues || szFlag.match(/ZOOM/))) {
 								var cColor = __maptheme_getChartColors(szColor);
 								szLineColor = cColor.textColor;
-								var newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:arial;font-size:" + String(nRadius / 2) + "px;text-anchor:start;baseline-shift:-45%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", szLabel);
+								var newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:"+(this.szTextFont||"arial")+";font-size:" + String(nRadius / 2) + "px;text-anchor:start;baseline-shift:-45%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", szLabel);
 								newText.fu.setPosition(nRadius + map.Scale.normalX(3), -nIndex * (nRadius * 2 - map.Scale.normalY(0)));
 							}
 							newShape.setAttributeNS(szMapNs, "tooltip", szTooltip);
@@ -16802,16 +16891,16 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						}
 						newShape.fu.setPosition(map.Scale.normalX(0) + nIndex * map.Scale.normalX(20), map.Scale.normalY(0));
 						if (nIndex > 0) {
-							map.Dom.newText(shapeGroup, map.Scale.normalX(-9) + nIndex * map.Scale.normalX(20), 0, "font-family:arial;font-size:" + String(360) + "px;text-anchor:middle;baseline-shift:-50%;fill:none;stroke:black;stroke-width:60;pointer-events:none;opacity:0.3;", "+");
-							map.Dom.newText(shapeGroup, map.Scale.normalX(-9) + nIndex * map.Scale.normalX(20), 0, "font-family:arial;font-size:" + String(360) + "px;text-anchor:middle;baseline-shift:-50%;fill:white;stroke:none;pointer-events:none;opacity:0.8;", "+");
+							map.Dom.newText(shapeGroup, map.Scale.normalX(-9) + nIndex * map.Scale.normalX(20), 0, "font-family:"+(this.szTextFont||"arial")+";font-size:" + String(360) + "px;text-anchor:middle;baseline-shift:-50%;fill:none;stroke:black;stroke-width:60;pointer-events:none;opacity:0.3;", "+");
+							map.Dom.newText(shapeGroup, map.Scale.normalX(-9) + nIndex * map.Scale.normalX(20), 0, "font-family:"+(this.szTextFont||"arial")+";font-size:" + String(360) + "px;text-anchor:middle;baseline-shift:-50%;fill:white;stroke:none;pointer-events:none;opacity:0.8;", "+");
 						}
 						if (szFlag.match(/VALUES/)) {
 							var cColor = __maptheme_getChartColors(szColor);
 							szLineColor = cColor.textColor;
-							var newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:arial;font-size:" + String(nRadius / 2) + "px;text-anchor:start;baseline-shift:-45%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", szLabel);
+							var newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:"+(this.szTextFont||"arial")+";font-size:" + String(nRadius / 2) + "px;text-anchor:start;baseline-shift:-45%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", szLabel);
 							newText.fu.setPosition(nRadius / 2 + map.Scale.normalX(3), -nIndex * (nRadius * 2));
 							if (szFlag.match(/MULTILINE/) && this.szSizeField && a && this.itemA[a]) {
-								newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:arial;font-size:" + String(nRadius / 2) + "px;text-anchor:start;baseline-shift:-45%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", String(this.itemA[a].nSize) + this.szSizeValueUnits);
+								newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:"+(this.szTextFont||"arial")+";font-size:" + String(nRadius / 2) + "px;text-anchor:start;baseline-shift:-45%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", String(this.itemA[a].nSize) + this.szSizeValueUnits);
 								newText.fu.setPosition(nRadius / 2 + map.Scale.normalX(3), -nIndex * (nRadius * 2) + (nRadius / 2));
 							}
 						}
@@ -17268,7 +17357,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						if (szSymbol == "circle" || szSymbol == "square" || szSymbol == "triangle" || szSymbol == "hexagon" || szSymbol == "label" || szSymbol == "empty") {
 							if (szFlag.match(/CENTERVALUES/)) {
 								if (nClass === 0) {
-									newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:arial;font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szText);
+									newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:"+(this.szTextFont||"arial")+";font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szText);
 								}
 							} else
 							if ((szFlag.match(/CENTER/) || szFlag.match(/TOP/) || szFlag.match(/BOTTOM/)) && !(szFlag.match(/DOMINANT/))) {
@@ -17293,12 +17382,12 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								}
 							} else {
 								if (this.szValueField && szFlag.match(/2VALUES/)) {
-									newText = map.Dom.newText(shapeGroup, 0, -nFontSize * 0.2, "font-family:arial;font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szText);
+									newText = map.Dom.newText(shapeGroup, 0, -nFontSize * 0.2, "font-family:"+(this.szTextFont||"arial")+";font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szText);
 									var nFontSize2 = Math.min(nFontSize * 0.8, 120); // * ((szFlag.match(/ZOOM/))?2:1);
 									var szValue = this.formatValue(nValue, this.nValueDecimals || 0) + this.szUnit;
-									newText2 = map.Dom.newText(shapeGroup, 0, (nFontSize - nFontSize2 * 0.2), "font-family:arial;font-size:" + nFontSize2 + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szValue);
+									newText2 = map.Dom.newText(shapeGroup, 0, (nFontSize - nFontSize2 * 0.2), "font-family:"+(this.szTextFont||"arial")+";font-size:" + nFontSize2 + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szValue);
 								} else {
-									newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:arial;font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szText);
+									newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:"+(this.szTextFont||"arial")+";font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szText);
 								}
 							}
 						} else {
@@ -17759,7 +17848,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 									if ( this.nXLen > 10 ){
 										var nModulo = Math.floor(this.nXLen/5);  
 										var ai = Math.floor(i/(this.nGridX||1));
-										if ( (ai != 0) && (ai != this.nXLen-2) ){
+										if ( (ai != 0) && (ai != this.nXLen-1) ){
 											if (!this.szXaxisA || !this.szXaxisA.length || ((this.nXLen > 100)&&(ai >= this.nXLen-5))) {
 												newText.parentNode.removeChild(newText);
 											}else
@@ -17837,6 +17926,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
 												plotShape.setAttributeNS(szMapNs, "tooltip",  this.formatValue(nValue, this.nValueDecimals || 2) + this.szUnit + " " + (this.szLabelA ? (this.szLabelA[nClass % (this.nGridX || 1000000)]) : ""));
 											}
+											plotShape = map.Dom.newShape('line', gridGroup, this.plot_last_position[yi].x, this.plot_last_position[yi].y, nAxis, (-nPValue) * nScale, "stroke:" + (this.szLineColor || szColor) + ";stroke-width:" + map.Scale.normalX(this.nLineWidth || 3) + ";stroke-linecap:round;stroke-opacity:0.3");
 										} else {
 											plotShape = map.Dom.newShape('line', plotGroup, this.plot_last_position[yi].x, this.plot_last_position[yi].y, nAxis, (-nPValue) * nScale, "stroke:" + (this.szLineColor || szColor) + ";stroke-width:" + map.Scale.normalX(this.nLineWidth || 3) + ";stroke-linecap:round;");
 											if ( this.nXLen < 25 ){
@@ -17856,7 +17946,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 										}
 									}
 									if (szFlag.match(/LOLLIPOP/) && nValue) {
-										plotShape = map.Dom.newShape('line', gridGroup, nAxis, 0, nAxis, (-nPValue) * nScale, "stroke:" + (szColor) + ";stroke-width:" + map.Scale.normalX(3) + ";stroke-linecap:round;");
+										plotShape = map.Dom.newShape('line', plotGroup, nAxis, 0, nAxis, (-nPValue) * nScale, "stroke:" + (szColor) + ";stroke-width:" + map.Scale.normalX(3) + ";stroke-linecap:round;");
 										if (plotShape) {
 											plotShape.setAttributeNS(szMapNs, "value", String(nValue));
 											plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
@@ -17900,7 +17990,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 								} else
 								if (szFlag.match(/LOLLIPOP/) && nValue) {
-									plotShape = map.Dom.newShape('line', gridGroup, nAxis, 0, nAxis, (-nPValue) * nScale, "stroke:" + (szColor) + ";stroke-width:" + map.Scale.normalX(3) + ";stroke-linecap:round;");
+									plotShape = map.Dom.newShape('line', plotGroup, nAxis, 0, nAxis, (-nPValue) * nScale, "stroke:" + (szColor) + ";stroke-width:" + map.Scale.normalX(3) + ";stroke-linecap:round;");
 									if (plotShape) {
 										plotShape.setAttributeNS(szMapNs, "value", String(nValue));
 										plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));

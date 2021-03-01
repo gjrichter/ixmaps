@@ -2163,7 +2163,7 @@
 
 					var typeId = ixmaps.parentApi.htmlgui_getMapTypeId() || ixmaps.htmlgui_getMapTypeId();
 
-					var fDark = typeId.match(/dark/i) || typeId.match(/black/i);
+					var fDark = typeId.match(/dark/i) || typeId.match(/black/i) || typeId.match(/satellite/i);
 
 					if (fDark) {
 						$("body").css("background-color", "#707070");

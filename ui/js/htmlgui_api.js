@@ -566,6 +566,18 @@ $Log: htmlgui_api.js,v $
 	};
 
 	/**
+	 * load a data feed (CSV, JSON,... )into an embed context defined by a registered map name
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szUrlData the url of the data feed to be loaded
+	 * @return void
+	 */
+	ixmaps.loadData = function(szMap,szUrlData,szFlag){
+		__checkArguments(arguments,2,"loadData()");
+		this.isMap = false;
+		this.dispatchToEmbeddedApi(szMap,"loadData",[szUrlData,szFlag]);
+	};
+	
+	/**
 	 * load a new project (json) into an embed context defined by a registered map name
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
 	 * @param {String} szUrlProject the url of the SVG map to be loaded

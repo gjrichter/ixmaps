@@ -385,7 +385,7 @@ $Log: htmlgui_story.js,v $
 			});
 			ixmaps.embeddedSVG.window.map.Api.clearHighlight();
 			ixmaps.embeddedSVG.window.map.Api.clearAllOverlays();
-			//ixmaps.embeddedSVG.window.map.Api.setMapTool("pan");
+			ixmaps.embeddedSVG.window.map.Api.setMapTool("pan");
 		}
 		
 		try {
@@ -410,6 +410,7 @@ $Log: htmlgui_story.js,v $
 		}else{
 			var the_height = Math.min($('#story-tool-content').height(),window.innerHeight);
 		}
+
 		the_height += 40;
 		if ( the_height > 100 ){
 			window.document.getElementById('story-tool').style.height= the_height+"px";

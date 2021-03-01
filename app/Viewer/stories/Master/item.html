@@ -58,6 +58,10 @@
 			color: #4466ff;
 		}
 
+		a {
+			color: #4466ff;
+		}
+
 		object {
 			margin: 0;
 			padding: 0;
@@ -152,7 +156,7 @@
 			var source = oldTarget = event.target;
             
             oldOpacity = oldOpacity || source.style.getPropertyValue("fill-opacity");
-            source.style.setProperty("fill-opacity","1");
+            //source.style.setProperty("fill-opacity","1");
             
 			while (!szTooltip && source) {
 				szTooltip = source.getAttribute("tooltip");
@@ -162,6 +166,7 @@
 				}
 				source = source.parentNode;
 			}
+			event.target.style.setProperty("fill-opacity","1");
 			showTooltip(event, szTooltip);
 			event.stopPropagation();
 			event.preventDefault();
@@ -233,7 +238,13 @@
 				SVGBox.y -= 30;
 				SVGBox.height += 60;
 
-				var size = __themeObj.szFlag.match(/PLOT|HORZ|STACKED/) ? 400 : 300;
+				var size = 200;
+				if (__themeObj.szFlag.match(/PIE|BAR|SEQUENCE/)){
+					size = 300;
+				} else
+				if (__themeObj.szFlag.match(/PLOT|HORZ|STACKED/)){
+					size = 400;
+				} 
 				var width = size;
 				var height = size / SVGBox.width * SVGBox.height;
 
@@ -274,7 +285,7 @@
 						}
 					}
 					szHtml += "<span style='color:" + (__themeObj.szLineColor || item.szColor) + ";margin-top:0.5em'>" + szValue + " " + __themeObj.szUnits + "<h1>";
-					szHtml += "</span>";
+					szHtml += "</span></div>";
 
 					$("#chartDiv").html(szHtml);
 					$("#chartDiv").height("auto");
@@ -442,11 +453,12 @@
 						szHtml += "</table>";
 					}
 					szHtml += "</div>";
-
+					szHtml += "<div style='height:100px'></div>";
+					
 					if (data.length > 50) {
 						szHtml += "<div style='padding:0 0.5em 0em 1.5em;color:#444'> list limited to 50 items!<br>" + (data.length - 50) + " more items not shown!</div>";
 					} else {
-						szHtml += "<br><br>";
+						szHtml += "<br><br>test";
 					}
 					
 					if ( (data.length > 1)) {
@@ -461,7 +473,7 @@
 						szHtml += "<div style='padding:2em 0.5em 0em 1.5em;color:#aaa'> " + data.length + " items aggregated </div>";
 					} 
 					szHtml += "<div style='padding:1.5em;padding-bottom:1em;overflow:auto;pointer-events:all'>";
-					szHtml += "<a href='#' title='show data' onclick=\"showData=true;ixmaps.makeItemContent()\">...</a>"
+					szHtml += "<a style='text-decoration:none' href='#' title='show data' onclick=\"showData=true;ixmaps.makeItemContent()\">...</a>"
 					szHtml += "</div>";
 				}
 
@@ -514,9 +526,10 @@
 
 				// list shape info
 				// --------------------------
+				/**
 				var szHtml = "";
 				if (!themeObj) {
-					szHtml += "<div style='margin-top:1em;color:#888888;background:#ffffff;width:100%;padding:1.5em;overflow:auto'>";
+					szHtml += "<div style='margin-top:1em;color:#888888;background:#ffffff;padding:1.5em;overflow:auto'>";
 					szHtml += "<h5 style='font-size:1.3em'>" + (szLayerName) + "</br>";
 					szHtml += "" + (szItemName) + "</h5>";
 					szHtml += "</div>";
@@ -524,7 +537,8 @@
 					szHtml += "<div style='background:#ffffff;width:100%;'>&nbsp;";
 					szHtml += "</div>";
 				}
-
+				**/
+				
 				// get map shape metadata or theme data
 				// ------------------------------------
 				var child = obj.childNodes.item(1);
@@ -549,11 +563,11 @@
 					szHtml += "</div>";
 				}else{
 					szHtml += "<div style='margin-top: -1em;padding:0 1.5em 1em 1.5em;overflow:auto;background:#ffffff;pointer-events:all'>";
-					szHtml += "<a href='#' title='show data' onclick=\"showData=true;ixmaps.makeItemContent()\">...</a>"
+					szHtml += "<a style='text-decoration:none' href='#' title='show data' onclick=\"showData=true;ixmaps.makeItemContent()\">...</a>"
 					szHtml += "</div>";
 				}
 
-				$("#result-div").css("height", "0");
+				//$("#result-div").css("height", "0");
 
 				// set tooltip for cloned SVG shape  
 				// ---------------------------------

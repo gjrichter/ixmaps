@@ -1110,12 +1110,14 @@ Map.Api.prototype.getShapePoints = function(objNode){
 		var ptOff = new point(0,0);
 		var szD = objNode.getAttributeNS(null,"d");
 		szD = szD.substr(1,szD.length-2);
+		szD.replace("M","M ");
 		var szDA = szD.split(' ');
 		for ( var i=0; i<szDA.length; i++){
 			if ( (szDA[i]=='l') || (szDA[i]=='L') ){
 				fMode = szDA[i];
 			}
-			else{
+			else
+			if ( szDA[i] && szDA[i].length ) {
 				var szDPA = szDA[i].split(',');
 				if ( fMode == 'l' ){
 					ptList[ptList.length] = new point(ptOff.x+Number(szDPA[0]),ptOff.y+Number(szDPA[1]));

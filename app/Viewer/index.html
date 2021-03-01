@@ -62,6 +62,11 @@
 				ixmaps.story = $(document).getUrlParam('story');
 			}
 			
+			// is there data to load into the viewer ?
+			if ($(document).getUrlParam('data')) {
+				ixmaps.data = $(document).getUrlParam('data');
+			}
+			
 			// is there a story to load into the viewer ?
 			if ($(document).getUrlParam('layout')) {
 				ixmaps.layout = $(document).getUrlParam('layout');

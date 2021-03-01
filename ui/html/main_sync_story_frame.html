@@ -329,6 +329,9 @@
 		var src = szEmbedUI + "&basemap="	+ szBaseMap 
 							+ "&name="		+ ixmaps.szName 
 							+ "&svggis="	+ szUrl;
+		
+		// API
+		// --------------------------------------------------------
 
 		if ( $(document).getUrlParam('map') ){
 			src += "&map="+decodeURIComponent($(document).getUrlParam('map'));
@@ -426,6 +429,10 @@
 
 		if ( $(document).getUrlParam('project') ){
 			src += "&project="+$(document).getUrlParam('project');
+			}
+
+		if ( $(document).getUrlParam('data') ){
+			src += "&project="+$(document).getUrlParam('data');
 			}
 
 		$("#map").html("<iframe id='embed-cross' src=\"" + src + "\" " +

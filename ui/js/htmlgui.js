@@ -1065,6 +1065,37 @@ $Log: htmlgui.js,v $
 			ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(theme);
 		} catch (e) {}
 	};
+	ixmaps.newStyleThemeJson = function (origTheme) {
+		var theme = {};
+		theme.layer = origTheme.layer;
+		theme.data = {};
+		theme.field = origTheme.field;
+		theme.field100 = origTheme.field100;
+		theme.style = origTheme.style;
+		for (var i in theme.style) {
+			if (i == "dbtable") {
+				theme.data["name"] = theme.style[i];
+				theme.style[i] = null;
+			}
+			if (i == "dbtableType") {
+				theme.data["type"] = theme.style[i];
+				theme.style[i] = null;
+			}
+			if (i == "dbtableUrl") {
+				theme.data["url"] = theme.style[i];
+				theme.style[i] = null;
+			}
+			if (i == "dbtableExt") {
+				theme.data["ext"] = theme.style[i];
+				theme.style[i] = null;
+			}
+			if (i == "datacache") {
+				theme.data["cache"] = theme.style[i];
+				theme.style[i] = null;
+			}
+		}
+		return theme;
+	};
 	ixmaps.refreshTheme = function (szThemeId) {
 		try {
 			ixmaps.embeddedSVG.window.map.Api.refreshTheme(szThemeId);
@@ -1251,7 +1282,9 @@ $Log: htmlgui.js,v $
 			if (!szThemeName) {
 				szThemeName = ixmaps.parentApi.getLegendThemeId();
 			}
-			return ixmaps.embeddedSVG.window.map.Api.getMapThemeDefinitionObj(szThemeName);
+			var themeObj = ixmaps.embeddedSVG.window.map.Api.getMapThemeDefinitionObj(szThemeName); 
+			//themeObj = ixmaps.newStyleThemeJson(themeObj);
+			return themeObj;
 		} catch (e) {
 			return null;
 		}
@@ -1530,6 +1563,9 @@ $Log: htmlgui.js,v $
 		} catch (e) {
 			alert('map api error!');
 		}
+	};
+	ixmaps.setMapTool = function (szMode) {
+		ixmaps.mapTool(szMode);
 	};
 	ixmaps.getMapTool = function () {
 		try {
@@ -2524,7 +2560,7 @@ $Log: htmlgui.js,v $
 							}
 						}
 						if (!fLoading && __lastOptionName && (options.name == __lastOptionName) ) {
-							ixmaps.showLoadingArrayStop();
+							//ixmaps.showLoadingArrayStop();
 						}else{
 							__lastOptionName = options.name;
 						}
@@ -3158,6 +3194,182 @@ $Log: htmlgui.js,v $
 		return szProject;
 	};
 
+	/**
+	 * load an ixmaps project    
+	 * @param szUrl the relative or absolute URL of the ixmaps project file
+	 * @type void
+	 */
+	ixmaps.loadData = function (szUrl, szFlag) {
+		setTimeout("ixmaps.doLoadData('"+szUrl+"','"+szFlag+"')",1000);
+	};
+	ixmaps.doLoadData = function (szUrl, szFlag) {
+		
+		var tt = {
+			"layer": "World Mercator",
+			"field": "$item$",
+			"field100": "",
+			"style": {
+				"type": "CHART|BUBBLE|FAST|MULTIQUAD|ZOOMTO|SIMPLELEGEND",
+				"colorscheme": [
+					"blue"],
+				"fillopacity": "0.7",
+				"shadow": "false",
+				"dbtable": "themeDataObj",
+				"dbtableUrl": "http://corsme.herokuapp.com/http://turismo.comune.civitanova.mc.it/wp-content/blogs.dir/9/sites/9/csv/C_C770_dataset_strutture-ricettive-extra-alberghiere_1608373621.csv",
+				"dbtableType": "csv",
+				"datacache": "true",
+				"showdata":"true",
+				"lookupfield": "Latitudine|Longitudine",
+				"symbols": [
+					"circle"],
+				"label":"items",
+				"units": "",
+				"refreshtimeout": "0",
+				"scale": "1",
+				"valuescale": "1",
+				"valuedecimals": "0",
+				"title": "dataset"
+				}
+		};
+
+		// load data from URL
+		// ------------------
+		$.get(szUrl,
+			function (data) {
+				if (data[0] == "{" ){
+					alert("json");
+				}else{
+					objTheme = {};
+					objTheme.layer = "World Mercator";
+					objTheme.fields = "$item$";
+					objTheme.style = {};
+					objTheme.style.type = "CHART|DOT",
+					objTheme.style.colorscheme = ["blue"],
+					objTheme.style.dbtableUrl = szUrl;
+					objTheme.style.dbtableType = "csv";
+					objTheme.style.dbtable = "themeDataObj";
+					objTheme.style.lookupfield = "Latitudine|Longitudine";
+					ixmaps.loadedProject = ixmaps.loadedProject || {};
+					ixmaps.loadedProject.map = ixmaps.loadedProject.map || {};
+					ixmaps.loadedProject.map.item = "html";
+					
+					tt.style.dbtableUrl = szUrl;
+					if ( szUrl.match(/corsme/) ){
+						szUrl = "http:"+szUrl.split("http:")[2];
+					}
+					tt.style.snippet = "fonte: <br><a href='"+szUrl+"'><small style='overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display:block; width:100%'>"+szUrl+"</small></a>";
+					ixmaps.newTheme("project", tt, "clear");
+				}
+			}).fail(function (e) {
+			ixmaps.error('loading error with:' + szUrl);
+		});
+
+	};
+	
+	ixmaps.editor = ixmaps.editor || {};
+	ixmaps.editor.analyseValues = function(a) {
+
+		var themeObj = {
+			"type": "",
+			"style": {
+				"type": ""
+			}
+		};
+
+		if (!a || (typeof(a) != "object")) {
+			return null;
+		}
+
+		// get unique valyes array
+		var onlyUnique = function(value, index, self) {
+			return self.indexOf(value) === index;
+		};
+		var u = a.filter(onlyUnique);
+
+		// if less than 20 unique values, assume distinct values -> theme type CATEGORICAL
+		// 
+		nDistinct = u.length;
+
+		// if only one vale == 1
+		// 
+		if ((nDistinct == 1) && (u[0] == 1)) {
+			themeObj.type = "item"
+			themeObj.style.type += "|DOT";
+			return themeObj;
+		}
+
+		// if less than 20 unique values, assume distinct values -> theme type CATEGORICAL
+		// 
+		if (0 && (nDistinct < 5)) {
+
+			// sort the values to give the themes always the same value sequence
+			u.sort();
+			// correct known problem; ["dopo ...","entro ...","entro ...",...]
+			if (String(u[0]).match(/dopo/)) {
+				u.push(u.shift());
+			}
+			// set the values in the theme object !!! 
+			themeObj.style.label = [];
+			for (i = 0; i < u.length; i++) {
+				themeObj.style.label.push(String(u[i]));
+			}
+			// set the theme distribution type 
+			themeObj.type = "exact";
+			themeObj.style.type += "|CATEGORICAL";
+			themeObj.style.colorscheme = ["7", "fruit"];
+		} else {
+			// if we have textual values, make always CATEGORICAL 
+			if (isNaN(u[0])) {
+				themeObj.type = "exact";
+				themeObj.style.type += "|CATEGORICAL";
+				themeObj.style.colorscheme = ["7", "fruit"];
+			} else {
+				themeObj.type = "numeric";
+				themeObj.style.colorscheme = ["7", "#ffffff", "#ff0000"];
+			}
+		}
+		return themeObj;
+	};
+
+	ixmaps.editor.makeDefaultTheme = function(color_selected) {
+
+		if (!ixmaps.editor.dbtable) {
+			return {};
+		}
+
+		objTheme = {
+			fields: "$item$"
+		};
+		objTheme.style = {};
+		objTheme.style.dbtableUrl = ixmaps.editor.dbtableUrl || "";
+		objTheme.style.dbtableType = ixmaps.editor.dbtableType || "";
+		objTheme.style.dbtable = "themeDataObj";
+		objTheme.style.lookupfield = " ";
+
+		if (ixmaps.editor.dbtable && ixmaps.editor.dbtable.table && (ixmaps.editor.dbtable.table.records > 250000)) {
+			objTheme.style.type = "CHART|SYMBOL|GRIDSIZE|DOPACITY|AGGREGATE|FAST|SUM|ZOOMTO";
+			//objTheme.style.type = "CHART|SYMBOL|AUTOSIZE|AGGREGATE|SUM|ZOOMTO";
+			objTheme.style.gridwidth = "10px";
+			objTheme.style.symbols = ["hexagon"];
+			objTheme.style.dopacitypow = 2;
+			objTheme.style.dopacityscale = 2;
+		} else
+		if (ixmaps.editor.dbtable && ixmaps.editor.dbtable.table && (ixmaps.editor.dbtable.table.records > 100000)) {
+			objTheme.style.type = "CHART|BUBBLE|AGGREGATE|FAST|SUM|ZOOMTO";
+			objTheme.style.gridwidth = "2px";
+			objTheme.style.fillopacity = "0.3";
+		} else {
+			//objTheme.style.type = "CHART|DOT|RAW|FAST";
+			objTheme.style.type = "CHART|DOT|RAW|FAST|ZOOMTO";
+			objTheme.style.fillopacity = "0.2";
+		}
+		objTheme.style.colorscheme = [1, "#eeeeff", "#0000dd"];
+		objTheme.style.editor = true;
+		ixmaps.editor.themeObj = objTheme;
+
+		return objTheme;
+
+	}
 
 }(window, document));
 

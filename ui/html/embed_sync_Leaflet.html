@@ -151,7 +151,7 @@
 		</div>
 
 		<!-- overlay -->
-		<div id="map-overlay" class="map-overlay" style="width:100%;z-index:1000;display:none;">
+		<div id="map-overlay" class="map-overlay" style="z-index:1000;display:none;">
 		</div>
         
 		<!-- popup -->
@@ -601,6 +601,11 @@
 					if ($(document).getUrlParam('project')) {
 						szProjectUrl = $(document).getUrlParam('project');
 						ixmaps.loadProject(szProjectUrl, false);
+						ixmaps.onMapReady = null;
+					}
+					if ($(document).getUrlParam('data')) {
+						szDataUrl = $(document).getUrlParam('data');
+						ixmaps.loadData(szDataUrl, false);
 						ixmaps.onMapReady = null;
 					}
 					if (ixmaps.parentApi.onMapReady){

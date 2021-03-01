@@ -647,7 +647,9 @@ $Log: htmlgui.js,v $
 
 		// bubble it up !
 		try{
-			this.parentApi.htmlgui_setMapTypeBG(szId);
+			if ( this.parentApi && (this.parentApi != this) ){
+				this.parentApi.htmlgui_setMapTypeBG(szId);
+			}
 		}
 		catch (e){
 		}
