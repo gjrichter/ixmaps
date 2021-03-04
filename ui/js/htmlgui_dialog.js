@@ -138,6 +138,8 @@ $Log: htmlgui.js,v $
 				});
 			}else
 			if ( (szUrl.substr(0,1) == ".") ){
+				console.log("dialog with iframe");
+				console.log(szUrl);
 				$("#"+szElement)[0].innerHTML = 
 					"<div overflow=\"auto\">"+
 					"<iframe style=\"width:100%;height:"+(dialogHeight-115)+"px;\" id=\"dialogframe\" src=\""+szUrl+"\" frameborder=\"0\" marginwidth=\"0px\" />"+
