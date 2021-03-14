@@ -98,7 +98,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		// create map
 		// ---------------------
 
-		LMap = L.map(this.szGmapDiv,{zoomControl:false});
+		LMap = L.map(this.szGmapDiv,{zoomControl:false,gestureHandling:(ixmaps.scrollsafe?true:false)});
 
 		// ---------------------
 		// define event handler
@@ -172,6 +172,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			name: "OpenStreetMap - Osmarenderer",
 			myname: "OpenStreetMap - Osmarenderer",
 			minZoom: 2,
+			maxZoom: 22,
 			attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 			subdomains: ['otile1','otile2','otile3','otile4']
 		});
@@ -215,6 +216,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			name: "OpenStreetMap - FR",
 			myname: "OpenStreetMap - FR",
 			minZoom: 2,
+			maxZoom: 19,
 			attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 			subdomains: ['a','b','c']
 		});
@@ -599,6 +601,10 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			lastLeafletLayer = mapTypeTranslate[szMapType]||szMapType;
 			LMap.addLayer(ixmaps.layers[mapTypeTranslate[szMapType]||szMapType]);
 			lastLeafletLayer = mapTypeTranslate[szMapType]||szMapType;
+			// GR 05.03.2021 make sure something is visible while panning
+			if (lastLeafletLayer.match(/gray|white|black/)){
+				ixmaps.panHidden = false;
+			}
 		} catch (e){return null;}
 	};
 

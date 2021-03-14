@@ -1431,9 +1431,16 @@ Map.Themes.prototype.getMapThemeDefinitionObj = function (szId) {
 	newObj.field = themeObj.szFields || "";
 	newObj.field100 = themeObj.szField100 || "";
 	
-	// GR 10.02.2021 new theme type WMS server has only one parameter 
-	if ( themeObj.szFlag.match(/\bWMS\b/) ){
-		newObj.style = {"type":"WMS","server":themeObj.szServer};
+	// GR 10.02.2021 new theme type WMS server has different set of parameter 
+	if ( themeObj.szFlag.match(/\bWMS|IMAGE\b/) ){
+		var styleObj = {
+			"type":themeObj.szFlag,
+			"server":themeObj.szServer,
+			"opacity":themeObj.nOpacity,
+			"title":themeObj.szTitle,
+			"name":themeObj.szName
+		};
+		newObj.style = styleObj;
 		return newObj;
 	}
 
@@ -6260,6 +6267,7 @@ MapTheme.prototype.realize = function () {
 			this.chartGroup = map.Dom.newGroup(map.Layer.layerNode, this.szThemesA[0]);
 			map.Layer.listA[this.szThemesA[0]] = new Map.Layer.Item(null);
 			map.Layer.listA[this.szThemesA[0]].szName = this.szThemesA[0];
+			this.isChecked = true;
 		}
 		
 		var mapGeoBounds = map.Zoom.getBoundsOfMapInGeoBounds();
@@ -13246,8 +13254,8 @@ MapTheme.prototype.chartMap = function (startIndex) {
 							if (this.nMaxA.length > 1) {
 								// multiple value charts like pies,stars, ...
 								for (i = 0; i < this.partsA.length; i++) {
-									this.partsA[i].nCount += (this.itemA[a].nCountA[i] && !isNaN(this.itemA[a].nCountA[i])) ? this.itemA[a].nCountA[i] : 0;
-									this.partsA[i].nSum += (this.itemA[a].nValuesA[i] && !isNaN(this.itemA[a].nValuesA[i])) ? this.itemA[a].nValuesA[i] : 0;
+									this.partsA[i].nCount += (this.itemA[a].nCountA && this.itemA[a].nCountA[i] && !isNaN(this.itemA[a].nCountA[i])) ? this.itemA[a].nCountA[i] : 0;
+									this.partsA[i].nSum += (this.itemA[a].nValuesA && this.itemA[a].nValuesA[i] && !isNaN(this.itemA[a].nValuesA[i])) ? this.itemA[a].nValuesA[i] : 0;
 								}
 							} else {
 								// single value charts like bubble, label, ...
@@ -17898,7 +17906,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 												}else{
 													var v = this.formatValue(nValue, this.nValueDecimals || 2);
 												}
-												plotShape.setAttributeNS(szMapNs, "tooltip", v + this.szUnit + " " + (this.szLabelA ? (this.szLabelA[nClass % (this.nGridX || 1000000)]) : ""));
+												plotShape.setAttributeNS(szMapNs, "tooltip", v + this.szUnit + " " + (this.szLabelA ? (this.szLabelA[nIndex % (this.nGridX || 1000000)]) : ""));
 												plotShape.setAttributeNS(szMapNs, "time", String(uTime));
 
 												if (this.szFlag.match(/\bFADE\b/)) {
@@ -21431,9 +21439,11 @@ MapTheme.prototype.toggle = function (flag) {
 		if (flag === true || (typeof (flag) == 'undefined' && (this.chartGroup.style.getPropertyValue("display") == "none"))) {
 			this.chartGroup.style.setProperty("display", "inline", "");
 			this.chartGroup.display = "inline";
+			this.isChecked = true;
 		} else {
 			this.chartGroup.style.setProperty("display", "none", "");
 			this.chartGroup.display = "none";
+			this.isChecked = false;
 		}
 	} else {
 		if (this.isChecked) {

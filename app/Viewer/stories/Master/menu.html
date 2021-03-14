@@ -41,11 +41,18 @@
 
 <body style="margin:0px;padding:0px;" onload="">
 
-	<!-- Container -->
-	<div id="container" style="padding:2em 1em;vertical-align:middle;background:RGBA(255,255,255,0.7)" >
+	<!-- Legend -->
+	
+	<div style="padding:2em 1em;vertical-align:middle;background:RGBA(255,255,255,0.7)" >
+		<h3>Map Themes</h3>
+		<hr>
+		<div id="legend"></div>
+	</div>	
+	
+	<!-- Legend position -->
+	<div id="container" style="padding:1em 1em;vertical-align:middle;background:RGBA(255,255,255,0.7)" >
 
 		<h3>Posizione Leggenda</h3>
-					
 		<hr>
 		<ul class="layoutlist">
 
@@ -58,9 +65,69 @@
 
 			<li><a href="javascript:ixmaps.setLayoutHeight(1);ixmaps.hideStoryTool();">height 100%</a></li>
 			<li><a href="javascript:ixmaps.setLayoutHeight(2);ixmaps.hideStoryTool();">height 200%</a></li>
+		</ul>
+		
+	</div>
 
-		</ul>	
+	
+	<script type="text/javascript">
+		
+		ixmaps.refreshThemeList = function(){
+			
+			var themes = ixmaps.getThemes();
 
+			var szHtml = "<ul style='list-style:none;margin-left:-1em'>";
+			for ( i in themes ){
+				var icon = themes[i].isChecked?"<span class='fa fa-check-square fa-fw' title='share actual map' ></span>":"<span class='fa fa-square fa-fw' title='toggle theme' ></span>";
+				
+				szHtml += "<li>";
+				
+				szHtml += "<a href='javascript:ixmaps.toggleTheme(null,\""+ themes[i].szId +"\");setTimeout(\"ixmaps.refreshThemeList()\",500)'>"+icon+" "+themes[i].szTitle+"</a>";
+				
+				var szType = "CHOROPLETH";
+				var szSymbol = "&#x25A0;";
+				var szColor = themes[i].colorScheme?themes[i].colorScheme[0]:"black";
+				
+				if ( themes[i].szFlag.match(/WMS/) ){
+					szType = "";
+					szSymbol = "";
+				}else
+				if ( themes[i].szFlag.match(/FEATURES/) ){
+					szType = "FEATURES";
+					szSymbol = "";
+				}else
+				if ( themes[i].szFlag.match(/VECTOR/) ){
+					szType = "VECTOR";
+					szSymbol = "&#x25AC;";
+				}else
+				if ( themes[i].szFlag.match(/TEXTONLY/) ){
+					szType = "TEXT";
+					szSymbol = "";
+				}else
+				if ( themes[i].szFlag.match(/CHART/) ){
+					szType = "CHART";
+					szSymbol = "&#x25CF;";
+					if ( themes[i].szFlag.match(/BAR/) ){
+						szSymbol = "&#x2B06;";
+					}
+				}
+				
+				szHtml += " " + szType + " ";
+				
+				szHtml += "<span style='font-size:1.8em;line-height:0.5em;color:" + szColor + "'>"+szSymbol+"</span>";
+				
+				szHtml += "&nbsp;<a href='javascript:ixmaps.popupThemeEditor(null,null,\""+ themes[i].szId+"\")'><span class='fa fa-pencil fa-fw' title='edit theme' ></span></a>";
+				
+				szHtml += "</li>";
+			}
+			szHtml += "</ul>";
 
+			$("#legend").html(szHtml);
+		}
+		
+		ixmaps.refreshThemeList();
+		
+	</script>
+	
 </body>
 </html>

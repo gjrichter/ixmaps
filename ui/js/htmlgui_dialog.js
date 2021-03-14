@@ -138,11 +138,9 @@ $Log: htmlgui.js,v $
 				});
 			}else
 			if ( (szUrl.substr(0,1) == ".") ){
-				console.log("dialog with iframe");
-				console.log(szUrl);
 				$("#"+szElement)[0].innerHTML = 
 					"<div overflow=\"auto\">"+
-					"<iframe style=\"width:100%;height:"+(dialogHeight-115)+"px;\" id=\"dialogframe\" src=\""+szUrl+"\" frameborder=\"0\" marginwidth=\"0px\" />"+
+					"<iframe style=\"width:100%;height:"+(dialogHeight-75)+"px;\" id=\"dialogframe\" src=\""+szUrl+"\" frameborder=\"0\" marginwidth=\"0px\" />"+
 					"</div>";
 			}else{
 				$("#"+szElement)[0].innerHTML = 
@@ -289,7 +287,9 @@ $Log: htmlgui.js,v $
 		this.openDialog(null,'projects','./tools/project_save.html','Save actual map & theme as project',position||'200,103',550,620);
 	};
 
-	ixmaps.popupThemeEditor = function(position){
+	ixmaps.popupThemeEditor = function(position,szId){
+		ixmaps.editor = ixmaps.editor || {};
+		ixmaps.editor.szThemeId = szId;
 		window.idialog = this.openDialog(null,'editor','./tools/theme_editor.html','Theme Editor',position||'10,103',380,600);
 	};
 

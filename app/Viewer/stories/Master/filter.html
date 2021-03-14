@@ -116,6 +116,10 @@
 	<script src="../../../../../data.js/data.js"></script>
 
 	<script src="filter.js"></script>
+	<script src="./assets/lib/d3/d3.js"></script>
+	<script src="./assets/lib/d3/d3.layout.cloud.js"></script>
+	<script src="./assets/lib/d3/d3.wordcloud.js"></script>
+	<script src="wordcloud.js"></script>
 
 	<script type="text/javascript">
 
@@ -147,7 +151,15 @@
 			setTimeout("ixmaps.data.makeFacets(null,'facetDiv')",10);
 		};
 
-		$.getScript("./filter.js",function(){
+		// load themes script
+		// and initialize map if all loaded
+		//
+		$.when(
+			$.getScript( "./filter.js" ),
+			$.Deferred(function( deferred ){
+				$( deferred.resolve );
+			})
+		).done(function(){
 			
 			if ( ixmaps.legend.legendA[ixmaps.legend.activeLegendId] ){
            		ixmaps.filterThemeId = ixmaps.legend.legendA[ixmaps.legend.activeLegendId].szId || null;
@@ -188,7 +200,8 @@
 				setTimeout("ixmaps.data.makeFacets(null,'facetDiv')",10);
 			}
 
-
+		}).fail(function(){
+			alert("script loading "+arguments[2].toString());
 		});
 
 	</script>

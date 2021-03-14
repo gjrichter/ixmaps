@@ -44,6 +44,8 @@
 	<link rel="stylesheet" type="text/css" href="../css/legend.css" />
 	<link rel="stylesheet" type="text/css" href="../css/main.css" />
 
+	<link rel="stylesheet" href="//unpkg.com/leaflet-gesture-handling/dist/leaflet-gesture-handling.min.css" type="text/css">
+	
 	<!--========================================================================= -->
 	<style>
 		.disable-select {
@@ -326,6 +328,8 @@
 
 <script src="../../ui/libs/leaflet-1.3.4/leaflet.js"></script>
 
+<script src="//unpkg.com/leaflet-gesture-handling"></script>
+
 <!--========================================================================= -->
 
 
@@ -572,6 +576,10 @@
 			}
 			if ($(document).getUrlParam('toolmarginleft')) {
 				$("#onmapbuttondiv").css("left", String(Number($(document).getUrlParam('toolmarginleft'))) + "px") ;
+			}
+			
+			if ($(document).getUrlParam('scrollsafe')) {
+				ixmaps.scrollsafe = true;
 			}
 
 			// ====================

@@ -55,9 +55,15 @@
 		}
 
 		a {
-			color: #4466ff;
+			color: #888888;
+			text-decoration: none;
 		}
-
+		
+		.theme-legend-item {
+			margin-top: 0.5em;
+			border-bottom: solid 1px #dddddd;
+		}
+		
 		object {
 			margin: 0;
 			padding: 0;
@@ -534,6 +540,7 @@
 							szHtml += "<svg width='300' height='300' viewBox='-500 -3500 5000 5000'>";
 							szHtml += "<g id='getchartmenutarget"+nCount*100+"' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();' onclick='javascript:ixmaps.onMouseClick();'></g>";
 							szHtml += "</svg></div>";
+							szHtml += "<p style='margin:-1em 0 0.5em 1em;font-size:1em'>classes of selected items</p>";
 						}
 						
 						szHtml += "<div id='menuDiv"+nCount+"' style='margin:1em 0 0.5em 1em;overflow:hidden'>";
@@ -544,14 +551,25 @@
 					}
 
 					szHtml += "<div style='height:1px'></div>";
-
+					
+					if ( themeObj.partsA.length > 1 ){
+						themeObj.szOrigLabelA = themeObj.activeTheme.szOrigLabelA;
+						szHtml += "<div style='margin:1.5em 1em 1em 1em'>";
+						if ( themeObj.activeTheme.szFlag.match(/COUNT/) ){
+							themeObj.szFlag += "|COUNT"
+							szHtml += ixmaps.legend.makeColorLegendHTMLLong(themeObj.szId);
+						}else{
+							themeObj.szFlag += "|SUM"
+							themeObj.szUnits = themeObj.activeTheme.szUnits;
+							szHtml += ixmaps.legend.makeColorLegendHTMLLong(themeObj.szId);
+						}
+						szHtml += "</div>";
+					}
+					
 					szHtml += "</section>";
 					
 					var indexA = themeObj.itemA;
 					var itemA  = themeObj.activeTheme.itemA;
-					for ( i in indexA ){
-						console.log(itemA[i]);
-					}
 					
 					
 				}

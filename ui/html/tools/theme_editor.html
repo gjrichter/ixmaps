@@ -216,18 +216,6 @@
 	}
 
 	ixmaps.loadEditor = function(){
-
-		var themes = ixmaps.getThemes();
-		for ( i in themes ){
-			if ( !themes[i].szFlag.match(/FEATURE|POSITION/) ){
-				ixmaps.editorThemeId = themes[i].szId;
-			}
-		}
-        
-        // GR 17.10.2019 new: get active legend theme
-        var themeObj = ixmaps.getThemeObj();
-        ixmaps.editorThemeId = themeObj.szId;       
-
         ixmaps.editor = ace.edit("editor");
 
 		// enable autocompletion and snippets
@@ -285,11 +273,11 @@
 	}
         
     // GR 17.10.2019 new: get active legend theme
-    var themeObj = ixmaps.getThemeObj();
+    var themeObj = ixmaps.getThemeObj(ixmaps.editor.szThemeId);
+
 	if(themeObj){
 		ixmaps.editorThemeId = themeObj.szId;       
 
-		ixmaps.editorThemeId = ixmaps.editorThemeId || cObj()?ixmaps.getThemeObj().szId:"";
 		setTimeout("ixmaps.loadEditor();",1000);
 	}
 		

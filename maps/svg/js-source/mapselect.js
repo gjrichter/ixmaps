@@ -96,7 +96,7 @@ Map.Selections.prototype.newSelection = function(szThemes,szSelectShape,szStyle,
 		}
 		// without a theme, no selection
 		if ( szThemes == null ){
-			displayMessage("please activate a layer",1000);
+			displayMessage("nothing to select!",1000);
 			return null;
 		}
 		// here we go 

@@ -10194,7 +10194,7 @@ function displayScale(evt,szPosition){
 			var szScale = String(__formatValue(1/nDispScale,0,"BLANK"))+":1";
 		}
 		var textNode = map.Dom.newText(scaleGroup,0,map.Scale.normalY(fontheight),"font-family:arial;font-size:"+map.Scale.normalY(fontheight/4*3)+"px;fill:"+szInfoBodyColor+"",szScale);
-		textNode.fu.setPosition(0,-map.Scale.normalY(10));
+		textNode.fu.setPosition(map.Scale.normalX(9),-map.Scale.normalY(9.5));
 	}
 
 	var nFrame = 2;

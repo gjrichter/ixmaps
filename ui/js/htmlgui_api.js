@@ -1270,8 +1270,8 @@ $Log: htmlgui_api.js,v $
 	 * @param {Array} position x,y screen position for the modal dialog
 	 * @void
 	 */
-	ixmaps.popupThemeEditor = function(szMap,position){
-		this.dispatchToEmbeddedApi(szMap,"popupThemeEditor",[position]);
+	ixmaps.popupThemeEditor = function(szMap,position,szId){
+		this.dispatchToEmbeddedApi(szMap,"popupThemeEditor",[position,szId]);
 	};
 	/**
 	 * show Theme Configurator (Wizzard)

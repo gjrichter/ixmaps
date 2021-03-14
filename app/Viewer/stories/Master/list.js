@@ -157,8 +157,16 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 		// theme
 		// ------------------------------------
-		var objThemeDefinition = ixmaps.getThemeDefinitionObj();
-		var objTheme = ixmaps.getThemeObj();
+		var themes = ixmaps.getThemes();
+		var szId = null;
+		for ( i in themes ){
+			if ( themes[i].szFlag.match(/CHART|CHOROPLETH/) ){
+				szId = themes[i].szId;
+				break;
+			}
+		}
+		var objThemeDefinition = ixmaps.getThemeDefinitionObj(null,szId);
+		var objTheme = ixmaps.getThemeObj(null,szId);
 		
 		// GR 11.02.2021 if theme = PLOT, make charts
 		if ( objTheme.szFlag.match(/PLOT|PIE|BAR/) ){
@@ -318,6 +326,21 @@ window.ixmaps.data = window.ixmaps.data || {};
 			}
 			source = source.parentNode;
 		}
+		// try to format tooltip
+		var szTestA = szTooltip.split(" ");
+		var szValue = "";
+		var szUnit = "";
+		var fValue = true;
+		szTestA.forEach(function(value){
+			if ( fValue && !isNaN(value)){
+				szValue += (value + " ");
+			}else{
+				fValue = false;
+				szUnit += (value + " ");
+			}
+		})
+		szTooltip = "<div style='font-size:0.9em;line-height:1.2em;color:#aaaaaa;max-width:100px'>"+szUnit+"</div><div style='font-size:1.5em;margin:-0em 0.5em -0.2em 0'>"+szValue+"</div>";
+		
 		event.target.style.setProperty("fill-opacity","1");
 		showTooltip(event, szTooltip);
 		event.stopPropagation();
@@ -351,8 +374,16 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 		// theme
 		// ------------------------------------
-		var objThemeDefinition = ixmaps.getThemeDefinitionObj();
-		var objTheme = ixmaps.getThemeObj();
+		var themes = ixmaps.getThemes();
+		var szId = null;
+		for ( i in themes ){
+			if ( themes[i].szFlag.match(/CHART|CHOROPLETH/) ){
+				szId = themes[i].szId;
+				break;
+			}
+		}
+		var objThemeDefinition = ixmaps.getThemeDefinitionObj(null,szId);
+		var objTheme = ixmaps.getThemeObj(null,szId);
 
 		// theme data
 		// ------------------------------------
@@ -478,16 +509,15 @@ window.ixmaps.data = window.ixmaps.data || {};
 			console.log(objTheme.indexA[i]);
 			console.log($("#getchartmenutarget"+i)[0]);
 			
-			setTimeout("ixmaps.data.drawChart("+i+",'" +szIdA+ "','" +szFlag+"')",50);
-			//objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);	
+			setTimeout("ixmaps.data.drawChart('" +szId+ "','" +i+ "','" +szIdA+ "','" +szFlag+"')",50);
 		}
 
 		objTheme.indexA.reverse();
 	};
 	
 	
-	ixmaps.data.drawChart = function(i,szIdA,szFlag){
-		var objTheme = ixmaps.getThemeObj();
+	ixmaps.data.drawChart = function(szId,i,szIdA,szFlag){
+		var objTheme = ixmaps.getThemeObj(szId);
 		objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);
 		$("#getchartmenutarget"+i).parent().attr("height","200");
 		var SVGBox = $("#getchartmenutarget"+i)[0].getBBox();
