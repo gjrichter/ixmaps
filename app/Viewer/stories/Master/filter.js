@@ -578,6 +578,9 @@ window.ixmaps.data = window.ixmaps.data || {};
 				szHtml += '</span></input>';
 				szHtml += '</div>'
 				
+				szTarget = "thisismywordcloud"+facetsA[i].id.replace(" ","_");
+				szHtml += "<div id='"+szTarget+"'></div>";
+				setTimeout("ixmaps.data.makeWordCloud('"+objTheme.szId+"','"+facetsA[i].id+"','"+szTarget+"')",100);
 			}
 
 			// ---------------------------------
