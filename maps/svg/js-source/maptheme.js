@@ -6295,32 +6295,9 @@ MapTheme.prototype.realize = function () {
 			imageHeight+'',
 			'x':-map.Scale.mapCenter.x/map.Zoom.nZoomX-width/2,
 			'y':-map.Scale.mapCenter.y/map.Zoom.nZoomY-height/2,
-			'style':'width:'+width+';height:'+height+''+";opacity:"+(this.nOpacity||0.8)+";pointer-events:none;"
+			'style':'width:'+width+';height:'+height+''+";opacity:"+(this.nOpacity||0.8)+";pointer-events:none;",
+			'onload':'map.Themes.getTheme("'+this.szId+'").clearWMS();'
 		});
-		/**
-		var newShape = map.Dom.constructNode('image', this.chartGroup, {
-			'xlink:href': 'https://image.discomap.eea.europa.eu/arcgis/rest/services/GioLandPublic/HRL_ImperviousnessDensity_2018/ImageServer/exportImage?f=image&renderingRule=%7B%22rasterFunction%22%3A%22IMD_MosaicSymbology.rft%22%7D&bbox='+
-			mapGeoBounds[0].x+'%2C'+
-			mapGeoBounds[0].y+'%2C'+
-			mapGeoBounds[1].x+'%2C'+
-			mapGeoBounds[1].y+'&imageSR=102100&bboxSR=4326&size='+
-			imageWidth+'%2C'+
-			imageHeight+'',
-			'x':-map.Scale.mapCenter.x/map.Zoom.nZoomX-width/2,
-			'y':-map.Scale.mapCenter.y/map.Zoom.nZoomY-height/2,
-			'style':'width:'+width+';height:'+height+''+";opacity:0.8;"
-		});
-		**/
-		
-		
-		
-		var childs = this.chartGroup.childNodes.length;
-		if ( (childs>1) && this.fDone ){
-			var szId = this.szId;
-			setTimeout(function(){
-				map.Themes.getTheme(szId).chartGroup.removeChild(map.Themes.getTheme(szId).chartGroup.firstChild);
-			},1000);
-		}
 		
 		this.fDone = true;
 		return;
@@ -6352,6 +6329,15 @@ MapTheme.prototype.realize = function () {
 		map.Themes.executeContinue();
 	}
 };
+
+/**
+ * remove old image from WMS Layer
+ */
+MapTheme.prototype.clearWMS  = function () {
+	if ( this.chartGroup.childNodes.length > 1 ){
+		this.chartGroup.removeChild(this.chartGroup.firstChild);
+	}
+}
 
 /**
  * realize the map theme
