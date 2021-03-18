@@ -458,9 +458,9 @@ window.ixmaps.data = window.ixmaps.data || {};
 		$("#getchartmenutarget"+i).parent().attr("height","200");
 		var SVGBox = $("#getchartmenutarget"+i)[0].getBBox();
 		if (SVGBox.width && SVGBox.height) {
-			var scale = Math.max(1, 4000 / SVGBox.width);
+			var scale = Math.max(1, 6000 / SVGBox.width);
 			SVGBox.width *= scale;
-			SVGBox.height *= scale;
+			SVGBox.height *= scale/2;
 			SVGBox.y -= (SVGBox.y+SVGBox.height)/4; //60;
 			SVGBox.height -= 60;
 
