@@ -460,7 +460,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 		if (SVGBox.width && SVGBox.height) {
 			var scale = Math.max(1, 6000 / SVGBox.width);
 			SVGBox.width *= scale;
-			SVGBox.height *= scale/2;
+			SVGBox.height *= scale/1.5;
 			SVGBox.y -= (SVGBox.y+SVGBox.height)/4; //60;
 			SVGBox.height -= 60;
 
