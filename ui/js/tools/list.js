@@ -138,7 +138,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 	//
 	// ===========================================
 
-	ixmaps.data.makeItemList = function (szFilter,szDiv) {
+	ixmaps.data.makeItemList = function (szFilter,szDiv,szId) {
 
 		facetsA = [];
 
@@ -157,12 +157,21 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 		// theme
 		// ------------------------------------
-		var objThemeDefinition = ixmaps.getThemeDefinitionObj();
-		var objTheme = ixmaps.getThemeObj();
+		if ( ! szId ){
+			var themes = ixmaps.getThemes();
+			for ( i in themes ){
+				if ( themes[i].szFlag.match(/CHART|CHOROPLETH/) ){
+					szId = themes[i].szId;
+					break;
+				}
+			}
+		}
+		var objThemeDefinition = ixmaps.getThemeDefinitionObj(szId);
+		var objTheme = ixmaps.getThemeObj(szId);
 		
 		// GR 11.02.2021 if theme = PLOT, make charts
 		if ( objTheme.szFlag.match(/PLOT|PIE|BAR/) ){
-			ixmaps.data.makeItemList_charts(szFilter,szDiv);
+			ixmaps.data.makeItemList_charts(szFilter,szDiv,szId);
 			return;
 		}
 
@@ -322,7 +331,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 		hideTooltip();
 	};
 
-	ixmaps.data.makeItemList_charts = function (szFilter,szDiv) {
+	ixmaps.data.makeItemList_charts = function (szFilter,szDiv,szId) {
 
 		facetsA = [];
 
@@ -341,8 +350,8 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 		// theme
 		// ------------------------------------
-		var objThemeDefinition = ixmaps.getThemeDefinitionObj();
-		var objTheme = ixmaps.getThemeObj();
+		var objThemeDefinition = ixmaps.getThemeDefinitionObj(szId);
+		var objTheme = ixmaps.getThemeObj(szId);
 
 		// theme data
 		// ------------------------------------
@@ -436,17 +445,44 @@ window.ixmaps.data = window.ixmaps.data || {};
 			console.log(objTheme.indexA[i]);
 			console.log($("#getchartmenutarget"+i)[0]);
 			
-			setTimeout("ixmaps.data.drawChart("+i+",'" +szIdA+ "','" +szFlag+"')",50);
+			setTimeout("ixmaps.data.drawChart('" +szId+ "','" +i+ "','" +szIdA+ "','" +szFlag+"')",50);
 			//objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);	
 		}
 
 	};
 	
 	
-	ixmaps.data.drawChart = function(i,szIdA,szFlag){
-		var objTheme = ixmaps.getThemeObj();
+	ixmaps.data.drawChart = function(szId,i,szIdA,szFlag){
+		var objTheme = ixmaps.getThemeObj(szId);
 		objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);
 		$("#getchartmenutarget"+i).parent().attr("height","200");
+		var SVGBox = $("#getchartmenutarget"+i)[0].getBBox();
+		if (SVGBox.width && SVGBox.height) {
+			var scale = Math.max(1, 4000 / SVGBox.width);
+			SVGBox.width *= scale;
+			SVGBox.height *= scale;
+			SVGBox.y -= (SVGBox.y+SVGBox.height)/4; //60;
+			SVGBox.height -= 60;
+
+			var size = objTheme.szFlag.match(/PLOT|HORZ|STACKED/) ? 400 : 300;
+			var width = size;
+			var height = size / SVGBox.width * SVGBox.height;
+
+			while (height > width) {
+				height *= 0.9;
+			}
+
+			$("#getchartmenutarget"+i)[0].parentNode.setAttribute("height", height+20);
+			$("#getchartmenutarget"+i)[0].parentNode.setAttribute("viewBox", SVGBox.x + ' ' + SVGBox.y + ' ' + SVGBox.width + ' ' + SVGBox.height);
+
+		} else {
+			$("#chartDiv").height(0);
+		}
+
+		
+		
+		
+		
 		
 	};
 	

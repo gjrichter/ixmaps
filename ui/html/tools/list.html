@@ -135,13 +135,17 @@
 		};
 
 		$.getScript("../../ui/js/tools/list.js",function(){
-
-			var objTheme = ixmaps.getThemeObj();
-			if ( !objTheme.szFlag.match(/EXACT/) ){
-				//ixmaps.changeThemeStyle(null,objTheme.szId,"type:RANGES","add");
+			
+			var szId = null;
+			var themes = ixmaps.getThemes();
+			for ( i in themes ){
+				if ( themes[i].szFlag.match(/CHART|CHOROPLETH/) ){
+					szId = themes[i].szId;
+					break;
+				}
 			}
-
-			var objThemeDefinition = ixmaps.getThemeDefinitionObj();
+			var objTheme = ixmaps.getThemeObj(szId);
+			var objThemeDefinition = ixmaps.getThemeDefinitionObj(szId);
 
 			if ( !objThemeDefinition ){
 				$("#facets").html("<h3>...nessun tema da filtrare!</h3>");
@@ -156,11 +160,11 @@
 				// show filter in input field
 				// --------------------------
 				$("#query").val(szFilter);
-				setTimeout("ixmaps.data.makeItemList('"+szFilter.replace(/\'/g,"\\'")+"','facetDiv')",10);
+				setTimeout("ixmaps.data.makeItemList('"+szFilter.replace(/\'/g,"\\'")+"','facetDiv','"+objTheme.szId+"')",10);
 				//setTimeout('$("#btn-solo-attivi").click();',10);
 
 			}else{
-				setTimeout("ixmaps.data.makeItemList(null,'facetDiv')",10);
+				setTimeout("ixmaps.data.makeItemList(null,'facetDiv','"+objTheme.szId+"')",10);
 			}
 
 
