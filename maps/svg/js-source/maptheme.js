@@ -163,6 +163,8 @@ var themeStyleTranslateA = [
 	,{ style: "fractionscale"	,obj: "nFractionScale"  }
 	,{ style: "minvalue"		,obj: "nMinValue"  }
 	,{ style: "maxvalue"		,obj: "nMaxValue"  }
+	,{ style: "lowvalue"		,obj: "nLowValue"  }
+	,{ style: "highvalue"		,obj: "nHighValue"  }
 
 	,{ style: "textfont"		,obj: "szTextFont"  }
 	,{ style: "textcolor"		,obj: "szTextColor"  }
@@ -946,6 +948,12 @@ Map.Themes.prototype.parseStyle = function (mapTheme, styleObj) {
 		}
 		if (__isdef(styleObj.maxvalue)) {
 			mapTheme.nMaxValue = styleObj.maxvalue;
+		}
+		if (__isdef(styleObj.lowvalue)) {
+			mapTheme.nLowValue = styleObj.lowvalue;
+		}
+		if (__isdef(styleObj.highvalue)) {
+			mapTheme.nHighValue = styleObj.highvalue;
 		}
 		if (__isdef(styleObj.showdata)) {
 			mapTheme.fShowData = JSON.parse(styleObj.showdata);
@@ -7805,8 +7813,8 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 		
 		// GR 23.12.2020 test tbd: make parameter clipUpper clipLower
 		this.__fClipToGeoBounds = false;
-		if ( this.objTheme.dbRecords.length > 100000 || this.szFlag.match(/CLIPTOGEOBOUNDS/) ){
-			if ( (map.Scale.nTrueMapScale * map.Scale.nZoomScale) < (this.nClipUpper||15000) )  {
+		if ( this.szFlag.match(/CLIPTOGEOBOUNDS/) ){
+			if ( (map.Scale.nTrueMapScale * map.Scale.nZoomScale) < (this.nClipUpper||1000000000) )  {
 				this.__fClipToGeoBounds = true;
 			}
 		}
@@ -17797,6 +17805,22 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 											map.Dom.newText(gridGroup, left * 1.1, -sy + nScaleFontSize * 0.3, "font-family:arial;font-size:" + nScaleFontSize + "px;text-anchor:end;fill:#888888;stroke:none;pointer-events:none;", st);
 												
 											this.nPlotHeight = s;
+										}
+										
+										if ( szFlag.match(/ZOOM/) ){
+										if ( this.nLowValue ){
+											map.Dom.newShape('line', gridGroup, left, -this.nLowValue*nScale, right, -this.nLowValue*nScale, "stroke:#dd0000;stroke-opacity:0.4;stroke-width:" + (map.Scale.normalX(0.1*nPlotScale)) + ";stroke-dasharray:"+(6*nPlotScale)+" "+(3*nPlotScale)+";");
+											if ( szFlag.match(/ZOOM/) ) {
+												map.Dom.newText(gridGroup, right*1.06, -this.nLowValue*nScale + nScaleFontSize * 0.3, "font-family:arial;font-size:" + nScaleFontSize + "px;text-anchor:end;fill:#888888;stroke:none;pointer-events:none;", this.nLowValue);
+											}
+										}
+										
+										if ( this.nHighValue ){
+											map.Dom.newShape('line', gridGroup, left, -this.nHighValue*nScale, right, -this.nHighValue*nScale, "stroke:#dd0000;stroke-opacity:0.4;stroke-width:" + (map.Scale.normalX(0.1*nPlotScale)) + ";stroke-dasharray:"+(6*nPlotScale)+" "+(3*nPlotScale)+";");
+											if ( szFlag.match(/ZOOM/) ) {
+												map.Dom.newText(gridGroup, right*1.06, -this.nHighValue*nScale + nScaleFontSize * 0.3, "font-family:arial;font-size:" + nScaleFontSize + "px;text-anchor:end;fill:#888888;stroke:none;pointer-events:none;", this.nHighValue);
+											}
+										}
 										}
 
 										map.Dom.newShape('line', gridGroup, nAxis, 0, nAxis, -(nMaxValue - nMinValue) * nScale, "stroke:#aaaaaa;stroke-width:" + (map.Scale.normalX(0.1)) + ";");
