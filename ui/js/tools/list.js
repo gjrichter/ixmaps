@@ -278,13 +278,14 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 	var showTooltip = function(evt, text) {
 		if (text && text.length) {
+			var x = $("#tooltip");
+			var top  = x.parent().offset().top;
+			var left = x.parent().offset().left;
 			var tooltip = document.getElementById("tooltip");
 			tooltip.innerHTML = text;
 			tooltip.style.display = "block";
-			var left = parseInt(sidebar.style.getPropertyValue("left"));
-			tooltip.style.left = evt.pageX - left + 20 + 'px';
-			//tooltip.style.left = evt.pageX - 20 + 'px';
-			tooltip.style.top = evt.pageY + 20 + 'px';
+			tooltip.style.left = evt.pageX - left - 20 + 'px';
+			tooltip.style.top = evt.pageY - top + 20 + 'px';
 		}
 	}
 
@@ -317,6 +318,21 @@ window.ixmaps.data = window.ixmaps.data || {};
 			}
 			source = source.parentNode;
 		}
+		// try to format tooltip
+		var szTestA = szTooltip.split(" ");
+		var szValue = "";
+		var szUnit = "";
+		var fValue = true;
+		szTestA.forEach(function(value){
+			if ( fValue && !isNaN(value)){
+				szValue += (value + " ");
+			}else{
+				fValue = false;
+				szUnit += (value + " ");
+			}
+		})
+		szTooltip = "<div style='font-size:1.5em;margin:-0em 0.5em -0.2em 0'>"+szValue+"</div><div style='font-size:0.9em;line-height:1.2em;color:#aaaaaa;max-width:100px'>"+szUnit+"</div>";
+		
 		event.target.style.setProperty("fill-opacity","1");
 		showTooltip(event, szTooltip);
 		event.stopPropagation();
