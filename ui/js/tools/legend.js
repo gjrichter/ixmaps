@@ -969,7 +969,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 
     ixmaps.legend.loadExternalLegend = function (szUrl) {
-
+		
         var szHtml = '<div id="map-legend-body" class="map-legend-body" style="margin-top:-1em"></div>';
 		if (0){
 			szHtml += '<div id="map-legend-delete" style="position:absolute;top:0.2em;right:-1em;border:solid 1px;padding:0.9em 1.2em 1.2em 1.2em;border-radius:2em">';
@@ -1516,8 +1516,13 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 	
 	ixmaps.legend.showItemList = function(){
    		ixmaps.legend.loadExternalLegend("../../ui/html/tools/list.html");
-	}
+	};
 	
+	ixmaps.legend.showItemGrid = function(){
+        $("#map-popup").load("../../ui/html/tools/list.html");
+        $("#map-popup").show();
+		$("#map-popup").css("width",window.innerWidth);
+	};
 
     /**
      * end of namespace
