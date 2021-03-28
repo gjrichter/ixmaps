@@ -2166,6 +2166,16 @@ Map.Themes.prototype.realizeDone = function (mapTheme) {
 	}
 	mapTheme.fRealizeDone = true;
 
+	if (mapTheme.szFlag.match(/BUFFER/)) {
+		this.activeBuffer = mapTheme;
+	} else {
+		this.activeTheme = mapTheme;
+	}
+	// notify HTML user about the actual theme
+	try {
+		HTMLWindow.ixmaps.htmlgui_setActualTheme(mapTheme.szId);
+	} catch (e) {}
+
 	// notify HTML user about the new theme
 	try {
 		HTMLWindow.ixmaps.htmlgui_onDrawTheme(mapTheme.szId);
@@ -4159,12 +4169,14 @@ Map.Themes.prototype.getChart = function (szId, targetGroup, szFlag, mapTheme) {
 				map.Dom.newText(targetGroup, -40, -280, __scaleStyleString(map.Scale.tStyle.Summary.szStyle, 0.8) + ";font-weight:normal;fill:#888888", mapTheme.szXaxisA[mapTheme.nActualFrame]);
 			}
 			
-			map.Dom.newText(targetGroup, -40, 0, szTextStyle + ";font-weight:normal;fill:#888888", szValueText);
+			map.Dom.newText(targetGroup, -40, 0, szTextStyle + ";font-weight:normal;stroke:#ffffff;stroke-width:20;stroke-opacity:0.3", szValueText);
+			map.Dom.newText(targetGroup, -40, 0, szTextStyle + ";font-weight:normal;fill:#444444", szValueText);
 			
 			
 			var szTextStyle = __scaleStyleString(map.Scale.tStyle.Summary.szStyle, 0.8);
 			var szTitle = mapTheme.itemA[szId].szTitle;
-			if ( (typeof(szTitle) != 'undefined') && (szTitle != "undefined") ){
+			if ( 0 && (typeof(szTitle) != 'undefined') && (szTitle != "undefined") ){
+				map.Dom.newText(targetGroup, -40, 280, szTextStyle + ";font-weight:normal;stroke:#ffffff;stroke-width:20;stroke-opacity:0.3", szTitle);
 				map.Dom.newText(targetGroup, -40, 280, szTextStyle + ";font-weight:normal;fill:#888888", szTitle);
 			}
 
@@ -6443,16 +6455,6 @@ MapTheme.prototype.realize_draw = function () {
 	this.isChecked = true;
 
 	// -------------------------------
-
-	if (this.szFlag.match(/BUFFER/)) {
-		map.Themes.activeBuffer = this;
-	} else {
-		map.Themes.activeTheme = this;
-	}
-	// notify HTML user about the actual theme
-	try {
-		HTMLWindow.ixmaps.htmlgui_setActualTheme(this.szId);
-	} catch (e) {}
 
 	if (!(this.szFlag.match(/CHART/)) ||
 		(this.szFlag.match(/BUBBLE/) || this.szFlag.match(/SQUARE/) || this.szFlag.match(/SYMBOL/)) ||
@@ -16252,9 +16254,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							}
 						}
 						var szFont = this.szTextFont || "arial";
-						newTextBg = map.Dom.newText(shapeGroup, 0, 0, "font-family:" + szFont + ";font-size:" + nFontSize + "px;font-weight:normal;text-anchor:middle;fill:none;stroke:" + szColor + ";stroke-width:" + nFontSize / 7 + ";stroke-opacity:0.5;pointer-events:none;stroke-linejoin:bevel;", szText);
+						newTextBg = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:" + szFont + ";font-size:" + nFontSize + "px;font-weight:normal;text-anchor:middle;fill:none;stroke:" + szColor + ";stroke-width:" + nFontSize / 7 + ";stroke-opacity:0.5;pointer-events:none;stroke-linejoin:bevel;", szText);
 						newTextBg.setAttributeNS(null, "id", this.szId + ":" + a + ":text:bg");
-						newText = map.Dom.newText(shapeGroup, 0, 0, "font-family:" + szFont + ";font-size:" + nFontSize + "px;font-weight:normal;text-anchor:middle;fill:" + (this.szTextColor || "#000000") + ";opacity:" + nOpacity + ";stroke:none;", szText);
+						newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:" + szFont + ";font-size:" + nFontSize + "px;font-weight:normal;text-anchor:middle;fill:" + (this.szTextColor || "#000000") + ";opacity:" + nOpacity + ";stroke:none;", szText);
 						newText.setAttributeNS(null, "id", this.szId + ":" + a + ":text");
 						newShape.parentNode.removeChild(newShape);
 					} else
@@ -16325,7 +16327,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			
 			nChartSize = nRadius * 2 / map.Scale.normalX(1);
 			ptNull.x = 0;
-			ptNull.y = nRadius + map.Scale.normalY(5);
+			ptNull.y = szFlag.match(/TEXTONLY/) ? (nRadius) : (nRadius + map.Scale.normalY(5));
 
 			this.nRealizedCount++;
 		} else {
@@ -17393,7 +17395,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								}
 							}
 						} else {
-							nFontSize = Math.max(nRadius * 0.8, 1);
+							nFontSize = Math.max(nRadius * 0.8, 1) * this.nValueScale;
 							shapeOnTopGroup = shapeOnTopGroup || map.Dom.newGroup(chartGroup, this.szId + ":" + a + ":chartontop");
 							newText = this.createTextLabel(SVGDocument, shapeOnTopGroup, "", szText, nFontSize / map.Scale.normalX(1), "", szColor);
 							newText.fu.setPosition(map.Scale.normalX(0) + nSymbolOffsetX, map.Scale.normalY(0) + nSymbolOffsetY);
@@ -18420,7 +18422,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			}
 		}
 
-		if (this.nRangeScale && !(szFlag.match(/ZOOM/) && szFlag.match(/HORZ/))) {
+		//if (this.nRangeScale && !(szFlag.match(/ZOOM/) && szFlag.match(/HORZ/))) {
+		if (this.nRangeScale) {
 			nStep = nStep * this.nRangeScale;
 		}
 
@@ -19217,7 +19220,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			barShape.fu.setPosition(0, nPosY);
 
 			if (szFlag.match(/STACKED/)) {
-				nPosY -= nValue * nStep;
+				if (!szFlag.match(/CENTER/)) {
+					nPosY -= nValue * nStep;
+				}
 			} else {
 				nPosY = 0;
 				nPosX += nWidth;
