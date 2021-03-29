@@ -468,15 +468,15 @@ window.ixmaps.data = window.ixmaps.data || {};
 	};
 	
 	
-	ixmaps.data.drawChart = function(szId,i,szIdA,szFlag){
+	ixmaps.data.drawChart = function(szId,i,szIdA,szFlag){ 
 		var objTheme = ixmaps.getThemeObj(szId);
 		objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);
 		$("#getchartmenutarget"+i).parent().attr("height","200");
 		var SVGBox = $("#getchartmenutarget"+i)[0].getBBox();
-		if (SVGBox.width && SVGBox.height) {
-			var scale = Math.max(1, 6000 / SVGBox.width);
+		if (0 && SVGBox.width && SVGBox.height) {
+			var scale = Math.max(1, 4000 / SVGBox.width);
 			SVGBox.width *= scale;
-			SVGBox.height *= scale/1.5;
+			SVGBox.height *= scale;
 			SVGBox.y -= (SVGBox.y+SVGBox.height)/4; //60;
 			SVGBox.height -= 60;
 
