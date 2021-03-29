@@ -426,7 +426,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 				var szText = "<h3><b>"+szSize+"</b>" + "  "+ szTitle + "</h3>";
 				var leftWidth = 0; //window.innerWidth/3;
 
-				szHtml += "<div id='"+objTheme.szId+":"+objTheme.indexA[i]+":chart' item='"+objTheme.indexA[i]+"' class='listitem' style='padding:0.5em 0em 0.7em 0.5em;margin-right:2em;border-bottom:#888 solid 0.5px;pointer-events:none'>";
+				szHtml += "<div id='"+objTheme.szId+":"+objTheme.indexA[i]+":chart' item='"+objTheme.indexA[i]+"' class='listitem' style='float:left;width:250px;padding:0.5em 0em 0.7em 0.5em;margin-right:2em;border-bottom:#888 solid 0.5px;pointer-events:none'>";
 				
 				szHtml += "<div class='title' style='pointer-events:none'>"+szText+"</div>";
 				
