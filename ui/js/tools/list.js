@@ -426,7 +426,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 				var szText = "<h3><b>"+szSize+"</b>" + "  "+ szTitle + "</h3>";
 				var leftWidth = 0; //window.innerWidth/3;
 
-				szHtml += "<div id='"+objTheme.szId+":"+objTheme.indexA[i]+":chart' item='"+objTheme.indexA[i]+"' class='listitem' style='float:left;width:250px;padding:0.5em 0em 0.7em 0.5em;margin-right:2em;border-bottom:#888 solid 0.5px;pointer-events:none'>";
+				szHtml += "<div id='"+objTheme.szId+":"+objTheme.indexA[i]+":chart' item='"+objTheme.indexA[i]+"' class='listitem' style='float:left;width:330px;padding:0.5em 0em 0.7em 0.5em;margin-right:2em;border-bottom:#888 solid 0.5px;pointer-events:none'>";
 				
 				szHtml += "<div class='title' style='pointer-events:none'>"+szText+"</div>";
 				
@@ -472,8 +472,9 @@ window.ixmaps.data = window.ixmaps.data || {};
 		var objTheme = ixmaps.getThemeObj(szId);
 		objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);
 		$("#getchartmenutarget"+i).parent().attr("height","200");
+		$("#getchartmenutarget"+i).parent().attr("width","330");
 		var SVGBox = $("#getchartmenutarget"+i)[0].getBBox();
-		if (0 && SVGBox.width && SVGBox.height) {
+		if (SVGBox.width && SVGBox.height) {
 			var scale = Math.max(1, 4000 / SVGBox.width);
 			SVGBox.width *= scale;
 			SVGBox.height *= scale;
@@ -488,7 +489,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 				height *= 0.9;
 			}
 
-			$("#getchartmenutarget"+i)[0].parentNode.setAttribute("height", height+20);
+			//$("#getchartmenutarget"+i)[0].parentNode.setAttribute("height", height+20);
 			$("#getchartmenutarget"+i)[0].parentNode.setAttribute("viewBox", SVGBox.x + ' ' + SVGBox.y + ' ' + SVGBox.width + ' ' + SVGBox.height);
 
 		} else {
