@@ -17872,7 +17872,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 											if (!this.szXaxisA || !this.szXaxisA.length || ((this.nXLen > 100)&&(ai >= this.nXLen-5))) {
 												newText.parentNode.removeChild(newText);
 											}else
-											if (!this.szXaxisA[ai] || !this.szXaxisA[ai].length || (this.szXaxisA[ai] == " ")) {
+											if ( 1 || !this.szXaxisA[ai] || !this.szXaxisA[ai].length || (this.szXaxisA[ai] == " ")) {
 												newText.parentNode.removeChild(newText);
 											}else{
 												newShape.fu.scaleBy(4,4	);

@@ -196,6 +196,15 @@
 			var __themeObj = ixmaps.getThemeObj();
 			if (szId.match(/chart/)){
 				__themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
+			}else{
+				// if not chart, get first CHOROPLETH theme
+				var themes = ixmaps.getThemes();
+				for ( i in themes ){
+					if (themes[i].szFlag.match(/CHOROPLETH/)){
+						__themeObj = themes[i];
+						break;
+					}
+				}
 			}
 			if (!__themeObj) {
 				return;

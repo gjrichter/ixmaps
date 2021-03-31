@@ -157,12 +157,14 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 		// theme
 		// ------------------------------------
-		var themes = ixmaps.getThemes();
-		var szId = null;
-		for ( i in themes ){
-			if ( themes[i].szFlag.match(/CHART|CHOROPLETH/) ){
-				szId = themes[i].szId;
-				break;
+		var szId = ixmaps.legend.actualTheme;
+		if ( !szId ){
+			var themes = ixmaps.getThemes();
+			for ( i in themes ){
+				if ( themes[i].szFlag.match(/CHART|CHOROPLETH/) ){
+					szId = themes[i].szId;
+					break;
+				}
 			}
 		}
 		var objThemeDefinition = ixmaps.getThemeDefinitionObj(null,szId);
@@ -170,7 +172,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 		
 		// GR 11.02.2021 if theme = PLOT, make charts
 		if ( objTheme.szFlag.match(/PLOT|PIE|BAR/) ){
-			ixmaps.data.makeItemList_charts(szFilter,szDiv);
+			ixmaps.data.makeItemList_charts(szFilter,szDiv,szId);
 			return;
 		}
 
@@ -339,7 +341,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 				szUnit += (value + " ");
 			}
 		})
-		szTooltip = "<div style='font-size:0.9em;line-height:1.2em;color:#aaaaaa;max-width:100px'>"+szUnit+"</div><div style='font-size:1.5em;margin:-0em 0.5em -0.2em 0'>"+szValue+"</div>";
+		szTooltip = "<div style='font-size:1.5em;margin:-0em 0.5em -0.2em 0'>"+szValue+"</div><div style='font-size:0.9em;line-height:1.2em;color:#aaaaaa;max-width:100px'>"+szUnit+"</div>";
 		
 		event.target.style.setProperty("fill-opacity","1");
 		showTooltip(event, szTooltip);
@@ -355,7 +357,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 		hideTooltip();
 	};
 
-	ixmaps.data.makeItemList_charts = function (szFilter,szDiv) {
+	ixmaps.data.makeItemList_charts = function (szFilter,szDiv,szId) {
 
 		facetsA = [];
 
@@ -374,12 +376,13 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 		// theme
 		// ------------------------------------
-		var themes = ixmaps.getThemes();
-		var szId = null;
-		for ( i in themes ){
-			if ( themes[i].szFlag.match(/CHART|CHOROPLETH/) ){
-				szId = themes[i].szId;
-				break;
+		if (!szId){
+			var themes = ixmaps.getThemes();
+			for ( i in themes ){
+				if ( themes[i].szFlag.match(/CHART|CHOROPLETH/) ){
+					szId = themes[i].szId;
+					break;
+				}
 			}
 		}
 		var objThemeDefinition = ixmaps.getThemeDefinitionObj(null,szId);

@@ -1513,13 +1513,15 @@ window.ixmaps.legend = window.ixmaps.legend || {};
             changeCss(".loading-text", "color:#666");
        }
     };
-	
-	ixmaps.legend.showItemList = function(){
+
+	ixmaps.legend.showItemList = function(szTheme){
+		ixmaps.legend.actualTheme = szTheme;
    		ixmaps.legend.loadExternalLegend("../../ui/html/tools/list.html");
 	};
 	
-	ixmaps.legend.showItemGrid = function(){
-        $("#map-popup").load("../../ui/html/tools/list.html");
+	ixmaps.legend.showItemGrid = function(szTheme){
+ 		ixmaps.legend.actualTheme = szTheme;
+       	$("#map-popup").load("../../ui/html/tools/list.html");
         $("#map-popup").show();
 		$("#map-popup").css("width",window.innerWidth);
 	};

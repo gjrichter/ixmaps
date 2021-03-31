@@ -136,17 +136,21 @@
 
 		$.getScript("../../ui/js/tools/list.js",function(){
 			
-			var szId = null;
-			var themes = ixmaps.getThemes();
-			for ( i in themes ){
-				if ( themes[i].szFlag.match(/CHART|CHOROPLETH/) ){
-					szId = themes[i].szId;
-					break;
+			// theme
+			// ------------------------------------
+			var szId = ixmaps.legend.actualTheme;
+			if ( !szId ){
+				var themes = ixmaps.getThemes();
+				for ( i in themes ){
+					if ( themes[i].szFlag.match(/CHART|CHOROPLETH/) ){
+						szId = themes[i].szId;
+						break;
+					}
 				}
 			}
 			var objTheme = ixmaps.getThemeObj(szId);
 			var objThemeDefinition = ixmaps.getThemeDefinitionObj(szId);
-
+			
 			if ( !objThemeDefinition ){
 				$("#facets").html("<h3>...nessun tema da filtrare!</h3>");
 				return;

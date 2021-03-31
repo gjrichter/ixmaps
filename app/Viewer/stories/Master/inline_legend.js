@@ -1260,9 +1260,15 @@ ixmaps.legend = ixmaps.legend || {};
     /**
      * show item list sidebar 	
       */
-	ixmaps.legend.showItemList = function(){
+	ixmaps.legend.showItemList = function(szTheme){
+		ixmaps.legend.actualTheme = szTheme;
 		ixmaps.loadStoryTool('./list.html',{frame:true});
  	}
+
+	ixmaps.legend.showItemGrid = function(szTheme){
+		ixmaps.legend.actualTheme = szTheme;
+		ixmaps.loadStoryTool('./list.html',{frame:true});
+	};	
 	
     // redraw or hide legend  
     __switchLegendMode = function () {
