@@ -327,7 +327,7 @@ $Log: htmlgui.js,v $
 		var fullHeight = __SVGEmbedHeight ? __SVGEmbedHeight : window.innerHeight;
 
 		var mapWidth = fullWidth - __mapLeft - __SVGmapPosX;
-		var mapHeight = fullHeight - __mapTop - - __mapFooter - __SVGmapPosY;
+		var mapHeight = fullHeight - __mapTop - __mapFooter - __SVGmapPosY;
 
 		this.hideLoading();
 
