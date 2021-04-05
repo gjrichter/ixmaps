@@ -403,6 +403,8 @@ $Log: htmlgui.js,v $
 
 			// GR 07.04.2018 default map
 			szUrl = szUrl || ixmaps.szDefaultMap;
+			
+			console.log(ixmaps);
 
 			if (szUrl || $(szUrl).assertStr()) {
 
