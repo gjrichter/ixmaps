@@ -39,8 +39,7 @@ $Log: htmlgui.js,v $
 
 	var ixmaps = {
 		version: "1.0",
-		JSON_Schema: "https://gjrichter.github.io/ixmaps/schema/ixmaps/v1.json",
-		szDefaultMap: "https://gjrichter.github.io/ixmaps/maps/svg/maps/generic/mercator.svg"
+		JSON_Schema: "https://gjrichter.github.io/ixmaps/schema/ixmaps/v1.json"
 	};
 
 	function expose() {
@@ -71,6 +70,8 @@ $Log: htmlgui.js,v $
 	/* ------------------------------------------------------------------ * 
 		global variables
 	 * ------------------------------------------------------------------ */
+
+	ixmaps.szDefaultMap = "../../maps/svg/maps/generic/mercator.svg";
 
 	ixmaps.szUrlSVG = null;
 	ixmaps.helpWindow = null;
@@ -402,8 +403,6 @@ $Log: htmlgui.js,v $
 
 			// GR 07.04.2018 default map
 			szUrl = szUrl || ixmaps.szDefaultMap;
-			
-			console.log(ixmaps);
 
 			if (szUrl || $(szUrl).assertStr()) {
 
