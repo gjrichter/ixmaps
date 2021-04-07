@@ -355,19 +355,20 @@ DonutChart.prototype.realize = function(){
 	// GR 14.02.2020 make background circle 
 	// 
 	if ( this.szStyle.match(/STARBURST/) && this.szStyle.match(/POLAR/) ) {
+
 		var radius = Math.max(1,this.nRadInner + nMaxRadius/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
-		var c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:white;fill-opacity:1;stroke:#dddddd;stroke-width:20px;"); 
+		var c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:white;fill-opacity:0.85;stroke:#aaaaaa;stroke-width:10px;"); 
 		c.setAttributeNS(null,"tooltip","75-100");
 		
 		var radius = Math.max(1,this.nRadInner + nMaxRadius75/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
-		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#dddddd;stroke-width:20px;stroke-dasharray:50 50"); 	
+		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#aaaaaa;stroke-width:10px;stroke-dasharray:50 50"); 	
 		c.setAttributeNS(null,"tooltip","50-75");
 		
 		var radius = Math.max(1,this.nRadInner + nMaxRadius50/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
-		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#dddddd;stroke-width:10px;"); 		c.setAttributeNS(null,"tooltip","25-50");
+		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#aaaaaa;stroke-width:5px;"); 		c.setAttributeNS(null,"tooltip","25-50");
 	
 		var radius = Math.max(1,this.nRadInner + nMaxRadius25/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
-		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#dddddd;stroke-width:20px;stroke-dasharray:50 50"); 
+		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#aaaaaa;stroke-width:10px;stroke-dasharray:50 50"); 
 		c.setAttributeNS(null,"tooltip","0-25");
 
 	}

@@ -5261,11 +5261,6 @@ Map.Event.prototype.defaultMouseOver = function(evt){
 		}
 	}
 
-	// GR 22.02.2018 non lecit call 
-	if (szMapToolType === ""){
-		return;
-	}
-
 	// mouse over popup window
 	if (SVGPopupGroup.fu.isContained(onoverShape) || SVGFixedGroup.fu.isContained(onoverShape)) {
 		if ( this.popupContextObj ){
@@ -5277,6 +5272,11 @@ Map.Event.prototype.defaultMouseOver = function(evt){
 		this.onoverPopup = false;
 	}
 		
+	// GR 22.02.2018 non lecit call 
+	if ((szMapToolType === "") && !this.onoverPopup){
+		return;
+	}
+
 	// HTML interface interception
 
 	if (szMapToolType == "clickinfo"){
@@ -7832,7 +7832,7 @@ var mapToolList = new MapToolList();
  * @param evt the actual event
  * @param szType the tool type ("coord","polygon",...)
  */
-var MapTool = function(evt,szType,nPos) {
+ 	MapTool = function(evt,szType,nPos) {
 	/** fontsize for all map tool texts @type int */
 	this.nFontSize      =  14;
 	/** SVG style to draw lines in map tools @type string */
@@ -7869,7 +7869,7 @@ var MapTool = function(evt,szType,nPos) {
 			mouseObject.parent = this;
 
 			textObj = map.Dom.newGroup(this.objNode,"distance-text"+String(Math.random()));
-			map.Dom.newShape('rect',textObj,0,0,1,1,this.szFillBgStyle);
+			map.Dom.newShape('rect',textObj,-map.Scale.normalX(this.nFontSize*0.3),0,1,1,this.szFillBgStyle);
 			map.Dom.newText(textObj,0,0,this.szTextStyle,"");
 			map.Dom.newText(textObj,0,0,this.szTextStyle,"");
 
@@ -7922,7 +7922,7 @@ var MapTool = function(evt,szType,nPos) {
 			map.Dom.newShape('line',this.objNode,mouseObject.mouseStartPosition.x,mouseObject.mouseStartPosition.y,mouseObject.mouseStartPosition.x,mouseObject.mouseStartPosition.y,this.szLineStyle);
 
 			textObj = map.Dom.newGroup(this.objNode,"distance-text"+String(Math.random()));
-			map.Dom.newShape('rect',textObj,mouseObject.mouseStartPosition.x+map.Scale.normalX(5),mouseObject.mouseStartPosition.y-map.Scale.normalY(5)-map.Scale.normalY(this.nFontSize*6/7),0,map.Scale.normalY(this.nFontSize),this.szFillBgStyle);
+			map.Dom.newShape('rect',textObj,mouseObject.mouseStartPosition.x,mouseObject.mouseStartPosition.y-map.Scale.normalY(5)-map.Scale.normalY(this.nFontSize*7/7),1000,map.Scale.normalY(this.nFontSize*1.3),this.szFillBgStyle);
 			map.Dom.newText(textObj,mouseObject.mouseStartPosition.x+map.Scale.normalX(5),mouseObject.mouseStartPosition.y-map.Scale.normalY(5),this.szTextStyle,"test");
 
 			endPoint = map.Dom.newGroup(this.objNode,"endpoint"+String(Math.random()));
@@ -8016,14 +8016,14 @@ MapTool.prototype.onMouseMove = function(evt){
 			textNode.fu.setPosition(deltaX/2,deltaY/2);
 
 			var bgRect = textNode.firstChild;
-			var textA = textNode.firstChild;
+			var textA = bgRect.nextSibling;
 			var nDistance = map.Scale.getDistanceInMeter(mouseObject.mouseStartPosition.x,
 																	mouseObject.mouseStartPosition.y,
 																	newMousePosition.x,
 																	newMousePosition.y);
 			textA.firstChild.nodeValue = map.Scale.formatDistanceString(nDistance);
 			var bBox = map.Dom.getBox(textA);
-			bgRect.setAttributeNS(null,"width",bBox.width);
+			bgRect.setAttributeNS(null,"width",bBox.width+bBox.height*0.7);
 			break;
 		case "zoomrect":
 		case "selectrect":
@@ -8502,8 +8502,8 @@ MapTool.prototype.redraw = function(evt){
 			var bBoxY = map.Dom.getBox(textY);
 			textX.setAttributeNS(null,"y",Number(bBoxX.height));
 			textY.setAttributeNS(null,"y",Number(bBoxX.y)+Number(bBoxX.height)+Number(bBoxY.height)+map.Scale.normalY(3));
-			cbgRect.setAttributeNS(null,"width" ,bBoxX.width);
-			cbgRect.setAttributeNS(null,"height",Number(bBoxX.height)+Number(bBoxY.height)+map.Scale.normalY(3));
+			cbgRect.setAttributeNS(null,"width" ,bBoxX.width+map.Scale.normalY(8));
+			cbgRect.setAttributeNS(null,"height",Number(bBoxX.height)+Number(bBoxY.height)+map.Scale.normalY(12));
 
 			var position = new point(newMousePosition.x,newMousePosition.y);
 			var offset = new point(map.Scale.normalX(5),map.Scale.normalY(5));
@@ -8735,7 +8735,7 @@ TextField.prototype.resizeField = function(){
 		var bBox = map.Dom.getBox(this.workspaceNode);
 		if (this.bgNode){
 			this.bgNode.setAttributeNS(null,"x",bBox.x-12);
-			this.bgNode.setAttributeNS(null,"y",bBox.y-3);
+			this.bgNode.setAttributeNS(null,"y",bBox.y-4);
 			this.bgNode.setAttributeNS(null,"width",bBox.width+24);
 			this.bgNode.setAttributeNS(null,"height",bBox.height+10);
 		}
