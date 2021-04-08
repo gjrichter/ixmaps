@@ -673,6 +673,10 @@
 						ixmaps.loadProject(szProjectUrl, false);
 						ixmaps.onMapReady = null;
 					}
+					if ($(document).getUrlParam('view')) {
+						szView = $(document).getUrlParam('view');
+						setTimeout("ixmaps.setView("+szView+")",50);
+					}
 					if ($(document).getUrlParam('data')) {
 						szDataUrl = $(document).getUrlParam('data');
 						ixmaps.loadData(szDataUrl, false);
