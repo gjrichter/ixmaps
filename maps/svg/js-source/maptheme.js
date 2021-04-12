@@ -8625,7 +8625,11 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 					}
 				} else {
 					for (k = 0; k < this.szFieldsA.length; k++) {
-						this.itemA[szId].nValuesA[k] += nValuesA[k] || 0;
+						if (this.__fMax) {
+							this.itemA[szId].nValuesA[k] = Math.max(this.itemA[szId].nValuesA[k],nValuesA[k]||0);
+						}else{
+							this.itemA[szId].nValuesA[k] += nValuesA[k] || 0;
+						}
 						nSize = Math.max(nSize, nValuesA[k] || 0);
 					}
 				}
@@ -16658,6 +16662,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		// --------------------------------------------------------
 		// draw the chart parts ( n symbols )
 		// --------------------------------------------------------
+		
+		var tStackValue = 0;
 
 		for (i = nStartI; i < nMaxI; i++) {
 			
@@ -16675,7 +16681,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				// GR 25.05.2015 explizit value display field, take it as is
 				tValue = __scanValue(this.itemA[a].szValue);
 			}
-
+			
 			if (this.szShowParts) {
 				var skipIt = true;
 				for (p in this.szShowPartsA) {
@@ -16698,6 +16704,14 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			nClass = nIndex;
 			if (this.nGridX && szFlag.match(/PLOT/)) {
 				nClass %= this.nGridX;
+			}
+			// make stack value
+			if (szFlag.match(/STACKED/)) {
+				if (nClass == 0){
+					tStackValue = 0;
+				}
+				tValue += tStackValue;
+				tStackValue = tValue;
 			}
 
 			// make tooltip text
