@@ -2499,6 +2499,12 @@ $Log: htmlgui_api.js,v $
 			if ( opt.themeLegend ){
 				szUrl += "&themelegend="+opt.themeLegend;
 			}
+			if ( opt.mode ){
+				szUrl += "&mode="+opt.mode;
+			}
+			if ( opt.scrollsafe ){
+				szUrl += "&scrollsafe="+(opt.scrollsafe?"1":"0");
+			}
 			if ( opt.tools ){
 				szUrl += "&tools="+(opt.tools?"1":"0");
 			}
@@ -2521,7 +2527,7 @@ $Log: htmlgui_api.js,v $
 			if ( opt.project ){
 				szUrl += "&project="+opt.project;
 			}
-		
+
 			var szHeight = opt.height || "640px";
 			var szWidth  = opt.width  || "100%";
 		

@@ -135,6 +135,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			name: "NOKIA - satellite",
 			myname: "NOKIA - satellite",
 			minZoom: 2,
+			maxZoom: 22,
 			attribution: 'Map tiles &copy; <a href="http://here.com/">HERE Maps</a>',
 			subdomains: ['1','2','3','4']
 		});

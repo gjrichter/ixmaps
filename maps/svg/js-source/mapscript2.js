@@ -9628,7 +9628,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 				szInfoTitle = chartTheme.itemA[szShapeId].szTitle;
 			}
 			if ( chartTheme && chartTheme.itemA[szShapeId] && chartTheme.itemA[szShapeId].dbIndexA && chartTheme.itemA[szShapeId].dbIndexA.length ){
-				szInfoTitle = chartTheme.itemA[szShapeId].dbIndexA.length + " " +map.Dictionary.getLocalText("items aggregated");
+				//szInfoTitle = chartTheme.itemA[szShapeId].dbIndexA.length + " " +map.Dictionary.getLocalText("items aggregated");
 			}
 			if ( chartTheme && chartTheme.itemA[szShapeId] && chartTheme.itemA[szShapeId].szSelectionId2 && (chartTheme.itemA[szShapeId].szSelectionId2 != "undefined") ){
 				szInfoTitle += " ==> " + chartTheme.itemA[szShapeId].szSelectionId2;
@@ -9680,7 +9680,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 					}
 					// add summary
 					var szTotal = map.Themes.getSummary(szShapeId,map.Themes.activeTheme);
-					if ( szTotal ){
+					if ( 0 && szTotal ){
 						var szTextStyle = __scaleStyleString(map.Scale.tStyle.Summary.szStyle,1); 
 						map.Dom.newText(chartGroup,chartBox.x,nYpos,szTextStyle,szTotal+chartTheme.szUnits);
 						nYpos += map.Scale.tStyle.Summary.nFontHeight;

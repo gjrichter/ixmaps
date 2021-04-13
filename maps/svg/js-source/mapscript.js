@@ -179,6 +179,7 @@ var szSVG = "http:"+"/"+"/"+"www.w3.org/2000/svg";
 var szMapNs = "http:"+"/"+"/"+"www.medienobjekte.de";
 var szXlink = "http:"+"/"+"/"+"www.w3.org/1999/xlink";
 var szHTTP = "http:"+"/"+"/";
+var szHTTPS = "https:"+"/"+"/";
 
 var szLinkTarget = "_blank";
 var szEmbedName = "SVGMap";
@@ -1573,6 +1574,9 @@ Map.Dom.prototype.newText = function(targetGroup,x,y,s,szText){
 	}
 	szText = String(szText);
 	if ( fCreatTextLink && szText.substr(0,7) == szHTTP ){
+		return this.newTextLink(targetGroup,x,y,s,szText);
+	}
+	if ( fCreatTextLink && szText.substr(0,8) == szHTTPS ){
 		return this.newTextLink(targetGroup,x,y,s,szText);
 	}
 	var nT = this.constructNode('text',targetGroup,{x:String(x),y:String(y),style:s});
@@ -4450,7 +4454,7 @@ function doDisplayTooltip(szText,xPos,yPos){
 	if (szText.length){
 		szText =  map.Dictionary.getLocalText(szText);
 		var offset = new point(map.Scale.normalX(20),map.Scale.normalY(20));
-		var newText = createTextField(SVGDocument,SVGTltipGroup,'tooltip',szText);
+		var newText = createTextField(SVGDocument,SVGTltipGroup,'tooltip',szText,16);
 		newText.style.setProperty("pointer-events","none","");
 		var textBox = map.Dom.getBox(newText);
 		if ( SVGPopupGroup.hasChildNodes ){
@@ -4956,8 +4960,8 @@ function createTextField(SVGDocument,SVGTargetGroup,szId,szText,fontheight){
 	}
 	if(SVGDocument && SVGTargetGroup){
 		var newGroup = map.Dom.newGroup(SVGTargetGroup,szId);
-		var newShadow = map.Dom.newShape('rect',newGroup,1,1,1,1,"fill:#444444;opacity:0.5;stroke:none");
-		var newRect = map.Dom.newShape('rect',newGroup,1,1,1,1,"fill:#fefeff;stroke:#444444;stroke-width:"+map.Scale.normalX(0.2)+"");
+		var newShadow = map.Dom.newShape('rect',newGroup,1,1,1,1,"fill:#aaaaaa;opacity:0.5;stroke:none");
+		var newRect = map.Dom.newShape('rect',newGroup,1,1,1,1,"fill:#fefeff;stroke:#aaaaaa;stroke-width:"+map.Scale.normalX(0.2)+"");
 		var newText = map.Dom.newText(newGroup,0,map.Scale.normalY(fontheight*1.25),"font-family:arial;font-size:"+map.Scale.normalY(fontheight)+"px;fill:"+szInfoBodyColor+"",szText);
 
 		__textField_group  = newGroup;
@@ -4973,8 +4977,8 @@ function createTextField(SVGDocument,SVGTargetGroup,szId,szText,fontheight){
 function sizeTextField(){
 		var fontheight = __textField_fontheight;
 		var bBox = map.Dom.getBox(__textField_group);
-		__textField_frame.setAttributeNS(null,"rx" ,map.Scale.normalX(2));
-		__textField_frame.setAttributeNS(null,"ry" ,map.Scale.normalX(2));
+		__textField_frame.setAttributeNS(null,"rx" ,map.Scale.normalX(4));
+		__textField_frame.setAttributeNS(null,"ry" ,map.Scale.normalX(4));
 		__textField_frame.setAttributeNS(null,"x" ,-map.Scale.normalX(fontheight*0.75));
 		__textField_frame.setAttributeNS(null,"y" ,-map.Scale.normalY(1));
 		__textField_frame.setAttributeNS(null,"width" ,bBox.width +map.Scale.normalX(fontheight*1.5));
@@ -4982,8 +4986,8 @@ function sizeTextField(){
 
 		__textField_shadow.setAttributeNS(null,"rx" ,map.Scale.normalX(4));
 		__textField_shadow.setAttributeNS(null,"ry" ,map.Scale.normalX(4));
-		__textField_shadow.setAttributeNS(null,"x" ,-map.Scale.normalX(fontheight*0.75)+map.Scale.normalX(2));
-		__textField_shadow.setAttributeNS(null,"y" ,map.Scale.normalY(2));
+		__textField_shadow.setAttributeNS(null,"x" ,-map.Scale.normalX(fontheight*0.75)+map.Scale.normalX(1));
+		__textField_shadow.setAttributeNS(null,"y" ,map.Scale.normalY(1));
 		__textField_shadow.setAttributeNS(null,"width" ,bBox.width +map.Scale.normalX(fontheight*1.5)+map.Scale.normalX(1.5));
 		__textField_shadow.setAttributeNS(null,"height",bBox.height+map.Scale.normalX(fontheight)/2-map.Scale.normalX(0));
 		return;
