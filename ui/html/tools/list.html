@@ -151,10 +151,13 @@
 			var objTheme = ixmaps.getThemeObj(szId);
 			var objThemeDefinition = ixmaps.getThemeDefinitionObj(szId);
 			
-			if ( !objThemeDefinition ){
-				$("#facets").html("<h3>...nessun tema da filtrare!</h3>");
+			if ( !objTheme ){
+				if (szId) {
+					$("#facetDiv").html("<div style='text-align:center;'><h1>Item List</h1><h4>error:<span style='color:red'> theme '"+szId+"' not found!</span></h4></div>");
+				}
 				return;
 			}
+
 			// theme data
 			// ------------------------------------
 			var szFilter = objThemeDefinition.style.filter;

@@ -96,7 +96,11 @@
 
 		<div class="btn-group" style="margin-top:0.8em;margin-bottom:0em;">
 			<button id="btn-solo-attivi" type="button" class="btn btn-default" onclick="$('.facet').hide();">solo filtri attivi</button>
-			<button id="btn-tutti"       type="button" class="btn btn-default" onclick="$('.facet').show();">tutti</button>
+			<button id="btn-tutti" type="button" class="btn btn-default" onclick="$('.facet').show();">tutti</button>
+		</div>
+		<div class="btn-group" style="margin-top:0.8em;margin-bottom:0em;">
+			<button id="btn-verbose" type="button" class="btn btn-default" onclick="verbose=true;ixmaps.htmlgui_onZoomAndPan();">verbose</button>
+			<button id="btn-sleek" type="button" class="btn btn-default" onclick="verbose=false;ixmaps.htmlgui_onZoomAndPan()">sleek</button>
 		</div>
 
 		<div id="facetDiv" style="margin-bottom:1em;width:100%">
@@ -115,11 +119,11 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.9.0/bootstrap-slider.min.js"></script>
 	<script src="../../../../../data.js/data.js"></script>
 
-	<script src="filter.js"></script>
-	<script src="./assets/lib/d3/d3.js"></script>
+	<script src="./assets/lib/d3/d3.js" charset="utf-8"></script>
 	<script src="./assets/lib/d3/d3.layout.cloud.js"></script>
 	<script src="./assets/lib/d3/d3.wordcloud.js"></script>
-	<script src="wordcloud.js"></script>
+
+	<script src="filter.js"></script>
 
 	<script type="text/javascript">
 
@@ -141,6 +145,8 @@
 		}
 
 		ixmaps.initialized = true;
+		
+		var verbose = false;
 
 		// -----------------------------------------------
 		// refresh theme on zoom and pan ! 

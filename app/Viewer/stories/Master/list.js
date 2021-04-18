@@ -170,6 +170,13 @@ window.ixmaps.data = window.ixmaps.data || {};
 		var objThemeDefinition = ixmaps.getThemeDefinitionObj(null,szId);
 		var objTheme = ixmaps.getThemeObj(null,szId);
 		
+		if ( !objTheme ){
+			if (szId) {
+				$("#"+szDiv).html("<h1>Item List</h1><h4>error:<span style='color:red'> theme '"+szId+"' not found!</span></h4>");
+			}
+			return;
+		}
+		
 		// GR 11.02.2021 if theme = PLOT, make charts
 		if ( objTheme.szFlag.match(/PLOT|PIE|BAR/) ){
 			ixmaps.data.makeItemList_charts(szFilter,szDiv,szId);
@@ -255,7 +262,9 @@ window.ixmaps.data = window.ixmaps.data || {};
 					for ( d = 0; d<mydata.records[index].length; d++ ){
 						szHtml += "<tr><td style='text-align:right;vertical-align:top;width:"+leftWidth+"px;color:#aaa;font-size:0.8em;'>"+mydata.fields[d].id+"</td>";
 						var szValue = String(mydata.records[index][d]);
-						if (szValue.match(/http:/) || szValue.match(/https:/)) {
+						if (!(szValue.match(/\<img/) || szValue.match(/\<a/)) &&
+							(szValue.match(/http:/) || szValue.match(/https:/))
+							) {
 							if (szValue.match(/.jpg/) || szValue.match(/.png/)) {
 								szValue = "<img  src='" + szValue + "' style='max-width:100%'>";
 							} else {
@@ -475,7 +484,9 @@ window.ixmaps.data = window.ixmaps.data || {};
 						for ( d = 0; d<mydata.records[index].length; d++ ){
 							szHtml += "<tr><td style='text-align:right;vertical-align:top;width:"+leftWidth+"px;color:#aaa;font-size:0.8em;'>"+mydata.fields[d].id+"</td>";
 							var szValue = String(mydata.records[index][d]);
-							if (szValue.match(/http:/) || szValue.match(/https:/)) {
+							if (!(szValue.match(/\<img/) || szValue.match(/\<a/)) &&
+								(szValue.match(/http:/) || szValue.match(/https:/))
+								) {
 								if (szValue.match(/.jpg/) || szValue.match(/.png/)) {
 									szValue = "<img  src='" + szValue + "' style='max-width:100%'>";
 								} else {

@@ -166,6 +166,21 @@
 				}
 				source = source.parentNode;
 			}
+			// try to format tooltip
+			var szTestA = szTooltip.split(" ");
+			var szValue = "";
+			var szUnit = "";
+			var fValue = true;
+			szTestA.forEach(function(value){
+				if ( fValue && !isNaN(value)){
+					szValue += (value + " ");
+				}else{
+					fValue = false;
+					szUnit += (value + " ");
+				}
+			})
+			szTooltip = "<div style='font-size:0.9em;line-height:1.2em;color:#aaaaaa;max-width:100px'>"+szUnit+"</div><div style='font-size:1.5em;margin:-0em 0.5em -0.1em 0em'>"+szValue+"</div>";
+		
 			event.target.style.setProperty("fill-opacity","1");
 			showTooltip(event, szTooltip);
 			event.stopPropagation();
@@ -437,7 +452,9 @@
 							}
 							var value = dataObject[i];
 							var szValue = (isNaN(value) || value < 10000) ? String(value) : ixmaps.__formatValue(dataObject[i], 2, "SPACE");
-							if (szValue.match(/http:/) || szValue.match(/https:/)) {
+							if (!(szValue.match(/\<img/) || szValue.match(/\<a/)) &&
+								(szValue.match(/http:/) || szValue.match(/https:/))
+								) {
 								if (szValue.match(/.jpg/) || szValue.match(/.png/)) {
 									szValue = "<img  src='" + szValue + "' style='max-width:100%'>";
 									szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";

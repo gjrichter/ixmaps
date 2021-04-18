@@ -125,6 +125,10 @@
 
 <body style="margin:0px;padding:0px;overflow:hidden;">
 
+	<!-- header -->
+	<div id="map-header" class="map-header" style="margin-left:2px;z-index:1000;display:none;">
+	</div>
+
 	<!--========================================================================= 
 		the map space
 	<!--========================================================================= -->
@@ -611,21 +615,40 @@
 			// ----------------------
 			// align user interface
 			// ----------------------
+			
+			// needed for relative ui element positioning
+			$("#map-overlay").css("width", window.innerWidth + "px");
+			$("#map-overlay").css("height", window.innerHeight + "px");
+			$("#map-overlay").css("pointer-events", "none");
 
 			if ($(document).getUrlParam('align')) {
 				if ($(document).getUrlParam('align') == "left") {
 					ixmaps.legendAlign = "left";
-					$(".map-legend").attr("data-align","left")
+					$(".map-legend").attr("data-align","left");
 					$(".map-legend").css("left", "4%");
 					$(".map-legend").css("top", "12px");
 					$(".title-field").css("left", "100px");
-				}
+				}else
 				if ($(document).getUrlParam('align') == "right") {
 					ixmaps.legendAlign = "right";
-					$(".map-legend").attr("data-align","right")
+					$(".map-legend").attr("data-align","right");
 					$("#onmapbuttondiv").css("left", "");
 					$("#onmapbuttondiv").css("right", "60px");
 					$(".map-legend").css("right", "25px");
+					$(".title-field").css("right", "100px");
+				}else
+				if ($(document).getUrlParam('align') == "center") {
+					$("#map-legend").appendTo("#map-header");
+					$("#map-header").show();
+					$("#ixmap").css("top", "75px");
+					ixmaps.legendAlign = "center";
+					$(".map-legend").attr("data-align","right");
+					$(".map-legend").css("font-size","0.5em");
+					$("#onmapbuttondiv").css("left", "");
+					$("#onmapbuttondiv").css("right", "60px");
+					$(".map-legend").css("left", "40%");
+					$(".map-legend").css("width", "100%");
+					$(".map-legend").css("max-width", "100%");
 					$(".title-field").css("right", "100px");
 				}
 			} else {
@@ -749,6 +772,9 @@
 				$("#legend").parent().css("left", (window.innerWidth - width - 20) + "px");
 				$("#legend").parent().css("top", (window.innerHeight - height - 40) + "px");
 			}
+			$("#map-overlay").css("width", window.innerWidth + "px");
+			$("#map-overlay").css("height", window.innerHeight + "px");
+			$("#map-overlay").css("pointer-events", "none");
 		});
 
 		// ----------------------
@@ -901,7 +927,8 @@
 
 		var __olditemclick = ixmaps.htmlgui_onItemClick;
 		ixmaps.htmlgui_onItemClick = function(szId){
-			if ( __olditemclick(szId) ){
+			// check __olditemclick when parent Api has no map; magick - tested 
+			if ( (ixmaps.parentApi.isMap == false) && __olditemclick(szId) ){
 				return true;
 			}else{
                 if (szId.match(/mapbackground:eventrect/)){

@@ -1027,7 +1027,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
             return;
         }
         ixmaps.legend.externalLegend = false;
-        $("#map-legend").html("<h3 id='map-legend-title' class='loading-text' style='font-size:20px;line-height:1.3em;margin-top:1px;padding:0.5em 1em;border:solid #444 0.5px;border-radius:5px'>" + (themeObj.szSplash || "loading ...") + "</h3>");
+        $("#map-legend").html("<h3 id='map-legend-title' class='loading-text' style='font-size:20px;line-height:1.3em;margin-top:1px;padding:0.5em 1em;border:solid #444 0px;border-radius:5px'>" + (themeObj.szSplash || "loading ...") + "</h3>");
         $("#map-legend").show();
     }
 

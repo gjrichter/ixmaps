@@ -169,6 +169,13 @@ window.ixmaps.data = window.ixmaps.data || {};
 		var objThemeDefinition = ixmaps.getThemeDefinitionObj(szId);
 		var objTheme = ixmaps.getThemeObj(szId);
 		
+		if ( !objTheme ){
+			if (szId) {
+				$("#"+szDiv).html("<h1>Item List</h1><h4>error:<span style='color:red'> theme '"+szId+"' not found!</span></h4>");
+			}
+			return;
+		}
+
 		// GR 11.02.2021 if theme = PLOT, make charts
 		if ( objTheme.szFlag.match(/PLOT|PIE|BAR/) ){
 			ixmaps.data.makeItemList_charts(szFilter,szDiv,szId);
@@ -469,27 +476,22 @@ window.ixmaps.data = window.ixmaps.data || {};
 	
 	
 	ixmaps.data.drawChart = function(szId,i,szIdA,szFlag){ 
+		
 		var objTheme = ixmaps.getThemeObj(szId);
 		objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);
-		$("#getchartmenutarget"+i).parent().attr("height","200");
+		
+		$("#getchartmenutarget"+i).parent().attr("height","240");
 		$("#getchartmenutarget"+i).parent().attr("width","330");
+		
 		var SVGBox = $("#getchartmenutarget"+i)[0].getBBox();
 		if (SVGBox.width && SVGBox.height) {
-			var scale = Math.max(1, 4000 / SVGBox.width);
+			var scale = 330*20 / SVGBox.width;
+			scale = objTheme.szFlag.match(/PLOT/)?1.1:1.2;
 			SVGBox.width *= scale;
 			SVGBox.height *= scale;
 			SVGBox.y -= (SVGBox.y+SVGBox.height)/4; //60;
 			SVGBox.height -= 60;
 
-			var size = objTheme.szFlag.match(/PLOT|HORZ|STACKED/) ? 400 : 300;
-			var width = size;
-			var height = size / SVGBox.width * SVGBox.height;
-
-			while (height > width) {
-				height *= 0.9;
-			}
-
-			//$("#getchartmenutarget"+i)[0].parentNode.setAttribute("height", height+20);
 			$("#getchartmenutarget"+i)[0].parentNode.setAttribute("viewBox", SVGBox.x + ' ' + SVGBox.y + ' ' + SVGBox.width + ' ' + SVGBox.height);
 
 		} else {
