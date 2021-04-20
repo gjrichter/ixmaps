@@ -644,8 +644,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 	};
 
 
-}( window.ixmaps = window.ixmaps || {} ));
-
+}( window.ixmaps = window.ixmaps || {}, jQuery ));
 
 // .............................................................................
 // EOF
