@@ -16835,6 +16835,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							continue;
 						}
 						if (szFlag.match(/HORZ/)) {
+							if (szFlag.match(/LEFT/)) {
+								nIndex = -nIndex;
+							}
 							if (szFlag.match(/VALUES/)) {
 								var cColor = __maptheme_getChartColors(szColor);
 								szLineColor = cColor.textColor;
@@ -16856,6 +16859,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							}
 							newShape.setAttributeNS(szMapNs, "tooltip", szTooltip);
 							newShape.fu.setPosition(nIndex * nRadius * 2, 0);
+							if (szFlag.match(/LEFT/)) {
+								nIndex = -nIndex;
+							}
 						} else {
 							if (szFlag.match(/VALUES/) && (!this.fHideValues || szFlag.match(/ZOOM/))) {
 								var cColor = __maptheme_getChartColors(szColor);
@@ -17818,7 +17824,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
                                                 map.Dom.newShape('line', gridGroup, left, -sy, right, -sy, "stroke:#888888;stroke-opacity:0.4;stroke-width:" + (map.Scale.normalX(0.05*nPlotScale)) + ";stroke-dasharray:"+(6*nPlotScale)+" "+(3*nPlotScale)+";");
                                             }
 												
-											map.Dom.newText(gridGroup, left * 1.1, -sy + nScaleFontSize * 0.3, "font-family:arial;font-size:" + nScaleFontSize + "px;text-anchor:end;fill:#888888;stroke:none;pointer-events:none;", st);
+											map.Dom.newText(gridGroup, left * 1.1, -sy + nScaleFontSize * 0.3, "font-family:arial;font-size:" + nScaleFontSize + "px;text-anchor:end;fill:"+(szFlag.match(/\bCOLOR\b/)?szColor:"#888888")+";stroke:none;pointer-events:none;", st);
 												
 											this.nPlotHeight = s;
 										}
@@ -18599,7 +18605,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			var nClass = nIndex%(this.nGridX||1000000);
 
 			// or: value -> class -> color 
-			if ((szFlag.match(/SEQUENCE/) || (nPartsA.length == 1)) && this.colorScheme.length >= 2) {
+			if ((szFlag.match(/SEQUENCE|CLIP/) || (nPartsA.length == 1)) && this.colorScheme.length >= 2) {
 				nColor = this.colorScheme[this.partsA.length - 1];
 				for (ii = 0; ii < this.partsA.length; ii++) {
 					if (nValue < this.partsA[ii].max) {
