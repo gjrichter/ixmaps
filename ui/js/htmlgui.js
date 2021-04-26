@@ -451,7 +451,7 @@ $Log: htmlgui.js,v $
 	ixmaps.HTML_loadSVGMap = function (szUrl) {
 
 		if (!szUrl || (typeof (szUrl) != 'string')) {
-			ixmaps.loadMapError();
+			ixmaps.loadMapError(szUrl);
 			return;
 		}
 
@@ -497,7 +497,7 @@ $Log: htmlgui.js,v $
 		} else {
 			this.szUrlSVGRoot = "";
 		}
-		$(this.svgObject).attr('onerror', 'ixmaps.loadMapError()');
+		$(this.svgObject).attr('onerror', 'ixmaps.loadMapError(ixmaps.szUrlSVG)');
 
 		$.get(this.szUrlSVG).
 		done(function (data) {
@@ -515,8 +515,8 @@ $Log: htmlgui.js,v $
 		ixmaps.do_enableSVG();
 	};
 
-	ixmaps.loadMapError = function () {
-		alert("SVG load error!");
+	ixmaps.loadMapError = function (e) {
+		alert("load SVG map error!\nurl: "+e);
 	};
 
 	/**
