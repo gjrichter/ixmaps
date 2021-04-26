@@ -397,11 +397,20 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 		// take only rows which are on the map
 		// -------------------------------------------------
-
-		szHtml += "<div class='title'>&nbsp;&nbsp;"+objTheme.indexA.length+" items on map</div>";
+		szHtml += "<div class='title' style='font-size:2em;line-height:1.5em'>"+objTheme.szTitle +" - "+ objTheme.indexA.length+" / "+Object.keys(objTheme.itemA).length+" items</div>";
+		if (objTheme.szSnippet){
+			szHtml += "<div class='title' style='font-size:1.3em;line-height:1.5em;margin-bottom:2em'>&nbsp;"+objTheme.szSnippet+"</div>";
+		}
 		var maxList = Math.min(objTheme.indexA.length,100);
 		if ( maxList < objTheme.indexA.length ){
 			szHtml += "<div class='title'>(only the first "+maxList+" items are shown)</div>";
+		}
+		if (objTheme.colorScheme && objTheme.szLabelA){
+			szHtml += "<div class='title' style='font-size:2em;line-height:1.5em'>";
+			for (var i in objTheme.colorScheme ){
+				szHtml += "<span style='background-color:"+objTheme.colorScheme[i]+";width:10px;border-radius:2em;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;"+objTheme.szLabelA[i]+"&nbsp;&nbsp; ";
+			} 
+			szHtml += "</div>";
 		}
 		szHtml += "<hr>";
 
@@ -433,7 +442,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 				var szText = "<h3><b>"+szSize+"</b>" + "  "+ szTitle + "</h3>";
 				var leftWidth = 0; //window.innerWidth/3;
 
-				szHtml += "<div id='"+objTheme.szId+":"+objTheme.indexA[i]+":chart' item='"+objTheme.indexA[i]+"' class='listitem' style='float:left;width:330px;padding:0.5em 0em 0.7em 0.5em;margin-right:2em;border-bottom:#888 solid 0.5px;pointer-events:none'>";
+				szHtml += "<div id='"+objTheme.szId+":"+objTheme.indexA[i]+":chart' item='"+objTheme.indexA[i]+"' class='listitem' style='float:left;width:330px;padding:0.5em 0em 0.7em 0.5em;margin-right:1em;border-bottom:#888 solid 0.5px;pointer-events:none'>";
 				
 				szHtml += "<div class='title' style='pointer-events:none'>"+szText+"</div>";
 				
