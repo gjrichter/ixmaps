@@ -10018,32 +10018,59 @@ MapTheme.prototype.distributeValues = function () {
 
 		// get media and median 
 		this.getMeanMedianQuantile();
-
-		// get deviation
-		for (var i = 0; i < nParts; i++) {
-			var nPopA = [];
+		
+		if (this.szFlag.match(/PLOT/)) {
+			
+			// get deviation
 			for (var a in this.itemA) {
-				if (this.itemA[a].nValuesA[i]) {
-					nPopA.push(this.itemA[a].nValuesA[i]);
+				var nPopA = [];
+				for (var i = 0; i < nParts; i++) {
+					if (this.itemA[a].nValuesA[i]) {
+						nPopA.push(this.itemA[a].nValuesA[i]);
+					}
+				} 
+				this.nDeviationA[a] = this.parent.getDeviationOfArray(nPopA);
+			}
+
+			for (var a in this.itemA) {
+				for (var i = 0; i < nParts; i++) {
+					if (Math.abs(this.itemA[a].nValuesA[i] - this.itemA[a].nValuesA[i-1]) > (this.nDeviationA[a])*2) {
+						if (this.szFlag.match(/NOOUTLIER/)) {
+							this.itemA[a].nValuesA[i] = this.itemA[a].nValuesA[i-1];
+							//delete this.itemA[a];
+						}
+					}
 				}
 			}
-			this.nDeviationA[i] = this.parent.getDeviationOfArray(nPopA);
-		}
+			
+		}else{
 
-		for (var i = 0; i < nParts; i++) {
-			for (var a in this.itemA) {
-				if (Math.abs(this.itemA[a].nValuesA[i] - this.nMeanA[i]) > this.nDeviationA[i] * 3) {
-					if (this.szFlag.match(/NOOUTLIER/)) {
-						delete this.itemA[a];
+			// get deviation
+			for (var i = 0; i < nParts; i++) {
+				var nPopA = [];
+				for (var a in this.itemA) {
+					if (this.itemA[a].nValuesA[i]) {
+						nPopA.push(this.itemA[a].nValuesA[i]);
 					}
-				} else {
-					if (!this.szFlag.match(/NOOUTLIER/)) {
-						delete this.itemA[a];
+				}
+				this.nDeviationA[i] = this.parent.getDeviationOfArray(nPopA);
+			}
+
+			for (var i = 0; i < nParts; i++) {
+				for (var a in this.itemA) {
+					if (Math.abs(this.itemA[a].nValuesA[i] - this.nMeanA[i]) > this.nDeviationA[i] * 3) {
+						if (this.szFlag.match(/NOOUTLIER/)) {
+							delete this.itemA[a];
+						}
+					} else {
+						if (!this.szFlag.match(/NOOUTLIER/)) {
+							delete this.itemA[a];
+						}
 					}
 				}
 			}
 		}
-
+		
 		// !! GR 03.10.2019 recalculate min/max
 		this.nMin = Number.MAX_VALUE;
 		this.nMax = (-Number.MAX_VALUE);

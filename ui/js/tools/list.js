@@ -405,10 +405,19 @@ window.ixmaps.data = window.ixmaps.data || {};
 		if ( maxList < objTheme.indexA.length ){
 			szHtml += "<div class='title'>(only the first "+maxList+" items are shown)</div>";
 		}
+		/**
 		if (objTheme.colorScheme && objTheme.szLabelA){
 			szHtml += "<div class='title' style='font-size:2em;line-height:1.5em'>";
 			for (var i in objTheme.colorScheme ){
 				szHtml += "<span style='background-color:"+objTheme.colorScheme[i]+";width:10px;border-radius:2em;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;"+objTheme.szLabelA[i]+"&nbsp;&nbsp; ";
+			} 
+			szHtml += "</div>";
+		}
+		**/
+		if (objTheme.colorScheme && objTheme.szOrigLabelA){
+			szHtml += "<div class='title' style='font-size:2em;line-height:1.5em'>";
+			for (var i in objTheme.szOrigLabelA ){
+				szHtml += "<span style='background-color:"+objTheme.colorScheme[i]+";width:10px;border-radius:2em;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;"+objTheme.szOrigLabelA[i]+"&nbsp;&nbsp; ";
 			} 
 			szHtml += "</div>";
 		}
