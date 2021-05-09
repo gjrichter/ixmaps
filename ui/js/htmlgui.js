@@ -554,6 +554,7 @@ $Log: htmlgui.js,v $
 		this.callback = callback;
 		ixmaps.HTML_loadSVGMap(szUrl);
 		ixmaps.dataLoaderA = [];
+		return ixmaps;
 	};
 
 	/**
