@@ -1071,7 +1071,7 @@
 			this.showQueryMessage();
 
 			$.ajax({
-				url: "http://open.mapquestapi.com/nominatim/v1/search.php?key=9VpTwb1ib382pomWexOxmr2J67UtDJKN&q=" + query +
+				url: "https://open.mapquestapi.com/nominatim/v1/search.php?key=9VpTwb1ib382pomWexOxmr2J67UtDJKN&q=" + query +
 					"&format=json&addressdetails=1",
 				success: function (result) {
 					if (result.length) {

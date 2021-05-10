@@ -760,7 +760,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 			// ----------------------------
 			fNumeric = true;
 			a.every(function (x) {
-				if (x.length && isNaN(__scanValue(x))) {
+				if (x && x.length && isNaN(__scanValue(x))) {
 					console.log(x);
 					fNumeric = false;
 				}

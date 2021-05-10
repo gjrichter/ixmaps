@@ -3030,6 +3030,16 @@ $Log: htmlgui.js,v $
 	ixmaps.setProject = function (szProject) {
 
 		var project = null;
+		
+		if (typeof (szProject) != "string") {
+			try {
+				ixmaps.setProjectJSON(szProject);
+			} catch (e) {
+				ixmaps.error("Code: " + e);
+			}
+			return;
+		}
+		
 		try {
 			project = JSON.parse(szProject);
 		} catch (e) {

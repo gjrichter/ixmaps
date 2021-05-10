@@ -121,7 +121,11 @@ $Log: htmlgui.js,v $
 			}
 			});
 		// GR 18.02.2014 set correct height
-		$("#"+szElement).parent().css("height",String(dialogHeight-60)+"px");
+		if (dialogHeight<=100){
+			$("#"+szElement).parent().css("height",String(dialogHeight-60)+"px");
+		}else{
+			$("#"+szElement).parent().css("height",String(dialogHeight)+"px");
+		}
 		// GR 13.10.2011 set opacity
 		if (nOpacity){
 			$("#"+szElement).parent().css("opacity",String(nOpacity));
