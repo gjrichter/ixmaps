@@ -204,7 +204,7 @@ MapSelection.prototype.initValues = function(){
 		}else{
 			this.themeRootNodesA =  myclone(themeObj.indexA);
 		}
-		this.nCount = this.nNodes = this.nThemeItems = this.themeRootNodesA.length;
+		this.nCount = this.nNodes = this.nThemeItems = this.themeRootNodesA?this.themeRootNodesA.length:0;
 		_TRACE(this.nCount+" nodes to check");
 		
 	}else{

@@ -3633,6 +3633,14 @@ Map.Themes.prototype.doChangeThemeStyle = function (szId, szStyle, szFlag) {
 				mapTheme.nGapSize = __calcNewValue(mapTheme.nGapSize, Number(styleObj.gapsize), szFlag);
 				mapTheme.fRedraw = true;
 			}
+			if (__isdef(styleObj.offsetx)) {
+				mapTheme.nOffsetX = __calcNewValue(mapTheme.nOffsetX, Number(styleObj.offsetx), szFlag);
+				mapTheme.fRedraw = true;
+			}
+			if (__isdef(styleObj.offsety)) {
+				mapTheme.nOffsetY = __calcNewValue(mapTheme.nOffsetY, Number(styleObj.offsety), szFlag);
+				mapTheme.fRedraw = true;
+			}
 			if (__isdef(styleObj.linecolor)) {
 				mapTheme.szLineColor = String(styleObj.linecolor);
 				mapTheme.fRedraw = true;
@@ -6316,7 +6324,7 @@ MapTheme.prototype.realize = function () {
 			'x':-map.Scale.mapCenter.x/map.Zoom.nZoomX-width/2,
 			'y':-map.Scale.mapCenter.y/map.Zoom.nZoomY-height/2,
 			'style':'width:'+width+';height:'+height+''+";opacity:"+(this.nOpacity||0.8)+";pointer-events:none;",
-			'onload':'map.Themes.getTheme("'+this.szId+'").clearWMS();'
+			'onload':'map.Themes.getTheme("'+this.szId+'").cleanWMS();'
 		});
 		
 		this.fDone = true;
@@ -6353,10 +6361,17 @@ MapTheme.prototype.realize = function () {
 /**
  * remove old image from WMS Layer
  */
-MapTheme.prototype.clearWMS  = function () {
+MapTheme.prototype.cleanWMS  = function () {
 	if ( this.chartGroup.childNodes.length > 1 ){
 		this.chartGroup.removeChild(this.chartGroup.firstChild);
 	}
+}
+
+/**
+ * remove all images from WMS Layer
+ */
+MapTheme.prototype.clearWMS  = function () {
+	map.Dom.clearGroup(this.chartGroup);
 }
 
 /**
@@ -17163,6 +17178,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						}
 					}
 				}
+				szLineColor = szLineColor || szColor;
 
 				// make the symbol
 				// ----------------
@@ -21262,6 +21278,9 @@ MapTheme.prototype.removeElements = function (evt) {
 	// remove old theme colors
 	this.unpaintMap();
 
+	// remove WMS images
+	this.clearWMS();
+	
 	if (this.onremove) {
 		try {
 			eval(this.onremove);

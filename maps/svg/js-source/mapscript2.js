@@ -2542,18 +2542,11 @@ Map.Layer.prototype.doFeatureScaling = function(nDelta){
 		_TRACE('.scaling: '+nodeTempA.length+' styles done');
 	}
 };
-/**
- * called by changeFeatureScaling to change the scaling of generated objects (charts,...)
- * @param nDelta the scaling factor
- */
-Map.Layer.prototype.doObjectScaling = function(newScale){	
 
-	if ( !fObjectScaling ){
-		return;
-	}
-
+Map.Layer.prototype.doDynamicObjectScaling = function(newScale){	
+	
 	map.Layer.nObjectScale = newScale;
-
+	
 	if ( fObjectScaling == "dynamic" ){
 
 		/** get the dynamic factor by comparing the actual map scale to the normal size scale
@@ -2564,17 +2557,24 @@ Map.Layer.prototype.doObjectScaling = function(newScale){
 		/** dynamically scale the objects by qubic root function **/
 		map.Layer.nObjectScale *= Math.pow(1/dx,1/map.Scale.nDynamicScalePow);	
 			
-		/** old dynamic scale
-		var nD = Math.log(1/newScale);
-		if ( nD > 1 ){
-			newScale *= nD;
-		}
-		**/
 	}
 
 	/** store the dynamic scale part for use in maptheme
 	**/
 	map.Layer.nDynamicObjectScale = map.Layer.nObjectScale / newScale;
+};
+
+/**
+ * called by changeFeatureScaling to change the scaling of generated objects (charts,...)
+ * @param nDelta the scaling factor
+ */
+Map.Layer.prototype.doObjectScaling = function(newScale){	
+
+	if ( !fObjectScaling ){
+		return;
+	}
+
+	this.doDynamicObjectScaling(newScale);
 
 	var nDelta = map.Layer.nObjectScale/map.Scale.objectScaling_lastScale;
 	map.Scale.objectScaling_lastScale = map.Layer.nObjectScale;

@@ -3186,6 +3186,12 @@ Map.Scale.prototype.setScaleParam = function(obj){
 	// TBD  split .changeFeatureScaling() into .unzoomFeatureScaling and .changeFeatureScaling()
 	var saveScale = this.featureScaling_lastScale;
 
+	this.nFeatureScaling = 1;
+	this.nBorderScaling  = 1;
+	this.nLineScaling    = 1;
+	this.nLabelScaling   = 1;
+	this.nObjectScaling  = 1;
+	
 	if ( obj.featureScaling && (obj.featureScaling != 1) ){
 		this.nFeatureScaling = obj.featureScaling;
 	}
@@ -3206,9 +3212,13 @@ Map.Scale.prototype.setScaleParam = function(obj){
 	if ( obj.normalSizeScale && (obj.normalSizeScale != 1) ){
 		this.nNormalSizeScale = Number(obj.normalSizeScale);
 	}
+	
+	this.nDynamicScalePow = 3;
 	if ( obj.dynamicScalePow && (obj.dynamicScalePow != 3) ){
 		this.nDynamicScalePow = Number(obj.dynamicScalePow);
 	}
+	map.Layer.doDynamicObjectScaling(map.Scale.nZoomScale);
+	
 };
 // .................................................................... 
 // helper for positioning and scaling of SVG elements       
