@@ -25,6 +25,31 @@ $Log: htmlgui_sync_Leaflet.js,v $
 
 (function( ixmaps, $, undefined ) {
 
+	function expose() {
+		var oldIxmaps = window.ixmaps;
+
+		ixmaps.noConflict = function () {
+			window.ixmaps = oldIxmaps;
+			return this;
+		};
+
+		window.ixmaps = ixmaps;
+	}
+
+	// define Data for Node module pattern loaders, including Browserify
+	if (typeof module === 'object' && typeof module.exports === 'object') {
+		module.exports = ixmaps;
+
+		// define Data as an AMD module
+	} else if (typeof define === 'function' && define.amd) {
+		define(ixmaps);
+	}
+
+	// define Data as a global variable, saving the original Data to restore later if needed
+	if (typeof window !== 'undefined') {
+		expose();
+	}
+
 	ixmaps.htmlMap_Api = "Leaflet";
 
 	/* ------------------------------------------------------------------ * 
