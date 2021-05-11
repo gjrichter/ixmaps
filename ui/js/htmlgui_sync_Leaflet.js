@@ -23,7 +23,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
  * define namespace ixmaps
  */
 
-(function( ixmaps, $, undefined ) {
+(function (window, document, undefined) {
 
 	function expose() {
 		var oldIxmaps = window.ixmaps;
@@ -669,7 +669,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 	};
 
 
-}( window.ixmaps = window.ixmaps || {}, jQuery ));
+}(window, document));
 
 // .............................................................................
 // EOF
