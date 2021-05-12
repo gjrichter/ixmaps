@@ -2300,10 +2300,12 @@ $Log: htmlgui_api.js,v $
 
 		setMapTypeId: function(szMapTypeId){
 			ixmaps.setMapTypeId(this.szMap,szMapTypeId);
+			return this;
 		},
 		
 		setBounds: function(bounds){
 			ixmaps.setBounds(this.szMap,bounds);
+			return this;
 		},
 
 		setView: function(center,zoom){
