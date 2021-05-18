@@ -7267,7 +7267,7 @@ MapTheme.prototype.filterValues = function (j) {
 						if (this.objTheme.dbFields[ii].id == filterObj.szFilterField) {
 							filterObj.nFilterFieldIndex = ii;
 						}
-						if (this.objTheme.dbFields[ii].id == filterObj.szFilterValue) {
+						if (this.objTheme.dbFields[ii].id == ("$"+filterObj.szFilterValue+"$")) {
 							filterObj.nFilterValueIndex = ii;
 						}
 					}
