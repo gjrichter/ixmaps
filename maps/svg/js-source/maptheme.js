@@ -13818,6 +13818,9 @@ MapTheme.prototype.chartMap = function (startIndex) {
 			}
 			shapeGroup.setAttributeNS(szMapNs,"info",szInfo);
 			
+			// maximal length of map elements
+			var maxLenX = (map.Scale.getMapPositionOfLatLon(80,180).x-map.Scale.getMapPositionOfLatLon(80,-180).x);
+			
 			// geojson Point
 			// -------------		
 			if ( json.type == "Point" ){
@@ -13840,6 +13843,12 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				var ptAct = new point(pt.x, pt.y);
 				for (i in coordinatesA){
 					var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[i][1],coordinatesA[i][0]);
+					// polygon segments with x length >= 99% of max width 
+					// are most probably caused by coordinate transition (-180 -> 178) or so
+					// we treat them like coordinate overflow and add/subtract max width
+					if ( Math.abs(pt.x-ptAct.x) > (maxLenX*0.99) ) {
+						pt.x += (pt.x<0)?maxLenX:-maxLenX;
+					}
 					d += (pt.x-ptAct.x) +','+ (pt.y-ptAct.y) +" ";
 					ptAct = new point(pt.x, pt.y);
 				}
@@ -13865,6 +13874,12 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					
 					for (ii in coordinatesA){
 						var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[ii][1],coordinatesA[ii][0]);
+						// polygon segments with x length >= 99% of max width 
+						// are most probably caused by coordinate transition (-180 -> 178) or so
+						// we treat them like coordinate overflow and add/subtract max width
+						if ( Math.abs(pt.x-ptAct.x) > (maxLenX*0.99) ) {
+							pt.x += (pt.x<0)?maxLenX:-maxLenX;
+						}
 						d += (pt.x-ptAct.x) +','+ (pt.y-ptAct.y) +" ";
 						ptAct = new point(pt.x, pt.y);
 					}
@@ -13892,6 +13907,13 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					
 					for (ii in coordinatesA){
 						var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[ii][1],coordinatesA[ii][0]);
+						// polygon segments with x length >= 99% of max width 
+						// are most probably caused by coordinate transition (-180 -> 178) or so
+						// we treat them like coordinate overflow and add/subtract max width
+						if ( Math.abs(pt.x-ptAct.x) > (maxLenX*0.99) ) {
+							pt.x += (pt.x<0)?maxLenX:-maxLenX;
+						}
+						
 						x += pt.x;
 						y += pt.y;
 						d += (pt.x-ptAct.x) +','+ (pt.y-ptAct.y) +" ";
@@ -13930,6 +13952,13 @@ MapTheme.prototype.chartMap = function (startIndex) {
 
 						for (ii in coordinatesA){
 							var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[ii][1],coordinatesA[ii][0]);
+							// polygon segments with x length >= 99% of max width 
+							// are most probably caused by coordinate transition (-180 -> 178) or so
+							// we treat them like coordinate overflow and add/subtract max width
+							if ( Math.abs(pt.x-ptAct.x) > (maxLenX*0.99) ) {
+								pt.x += (pt.x<0)?maxLenX:-maxLenX;
+							}
+							
 							x[p] += pt.x;
 							y[p] += pt.y;
 							
