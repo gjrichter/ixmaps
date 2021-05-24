@@ -1640,7 +1640,7 @@ Map.Themes.prototype.loadExternalData = function (szData, fRefresh, themeObj) {
 
 			// GR 20.10.2013 new external data loader by explicit data url 
 			// -----------------------------------------------------------
-			if (themeObj && (themeObj.coTableUrl || themeObj.coTableExt)) {
+			if (themeObj && (themeObj.coTableUrl || themeObj.coTableExt || (themeObj.coTableType == "ext") )) {
 				try {
 					// set cached object
 					this.themeDataCacheA[szData] = {
