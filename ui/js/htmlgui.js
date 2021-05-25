@@ -2537,7 +2537,8 @@ $Log: htmlgui.js,v $
 				// a) data is loaded by a specific data provider function
 				// -------------------------------------------------------
 				if (options.type == "ext") {
-					console.log(ixmaps);
+					console.log(eval("ixmaps." + options.name));
+					console.log(eval("ixmaps.parentApi" + options.name));
 					if (eval("ixmaps." + options.name)){
 						options.setData = ixmaps.setExternalData;
 						var fLoading = false;
