@@ -2832,7 +2832,8 @@ Map.Themes.prototype.doMarkClass = function (szId, szClass, szStep) {
  * @param szId the id of the chart group 
  */
 Map.Themes.prototype.doUnmarkClass = function (szId, szClass) {
-	if (this.subTheme) {
+	// GR 30.05.2021 not working, therefore if (0... , test in progresss 
+	if (0 && this.subTheme) {
 		this.subTheme.removeSubTheme();
 		this.subTheme = null;
 		return;
