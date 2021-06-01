@@ -10276,7 +10276,7 @@ MapTheme.prototype.distributeValues = function () {
 
 
 	// GR 13.11.2016 user defined color scheme ?
-	if (this.colorScheme[0].match(/user/i)) {
+	if (1 || this.colorScheme[0].match(/user/i)) {
 		try {
 			HTMLWindow.ixmaps.htmlgui_colorScheme(this);
 		} catch (e) {}
