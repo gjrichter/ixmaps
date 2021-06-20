@@ -1821,9 +1821,9 @@ $Log: htmlgui_api.js,v $
 	 * @param {String} szMessage the message to display
 	 * @return void
 	 */
-	ixmaps.message = function(szMessage){
+	ixmaps.message = function(szMessage,nTimeout){
 		for ( a in ixmaps.embeddedApiA ){
-			ixmaps.embeddedApiA[a].message(szMessage);
+			ixmaps.embeddedApiA[a].message(szMessage,nTimeout);
 		}
 	};
 

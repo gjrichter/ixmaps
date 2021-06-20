@@ -841,6 +841,16 @@ $Log: htmlgui.js,v $
 		this.setMapOverlayHTML(szHtml);
 	};
 
+	/**
+	 * display title with border and background
+	 * @param szTitle an arbitrary text
+	 * @param szColor an arbitrary text
+	 * @type void
+	 */
+	ixmaps.setTitleBox = function(szTitle,szColor){
+		ixmaps.setTitle("<span style='padding: 0.3em 1em;border:solid #ddd 1px;border-radius:0.2em;font-family:courier new,Raleway,arial,helvetica;background:"+(szColor||"rgba(255,255,255,0.9)")+";color:"+(szColor?"#fff":"#888")+"'>"+szTitle+"</span");
+	};
+
 	// -----------------------------------
 	// show/hide HTML map
 	// -----------------------------------
@@ -1912,11 +1922,7 @@ $Log: htmlgui.js,v $
 	 * Is called by the svg map script to log error messages 
 	 */
 	ixmaps.htmlgui_errorLog = function (szMessage) {
-
-		$("#loading-text").empty();
-		$("#loading-text").append(szMessage + "e");
-
-		alert(szMessage);
+		ixmaps.status(szMessage,2000);
 	};
 
 	// ---------------------------------------------------------
@@ -2314,8 +2320,11 @@ $Log: htmlgui.js,v $
 		eval('ixmaps.embeddedSVG.window.' + szScript);
 	};
 
-	ixmaps.message = function (szMessage) {
+	ixmaps.message = function (szMessage,nTimeout) {
 		ixmaps.htmlgui_displayInfo(szMessage);
+		if (nTimeout){
+			setTimeout("ixmaps.htmlgui_killInfo()",nTimeout);
+		}
 	};
 
 	// -----------------------------------------------------------
@@ -2880,6 +2889,30 @@ $Log: htmlgui.js,v $
 						}
 					});
 				}
+			}else
+			// project requires external resources (scripts) 
+			//
+			if ( (typeof (project.require) != "undefined") ) {
+				ixmaps.loading = 0;
+				for ( i in project.require ){
+					ixmaps.loading++;
+					$.ajax({
+						type: "GET",
+						url: project.require[i],
+						dataType: "text",
+						success: function (script) {
+							eval(script);
+							if (--ixmaps.loading<=0){
+								ixmaps.continueSetProjectJSON(project, szFlag);
+							}	
+						},
+						error: function (jqxhr, settings, exception) {
+							ixmaps.showLoadingArrayStop();
+							ixmaps.hideLoading();
+							ixmaps.error("required resource '"+project.require[ixmaps.loading]+"' could not be loaded !", 2000);
+						}
+					});
+				}
 			}else{
 				// no external resource -> go
 				ixmaps.continueSetProjectJSON(project, szFlag);
@@ -3186,6 +3219,10 @@ $Log: htmlgui.js,v $
 		map.zoom = zoom;
 
 		project.map = map;
+		
+		if (ixmaps.loadedProject && ixmaps.loadedProject.require) {
+			project.require = ixmaps.loadedProject.require;
+		}
 		
 		if (ixmaps.loadedProject && ixmaps.loadedProject.required) {
 			project.required = ixmaps.loadedProject.required;
