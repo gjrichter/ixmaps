@@ -3761,6 +3761,14 @@ Map.Themes.prototype.doChangeThemeStyle = function (szId, szStyle, szFlag) {
 				mapTheme.nClipTimeout = 1 / mapTheme.nClipFrameRate * 1000;
 				mapTheme.fRedraw = true;
 			}
+			if (__isdef(styleObj.refresh)) {
+				mapTheme.nRefreshTimeout = Number(styleObj.refresh) * 1000;
+				mapTheme.fRealize = true;
+			}
+			if (__isdef(styleObj.refreshtimeout)) {
+				mapTheme.nRefreshTimeout = Number(styleObj.refreshtimeout);
+				mapTheme.fRealize = true;
+			}
 			if (__isdef(styleObj.gridx)) {
 				mapTheme.nGridX = Number(styleObj.gridx) || 7;
 				//				mapTheme.fRealize = true;
@@ -5659,65 +5667,65 @@ ObjTheme.prototype.getFields = function () {
 		}
 		if ((this.nFieldSelectionIndex == -1) && (this.nFieldSelectionIndexA[0] == -1)) {
 			if (!this.szSelectionField || !this.szSelectionField.length) {
-				alert("ERROR on load theme data: selection not defined !");
+				_ERROR("ERROR on load theme data: selection not defined !");
 			} else {
-				alert("ERROR on load theme data: selection field '" + this.szSelectionField + "' not found !");
+				_ERROR("ERROR on load theme data: selection field '" + this.szSelectionField + "' not found !");
 			}
 		}
 		for (k = 0; k < this.szFieldsA.length; k++) {
 			if (typeof (this.nFieldIndexA[k]) == 'undefined') {
-				alert("ERROR on load theme data: value field '" + this.szFieldsA[k] + "' not found !");
+				_ERROR("ERROR on load theme data: value field '" + this.szFieldsA[k] + "' not found !");
 				return false;
 			}
 		}
 		// GR 20.02.2018 check
 		if (this.szField100 && !this.szField100.match(/\$/) && (typeof (this.nField100Index) == 'undefined')) {
-			alert("ERROR on load theme data: 100field: '" + this.szField100 + "' not found !");
+			_ERROR("ERROR on load theme data: 100field '" + this.szField100 + "' not found !");
 		}
 		if (this.szColorField && !this.szColorField.match(/\$/) && (typeof (this.nColorFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: colorfield: '" + this.szColorField + "' not found !");
+			_ERROR("ERROR on load theme data: colorfield: '" + this.szColorField + "' not found !");
 		}
 		if (this.szSymbolField && !this.szSymbolField.match(/\$/) && (typeof (this.nSymbolFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: symbolfield: '" + this.szSymbolField + "' not found !");
+			_ERROR("ERROR on load theme data: symbolfield: '" + this.szSymbolField + "' not found !");
 		}
 		if (this.szValueField && !this.szValueField.match(/\$/) && (typeof (this.nValueFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: valuefield: '" + this.szValueField + "' not found !");
+			_ERROR("ERROR on load theme data: valuefield: '" + this.szValueField + "' not found !");
 		}
 		if (this.szLabelField && !this.szLabelField.match(/\$/) && (typeof (this.nLabelFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: labelfield: '" + this.szLabelField + "' not found !");
+			_ERROR("ERROR on load theme data: labelfield '" + this.szLabelField + "' not found !");
 		}
 		if (this.szTitleField && !this.szTitleField.match(/\$/) && (typeof (this.nTitleFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: titlefield: '" + this.szTitleField + "' not found !");
+			_ERROR("ERROR on load theme data: titlefield '" + this.szTitleField + "' not found !");
 		}
 		if (this.szSnippetField && !this.szSnippetField.match(/\$/) && (typeof (this.nSnippetFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: snippetfield: '" + this.szSnippetField + "' not found !");
+			_ERROR("ERROR on load theme data: snippetfield '" + this.szSnippetField + "' not found !");
 		}
 		if (this.szSizeField && !this.szSizeField.match(/\$/) && (typeof (this.nSizeFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: sizefield: '" + this.szSizeField + "' not found !");
+			_ERROR("ERROR on load theme data: sizefield '" + this.szSizeField + "' not found !");
 		}
 		if (this.szTimeField && !this.szTimeField.match(/\$/) && (typeof (this.nTimeFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: timefield: '" + this.szTimeField + "' not found !");
+			_ERROR("ERROR on load theme data: timefield '" + this.szTimeField + "' not found !");
 		}
 		if (this.szXField && !this.szXField.match(/\$/) && (typeof (this.nXFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: xfield: '" + this.szXField + "' not found !");
+			_ERROR("ERROR on load theme data: xfield '" + this.szXField + "' not found !");
 		}
 		if (this.szYField && !this.szYField.match(/\$/) && (typeof (this.nYFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: yfield: '" + this.szYField + "' not found !");
+			_ERROR("ERROR on load theme data: yfield '" + this.szYField + "' not found !");
 		}
 		if (this.szAlphaField && !this.szAlphaField.match(/\$/) && (typeof (this.nAlphaFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: alphafield: '" + this.szAlphaField + "' not found !");
+			_ERROR("ERROR on load theme data: alphafield '" + this.szAlphaField + "' not found !");
 		}
 		if (this.szAlphaField100 && !this.szAlphaField100.match(/\$/) && (typeof (this.nAlphaField100Index) == 'undefined')) {
-			alert("ERROR on load theme data: alpha100field: '" + this.szAlphaField100 + "' not found !");
+			_ERROR("ERROR on load theme data: alpha100field '" + this.szAlphaField100 + "' not found !");
 		}
 		if (this.szFilterField && !this.szFilterField.match(/\$/) && (typeof (this.nFilterFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: filterfield: '" + this.szFilterField + "' not found !");
+			_ERROR("ERROR on load theme data: filterfield '" + this.szFilterField + "' not found !");
 		}
 		if (this.szAggregationField && !this.szAggregationField.match(/\$/) && (typeof (this.nAggregationFieldIndex) == 'undefined')) {
-			alert("ERROR on load theme data: aggregationfield: '" + this.szAggregationField + "' not found !");
+			_ERROR("ERROR on load theme data: aggregationfield '" + this.szAggregationField + "' not found !");
 		}
 		if (this.szItemField && (this.szItemField != this.szSelectionField) && !this.szItemField.match(/\$/) && ((typeof (this.nFieldItemIndex) == 'undefined') || this.nFieldItemIndex == -1)) {
-			alert("ERROR on load theme data: itemfield: '" + this.szItemField + "' not found !");
+			alert("ERROR on load theme data: itemfield '" + this.szItemField + "' not found !");
 		}
 	} else {
 		var themeNode = SVGDocument.getElementById(this.szName);
@@ -6413,7 +6421,9 @@ MapTheme.prototype.realize_draw = function () {
 			this.szShapeType += "+buffer";
 		}
 	}
-
+	if (this.szOrigFlag.match(/LINES/)){
+		this.szShapeType = "line";
+	}
 
 	_TRACE("===========================> ");
 	_TRACE("  MapTheme.realize_draw() ");
@@ -7175,11 +7185,11 @@ MapTheme.prototype.loadValues = function () {
 	this.__themeNodes = map.Themes.themeNodes;
 
 	for (var i = 0; i < this.szThemesA.length; i++) {
-
+			
 		if (map.Layer.isScaleDependentLayer(this.szThemesA[i]) &&
 			!map.Layer.isScaleDependentLayerOn(this.szThemesA[i])) {
 			this.hiddenLayerA[this.szThemesA[i]] = true;
-			this.fReload = true;
+			this.fRealize = true;
 			continue;
 		} else {
 			this.hiddenLayerA[this.szThemesA[i]] = false;
@@ -7397,7 +7407,7 @@ MapTheme.prototype.getSelectionId = function (szTheme, j) {
 			this.nSelection_0 = this.objTheme.nFieldSelectionIndexA[0];
 			this.nSelection_1 = this.objTheme.nFieldSelectionIndexA[1];
 		} else
-		if (this.objTheme.nFieldSelectionIndex) {
+		if (this.objTheme.nFieldSelectionIndex >= 0) {
 			var szId = __mpap_decode_utf8(String(this.objTheme.dbRecords[j][this.objTheme.nFieldSelectionIndex]));
 
 			// GR 22.05.2015 geo-json point definition
@@ -7469,21 +7479,25 @@ MapTheme.prototype.getSelectionId = function (szTheme, j) {
 	}
 
 	// c) selection by lookup field
-	// -------------------------
-	szId = __mpap_decode_utf8(String(this.objTheme.dbRecords[j][this.objTheme.nFieldSelectionIndex]));
+	// ----------------------------
+	if (this.objTheme.nFieldSelectionIndex >= 0){
+		szId = __mpap_decode_utf8(String(this.objTheme.dbRecords[j][this.objTheme.nFieldSelectionIndex]));
 
-	if (this.nSelectionFieldDigits) {
-		szId = ("000000000000000" + szId).slice(-this.nSelectionFieldDigits);
-	}
+		if (this.nSelectionFieldDigits) {
+			szId = ("000000000000000" + szId).slice(-this.nSelectionFieldDigits);
+		}
 
-	if (this.fSelectionFieldToNumber) {
-		szId = String(Number(szId));
-	}
+		if (this.fSelectionFieldToNumber) {
+			szId = String(Number(szId));
+		}
 
-	if (this.fSelectionFieldToUpper) {
-		szId = String(szId).toUpperCase();
+		if (this.fSelectionFieldToUpper) {
+			szId = String(szId).toUpperCase();
+		}
+		return szTheme + "::" + szId + (this.szSelectionFieldSuffix || "");
 	}
-	return szTheme + "::" + szId + (this.szSelectionFieldSuffix || "");
+	
+	return null;
 };
 
 
@@ -7926,11 +7940,11 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 			this.itemA = [];
 
 			this.removeDefinitionFromFlag("ZOOMTO");
-			var defObj = map.Themes.getMapThemeDefinitionObj(this.szId);
-			map.Themes.newThemeObjA = map.Themes.newThemeObjA || [];
-			map.Themes.newThemeObjA.push(defObj);
-			setTimeout(function(){map.Themes.newThemeByObj();}, 100);
-			return;
+			//var defObj = map.Themes.getMapThemeDefinitionObj(this.szId);
+			//map.Themes.newThemeObjA = map.Themes.newThemeObjA || [];
+			//map.Themes.newThemeObjA.push(defObj);
+			//setTimeout(function(){map.Themes.newThemeByObj();}, 100);
+			//return;
 		}
 		// .............................................
 
@@ -13819,6 +13833,21 @@ MapTheme.prototype.chartMap = function (startIndex) {
 			}
 			shapeGroup.setAttributeNS(szMapNs,"info",szInfo);
 			
+			// if part of a theme, set the color
+			// ----------------------------------
+			if (this.szFlag.match(/CATEGORICAL/)) {
+				this.chart.szColor = this.colorScheme[this.itemA[a].nValuesA[0] - 1];
+			} else
+			if (this.partsA.length > 1) {
+				for (i = 0; i < this.partsA.length; i++) {
+					if ((this.itemA[a].nValuesA[0] >= this.partsA[i].min) && (this.itemA[a].nValuesA[0] < this.partsA[i].max)) {
+						this.chart.szColor = this.colorScheme[i];
+					}
+				}
+			}
+			shapeGroup.setAttributeNS(null,"style","stroke:"+this.chart.szColor);
+			shapeGroup.setAttributeNS(szMapNs, "class", (typeof (this.itemA[a].nClass) != "undefined") ? this.itemA[a].nClass : String(this.itemA[a].nValuesA[0] - 1));
+			
 			// maximal length of map elements
 			var maxLenX = (map.Scale.getMapPositionOfLatLon(80,180).x-map.Scale.getMapPositionOfLatLon(80,-180).x);
 			
@@ -13827,8 +13856,10 @@ MapTheme.prototype.chartMap = function (startIndex) {
 			if ( json.type == "Point" ){
 				
 				map.Layer.listA[this.szThemesA[0]].szType = "point";
-				shapeGroup.fu.setMatrix([this.nChartGroupScaleX, 0, 0, this.nChartGroupScaleY, ptOff.x, ptOff.y]);
-				var shape = map.Dom.newShape('circle', shapeGroup, 0, 0, map.Scale.normalX(0.0001));
+				var coordinatesA = json.coordinates;
+				var pt = map.Scale.getMapPositionOfLatLon(coordinatesA[1],coordinatesA[0]);
+				shapeGroup.fu.setMatrix([this.nChartGroupScaleX, 0, 0, this.nChartGroupScaleY, pt.x, pt.y]);
+				var shape = map.Dom.newShape('circle', shapeGroup, 0, 0, map.Scale.normalX(1),"fill:#dd0000;fill-opacity:0.3;stroke:#dd0000;stroke-opacity:1;stroke-width:1");
 			}
 			
 			// geojson LineString
@@ -13925,6 +13956,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				}
 				var shape = map.Dom.newShape('path', shapeGroup, d, "");
 				shapeGroup.setAttributeNS(szMapNs,"center","x:"+x/count+",y:"+y/count);
+				shapeGroup.setAttributeNS(null,"style","fill:"+this.chart.szColor+";fill-opacity:0.5");
 			}
 
 			// geojson MultiPolygon
@@ -13980,6 +14012,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 						pp = count[p];
 					}
 				}
+				shapeGroup.setAttributeNS(null,"style","stroke:"+this.chart.szColor+";fill-opacity:0.5");
 			}
 
 			continue;
