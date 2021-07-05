@@ -6421,7 +6421,7 @@ MapTheme.prototype.realize_draw = function () {
 			this.szShapeType += "+buffer";
 		}
 	}
-	if (this.szOrigFlag.match(/LINES/)){
+	if (this.szOrigFlag.match(/FEATURES/) && this.szOrigFlag.match(/LINES/)){
 		this.szShapeType = "line";
 	}
 
@@ -10037,6 +10037,11 @@ MapTheme.prototype.aggregateValues = function () {
 MapTheme.prototype.distributeValues = function () {
 
 	if (this.nCount === 0) {
+		if (this.szFlag.match(/CATEGORICAL/)) {
+			_ERROR("ERROR on 'CATEGORICAL' theme: no matching values !");
+			displayMessage("theme: no matching values !", 3000);
+
+		}
 		return false;
 	}
 
@@ -13371,6 +13376,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		} else {
 			for (a in this.itemA) {
 				this.indexA[this.indexA.length] = a;
+				/**
 				// sum counts for sequenze parts
 				// -----------------------------
 				if (this.szFlag.match(/CHART/) && !this.szFlag.match(/CATEGORICAL/)) {
@@ -13378,8 +13384,8 @@ MapTheme.prototype.chartMap = function (startIndex) {
 						this.partsA[i].nCount++;
 						this.partsA[i].nSum += !isNaN(this.itemA[a].nValuesA[i]) ? this.itemA[a].nValuesA[i] : 0;
 					}
-					// GR 08.03.2013 we have to store the number of drawn
 				}
+				**/
 				nCharts++;
 				nToDraw++;
 			}
@@ -13707,7 +13713,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 
 	var nRadius = map.Scale.getDeltaXofDistanceInMeter(this.nGridWidth) / 2 * 20;
 	nRadius = nRadius * map.Scale.nZoomScale * 20;
-
+	
 	for (var nAi = startIndex; nAi < this.indexA.length; nAi++) {
 
 		// execution canceled ? -----------------
@@ -13839,9 +13845,12 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				this.chart.szColor = this.colorScheme[this.itemA[a].nValuesA[0] - 1];
 			} else
 			if (this.partsA.length > 1) {
+				this.chart.szColor = this.szNoDataColor ? this.szNoDataColor : "white";
 				for (i = 0; i < this.partsA.length; i++) {
 					if ((this.itemA[a].nValuesA[0] >= this.partsA[i].min) && (this.itemA[a].nValuesA[0] < this.partsA[i].max)) {
 						this.chart.szColor = this.colorScheme[i];
+						this.itemA[a].nClass = i;
+						this.partsA[i].nCount++;
 					}
 				}
 			}
@@ -17175,13 +17184,13 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						nRadius = nRadius / 5;
 					}
 				}
-
+ 
 				// GR 17.01.2014 don't draw stupid zero symbols
 				if (isNaN(nRadius) || !nRadius) {
-					nRadius = 0;
-					if (!(szFlag.match(/STAR/) || szFlag.match(/STACKED/))) {
+					if (!szFlag.match(/STAR|STACKED|PLOT/)) {
 						continue;
 					}
+					nRadius = 1;
 				}
 
 				// get the symbol
@@ -17232,7 +17241,13 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 									nRadius = map.Scale.normalX(2 + 5 * (ii + 1) / this.partsA.length);
 								}
 								nClass = ii;
-								//chartGroup.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
+								break;
+							}else
+							if (this.szRanges && this.szRanges.length && (nValue < this.partsA[ii].min)) {
+								szColor = this.colorScheme[ii-1];
+								var cColor = __maptheme_getChartColors(szColor);
+								szLineColor = cColor.textColor;
+								nClass = ii-1;
 								break;
 							}
 						}
