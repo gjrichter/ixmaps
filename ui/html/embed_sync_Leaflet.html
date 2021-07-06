@@ -941,7 +941,7 @@
 						szItemUrl = szItemUrl.replace("../../../..","../..");
 					}
 					if (ixmaps.loadedProject.map.item){
-						ixmaps.szMapItemId = szId;
+						ixmaps.szMapItemId = ixmaps.parentApi.szMapItemId = szId;
 						window.idialog = this.openDialog(null,'item',szItemUrl,'Item info','50,50',480,660);
 						ixmaps.onDialogClose = function(){
 							ixmaps.embeddedSVG.window.map.Api.clearHighlight();
