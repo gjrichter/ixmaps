@@ -13457,7 +13457,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 
 			var chartYPosA = [];
 
-			if ((this.szFlag.match(/3D/) || this.szFlag.match(/BOX/) || (this.szFlag.match(/POINTER/) && this.szFlag.match(/BAR/))) &&
+			if ((this.szFlag.match(/3D/) || this.szFlag.match(/xxxBOXxxx/) || (this.szFlag.match(/POINTER/) && this.szFlag.match(/BAR/))) &&
 				!((this.szFlag.match(/MULTIPLE/) || this.szFlag.match(/MULTIGRID/)) && !this.szFlag.match(/AGGREGATE/))) {
 
 				// sort by y position 
