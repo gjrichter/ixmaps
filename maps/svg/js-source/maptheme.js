@@ -17928,6 +17928,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 											
 											var left = -nStep / (szFlag.match(/LINES/) ? 3 : 1);
 											var right = nStep * ((this.nGridX) ? nPartsA.length / this.nGridX - 1 : nPartsA.length - 1);
+															
 											if (szFlag.match(/PLOTVAR/) && (nPartsA.length / this.nGridX > 1)) {
 												right = nStep * this.nGridX;
 											}
@@ -17944,8 +17945,11 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
                                             }else{
                                                 map.Dom.newShape('line', gridGroup, left, -sy, right, -sy, "stroke:#888888;stroke-opacity:0.4;stroke-width:" + (map.Scale.normalX(0.05*nPlotScale)) + ";stroke-dasharray:"+(6*nPlotScale)+" "+(3*nPlotScale)+";");
                                             }
-												
-											map.Dom.newText(gridGroup, left * 1.1, -sy + nScaleFontSize * 0.3, "font-family:arial;font-size:" + nScaleFontSize + "px;text-anchor:end;fill:"+(szFlag.match(/\bCOLOR\b/)?szColor:"#888888")+";stroke:none;pointer-events:none;", st);
+											if (szFlag.match(/RIGHT/)){
+												map.Dom.newText(gridGroup, right+map.Scale.normalX(15), -sy + nScaleFontSize * 0.3, "font-family:arial;font-size:" + nScaleFontSize + "px;text-anchor:start;fill:"+(szFlag.match(/\bCOLOR\b/)?szColor:"#888888")+";stroke:none;pointer-events:none;", st);
+											}else{
+												map.Dom.newText(gridGroup, left * 1.1, -sy + nScaleFontSize * 0.3, "font-family:arial;font-size:" + nScaleFontSize + "px;text-anchor:end;fill:"+(szFlag.match(/\bCOLOR\b/)?szColor:"#888888")+";stroke:none;pointer-events:none;", st);
+											}	
 												
 											this.nPlotHeight = s;
 										}
