@@ -456,7 +456,8 @@ ixmaps.legend = ixmaps.legend || {};
         if ( nSumCount && 
 			!((themeObj.szLegendUnits||themeObj.szUnits) == "%") && 
 			!themeObj.szFlag.match(/BAR/) && 
-			!(ixmaps.layout == "minimal") 
+			!(ixmaps.layout == "minimal") &&
+			(themeObj.szFlag.match(/SUM|COUNT/))
 		   ){
             var szSum = ixmaps.__formatValue(nSumCount,nDecimals,"SPACE") + " " + (themeObj.szLegendUnits||themeObj.szUnits||"");
             szHtml += "<div style='font-size:1.8em;font-weight:light;margin:0em 0em 0.7em 0em;'>" + szSum + "</div>";
@@ -596,7 +597,7 @@ ixmaps.legend = ixmaps.legend || {};
                     // --------------------------------
                     
                     if (sortA[i].count) {
-                        szHtml += "<span class='theme-legend-count' style='font-size:0.9em;'> " + szValue + " " + szUnit + "</span>";
+                        szHtml += "<span class='theme-legend-count' style='float:right;font-size:0.9em;'> " + szValue + " " + szUnit + "</span>";
                     } else
                     if (themeObj.szLabelA && !themeObj.szFlag.match(/SIMPLELEGEND/) && !(ixmaps.layout == "minimal") ) {
                         if ((typeof (themeObj.nMinA[i]) != "undefined") &&

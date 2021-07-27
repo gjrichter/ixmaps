@@ -553,7 +553,8 @@
 					szHtml += "<div style='height:1px'></div>";
 					
 					if ( themeObj.partsA.length > 1 ){
-						themeObj.szOrigLabelA = themeObj.activeTheme.szOrigLabelA;
+						themeObj.szLabelA = themeObj.activeTheme.szLabelA||themeObj.activeTheme.szValuesA;
+						themeObj.szOrigLabelA = themeObj.activeTheme.szOrigLabelA||themeObj.activeTheme.szValuesA;
 						szHtml += "<div style='margin:1.5em 1em 1em 1em'>";
 						if ( themeObj.activeTheme.szFlag.match(/COUNT/) ){
 							themeObj.szFlag += "|COUNT"

@@ -245,7 +245,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 	// if this filter is already active, clear filter
 	// -----------------------------------------------
 	__setFacetFilter = function (szFilter) {
-
+		
 		// if new filter given, add to filter array (delete existent filter of the same data column)
 		if (szFilter.length) {
 
@@ -271,7 +271,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 		var objThemesA = ixmaps.getThemes();
 		for ( a in objThemesA ){
 			objTheme = objThemesA[a];
-			if ( !objTheme.szFlag.match(/FEATURE/) ){
+			if ( objTheme.szFlag.match(/CHART|CHOROPLETH/) ){
                 if ( szFilter ){
                     ixmaps.changeThemeStyle(null,objTheme.szId, "filter:" + (szFilter || " "), "set");
                 }else{

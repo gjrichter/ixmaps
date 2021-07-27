@@ -135,7 +135,7 @@ p{
 		padding: 15px;
 		background: #f4f5f7;
 		border: solid #cccccc 0.1px;
-		border-radius: 0.5px;
+		border-radius: 0em 0.5em 0.5em 0.5em;
 	}
 	#themeLegendDiv {
 		border-radius: 0.5px;

@@ -824,7 +824,7 @@
 		}else{
 
 			$("#header").css("background","white");
-			$("#themeLegendDiv").css("background","rgba(255,255,255,0.3)");
+			$("#themeLegendDiv").css("background","rgba(255,255,255,0.6)");
 			$("#themeLegendDiv").css("border","none");
 			$("#map-legend").css("background","rgba(255,255,255,0.75)");
 			$("legend").css("color","#222");
