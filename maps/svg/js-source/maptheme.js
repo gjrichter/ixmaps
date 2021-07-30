@@ -14420,7 +14420,14 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		
 		var nAutoScale = 1;
 		if ( (this.nMaxValue == "auto") && this.nMaxValuePlot ){
-			nAutoScale = nAutoScale/ Math.pow(this.nMax,1/3) *  Math.pow(this.nMaxValuePlot,1/3);
+			nAutoScale = 1 / Math.pow(this.nMax,1/3) *  Math.pow(this.nMaxValuePlot,1/3);
+			// GR 30.07.2021
+			// auto -> nAutoScale = individual plot sizes
+			// so, if we have another curve for the same map id (a), 
+			// me must know the size of the existing plot to fit the new one in
+			// map.Themes.autoScale holds a plot scale for every map chart position (a)
+			map.Themes.autoScale = map.Themes.autoScale || [];
+			nAutoScale = map.Themes.autoScale[a] = map.Themes.autoScale[a] || nAutoScale;
 		}
 
 		if (ptNull && ptOff && shapeGroup) {
@@ -18091,7 +18098,6 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
 												plotShape.setAttributeNS(szMapNs, "tooltip",  this.formatValue(nValue, this.nValueDecimals || 2) + this.szUnit + " " + (this.szLabelA ? (this.szLabelA[nClass % (this.nGridX || 1000000)]) : ""));
 											}
-											plotShape = map.Dom.newShape('line', gridGroup, this.plot_last_position[yi].x, this.plot_last_position[yi].y, nAxis, (-nPValue) * nScale, "stroke:" + (this.szLineColor || szColor) + ";stroke-width:" + map.Scale.normalX(this.nLineWidth || 3) + ";stroke-linecap:round;stroke-opacity:0.3");
 										} else {
 											plotShape = map.Dom.newShape('line', plotGroup, this.plot_last_position[yi].x, this.plot_last_position[yi].y, nAxis, (-nPValue) * nScale, "stroke:" + (this.szLineColor || szColor) + ";stroke-width:" + map.Scale.normalX(this.nLineWidth || 3) + ";stroke-linecap:round;");
 											if ( this.nXLen < 25 ){

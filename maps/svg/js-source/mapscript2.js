@@ -9603,7 +9603,13 @@ doDisplayInfo = function(xPos,yPos,szMode){
 			szShapeId = szTheme+"::"+szChart;
 
 			if ( chartTheme.szFlag.match(/PLOT/) ){
-				ptNull = map.Themes.getChart(szShapeId,chartGroup,"VALUES|XAXIS|ZOOM|BOX|GRID",chartTheme);
+				for ( var t=0; t<map.Themes.themesA.length; t++ ){
+					var objTheme = map.Themes.themesA[t];
+					if ( objTheme.szFlag.match(/PLOT/) ){
+						ptNull = map.Themes.getChart(szShapeId,chartGroup,"VALUES|XAXIS|ZOOM|BOX|GRID",objTheme);
+					}
+				}
+				
 			}else
 			if ( chartTheme.szFlag.match(/POINTER/) && (chartTheme.nOrigSumA.length > 1) && (chartTheme.partsA.length > 1) ){
 				ptNull = map.Themes.getChart(szShapeId,chartGroup,"VALUES|ZOOM|AXIS|HORZ",chartTheme);
