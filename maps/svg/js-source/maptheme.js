@@ -8664,9 +8664,16 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 					}
 				}
 
-				this.itemA[szId].nSize += (nValueSize || (this.objTheme.nSizeFieldIndex ? 0 : nSize));
-				this.itemA[szId].nAlpha += (nAlphaValue || 1);
-				this.itemA[szId].nValue100 += nValue100 || 0;
+				if (this.__fMax) {
+					this.itemA[szId].nSize = Math.max(this.itemA[szId].nSize,
+													  (nValueSize || (this.objTheme.nSizeFieldIndex ? 0 : nSize)));
+					this.itemA[szId].nAlpha = Math.max(this.itemA[szId].nAlpha,(nAlphaValue || 1));
+					this.itemA[szId].nValue100 = Math.max(this.itemA[szId].nValue100,(nValue100 || 0));
+				}else{
+					this.itemA[szId].nSize += (nValueSize || (this.objTheme.nSizeFieldIndex ? 0 : nSize));
+					this.itemA[szId].nAlpha += (nAlphaValue || 1);
+					this.itemA[szId].nValue100 += nValue100 || 0;
+				}
 				this.itemA[szId].nCount++;
 				this.itemA[szId].dbIndexA.push(j);
 				this.itemA[szId].ptPosA.push(ptOrigPos);
@@ -15761,7 +15768,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		// GR 09.11.2019 donut with count or size == 1 --> bubble
 		if (donut.partsA.length < 2 && (this.itemA[a].nCount == 1)) {
 			donut.nRadInner = 0;
-			donut.nRadOuter *= 0.85;
+			//donut.nRadOuter *= 0.85;
 		}
 
 		donut.realize();
@@ -17749,7 +17756,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 							if (!fPlotInit) {
 								var szGridId = this.szId + ":" + this.itemA[a].szSelectionId + ":chartgrid";
-								var gridGroup = SVGDocument.getElementById(szGridId);
+								var gridGroup = null; //SVGDocument.getElementById(szGridId);
 								if (!gridGroup || szFlag.match(/ZOOM/)) {
 									if (1||szFlag.match(/AREA/)) {
 										shapeOnTopGroup = shapeOnTopGroup || map.Dom.newGroup(chartGroup, this.szId + ":" + a + ":chartontop");
@@ -19621,7 +19628,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 	}
 
 	// GR 20.03.2013 make shure, the chart does not exeeds height 150 
-	if (szFlag.match(/ZOOM/) ) {
+	if (0 && szFlag.match(/ZOOM/) ) {
 		var chartBox = map.Dom.getBox(chartGroup);
 		if (chartBox.height > map.Scale.normalY(150)) {
 			var nScale = Math.min(1, (map.Scale.normalY(150) / chartBox.height));
