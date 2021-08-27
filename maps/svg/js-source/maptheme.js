@@ -19627,25 +19627,6 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		}
 	}
 
-	// GR 20.03.2013 make shure, the chart does not exeeds height 150 
-	if (0 && szFlag.match(/ZOOM/) ) {
-		var chartBox = map.Dom.getBox(chartGroup);
-		if (chartBox.height > map.Scale.normalY(150)) {
-			var nScale = Math.min(1, (map.Scale.normalY(150) / chartBox.height));
-			// GR 17.05.2013 make shure, the chart is minimum height 30 
-			nScale = Math.max(nScale, (map.Scale.normalY(30) / chartBox.height));
-			shapeGroup.fu.scale(nScale, nScale);
-			if (shapeOnTopGroup) {
-				shapeOnTopGroup.fu.scale(nScale, nScale);
-			}
-			if (textOnTopGroup) {
-				textOnTopGroup.fu.scale(nScale, nScale);
-				var pos = textOnTopGroup.fu.getPosition();
-				textOnTopGroup.fu.setPosition(pos.x*nScale,pos.y);
-			}
-		}
-	}
-
 	ptNull.x = 0;
 	ptNull.y = 0;
 	// GR 01.02.2015 we need to know later, if chart has been drawn

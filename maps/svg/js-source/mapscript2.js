@@ -9656,17 +9656,19 @@ doDisplayInfo = function(xPos,yPos,szMode){
 
 				var chartBox = map.Dom.getBox(chartGroup);
 				if ( chartBox.width > 0 && chartBox.height > 0 ){
-					chartGroup.fu.scale(2,2);
-					chartGroup.fu.setPosition(map.Scale.normalX(nIndent)-chartBox.x*2,contentBox.height+map.Scale.normalY(nIndent)-chartBox.y*2);
+					var nScale = Math.min(map.Scale.normalX(300)/chartBox.height,map.Scale.normalX(400)/chartBox.width);
+					chartGroup.fu.scale(nScale,nScale);
+					chartGroup.fu.setPosition(map.Scale.normalX(nIndent)-chartBox.x*nScale,contentBox.height+map.Scale.normalY(nIndent)-chartBox.y*nScale);
 
 					var nYpos = chartBox.y+chartBox.height+map.Scale.normalY(nIndent);
 
 					// add title
+					var nFontScale = 1.5/nScale;
 					var szTitle = (chartTheme.szTitle||" ").replace(/\<br\>/," \n ");
-					var szTextStyle = __scaleStyleString(map.Scale.tStyle.Description.szStyle,0.5); 
-					nYpos += map.Scale.tStyle.Description.nFontHeight*0.25 + map.Scale.normalY(1);
+					var szTextStyle = __scaleStyleString(map.Scale.tStyle.Description.szStyle,nFontScale); 
+					nYpos += map.Scale.tStyle.Description.nFontHeight*nFontScale + map.Scale.normalY(2*nFontScale);
 					var newTitle = map.Dom.newText(chartGroup,chartBox.x,nYpos,szTextStyle,szTitle);
-					nYpos += map.Scale.tStyle.Description.nFontHeight*1 + map.Scale.normalY(1);
+					nYpos += map.Scale.tStyle.Description.nFontHeight*nFontScale + map.Scale.normalY(nFontScale);
 					
 					map.Dom.wrapText(newTitle,chartBox.width);
 					// add snippet
