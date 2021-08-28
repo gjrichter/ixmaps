@@ -21357,6 +21357,13 @@ MapTheme.prototype.removeElements = function (evt) {
 	// remove WMS images
 	this.clearWMS();
 	
+	// remove FEATURE generated groups in layer pane
+	if (this.szFlag.match(/FEATURE/)) {
+		var labelGroup = SVGDocument.getElementById(this.chartGroup.getAttributeNS(null,"id") + ":label");
+		this.chartGroup.parentNode.removeChild(labelGroup);
+		this.chartGroup.parentNode.removeChild(this.chartGroup);
+	}
+	
 	if (this.onremove) {
 		try {
 			eval(this.onremove);
