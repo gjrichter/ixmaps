@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>iXMaps</title>
+    <link rel="shortcut icon" href="../../../ui/resources/images/ixmaps_logo.png" >
+
+ 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>
+    <!-- CSS Libs -->
+    <link rel="stylesheet" type="text/css" href="../lib/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../lib/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../lib/css/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="../lib/css/bootstrap-switch.min.css">
+    <link rel="stylesheet" type="text/css" href="../lib/css/checkbox3.min.css">
+    <link rel="stylesheet" type="text/css" href="../lib/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="../lib/css/dataTables.bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../lib/css/select2.min.css">
+    <!-- CSS App -->
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <link rel="stylesheet" type="text/css" href="../css/themes/flat-blue.css">
+
+	<style type="text/css">
+	:root{
+		--mono_fonts:14px/1.5 Menlo,Consolas,monospace;
+		--serif:"Iowan Old Style","Apple Garamond",Baskerville,"Palatino Linotype","Times New Roman","Droid Serif",Times,"Source Serif Pro",serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+		--sans-serif:-apple-system,BlinkMacSystemFont,"avenir next",avenir,helvetica,"helvetica neue",ubuntu,roboto,noto,"segoe ui",arial,sans-serif
+		}
+	.output{
+		font-family:var(--serif);
+		font-size:1.5em;
+		padding:0em 20px;
+	}
+	.output h1,h2,h3,h4,h5{
+		font-family:var(--sans-serif);
+	}
+
+	.app-container .content-container .side-body.padding-top {
+		padding-top: 23px;
+		margin-left: 0px;
+	}
+	</style>
+
+
+
+</head>
+
+<body class="flat-blue">
+    <div class="app-container">
+        <div class="row content-container">
+            <nav class="navbar navbar-default navbar-fixed-top navbar-top">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-expand-toggle">
+                            <i class="fa fa-bars icon"></i>
+                        </button>
+                        <ol class="breadcrumb navbar-breadcrumb">
+                            <li id="page-header" class="active"><a href="javascript:ixmaps.home()">&nbsp;&nbsp;&nbsp;map collection</a></li>
+                        </ol>
+                        <button type="button" class="navbar-right-expand-toggle pull-right visible-xs">
+                            <i class="fa fa-th icon"></i>
+                        </button>
+                    </div>
+					<div class="nav navbar-nav navbar-right">
+                        <ol class="breadcrumb navbar-breadcrumb">
+                            <li class="active"><a href="javascript:ixmaps.next()"><i class="fa fa-info icon"></i>&nbsp;&nbsp;next&nbsp;&nbsp;</a></li>
+                            <li class="active"><a href="javascript:ixmaps.info()"><i class="fa fa-info icon"></i>&nbsp;&nbsp;info&nbsp;&nbsp;</a></li>
+                            <li class="active"><a href="javascript:ixmaps.home()"><i class="fa fa-level-up icon"></i>&nbsp;&nbsp;up&nbsp;&nbsp;</a></li>
+                        </ol>
+                    </div>
+
+                </div>
+            </nav>
+
+			<div id="menu"></div>
+
+           <!-- Banner -->
+			<!--
+            <div class="jumbotron app-header">
+                <div class="container">
+                </div>
+            </div>  
+			-->
+			<br>
+			<br>
+           <!-- Main Content -->
+            <div >
+                <div class="side-body padding-top">
+
+					<div class="row">
+                        <div class="col-xs-12">
+                            <div >
+								<div style="overflow:hidden;">
+									<iframe id="map-frame" width="100%" height="840px" style="border:0;overflow:hidden" src= ></iframe>
+								</div>
+							</div>
+						</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div>
+
+		    <!-- Javascript Libs -->
+            <script type="text/javascript" src="../lib/js/jquery.min.js"></script>
+            <script type="text/javascript" src="../lib/js/bootstrap.min.js"></script>
+			<!--
+            <script type="text/javascript" src="../lib/js/Chart.bundle.js"></script>
+			-->
+            <script type="text/javascript" src="../lib/js/bootstrap-switch.min.js"></script>
+            <script type="text/javascript" src="../lib/js/jquery.matchHeight-min.js"></script>
+            <script type="text/javascript" src="../lib/js/jquery.dataTables.min.js"></script>
+            <script type="text/javascript" src="../lib/js/dataTables.bootstrap.min.js"></script>
+            <script type="text/javascript" src="../lib/js/select2.full.min.js"></script>
+			<!--
+            <script type="text/javascript" src="../lib/js/ace/ace.js"></script>
+            <script type="text/javascript" src="../lib/js/ace/mode-html.js"></script>
+            <script type="text/javascript" src="../lib/js/ace/theme-github.js"></script>
+			-->
+
+			<script type="text/javascript" src = "../../../ui/libs/getUrlParam/js/jquery.getUrlParam.js"></script>
+			<script type="text/javascript" src = "../../../ui/js/htmlgui_api.js"></script>
+
+			
+			
+			<!-- Javascript -->
+			<script>
+
+			// ---------------------------------------------------------------------------------------
+			// infuse HTML snippets
+			// ---------------------------------------------------------------------------------------
+
+			infuseHTML = function(szElement,szUrl,szDiv){
+
+				szStoryRoot = "";
+
+				if ( typeof($("#"+szElement)[0]) == "undefined" ){
+					return;
+				}
+				$("#"+szElement).load(szUrl+' #'+ szDiv , function(response, status, xhr) {
+					  if (status == "error") {
+						var msg = "Sorry but there was an error: ";
+						$("#story").html(msg + xhr.status + "<br><br> '" +szStoryRoot+szUrl+ "'<br><br> " + xhr.statusText);
+					  }
+					});
+			};
+
+			infuseHTML("menu","./menu.html","menu");
+
+
+			// ---------------------------------------------------------------------------------------
+			// get projects source (GitHub)
+			// ---------------------------------------------------------------------------------------
+
+			var __projects = null;
+			var __actualProject = null;
+			var __isMap = false;
+
+			var repository = $(document).getUrlParam('projects') || 'gjrichter/elezioni-europee-2019/contents/projects';
+
+			ixmaps.directory = "https://api.github.com/repos/"+repository+"?ref=master";
+
+			// ---------------------------------------------------------------------------------------
+			// load list of example projects into menu
+			// ---------------------------------------------------------------------------------------
+			//
+			$.ajax({
+
+					// The URL for the request
+					url: "https://api.github.com/repos/"+repository+"?ref=master",
+
+					// The data to send (will be converted to a query string)
+					data: {
+						id: 123
+					},
+
+					// Whether this is a POST or GET request
+					type: "GET",
+
+					// The type of data we expect back
+					dataType: "text",
+				})
+				// Code to run if the request succeeds (is done);
+				// The response is passed to the function
+				.done(function (result) {
+
+					__projects = JSON.parse(result);
+					szHtml = "";
+					nCount = 0;
+					for (p in __projects) {
+						console.log(__projects[p].name);
+					}
+					for (p in __projects) {
+						if ( __projects[p].download_url && __projects[p].download_url.match(/readme.md/i)){
+							ixmaps.readme = __projects[p].download_url;
+						}
+						if ( __projects[p].download_url && __projects[p].download_url.match(/json/i)){
+							$.ajax({
+									url: __projects[p].download_url,
+									data: {
+										id: 123
+									},
+									type: "GET",
+									dataType: "text",
+								})
+								.done(function (result,textStatus, jqXHR) {
+
+									var json = JSON.parse(result);
+
+									szHtml += '<li>';
+									szHtml += '<a class="dropdown-item text-black" style="height:100%" href="javascript:ixmaps.loadExample(\'' + this.url +	'\')">';
+
+									szHtml += '<h5 style="width:90%;white-space:normal;line-height:1em;margin-top:1.5em;margin-bottom:0.2em">';
+
+									if ( json.metadata.title && json.metadata.title.length ){
+										szHtml += json.metadata.title;
+									}else{
+										szHtml += json.themes[0].style.title;
+									}
+									szHtml +=  '</h5>';
+
+									szHtml +=  '</a>';
+									szHtml +=  '<div style="margin-left:1.5em;font-size:0.8em;line-height:1.1em;width:80%">';
+
+									if ( json.metadata.thumbnail && json.metadata.thumbnail.length ){
+										szHtml += "<img src="+json.metadata.thumbnail+" style='height:48px;margin-bottom:0.5em' >";
+									}
+									if ( json.metadata.snippet && json.metadata.snippet.length ){
+										szHtml += json.metadata.snippet;
+									}
+									if ( json.metadata.info && json.metadata.info.length ){
+										szHtml += json.metadata.info;
+									}
+									if ( json.metadata.legend && json.metadata.legend.length ){
+										szHtml += json.metadata.legend;
+									}
+
+									szHtml +=  '</div>';
+									szHtml +=  '</li>';
+
+									$("#project-list").html(szHtml);
+								})
+								.fail(function (xhr, status, errorThrown) {
+									alert("Sorry, there was a problem!");
+									console.log("Error: " + errorThrown);
+									console.log("Status: " + status);
+									console.dir(xhr);
+								})
+						}
+					}
+
+
+				})
+				// Code to run if the request fails; the raw request and
+				// status codes are passed to the function
+				.fail(function (xhr, status, errorThrown) {
+					alert("Sorry, there was a problem!");
+					console.log("Error: " + errorThrown);
+					console.log("Status: " + status);
+					console.dir(xhr);
+				})
+				// Code to run regardless of success or failure;
+				.always(function (xhr, status) {});
+
+
+
+
+			</script>
+
+			<script src="../../../../data.js/data.js"></script>
+
+            <script type="text/javascript" src="../js/app.js"></script>
+        </div>
+
+	<script>
+
+	// --------------------------------------------------------------------------------------------
+	// here we go
+	// --------------------------------------------------------------------------------------------
+
+	__resize = function(){
+			$("#map-frame").attr("height",window.innerHeight - 65+"px");
+			$("#map-frame").attr("width",window.innerWidth - 10 +"px");
+	}
+
+	$(document).ready(function() {
+
+			// is there a bookmark to execute at load ?
+			if ( $(document).getUrlParam('bookmark') ){
+				x = $(document).getUrlParam('bookmark');
+				__bound = decodeURIComponent(((typeof(x)!="string")?x.join(""):x));
+			}
+			if ( $(document).getUrlParam('maptype') ){
+				__maptype = $(document).getUrlParam('maptype');
+			}
+
+			if ($(document).getUrlParam('project')) {
+				__story += ("?project=" + $(document).getUrlParam('project'));
+				ixmaps.project = $(document).getUrlParam('project');
+			}
+
+			__resize();
+
+			// --------------
+			// embed the map 
+			// --------------
+
+			// define callback on map ready 
+			ixmaps.waitForMap("map-frame",function(map) {
+				if ( ixmaps.project ){
+					ixmaps.loadProject('map',ixmaps.project);
+				}
+			});
+			// load map into frame 
+			$("#map-frame").attr("src","../../../ui/html/main_sync_story_frame.html?basemap=ll&maptype=CartoDB - Positron&themelegend=0"+
+					"&svggis="+
+					"&story=../../app/project-presenter/stories/Master/index.html"+
+					"&layout=right&sidebar=80%&mapcontrol=true&tools=1"+
+					"&bookmark="+encodeURIComponent("")+
+					"&attribution="+encodeURIComponent("powered by <a href='https://www.ixmaps.com' target='_blank' style='color:#0E77B2'>iXMaps</a>")+
+					"&appid=ProjectExplorer" )
+					;
+
+			__szBookmark = null;
+
+	}); // end $(document).ready
+
+	$(window).resize(function() {
+			__resize();
+	});
+
+	// --------------------------------------------------------------------------------------------
+	// load projects by links generated in the main menu
+	// --------------------------------------------------------------------------------------------
+
+	ixmaps.loadExample = function(szProjectUrl){
+		ixmaps.project = szProjectUrl;
+		ixmaps.loadProject('map',szProjectUrl,"clear");
+		ixmaps.loadStory('../../app/project-presenter/stories/Master/index.html');
+	}
+
+	</script>
+
+</body>
+
+</html>

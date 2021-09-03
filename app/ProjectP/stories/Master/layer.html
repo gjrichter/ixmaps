@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+<meta http-equiv="Content-Language" content="en-us" />
+<meta name="copyright" content="Guenter Richter"/>
+<meta name="author" content="service@medienobjekte.de"/>
+<meta name="description" content="Interactive &amp; estensible maps in SVG"/>
+<meta name="revisit-after" content="30 days"/>
+<meta name="distribution" content="Global"/>
+
+<link rel="stylesheet" href="help.css" type="text/css" />
+
+<style type="text/css">
+	h1,h2,h3,h4,h5,h6,p {
+		font-family: arial,helvetica;
+		color: #444;
+		font-weight: 300;
+	}
+	p {
+		font-family: arial,helvetica;
+		color: #444;
+		font-weight: 300;
+	}
+	a {
+		font-family: arial,helvetica;
+		font-weight: 100;
+		color: #444;
+		text-decoration:none;
+	}
+
+	a:hover {
+		color: #0044dd;
+		text-decoration:none;
+	}
+</style>
+
+</head>
+
+<body style="margin:0px;padding:0px;" onload="">
+
+	<!-- Container -->
+	<div id="container" style="padding:2em 1em;vertical-align:middle;background-color:rgba(255,255,255,0.9)" >
+
+		<h3>MAPPA DI FONDO</h3>
+					
+		<hr>
+		<ul class="maptypelist">
+
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('white');ixmaps.hideStoryTool();">white</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('gray');ixmaps.hideStoryTool();">gray</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('black');ixmaps.hideStoryTool();">black</a></li>
+
+			<li role="separator" class="divider"></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('OpenStreetMap - Osmarenderer');ixmaps.hideStoryTool();">OpenStreetMap - Osmarenderer</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('OpenStreetMap - FR');ixmaps.hideStoryTool();">OpenStreetMap - Humanitarian</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('OpenStreetMap - wikipedia');ixmaps.hideStoryTool();">OpenStreetMap - Wikipedia</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('OpenTopoMap');ixmaps.hideStoryTool();">Open Topo Map</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('OpenPtMap');ixmaps.hideStoryTool();">Open Public Transport Map</a></li>
+
+			<li role="separator" class="divider"></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('Stamen - toner-lite');ixmaps.hideStoryTool();">Stamen - toner-lite</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('Stamen - watercolor');ixmaps.hideStoryTool();">Stamen - watercolor</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('Stamen - terrain');ixmaps.hideStoryTool();">Stamen - terrain</a></li>
+
+			<li role="separator" class="divider"></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('CartoDB - Positron');ixmaps.hideStoryTool();">CartoDB - Positron</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('CartoDB - Dark matter');ixmaps.hideStoryTool();">CartoDB - Dark matter</a></li>
+
+            <li role="separator" class="divider"></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('MapTiler - Positron');ixmaps.hideStoryTool();">MapTiler - Positron</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('MapTiler - Dark Matter');ixmaps.hideStoryTool();">MapTiler - Dark Matter</a></li>
+
+			<li role="separator" class="divider"></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('ArcGIS - Topo');ixmaps.hideStoryTool();">ArcGIS - Topo</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('ArcGIS - Light Gray Base');ixmaps.hideStoryTool();">ArcGIS - Light Gray Base</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('ArcGIS - Ocean Basemap');ixmaps.hideStoryTool();">ArcGIS - Ocean Basemap</a></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('ArcGIS - Hillshade');ixmaps.hideStoryTool();">ArcGIS - Hillshade</a></li>
+
+			<li role="separator" class="divider"></li>
+			<li><a href="javascript:ixmaps.htmlgui_setMapTypeId('NOKIA - satellite');ixmaps.hideStoryTool();">Nokia - Satellite</a></li>
+		</ul>	
+
+
+</body>
+</html>

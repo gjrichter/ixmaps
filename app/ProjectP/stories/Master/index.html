@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Corruptiuon Perceptiuon Index - ixmaps story</title>
+	<meta name="author" content="ixmaps" />
+	<meta name="description" content="ixmaps story" />
+	<meta name="keywords" content="ixmaps,corruption,map" />
+	<meta name="Resource-type" content="Document" />
+
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/css/jquery.fullPage.css" />
+	<link rel="stylesheet" type="text/css" href="index.css" />
+	<link href="assets/css/font-awesome.min.css" rel="stylesheet">
+	<link href="assets/css/icomoon.css" rel="stylesheet" />
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github-gist.min.css">
+	<link rel="stylesheet" href="./test.css">
+
+	<style>
+		#tooltip {
+			font-family: arial, system;
+			font-size: 14px;
+			background: white;
+			border: 0.5px solid black;
+			border-radius: 5px;
+			padding: 0.5em 1em 0.5em 1em;
+			max-width: 300px;
+			box-shadow: 1px 1px 9px rgba(0, 0, 0, .275);
+		}
+
+		#tooltip p {
+			font-size: 14px;
+		}
+
+		#tooltip table {
+			font-size: 14px;
+		}
+
+		table {
+			border: none;
+			margin-left: -0.5em;
+		}
+
+		td {
+			border: none;
+			vertical-align: top;
+			padding: 0.5em;
+		}
+
+		tr {
+			margin-top: -0.5em;
+		}
+
+		p {
+			margin-top: 0em;
+			margin-bottom: 0.5em;
+			line-height: 1.2em;
+		}
+
+		#filelist {
+			font-size: 1.2em;
+			width: 95%;
+
+		}
+
+		#filelist p {
+			font-size: 1.2em;
+			width: 95%;
+
+		}
+
+		#filelist h2 {
+			font-size: 1.5em;
+			width: 95%;
+
+		}
+
+		#filelist h3 {
+			font-size: 1.3em;
+			width: 95%;
+
+		}
+
+		#readme {
+			font-size: 1.2em;
+			width: 95%;
+
+		}
+
+		#readme p {
+			font-size: 1.2em;
+			width: 95%;
+
+		}
+
+		#readme h2 {
+			font-size: 1.5em;
+			width: 95%;
+
+		}
+
+		#readme h3 {
+			font-size: 1.3em;
+			width: 95%;
+
+		}
+	</style>
+	<style>
+		.read-md {
+			max-width: 800px;
+			margin: 0em 0em 0em 0em;
+		}
+
+		.avatar {
+			position: absolute;
+			top: 0;
+			right: 100%;
+			border-radius: 4px;
+		}
+
+		.gist-readme {
+			line-height: 1.5em;
+			max-width: 720px;
+			max-height: 1000000vh;
+		}
+
+		.gist-id,
+		pre,
+		code,
+		textarea {
+			font-family: "Menlo", monospace;
+			line-height: normal;
+		}
+
+		.gist-id {
+			line-height: 0;
+		}
+
+		.title {
+			margin-bottom: 2.5em;
+		}
+
+		.gist {
+			float: left;
+			margin-right: 1em;
+		}
+
+		.source {
+			border-left: solid #ddd 0px;
+			padding-left: 0em;
+		}
+
+		.intro {
+			margin: 0;
+		}
+	</style>
+
+	<style>
+		code {
+			background-color: rgba(148, 144, 146, 0.2);
+		}
+
+		pre {
+			white-space: pre-wrap;
+			/* css-3 */
+			white-space: -moz-pre-wrap;
+			/* Mozilla, since 1999 */
+			white-space: -pre-wrap;
+			/* Opera 4-6 */
+			white-space: -o-pre-wrap;
+			/* Opera 7 */
+			word-wrap: break-word;
+			/* Internet Explorer 5.5+ */
+			xxbackground-color: #f8f8f8;
+			margin-top: 1.5em;
+			margin-bottom: 1.5em;
+			padding: 0.5rem 0.3125rem;
+		}
+
+		pre code {
+			background-color: transparent;
+			border: 0;
+			padding: 0;
+		}
+
+		pre code.hljs {
+			display: block;
+			padding: 1em;
+		}
+
+		code.hljs {
+			display: inline;
+			padding: 0 0.5em;
+			border: solid #ddd 0.5px;
+			border-radius: 0.1em;
+			font-size: 1.1em;
+			xxbackground-color: rgba(148, 144, 146, 0.2);
+		}
+
+		blockquote {
+			color: #aaa;
+			font-size: 1em;
+			font-weight: normal;
+			font-style: italic;
+			margin-left: 0em;
+			padding-left: 1em;
+			border-left: solid #ddd 4px;
+		}
+	</style>
+	<style>
+		h1 {
+			font-size: 36px;
+			font-weight: 700;
+			letter-spacing: -1px;
+			margin: 0.2em 0em 0em 0em;
+		}
+
+		h2 {
+			font-weight: 700;
+			margin-top: 1.5em;
+			margin-bottom: 0.5em;
+		}
+
+		h3 {
+			font-weight: 700;
+			margin-top: 1.5em;
+			margin-bottom: 0.5em;
+		}
+
+		h1,
+		h2 {
+			text-rendering: optimizeLegibility;
+		}
+
+		h1,
+		iframe {
+			width: 960px;
+		}
+
+		iframe {
+			border: none;
+		}
+
+		a {
+			color: #2980B9;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		a:hover {
+			text-decoration: none;
+			color: #40a1e1;
+		}
+
+		a:visited {
+			text-decoration: none;
+			color: red;
+		}
+
+		p {
+			line-height: 1.5em;
+			margin: 0;
+			font-size: 1em;
+			margin: 1em 0em;
+		}
+
+		.read-md {
+			max-width: 800px;
+			margin: 0em 0em 0em 0em;
+		}
+
+		.avatar {
+			position: absolute;
+			top: 0;
+			right: 100%;
+			border-radius: 4px;
+		}
+
+		.gist-readme {
+			line-height: 1.5em;
+			max-width: 720px;
+			max-height: 1000000vh;
+		}
+
+		.gist-id,
+		pre,
+		code,
+		textarea {
+			font-family: "Menlo", monospace;
+			line-height: normal;
+		}
+
+		.gist-id {
+			line-height: 0;
+		}
+
+		.title {
+			margin-bottom: 2.5em;
+		}
+
+		.gist {
+			float: left;
+			margin-right: 1em;
+		}
+
+		.source {
+			border-left: solid #ddd 0px;
+			padding-left: 0em;
+			width: 10000px;
+		}
+
+		.source-scroll {
+			width: 100%;
+			overflow: auto;
+		}
+
+		.prettyprint {
+			font-size: 0.9em;
+		}
+
+		code {
+			xxcolor: #a66;
+		}
+	</style>
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github-gist.min.css">
+
+	<style>
+		pre {
+			white-space: pre-wrap;
+			/* css-3 */
+			white-space: -moz-pre-wrap;
+			/* Mozilla, since 1999 */
+			white-space: -pre-wrap;
+			/* Opera 4-6 */
+			white-space: -o-pre-wrap;
+			/* Opera 7 */
+			word-wrap: break-word;
+			/* Internet Explorer 5.5+ */
+			xxbackground-color: #f8f8f8;
+			margin-top: 1.5em;
+			margin-bottom: 1.5em;
+			padding: 0.5rem 0.3125rem;
+		}
+
+		pre code {
+			background-color: transparent;
+			border: 0;
+			padding: 0;
+		}
+
+		pre code.hljs {
+			display: block;
+			padding: 1em;
+		}
+
+		code.hljs {
+			display: inline;
+			padding: 0 0.5em;
+			border: solid #ddd 0px;
+			border-radius: 0.1em;
+			xxbackground-color: rgba(155, 155, 155, 0.1);
+		}
+
+		blockquote {
+			color: #aaa;
+			font-size: 1em;
+			font-weight: normal;
+			font-style: italic;
+			margin-left: 0em;
+			padding-left: 1em;
+			border-left: solid #ddd 4px;
+		}
+
+		ol {
+			list-style: disc;
+			margin: 0;
+			padding: 1em;
+		}
+
+		ul {
+			list-style: circle;
+			margin: 0;
+			padding-left: 1em;
+		}
+	</style>
+
+</head>
+
+<body class="story-body">
+
+	<div id="fullpage" style="display:none;background-color:white">
+
+		<div class="section" id="first-section">
+
+			<!-- readme.md -->
+
+			<div class="slide">
+				<div class="intro down">
+					<div>
+						<form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
+							<fieldset>
+								<legend id="legend"><br>
+									<span id="loadProjectButton" style="display:none">
+										<a href="javascript:$('#loadProject').show();$('#loadProjectButton').hide();$('#loadProjectHideButton').show()"
+											title="load project">[+]</a></span>
+									<span id="loadProjectHideButton" style="display:none">
+										<a href="javascript:$('#loadProject').hide();$('#loadProjectButton').show();$('#loadProjectHideButton').hide()"
+											title="load project">[-]</a></span>
+									<span id="saveProjectButton" style="display:none">
+										<a href="javascript:ixmaps.popupProject()" title="save project">[->]</a></span>
+								</legend>
+								<input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+								<div id="loadProject" style="margin-top:0.5em;background:rgba(0,0,0,0);">
+									<input type="file" id="fileselect" name="fileselect[]" multiple="multiple"
+										style="display:none" />
+									<div id="filedrag"
+										style="clear:both;height:10em;width:100%;border:dashed #dddddd 2px;">drop files
+										here</div>
+									<label class="fileContainer" for="fileselect"
+										style="position:relative;top:-6em;left:30%">or select project</label>
+								</div>
+
+							</fieldset>
+
+						</form>
+					</div>
+					<div id="messages">
+					</div>
+					<h3 id="titlexxx" class="title" style="margin-left:10px;margin-top:0.3em;margin-bottom:0em;"></h3>
+				</div>
+				<div style="clear:both">
+					<div id="description">
+					</div>
+					<div id="readme" >
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+		<div class="section">
+
+			<!-- legend -->
+
+			<div class="slide">
+				<div class="intro up down">
+					<div id="legendTabs" style="display:none">
+						<ul id="legendTabsList" class="nav nav-tabs">
+							<li id="lastLegendTab"><a href="#" onclick="activateTab($(this))">Map Layer</a></li>
+						</ul>
+					</div>
+
+					<div id='themeLegendDiv' style="margin-top:-2.5em;clear:both;display:none"></div>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="section">
+
+			<!-- project -->
+
+			<div class="slide">
+				<div class="intro up down">
+					<div id="messages">
+					</div>
+					<h3 id="titlexxx" class="title" style="margin-left:10px;margin-top:0.3em;margin-bottom:0em;"></h3>
+				</div>
+				<div style="clear:both">
+					<div id="description">
+					</div>
+					<div id="filelist" style="height:10000px">
+					</div>
+				</div>
+
+				<div id="tooltip" style="position: absolute; display: none;"></div>
+				<div id="tooltips" style="display: none;"></div>
+			</div>
+		</div>
+
+
+		<div class="section">
+			<div class="intro footer up">
+				<br>
+				<h2>Attribuzioni</h2>
+				<br>
+				<br>
+				<p>Visualization:<br>
+					created by <a href="http://ixmaps.com">iXmaps</a> - CC BY</p>
+				<p> <span class="icon icon-envelop"></span> <a href="#"> info@ixmaps.com</a> <br />
+					<span class="icon icon-twitter"></span> <a href="#"> @grichter </a> <br />
+				</p>
+				<br>
+				<p>credits</p>
+				<p>
+					<a href="http://alvarotrigo.com/fullPage/">alvarotrigo.com</a> - for the scrolling
+					<br><a href="http://icomoon.io">icomoon.io</a> - for the nice icons
+				</p>
+
+			</div>
+		</div>
+
+	</div>
+
+
+	<!-- ==== MODAL DIALOG ==== -->
+	<div id="modal-dialog-1" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog"
+		aria-labelledby="myLargeModalLabel" aria-hidden="true" style="z-index:9999">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				...
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+	<div id="modal-dialog-2" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog"
+		aria-labelledby="myLargeModalLabel" aria-hidden="true" style="z-index:9999">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				...
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+	<div id="modal-dialog-3" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog"
+		aria-labelledby="myLargeModalLabel" aria-hidden="true" style="white;z-index:9999">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				...
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+
+	<!--[if IE]>
+		<script type="text/javascript">
+			 var console = { log: function() {} };
+		</script>
+	<![endif]-->
+
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="assets/js/main.js"></script>
+	<script type="text/javascript" src="assets/js/masonry.pkgd.min.js"></script>
+	<script type="text/javascript" src="assets/js/imagesloaded.js"></script>
+	<script type="text/javascript" src="assets/js/classie.js"></script>
+	<script type="text/javascript" src="assets/js/AnimOnScroll.js"></script>
+
+	<script type="text/javascript" src="assets/plugins/scrolloverflow.js"></script>
+
+	<script type="text/javascript" src="assets/plugins/jquery.fullPage.min.js"></script>
+	<script src="https://cdn.rawgit.com/showdownjs/showdown/1.8.6/dist/showdown.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+	<script type="text/javascript">
+		infuseHTML = function (szElement, szUrl, szDiv) {
+
+			if (typeof ($("#" + szElement)[0]) == "undefined") {
+				return;
+			}
+			$("#" + szElement).load(szUrl + ' #' + szDiv, function (response, status, xhr) {
+				if (status == "error") {
+					var msg = "Sorry but there was an error: ";
+					$("#story").html(msg + xhr.status + "<br><br> '" + szUrl + "'<br><br> " + xhr.statusText);
+				}
+			});
+		};
+
+		var language = window.navigator.userLanguage || window.navigator.language;
+		language = language.split("-")[0];
+		infuseHTML("tooltips", "./tooltips_" + language + ".html", "tooltips");
+
+		// --------------------------------
+		// p a g e 
+		// --------------------------------
+
+		// enumerate sections, slides and theme
+		// and create the right id's for fullpage slide handling
+		// -----------------------------------------------------
+		var section = 0;
+		$(".section").each(function () {
+			$(this).attr("id", "section" + (++section));
+			var slide = 0;
+			$(this).find(".slide").each(function () {
+				$(this).attr("id", "section" + section + "slide" + (++slide));
+				$(this).find(".theme").each(function () {
+					$(this).attr("id", "theme_" + section + "" + slide);
+				});
+			});
+		});
+
+		// CUSTOM SCROLL SCRIPT FUNCTION FOR NAVBAR
+		$(function () {
+			$('.scrollclass a').bind('click', function (event) { //just pass scrollclass in design and start scrolling
+				var $anchor = $(this);
+				$('html, body').stop().animate({
+					scrollTop: $($anchor.attr('href')).offset().top
+				}, 1000, 'easeInOutQuad');
+				event.preventDefault();
+			});
+		});
+		//ADD REMOVE PADDING CLASS ON SCROLL
+		$(window).scroll(function () {
+			if ($(document).scrollTop() > 40) {
+				$(".navbar-fixed-top").addClass("navbar-pad-original");
+			} else {
+				$(".navbar-fixed-top").removeClass("navbar-pad-original");
+			}
+		});
+
+		/**
+		var html = '<a href="javascript:$.fn.fullpage.moveSectionDown();"><div class="row scrollclass fp-controlArrow fp-down" style="left:'+(window.innerWidth/2-33)+'px;text-align:center;margin-top:-0.7em;margin-bottom:1em;"></div></a>';
+		$('.down').append(html);
+
+		var html = '<a href="javascript:$.fn.fullpage.moveSectionUp();"><div class="row scrollclass fp-controlArrow fp-up" style="left:'+(window.innerWidth/2-33)+'px;text-align:center;margin-top:-2.2em;margin-bottom:3em;margin-left:1em"></div></a>';
+		$('.up').append(html);
+		**/
+
+		init_fullpage = function () {
+
+			$('#fullpage').fullpage({
+				'scrollOverflow': true,
+				'scrollOverflowOptions': {
+					scrollbars: false
+				},
+				'verticalCentered': false,
+				'css3': true,
+				//'sectionsColor': ['#888888', '#4A6F81', '#B14A4A'],
+				'navigation': true,
+				'navigationPosition': 'right',
+				'navigationTooltips': ['Incidenti', 'Analisi temporali', 'Pericolosità', 'Natura del incidente',
+					'Attribuzioni'
+				],
+
+				'afterLoad': function (a, index, c, d) {
+					__section = index;
+					__slide = 0;
+					$.fn.fullpage.silentMoveTo(index, __slide);
+				},
+				'afterSlideLoad': function (a, index, c, d) {
+					__slide = d;
+					__onChange();
+				},
+
+				'onLeave': function (index, nextIndex, direction) {}
+			});
+			$('#fullpage').fadeIn("slow");
+		};
+
+		$(document).ready(function () {
+
+			var __section = null;
+			var __slide = null;
+			var __fMoveActive = false;
+
+			var __onChange = function () {
+
+				if (!ixmaps.initialized) {
+					return;
+				}
+				if (ixmaps.fMoveToSection) {
+					ixmaps.fMoveToSection = false;
+					return;
+				}
+				__doTheme("theme_" + __section + (__slide + 1));
+			};
+
+			$('#fullpage').fullpage({
+				'scrollOverflow': true,
+				'scrollOverflowOptions': {
+					scrollbars: false
+				},
+				'verticalCentered': false,
+				'css3': true,
+				//'sectionsColor': ['#888888', '#4A6F81', '#B14A4A'],
+				'navigation': true,
+				'navigationPosition': 'right',
+				'navigationTooltips': ['Incidenti', 'Analisi temporali', 'Pericolosità',
+					'Natura del incidente', 'Attribuzioni'
+				],
+
+				'afterLoad': function (a, index, c, d) {
+					__section = index;
+					__slide = 0;
+					$.fn.fullpage.silentMoveTo(index, __slide);
+				},
+				'afterSlideLoad': function (a, index, c, d) {
+					__slide = d;
+					__onChange();
+				},
+
+				'onLeave': function (index, nextIndex, direction) {}
+			});
+			$('#fullpage').fadeIn("slow");
+		});
+
+		__doThemeOldTheme = null;
+		__doThemeTimeout = null;
+		__doTheme = function (szName) {
+			if (szName == __doThemeOldTheme) {
+				return;
+			}
+			__doThemeOldTheme = szName;
+			if (__doThemeTimeout) {
+				clearTimeout(__doThemeTimeout);
+			}
+			__doThemeTimeout = setTimeout("__doThemeOnTimeout('" + szName + "')", 100);
+		}
+		__doThemeOnTimeout = function (szName) {
+			$("#" + szName).click();
+			eval($("#" + szName).attr("href"));
+		}
+
+		// ------------------------------
+		// set resize handler
+		// ------------------------------
+		$(window).resize(function () {
+			// refresh scrollspy !!!
+			$('[data-spy="scroll"]').each(function () {
+				var $spy = $(this).scrollspy('refresh')
+			});
+		});
+
+		var ixmaps = null;
+		if (window.opener) {
+			ixmaps = window.opener.ixmaps;
+		} else
+		if (parent) {
+			ixmaps = parent.window.ixmaps;
+		} else {
+			alert("error: missing parent window for themes !");
+		}
+
+		ixmaps.initialized = false;
+
+		// don't synchronise multiple map frames
+		ixmaps.setSyncMultiMaps(false);
+
+		var nLegendDiv = 0;
+		var legendA = Array(0);
+		ixmaps.setLegendDiv = function (n) {
+			nLegendDiv = n;
+		};
+
+		ixmaps.setLoading = function () {
+			ixmaps.showLoading("... caricando ...");
+		};
+
+		// ------------------------------
+		// if map ready, make first theme
+		// ------------------------------
+		ixmaps.myMapReady = function (map) {
+
+			ixmaps.initialized = true;
+
+			// define some helper for the sidebar menu
+
+			ixmaps.moveSectionsDown = function (nr) {
+				nr = nr || 1;
+				for (var i = 0; i < nr; i++) {
+					setTimeout("$.fn.fullpage.moveSectionDown();", i * 100);
+				}
+			};
+
+			ixmaps.moveToSection = function (nr, slide) {
+				ixmaps.fMoveToSection = true;
+				$.fn.fullpage.silentMoveTo(nr, slide);
+			};
+
+			ixmaps.moveSlideRight = function (nr) {
+				nr = nr || 1;
+				for (var i = 0; i < nr; i++) {
+					setTimeout("$.fn.fullpage.moveSlideRight();", i * 100);
+				}
+			};
+		};
+
+		ixmaps.htmlgui_onItemClick = function (szId) {
+
+			console.log(szId);
+
+			if (szId.match(/theme/)) {
+				var data = ixmaps.getData('map', szId);
+				var szTitle = data.title;
+				ixmaps.szMapItemId = szId;
+				ixmaps.loadStoryTool('./item.html');
+				return true;
+			} else {
+				if (szId.match(/mapbackground/)) {
+					ixmaps.hideStoryTool();
+					return false;
+				}
+				ixmaps.szMapItemId = szId;
+				ixmaps.loadStoryTool('./item.html');
+				//ixmaps.embeddedSVG.window.map.Api.highlightItem(szId);
+				return true;
+			}
+			return false;
+		};
+
+		// load themes script
+		// and initialize map if all loaded
+		//
+		$.when(
+			$.getScript("./index.js"),
+			$.getScript("./inline_legend.js"),
+			$.getScript("../../../../ui/js/tools/layer_legend.js"),
+			$.Deferred(function (deferred) {
+				$(deferred.resolve);
+			})
+		).done(function () {
+			ixmaps.initialized = true;
+			// adapt iframe height in parent
+			// ----------------------------------------------------------------------
+			ixmaps.resizeStoryFrame = function () {
+				var the_height = window.parent.window.document.getElementById('embed-story').contentWindow
+					.document.body.scrollHeight;
+				if (the_height > 100) {
+					window.parent.window.document.getElementById('story-board').style.height = the_height + "px";
+				}
+			};
+
+			ixmaps.legend.maxwidth = window.innerWidth - 20;
+
+			ixmaps.htmlgui_setMapTypeBG(ixmaps.getMapTypeId());
+			/*
+			 * listen on Zoom and Pan  
+			 * to make the mapo layer legend 
+			 */
+			ixmaps.htmlgui_onZoomAndPan = function (nZoom) {
+				ixmaps.viewer_makeLayerLegend();
+				ixmaps.resizeStoryFrame();
+			};
+
+			// GR 09.01.2019 trigger change on story (body) to adapt iframe height in parent
+			// ----------------------------------------------------------------------
+			var myElement = $("body")[0];
+			if (window.addEventListener) {
+				// Normal browsers
+				myElement.addEventListener('DOMSubtreeModified', ixmaps.resizeStoryFrame, false);
+			} else
+			if (window.attachEvent) {
+				// IE
+				myElement.attachEvent('DOMSubtreeModified', ixmaps.resizeStoryFrame);
+			}
+
+		}).fail(function () {
+			alert("script loading " + arguments[2].toString());
+		});
+
+		// --------------------------------------------------------------
+		// define click extension to
+		// check/highlight the theme button 
+		// --------------------------------------------------------------
+
+		// array to store the clicked objects for onRemoveTheme callback
+		var clickA = new Array(0);
+
+		// store the last clicked object for onNewTheme callback
+		var lastClicked = null;
+		$("a").click(function () {
+			if (String($(this).attr("href")).match(/newtheme/i)) {
+				lastClicked = $(this);
+			}
+		});
+
+		// -----------------------------------
+		// adapt legend background to map type
+		// -----------------------------------
+
+		/**
+		 * set legend background on map type change
+		 * @type void
+		 */
+		__changeCss = function (className, classValue) {
+
+			var cssMainContainer = $('#css-modifier-container');
+			if (cssMainContainer.length == 0) {
+				var cssMainContainer = $('<style id="css-modifier-container"></style>');
+				cssMainContainer.appendTo($('head'));
+			}
+			cssMainContainer.append(className + " {" + classValue + "}\n");
+		};
+
+		ixmaps.htmlgui_setMapTypeBG = function (szId) {
+			return true;
+
+			$("#css-modifier-container").remove();
+
+			if (szId.match(/dark/i) || szId.match(/black/i)) {
+				$(".story-body").css("color", "#888");
+				__changeCss(".story-body", "background-color:rgba(0,0,0,1)");
+				__changeCss(".inline-legend", "background-color:rgba(25,25,25,0.7)");
+				__changeCss(".title", "background-color:rgba(25,25,25,0.7)");
+			} else {
+				__changeCss(".body-story", "background-color:rgba(255,255,255,1)");
+				__changeCss(".inline-legend", "background-color:rgba(255,255,255,0.5)");
+				__changeCss(".title", "background-color:rgba(255,255,255,0.5)");
+			}
+		};
+
+		__hideTimeout = null;
+		showTooltip = function (evt, text) {
+			console.log(evt);
+			setTimeout("doShowTooltip(" + evt.pageX + "," + (evt.target.offsetTop) + ",'" + text + "')", 250);
+		}
+		doShowTooltip = function (x, y, text) {
+			if (text && text.length) {
+
+				var html = $("#t_" + text.replace(/"/g, ""));
+
+				if (html[0]) {
+					text = html.html();
+				}
+				var tooltip = document.getElementById("tooltip");
+				var sidebar = document.getElementById("sidebar");
+				tooltip.innerHTML = text;
+				tooltip.style.display = "block";
+				tooltip.style.left = x + 15 + 'px';
+				tooltip.style.top = y + 5 + 'px';
+				tooltip.setAttribute("onMouseOver", "clearTimeout(__hideTimeout)");
+				tooltip.setAttribute("onMouseOut", "hideTooltip()");
+			}
+		}
+
+		hideTooltip = function () {
+			__hideTimeout = setTimeout("doHideTooltip()", 250);
+		}
+		doHideTooltip = function () {
+			var tooltip = document.getElementById("tooltip");
+			tooltip.style.display = "none";
+		}
+
+		__showProject = function (szUrl, n, all) {
+			if (!szUrl) {
+				return;
+			}
+			$.ajax({
+					// The URL for the request
+					url: szUrl,
+
+					// The data to send (will be converted to a query string)
+					data: {
+						id: 123
+					},
+
+					// Whether this is a POST or GET request
+					type: "GET",
+
+					// The type of data we expect back
+					dataType: "text",
+				})
+				// Code to run if the request succeeds (is done);
+				// The response is passed to the function
+				.done(function (result) {
+
+					var project = JSON.parse(result);
+
+					//$("#title").html(project.themes[0].style.title);
+					$("#count").html(n + "/" + all);
+
+					var list = "";
+					var id = "source";
+
+					list += '<h2><span style="color:#ddd">#</span> ' + 'project ';
+					list +=
+						'<a href="javascript:ixmaps.loadStoryTool(\'../../../../ui/html/tools/theme_editor.html\',{frame:true})"> [edit]</a>';
+					list +=
+						'<a href="javascript:ixmaps.loadStoryTool(\'../../../../ui/html/tools/theme_configurator.html\',{frame:true})"> [config]</a>';
+					list += '</h2>';
+					list += '<div class="source-scroll" >';
+					list += '<div class="source" >';
+					list += '<pre id="' + id + '" class="prettyprint">';
+					list += '</pre>';
+					list += '</div>';
+					list += '</div>';
+
+					$("#filelist").html(list);
+
+					$("#" + id + "").text(String(result));
+					hljs.highlightBlock($("#" + id)[0]);
+
+					$(".hljs-attr").attr("onMouseOver", "showTooltip(event,$(this).text())");
+					$(".hljs-attr").attr("onMouseOut", "hideTooltip()");
+
+					if (project.themes[0].style.dbtableExt) {
+						__showFile(project.themes[0].style.dbtableExt);
+					}
+					$("#filelist").css("height", "100%");
+
+					$.fn.fullpage.reBuild();
+					$.fn.fullpage.moveSectionDown();
+					$.fn.fullpage.moveSectionUp();
+
+				});
+		};
+		__showMD = function (szUrl) {
+
+			$("#readme").html("");
+
+			$.ajax({
+					// The URL for the request
+					url: szUrl,
+
+					// The data to send (will be converted to a query string)
+					data: {
+						id: 123
+					},
+
+					// Whether this is a POST or GET request
+					type: "GET",
+
+					// The type of data we expect back
+					dataType: "text",
+				})
+				// Code to run if the request succeeds (is done);
+				// The response is passed to the function
+				.done(function (result) {
+
+					var converter = new showdown.Converter();
+					var mdhtml = converter.makeHtml(result);
+
+					var szHtml = "<div style='margin-left:11px;margin-right:-2em'>" + mdhtml + "</div>";;
+					$("#readme").append(szHtml);
+
+					$("pre code").each(function () {
+						hljs.highlightBlock(this);
+					});
+
+					// Table Of Content
+					// ----------------
+					$("p").each(function () {
+						if ($(this).text() == "[TOC]") {
+							console.log($(this).text())
+							var toc = "<ol style='margin-top:-1em;margin-bottom:2em'>";
+							$("h3").each(function () {
+								if ($(this).attr("id") && $(this).text()) {
+									toc += "<li>" + $(this).text() + "</li>";
+								}
+							});
+							toc += "</ol>";
+							$(this).html(toc);
+						}
+					});
+
+					$.fn.fullpage.reBuild();
+					$.fn.fullpage.moveSectionDown();
+					$.fn.fullpage.moveSectionUp();
+
+					__showProject(ixmaps.parentApi.project, 1, 1);
+				})
+				.error(function (result) {
+
+					$.fn.fullpage.reBuild();
+					$.fn.fullpage.moveSectionDown();
+				
+					__showProject(ixmaps.parentApi.project, 1, 1);
+				});
+
+			//$("#readme").css("height","100%");
+		};
+
+		__showFile = function (szUrl) {
+			$.ajax({
+					// The URL for the request
+					url: szUrl,
+
+					// The data to send (will be converted to a query string)
+					data: {
+						id: 123
+					},
+
+					// Whether this is a POST or GET request
+					type: "GET",
+
+					// The type of data we expect back
+					dataType: "text",
+				})
+				// Code to run if the request succeeds (is done);
+				// The response is passed to the function
+				.done(function (result) {
+
+					var list = "";
+					var id = "source1";
+
+					list += '<h2><span style="color:#ddd">#</span> script</h2>';
+					list += '<h5><span style="color:#ddd">#</span> ' + szUrl + '</h5>';
+					list += '<div class="source" >';
+					list += '<pre id="' + id + '" class="prettyprint">';
+					list += '</pre>';
+					list += '</div>';
+
+					$("#filelist").append(list);
+
+					$("#" + id + "").text(String(result));
+					hljs.highlightBlock($("#" + id)[0]);
+
+					$("#filelist").css("height", "100%");
+
+					$.fn.fullpage.reBuild();
+					$.fn.fullpage.moveSectionDown();
+					$.fn.fullpage.moveSectionUp();
+				});
+		};
+
+		__showDir = function (szUrl) {
+			
+			$("#readme").hide();
+
+			// ---------------------------------------------------------------------------------------
+			// load list of example projects into menu
+			// ---------------------------------------------------------------------------------------
+			//
+			$.ajax({
+
+					// The URL for the request
+					url: szUrl,
+
+					// The data to send (will be converted to a query string)
+					data: {
+						id: 123
+					},
+
+					// Whether this is a POST or GET request
+					type: "GET",
+
+					// The type of data we expect back
+					dataType: "text",
+				})
+				// Code to run if the request succeeds (is done);
+				// The response is passed to the function
+				.done(function (result) {
+
+					__projects = JSON.parse(result);
+					szHtml = "";
+					nCount = 0;
+					for (p in __projects) {
+						console.log(__projects[p].name);
+						szHtml += '<div id="project'+p+'" style="border-bottom:solid #888888 1px;margin-bottom:0.5em;max-width:700px"></div>';
+						$("#readme").html(szHtml);
+					}
+					setTimeout("__doShowDir('"+szUrl+"')",100);
+				});
+		};
+		__doShowDir = function (szUrl) {
+			
+			window.parent.window.parent.window.document.getElementById('page-header').innerHTML = "project repository: "+decodeURIComponent(szUrl.split("https://api.github.com/repos/")[1].split("?")[0]);
+			
+			// ---------------------------------------------------------------------------------------
+			// load list of example projects into menu
+			// ---------------------------------------------------------------------------------------
+			//
+			$.ajax({
+
+					// The URL for the request
+					url: szUrl,
+
+					// The data to send (will be converted to a query string)
+					data: {
+						id: 123
+					},
+
+					// Whether this is a POST or GET request
+					type: "GET",
+
+					// The type of data we expect back
+					dataType: "text",
+				})
+				// Code to run if the request succeeds (is done);
+				// The response is passed to the function
+				.done(function (result) {
+
+					__projects = JSON.parse(result);
+					szHtml = "";
+					nCount = 0;
+					for (p in __projects) {
+						if ( __projects[p].download_url && __projects[p].download_url.match(/readme.md/i)){
+							ixmaps.readme = __projects[p].download_url;
+						}
+						if ( __projects[p].download_url && __projects[p].download_url.match(/json/i)){
+							$.ajax({
+									url: __projects[p].download_url,
+									data: {
+										id: p
+									},
+									type: "GET",
+									dataType: "text",
+								})
+								.done(function (result,textStatus, jqXHR) {
+
+									szHtml = "";
+									var json = JSON.parse(result);
+
+									var x = this.url.split("/");
+									console.log(x);	
+									x[2] = "github.com";
+									x[5] = "blob/"+x[5];
+									szHtml += '<a class="dropdown-item text-black" style="height:100%" href="' + x.join("/") +	'" target="_blank">';
+								
+									szHtml += this.url.split('id=')[1];
+									var x = this.url.split('/');
+									szHtml += "<span style='font-size:0.5em'> "+x[x.length-1].split('?')[0]+"</span>";
+								
+									szHtml += "</a>";
+
+									szHtml += '<a class="dropdown-item text-black" style="height:100%" href="javascript:ixmaps.loadExample(\'' + this.url +	'\')">';
+
+									szHtml +=  '<div style="margin-left:1.5em;font-size:0.8em;line-height:1.1em;width:80%">';
+
+									if ( json.metadata.title && json.metadata.title.length ){
+										szHtml += "<h2 style='font-size:2em;margin:0em'>";
+										szHtml += json.metadata.title;
+										szHtml += "</h2>";
+										szHtml += "<h5 style='font-size:1.2em;margin-top:0em'>";
+										szHtml += json.metadata.snippet||"";
+										szHtml += "</h5>";
+									}else
+									if ( json.map.legend && json.map.legend.length ){
+										szHtml += "<div style='font-size:0.6em;margin-bottom:2em'>";
+										szHtml += json.map.legend;
+										szHtml += "</div>";
+									}else
+									if ( json.themes && json.themes.length ){
+										szHtml += "<div style='font-size:2em;line-height:1.1em;font-weight:bold'>";
+										szHtml += json.themes[json.themes.length-1].style.title||"[Title]";
+										szHtml += "</div>";
+										szHtml += "<div style='font-size:0.8em'>";
+										szHtml += json.themes[json.themes.length-1].style.snippet||"";
+										szHtml += "</div>";
+									}
+								
+									// image ??
+									szHtml += "<div style='margin-top:0.5em'>";
+									szHtml += "<img src=\""+this.url.replace(".json",".png")+"\">";
+									szHtml += "</div>";
+									
+									/**
+									
+									szHtml +=  '<iframe id="map" width="100%" height="250" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://gjrichter.github.io/ixmaps/ui/html/embed_sync_Leaflet.html?ui=embed&basemap=ll&align=right&mode=info&legend=1&name=map9&sync=false&footer=1&project='+this.url+'"></iframe>';
+	
+									if ( json.metadata.thumbnail && json.metadata.thumbnail.length ){
+										szHtml += "<img src="+json.metadata.thumbnail+" style='height:48px;margin-bottom:0.5em' >";
+									}
+									if ( json.metadata.snippet && json.metadata.snippet.length ){
+										szHtml += json.metadata.snippet;
+									}
+									if ( json.metadata.info && json.metadata.info.length ){
+										szHtml += json.metadata.info;
+									}
+									if ( json.map.legend && json.map.legend.length ){
+										szHtml += "<div style='font-size:0.8em;margin-bottom:2em'>";
+										szHtml += json.map.legend;
+										szHtml += "</div>";
+									}else
+									if ( json.themes && json.themes.length ){
+										szHtml += "<div style='font-size:2em;line-height:1.1em;'>";
+										szHtml += json.themes[0].style.title;
+										szHtml += "</div>";
+										szHtml += "<div style='font-size:0.8em'>";
+										szHtml += json.themes[0].style.snippet;
+										szHtml += "</div>";
+									}
+									**/
+
+									szHtml +=  '</div>';
+									
+									szHtml +=  '</a>';
+
+									$("#project"+this.url.split('id=')[1]).html(szHtml);
+								})
+								.fail(function (xhr, status, errorThrown) {
+									alert("Sorry, there was a problem!");
+									console.log("Error: " + errorThrown);
+									console.log("Status: " + status);
+									console.dir(xhr);
+								})
+						}
+					}
+
+					$("#readme").show();
+					$("#readme").css("height", "100000px");
+				
+					$.fn.fullpage.reBuild();
+					$.fn.fullpage.moveSectionDown();
+					$.fn.fullpage.moveSectionUp();
+
+				});
+		};
+		$("#readme").html("");
+		$("#filelist").html("");
+
+		if (ixmaps.parentApi && ixmaps.parentApi.directory) {
+			$("#loadProject").hide();
+			__showDir(ixmaps.parentApi.directory);
+		}
+		if (ixmaps.parentApi && ixmaps.parentApi.readme) {
+			$("#loadProject").hide();
+			__showMD(ixmaps.parentApi.readme);
+		}
+		if (ixmaps.parentApi && ixmaps.parentApi.project) {
+			$("#loadProject").hide();
+			//__showMD(ixmaps.parentApi.project.split(".json")[0]+".md");
+		}
+
+		setTimeout('$("#readme").css("height","100%")', 1000);
+		setTimeout('$("#filelist").css("height","100%")', 1000);
+
+		ixmaps.htmlgui_onProjectLoaded = function (project) {
+			ixmaps.legend.resetTabs();
+			__showMD(ixmaps.parentApi.project.split(".json")[0] + ".md");
+			$.fn.fullpage.moveSectionUp();
+			$.fn.fullpage.moveSectionUp();
+			$.fn.fullpage.moveSectionUp();
+			$('.fp-scroller').css('transform','translate(0px, 0px) translateZ(0px)');
+		};
+
+		ixmaps.parentApi.home = function(){
+			//__showMD(ixmaps.parentApi.readme);
+			$.fn.fullpage.moveSectionUp();
+			$.fn.fullpage.moveSectionUp();
+			$.fn.fullpage.moveSectionUp();
+		};
+
+		ixmaps.parentApi.info = function(){
+			ixmaps.loadStoryTool('./about.html');
+		};
+
+	</script>
+
+	<script src="filedrag.js"></script>
+
+	<script>
+		ixmaps.moveSectionsDown = function (nr) {
+			nr = nr || 1;
+			for (var i = 0; i < nr; i++) {
+				setTimeout("$.fn.fullpage.moveSectionDown();", i * 100);
+			}
+		};
+
+		var doublette = false;
+		ixmaps.loadExample = function (file) {
+			if (doublette) {
+				doublette = false;
+				return;
+			}
+			doublette = true;
+			ixmaps.setSidebarWidth('33');
+			ixmaps.setLayout('overlay');
+			ixmaps.moveSectionsDown(1);
+			
+			ixmaps.loadProject('map', file);
+			//ixmaps.parentApi.project = file;
+			//__showMD(file.split(".json")[0]+".md");
+		}
+	</script>
+
+
+</body>
+
+</html>

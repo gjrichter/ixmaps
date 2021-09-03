@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en-gb">
+  <!-- **********************************************************************
+tooltips.html$Comment: test project json tooltips$Source : tooltips.html,v $$InitialAuthor: guenter richter $$InitialDate: 2019/01/31 $$Author: guenter richter $$Id:tooltips.html 1 2019-01-31 00:00:00Z Guenter Richter $licensed under CC-BY$Log:tooltips.html,v $********************************************************************** -->
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="assets/img/favicon.png">
+    <title>tooltips</title>
+    <style>
+		.tooltip {
+		font-family: arial,system; 
+		background: white;
+		border: 0.5px solid black;
+		border-radius: 5px;
+		padding: 5px;
+		max-width: 300px;
+	}
+  table{
+      border: none;
+    	margin-left: -0.5em;
+    }
+  td{
+      border: none;
+      vertical-align: top;
+      padding:	0.5em;
+    }
+	</style>
+  </head>
+  <body>
+    <div id="tooltips">
+      <hr> project metadata
+      <hr>
+      <div id="t_metadata" class="tooltip">
+        <p><b>"metadata"</b></p>
+        <p>object to define metadata to describe the ixmaps project and add
+          links to additional information about the project</p>
+      </div>
+      <div id="t_title" class="tooltip">
+        <p><b>"title"</b></p>
+        <p>the title of theme or project</p>
+      </div>
+      <div id="t_snippet" class="tooltip">
+        <p><b>"snippet"</b></p>
+        <p>a short description </p>
+      </div>
+      <div id="t_description" class="tooltip">
+        <p><b>"description"</b></p>
+        <p>a longer verbose description</p>
+      </div>
+      <div id="t_thumbnail" class="tooltip">
+        <p><b>"thumbnail"</b></p>
+        <p>link to a thumbnail size image</p>
+      </div>
+      <div id="t_about" class="tooltip">
+        <p><b>"about"</b></p>
+        <p>link to a project page</p>
+      </div>
+      <div id="t_read" class="tooltip">
+        <p><b>"read"</b></p>
+        <p>link to project documentation format .md</p>
+      </div>
+      <div id="t_help" class="tooltip">
+        <p><b>"help"</b></p>
+        <p>link to a help page</p>
+      </div>
+      <div id="t_created" class="tooltip">
+        <p><b>"created"</b></p>
+        <p>automatically created time stamp</p>
+      </div>
+      <hr> map
+      <hr>
+      <div id="t_map" class="tooltip">
+        <p><b>"map"</b></p>
+        <p>resource locator of a <b>SVG vector map</b> to load into the ixmaps
+          framework</p>
+        <p>"... <b>mercator.svg</b>" is an empty vector map to create a g<b>eographic
+            coordinate space</b> in mercator projection to create theme charts
+          at geo coordinates (lat/lon) to overlay on tile maps (leaflet)</p>
+        <p>specially <b>generated SVG vector maps</b> can be loaded to create <b>CHOROPLETH</b>
+          maps or overlay <b>vector map layer</b> on tile maps.</p>
+      </div>
+      <div id="t_basemap" class="tooltip">
+        <p><b>"basemap"</b></p>
+        <p>name of a tile map layer defined in the basemap (leaflet).</p>
+        <p>specifies the tile service for the basemap:</p>
+        <ul class="maptypelist" style="list-style: circle; font-family: Raleway, Arial; font-weight: 300; color: rgb(83, 99, 125); font-size: medium; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-style: initial; text-decoration-color: initial;">
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">OpenStreetMap
+              - Osmarenderer</a></li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">OpenStreetMap
+              - Roads</a></li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">OpenStreetMap
+              - Humanitarian</a></li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">OpenStreetMap
+              - Wikipedia</a></li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">OpenStreetMap
+              - Gray</a></li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">Open
+              Topo Map</a></li>
+          <li role="separator" class="divider" style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><br>
+          </li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">Stamen
+              - toner-lite</a></li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">Stamen
+              - watercolor</a></li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">Stamen
+              - terrain</a></li>
+          <li role="separator" class="divider" style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><br>
+          </li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">CartoDB
+              - Positron</a></li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">CartoDB
+              - Dark matter</a></li>
+          <li role="separator" class="divider" style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><br>
+          </li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">ArcGIS
+              - Topo</a></li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">ArcGIS
+              - Light Gray Base</a></li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">ArcGIS
+              - Ocean Basemap</a></li>
+          <li style="padding: 0px 5px 5px 0px; margin: 0px; font-family: Raleway, Arial; font-weight: 300;"><a
+              style="font-family: arial, helvetica; font-weight: 100; color: rgb(68, 68, 68); text-decoration: none;">ArcGIS
+              - Hillshade</a></li>
+        </ul>
+        <p></p>
+      </div>
+      <hr> - scaleparam
+      <hr>
+      <div id="t_scaleParam" class="tooltip">
+        <p><b>"scaleParam": </b>{ <i>object</i> }</p>
+        <p>json object to define parameter related to the map scale</p>
+      </div>
+      <div id="t_normalSizeScale" class="tooltip">
+        <p><b>"normalSizeScale"</b></p>
+        <p>defines the normal zoom level for the adaption of <b>chart objects</b>
+          to the map zoom</p>
+        <p>if "objectscaling" is set to "dynamic", the size of chart object is
+          adapted with a dynamic growth to the map zoom level.</p>
+        <p>for this procedure it is necessary to define a zoom level for the
+          'normal' size of the chart object.</p>
+        <p>the level is defined by a map scale.</p>
+        <p>Example: 1:1200000 -&gt; "1200000".</p>
+      </div>
+      <hr> - options
+      <hr>
+      <div id="t_options" class="tooltip">
+        <p><b>"options" </b><b>:</b> { <i>object</i> }<b></b></p>
+        <p>parameter to control the map behavior </p>
+      </div>
+      <div id="t_featurescaling" class="tooltip">
+        <p><b>"featurescaling"</b></p>
+        <p>defines the adaption of <b>map features</b> to the map zoom</p>
+        <p>possible values are:</p>
+        <table style="width: 100%" border="1">
+          <tbody>
+            <tr>
+              <td>"false"</td>
+              <td>map features like borders get bigger with zoom</td>
+            </tr>
+            <tr>
+              <td>"true"</td>
+              <td>map features have always the same size</td>
+            </tr>
+            <tr>
+              <td>"dynamic"</td>
+              <td>map features are getting bigger, but less than with "false"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="t_objectscaling" class="tooltip">
+        <p><b>"objectscaling"</b></p>
+        <p>defines the adaption of <b>chart objects</b> to the map zoom</p>
+        <p> possible values are:</p>
+        <table style="width: 293px; height: 189px;" border="1">
+          <tbody>
+            <tr>
+              <td>"false"</td>
+              <td>chart objects like pies or bar will get bigger with the map
+                zoom</td>
+            </tr>
+            <tr>
+              <td>"true"</td>
+              <td>chart objects will have always the same size</td>
+            </tr>
+            <tr>
+              <td>"dynamic"</td>
+              <td>chart objects are getting bigger in a 'natural way'</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>if set to 'dynamic' please see the importance of the
+          "normalsizescale" parameter</p>
+      </div>
+      <div id="t_clipmap" class="tooltip">
+        <p><b>"clipmap"</b></p>
+        <p>internal flag <b><br>
+          </b></p>
+      </div>
+      <div id="t_clipmapdynamic" class="tooltip">
+        <p><b>"clipmapdynamic"</b></p>
+        <p>internal flag</p>
+      </div>
+      <div id="t_dynamiclabel" class="tooltip">
+        <p><b>"dynamiclabel"</b></p>
+        <p>enable dynamic map label re-positioning</p>
+      </div>
+      <div id="t_labelspace" class="tooltip">
+        <p><b>"labelspace"</b></p>
+        <p>defines the space around texts to preserve when automatically
+          re-position map label.</p>
+      </div>
+      <div id="t_checklabeloverlap" class="tooltip">
+        <p><b>"checklabeloverlap"</b></p>
+        <p>flag to enable re-positioning of overlapping map labels</p>
+      </div>
+      <div id="t_dynamiclayer" class="tooltip">
+        <p><b>"dynamiclayer"</b></p>
+        <p>enables the scale dependent switching of layer </p>
+      </div>
+      <div id="t_dynamictiles" class="tooltip">
+        <p><b>"dynamictiles"</b></p>
+        <p>enable the dynamic loading of map tiles dependent to the map zoom and
+          pan</p>
+      </div>
+      <div id="t_discardtiles" class="tooltip">
+        <p><b>"discardtiles"</b></p>
+        <p>enables the mechanism which removes map tiles that are not visible
+          from memory</p>
+      </div>
+      <div id="t_loadmultitiles" class="tooltip">
+        <p><b>"loadmultitiles"</b></p>
+        <p>enables more than one xmlhttprequests at a time</p>
+      </div>
+      <div id="t_loadsilent" class="tooltip">
+        <p><b>"loadsilent"</b></p>
+        <p>don't make a loading message </p>
+      </div>
+      <div id="t_loadexternaldata" class="tooltip">
+        <p><b>"loadexternaldata"</b></p>
+        <p>enables the loading of data from external urls</p>
+      </div>
+      <div id="t_buttonsize" class="tooltip">
+        <p><b>"buttonsize"</b></p>
+        <p>the size of buttons for the SVG user interface (deprecated)</p>
+      </div>
+      <div id="t_fastpan" class="tooltip">
+        <p><b>"fastpan"</b></p>
+        <p>internal flag</p>
+      </div>
+      <div id="t_panborder" class="tooltip">
+        <p><b>"panborder"</b></p>
+        <p>make a clickable border around the map with buttons to pan the map</p>
+      </div>
+      <div id="t_northarrow" class="tooltip">
+        <p><b>"northarrow"</b></p>
+        <p>display a northarrow within the map; includes the capacity to rotate
+          the map</p>
+        <p>only available if ixmaps is used without a basemap (leaflet)</p>
+      </div>
+      <div id="t_sidebarbuttons" class="tooltip">
+        <p><b>"sidebarbuttons"</b></p>
+        <p>show buttons to show/hide the sidebar in map.</p>
+      </div>
+      <div id="t_tooltipdelay" class="tooltip">
+        <p><b>"tooltipdelay"</b></p>
+        <p>delay (in ms) to show a tooltip on mouse over </p>
+      </div>
+      <div id="t_popupdelay" class="tooltip">
+        <p><b>"popupdelay"</b></p>
+        <p>delay (in ms) to show a map item info window on mouse over.</p>
+      </div>
+      <div id="t_popupgridstyle" class="tooltip">
+        <p><b>"popupgridstyle"</b></p>
+        <p>style defining flags for the data table to show in map item info
+          windows on demand.</p>
+      </div>
+      <div id="t_popupalignment" class="tooltip">
+        <p><b>"popupalignment"</b></p>
+        <p>where to align map item info windows</p>
+      </div>
+      <div id="t_labelscaling" class="tooltip">
+        <p><b>"labelscaling"</b></p>
+        <p>defines the adaption of <b>map label </b>to the map zoom </p>
+        <p> possible values are:</p>
+        <table style="width: 293px; height: 189px;" border="1">
+          <tbody>
+            <tr>
+              <td>"false"</td>
+              <td>chart objects like pies or bar will get bigger with the map
+                zoom</td>
+            </tr>
+            <tr>
+              <td>"true"</td>
+              <td>chart objects will have always the same size</td>
+            </tr>
+            <tr>
+              <td>"dynamic"</td>
+              <td>chart objects are getting bigger in a 'natural way'</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="t_transparentbackground" class="tooltip">
+        <p><b>"transparentbackground"</b></p>
+        <p>don't make a background for the SVG map; important to show the base
+          map</p>
+      </div>
+      <div id="t_toolmargintop" class="tooltip">
+        <p><b>"toolmargintop"</b></p>
+        <p>positionof info displays </p>
+      </div>
+      <div id="t_flushChartDraw" class="tooltip">
+        <p><b>"flushChartDraw"</b></p>
+        <p>maximal number of charts to be drawn without a pause to give time for
+          rendering</p>
+      </div>
+      <div id="t_mapopacity" class="tooltip">
+        <p><b>"mapopacity"</b></p>
+        <p>the opacity of the SVG map</p>
+      </div>
+      <div id="t_basemapopacity" class="tooltip">
+        <p><b>"basemapopacity"</b></p>
+        <p>the opacity of the HTML base map</p>
+      </div>
+      <hr> view
+      <hr>
+      <div id="t_center" class="tooltip">
+        <p><b>"center" :</b> { <i>object</i> }<b><br>
+          </b></p>
+        <p>initial map center of the project defined in geo coordinates </p>
+      </div>
+      <div id="t_lat" class="tooltip">
+        <p><b>"lat"</b></p>
+        <p>latitude of a map position </p>
+      </div>
+      <div id="t_lng" class="tooltip">
+        <p><b>"lng"</b></p>
+        <p>longitude of a map position</p>
+      </div>
+      <div id="t_zoom" class="tooltip">
+        <p><b>"zoom"</b></p>
+        <p>initial zoom level of the project defined from 1 to 20</p>
+        <p> corresponds to the zoom level of the base map (Leaflet) </p>
+      </div>
+      <hr> themes
+      <hr>
+      <div id="t_themes" class="tooltip">
+        <p><b>"themes" : [{ <i>array of theme objects</i> }]</b></p>
+        <p>contains the definition of one or more map themes</p>
+        <p>a map theme is a data visualization defined by the parameter of one
+          theme object </p>
+      </div>
+      <div id="t_layer" class="tooltip">
+        <p><b>"layer"</b></p>
+        <p>the name of the map layer to be addressed by the theme.</p>
+        <p>obligatory for CHOROPLETH themes, mandatory for CHART themes</p>
+        <p>can be set to "generic" if the chart position is defined by
+          geocoordinates</p>
+      </div>
+      <div id="t_field" class="tooltip">
+        <p><b>"field"</b></p>
+        <p>defines the main<b> theme data<br>
+          </b></p>
+        <p>is the <b>name</b> of a data table <b>column</b></p>
+        <p>the values of this column define either the color or the size of the
+          theme objects</p>
+        <p>"$index$" is a special name to define 1 generic item per data row</p>
+      </div>
+      <div id="t_field100" class="tooltip">
+        <p><b>"field100"</b> : "<em>text</em>"</p>
+        <p>the column name of a 2° data field <br>
+          which contains data for <br>
+          percent/fraction/difference calculation</p>
+      </div>
+      <div id="t_style" class="tooltip">
+        <p><b>"style"</b> : { <i>style object</i> }</p>
+        <p>defines the theme <b>style</b></p>
+      </div>
+      <div id="t_type" class="tooltip">
+        <p><b>"type"</b> : "<em>key1|key2|...</em>"</p>
+        <p>defines the type of the data visualization (theme)</p>
+        <p>alliteration of keywords to configure&nbsp; chart type and data
+          handling</p>
+      </div>
+      <div id="t_colorscheme" class="tooltip">
+        <p><b>"colorscheme"</b> : [ "<em>array of strings</em>" ]</p>
+        <p>defines the colors of the theme</p>
+        <p> either by defining n color codes or by defining a color-scheme by
+          generation parameter</p>
+      </div>
+      <div id="t_opacity" class="tooltip">
+        <p><b>"opacity"</b> : "<em>number</em>"</p>
+        <p>defines the overall opacity of the theme from 0 to 1</p>
+      </div>
+      <div id="t_fillopacity" class="tooltip">
+        <p><b>"fillopacity"</b> : "<em>number</em>"</p>
+        <p>defines the opacity of all area filling whithin the the theme charts
+          from 0 to 1</p>
+      </div>
+      <div id="t_shadow" class="tooltip">
+        <p><b>"shadow"</b> : "<em>true or false</em>"</p>
+        <p>defines whether or not the theme charts will be created with a shadow
+          effect</p>
+      </div>
+      <div id="t_blur" class="tooltip">
+        <p><b>"blur"</b> : "<em>number</em>"</p>
+        <p>defines a 'blur' effect for the chart theme</p>
+      </div>
+      <div id="t_filter" class="tooltip">
+        <p><b>"filter"</b> : "<em>SQL like fiter string </em>"</p>
+        <p>defines a SQL query to apply to data table before creating the theme
+          charts</p>
+        <p>example:<span style="color: rgb(223, 80, 0);"></span></p>
+        <p style="font-size:0.8em"><span style="color: rgb(223, 80, 0);">"WHERE
+            \"Uncertainty bounds*\" = \"Median\""</span></p>
+        <p></p>
+      </div>
+      <div id="t_dbtable" class="tooltip">
+        <p><b>"dbtable"</b></p>
+        <p>defines the name of the 'internal' data object.</p>
+        <p>This is the data object name you must refer in data processing
+          procedures</p>
+        <p>It is best practice to give it a data specific name to avoid data
+          meddling when using different data on the map </p>
+      </div>
+      <div id="t_dbtableUrl" class="tooltip">
+        <p><b>"dbtableUrl"</b></p>
+        <p>defines an external data source</p>
+      </div>
+      <div id="t_dbtableType" class="tooltip">
+        <p><b>"dbtableType"</b></p>
+        <p>defines the file type of the external data source</p>
+        <p>possible types: csv, json, geojson and jsonDB</p>
+      </div>
+      <div id="t_dbtableExt" class="tooltip">
+        <p><b>"dbtableExt"</b></p>
+        <p>defines the name and path of an external javascript source which
+          contains a data processor function to be executed when the theme data
+          has been loaded</p>
+      </div>
+      <div id="t_datacache" class="tooltip">
+        <p><b>"datacache"</b></p>
+        <p>enables external data caching; if false, the data will be reloaded
+          every time the internal data object is referred to in a map theme</p>
+      </div>
+      <div id="t_itemfield" class="tooltip">
+        <p><b>"itemfield"</b> : "<em>text</em>"</p>
+        <p>defines the data field (column) that contains position relevant data</p>
+        <p>The position data can be the id's of map shapes or geo coordinates</p>
+        <p>2 lookup fields for different columns containing latitude and
+          longitude can be defined as one separated by '|'<br>
+          example: "lookupfield":"LAT|LON"</p>
+      </div>
+      <div id="t_lookupfield" class="tooltip">
+        <p><b>"lookupfield"</b> : "<em>text</em>"</p>
+        <p>defines the data field (column) that contains position relevant data</p>
+        <p>The position data can be the id's of map shapes or geo coordinates</p>
+        <p>2 lookup fields for different columns containing latitude and
+          longitude must be defined as one separated by '|'<br>
+          example: "lookupfield":"LAT|LON"</p>
+      </div>
+      <div id="t_showdata" class="tooltip">
+        <p><b>"showdata"</b> </p>
+        <p>enable showing <b>theme item data</b> in the info window</p>
+        <p>value can be "true", or a list of data columns to show, like: </p>
+        <p>"name|country|value"</p>
+      </div>
+      <div id="t_child" class="tooltip">
+        <p><b>"child"</b> </p>
+        <p>internal flag</p>
+      </div>
+      <div id="t_symbols" class="tooltip">
+        <p><b>"symbols"</b> : [ "<em>array of strings</em>" ]</p>
+        <p>defines the symbols for a SYMBOL chart type</p>
+        <p>symbols can be predefined types or id's of loaded SVG symbols</p>
+        <p>pre-loaded symbols: </p>
+        <table style="width: 293px; height: 189px;" border="1">
+          <tbody>
+            <tr>
+              <td>"circle"</td>
+              <td>filled circles</td>
+            </tr>
+            <tr>
+              <td>"square"</td>
+              <td>filled square</td>
+            </tr>
+            <tr>
+              <td>"label"</td>
+              <td>filled rectangle</td>
+            </tr>
+            <tr>
+              <td>"diamond"</td>
+              <td>diamond shaped symbol</td>
+            </tr>
+            <tr>
+              <td>"triangle"</td>
+              <td>triange standing on top</td>
+            </tr>
+            <tr>
+              <td>"hexagon"</td>
+              <td>hexagonal shape</td>
+            </tr>
+            <tr>
+              <td>"cross"</td>
+              <td>cross symbol</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="t_units" class="tooltip">
+        <p><b>"units"</b> </p>
+        <p>defines a unit to <b>append</b> to the theme <b>value display</b>:</p>
+        <p>examples; "kg", "%"</p>
+      </div>
+      <div id="t_units" class="tooltip">
+        <p><b>"legendunits"</b> </p>
+        <p>defines a unit to <b>append</b> to the <b>value display</b> in the
+          <b>theme legend</b>:</p>
+        <p>examples; "kg", "%"</p>
+      </div>
+      <div id="t_normalsizevalue" class="tooltip">
+        <p><b>"normalsizevalue"</b> </p>
+        <p>charts representing values by size are normally scaled between
+          minimal and maximal value.</p>
+        <p>with this property you can explicitly define a value for the 'normal'
+          size of the chart (which is about 30 pixel).</p>
+        <p>by this you are able to 'normalize' the data representation for
+          different or realtime updated datasets.</p>
+        <p>without it, the sizes would change with different min/max values</p>
+      </div>
+      <div id="t_scale" class="tooltip">
+        <p><b>"scale"</b> </p>
+        <p>a relative chart scaling factor</p>
+      </div>
+      <div id="t_textcolor" class="tooltip">
+        <p><b>"textcolor"</b> </p>
+        <p>defines a color for the text parts of charts</p>
+      </div>
+      <div id="t_linecolor" class="tooltip">
+        <p><b>"linecolor"</b> </p>
+        <p>defines a color for the chart outlines </p>
+      </div>
+      <div id="t_linewidth" class="tooltip">
+        <p><b>"linewidth"</b> </p>
+        <p>defines the width of chart outlines or curve lines</p>
+      </div>
+      <div id="t_boxopacity" class="tooltip">
+        <p><b>"boxopacity"</b> </p>
+        <p>define the opacity of chart BOX backgrounds</p>
+      </div>
+      <div id="t_valuescale" class="tooltip">
+        <p><b>"valuescale"</b> </p>
+        <p>scale the chart value display</p>
+      </div>
+      <div id="t_gridwidth" class="tooltip">
+        <p><b>"gridwidth"</b> </p>
+        <p>the width of the aggregation grid</p>
+        <p>defined either in screen pixel ("50px") or in map distances ("1000"
+          which equals 1km) </p>
+      </div>
+      <div id="t_aggregationscale" class="tooltip">
+        <p><b>"aggregationscale"</b> </p>
+        <p>an object to define different gridwidth values depending on map
+          scales</p>
+        <p>with this, the aggregation grid can be defined in dependency of the
+          map zoom</p>
+      </div>
+      <div id="t_rangescale" class="tooltip">
+        <p><b>"rangescale"</b> </p>
+        <p>defines a relative range scaling factor for charts</p>
+      </div>
+      <div id="t_dopacitypow" class="tooltip">
+        <p><b>"dopacitypow"</b> </p>
+        <p>defines the dynamic of the value based opacity of bivariate themes</p>
+        <p>it acts like a contrast factor in themes with dynamic opacity</p>
+        <p>values from 0.1 to 10</p>
+        <p>lower values = 'higher contrast'</p>
+      </div>
+      <div id="t_dopacityscale" class="tooltip">
+        <p><b>"dopacityscale"</b> </p>
+        <p>defines the intensity of dynamic opacity</p>
+        <p>neutral value = 1</p>
+      </div>
+      <div id="t_sizefield" class="tooltip">
+        <p><b>"sizefield"</b> </p>
+        <p>the name of the data column which values will define the chart sizes</p>
+      </div>
+      <div id="t_alphafield" class="tooltip">
+        <p><b>"alphafield"</b> </p>
+        <p>the name of the data column which values will define the chart
+          opacity</p>
+      </div>
+      <div id="t_colorfield" class="tooltip">
+        <p><b>"colorfield"</b> </p>
+        <p>the name of the data column to select the chart color </p>
+        <p>needs property "colorvalues" </p>
+      </div>
+      <div id="t_symbolfield" class="tooltip">
+        <p><b>"symbolfield"</b> </p>
+        <p>the name of the data column to define the symbol type</p>
+        <p>needs property "symbolvalues" </p>
+      </div>
+      <div id="t_titlefield" class="tooltip">
+        <p><b>"titlefield"</b> </p>
+        <p>the name of the data column for chart titles</p>
+      </div>
+      <div id="t_valuefield" class="tooltip">
+        <p><b>"valuefield"</b> </p>
+        <p>the name of the data column which values will be showed as chart
+          value texts</p>
+      </div>
+      <div id="t_values" class="tooltip">
+        <p><b>"values"</b><b></b> : [ "<em>array of strings</em>" ] </p>
+        <p>array of allowed values for EXACT themes</p>
+      </div>
+      <div id="t_label" class="tooltip">
+        <p><b>"label"</b><b></b> : [ "<em>array of strings</em>" ] </p>
+        <p>array of <b>label</b> to use in the theme legend</p>
+        <p> defines label for the values contained in the <b>"values"</b>
+          property; for <b>EXACT</b> themes</p>
+      </div>
+      <div id="t_colorvalues" class="tooltip">
+        <p><b>"colorvalues"</b><b></b> : [ "<em>array of strings</em>" ] </p>
+        <p>array of allowed values for the content of the "colorfield" data
+          column</p>
+        <p>number of "colorvalues" must match the number of colors defined in
+          the "colorscheme"</p>
+      </div>
+      <div id="t_symbolvalues" class="tooltip">
+        <p><b>"symbolvalues"</b><b></b> : [ "<em>array of strings</em>" ] </p>
+        <p>array of allowed values for the content of the "symbolfield" data
+          column </p>
+        <p>number of "symbolvalues" must match the number of symbols defined in
+          the "symbols" array</p>
+      </div>
+      <div id="t_xaxis" class="tooltip">
+        <p><b>"xaxis"</b><b></b> : [ "<em>array of strings</em>" ] </p>
+        <p>array of x-axis values useful for bar charts and curve plots</p>
+        <p>needs XAXIS theme key</p>
+      </div>
+      <div id="t_gridx" class="tooltip">
+        <p><b>"gridx"</b> </p>
+        <p>defines the number of elements in x-axis direction</p>
+        <p>used in curves to define multiple curves by n x gridx values</p>
+        <p>example: defining 12 data columns for char source and gridx:3 results
+          in 3 curves with 4 x-axis steps</p>
+      </div>
+      <div id="t_labelupper" class="tooltip">
+        <p><b>"labelupper"</b> </p>
+        <p>define an upper map scale for the text label display below charts</p>
+      </div>
+      <div id="t_labellower" class="tooltip">
+        <p><b>"labellower"</b> </p>
+        <p>define an lower map scale for the text label display below charts</p>
+      </div>
+      <div id="t_valueupper" class="tooltip">
+        <p><b>"valueupper"</b> </p>
+        <p>define an upper map scale for the textual value display in charts</p>
+      </div>
+      <div id="t_valuelower" class="tooltip">
+        <p><b>"valuelower"</b> </p>
+        <p>define an lower map scale for the textual value display in charts</p>
+      </div>
+      <div id="t_chartupper" class="tooltip">
+        <p><b>"chartupper"</b> </p>
+        <p>define an upper map scale for the chart display</p>
+      </div>
+      <div id="t_chartlower" class="tooltip">
+        <p><b>"chartlower"</b> </p>
+        <p>define a lower map scale for the chart display</p>
+      </div>
+      <div id="t_shadowupper" class="tooltip">
+        <p><b>"shadwoupper"</b> </p>
+        <p>define an upper map scale for the chart shadow</p>
+      </div>
+      <div id="t_shadowlower" class="tooltip">
+        <p><b>"shadowlower"</b> </p>
+        <p>define an lowerr map scale for the chart shadow</p>
+      </div>
+      <div id="t_boxupper" class="tooltip">
+        <p><b>"boxupper"</b> </p>
+        <p>define an upper map scale for a box&nbsp; around the chart</p>
+      </div>
+      <div id="t_titlelower" class="tooltip">
+        <p><b>"titlelower"</b> </p>
+        <p>define an lower map scale for the box title display</p>
+      </div>
+      <div id="t_titleupper" class="tooltip">
+        <p><b>"titleupper"</b> </p>
+        <p>define an upper map scale for the box&nbsp; title display</p>
+      </div>
+      <div id="t_boxlower" class="tooltip">
+        <p><b>"boxlower"</b> </p>
+        <p>define an lower map scale for a box&nbsp; around the chart</p>
+      </div>
+      <div id="t_valuedecimals" class="tooltip">
+        <p><b>"valuedecimals"</b> </p>
+        <p>number of decimals for chart value displays</p>
+        <p>example:</p>
+        <p>"valuedecimals":"2" --&gt;12.50</p>
+      </div>
+    </div>
+  </body>
+</html>
