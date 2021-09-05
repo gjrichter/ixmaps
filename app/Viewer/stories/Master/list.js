@@ -532,7 +532,19 @@ window.ixmaps.data = window.ixmaps.data || {};
 	
 	ixmaps.data.drawChart = function(szId,i,szIdA,szFlag){
 		var objTheme = ixmaps.getThemeObj(szId);
-		objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);
+
+		if ( objTheme.szFlag.match(/PLOT/) ){
+			var themesA = ixmaps.getThemes();
+			for ( var t=0; t<themesA.length; t++ ){
+				var objTheme = themesA[t];
+				if ( objTheme.szFlag.match(/PLOT/) ){
+					objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, "");
+				}
+			}
+		}else{
+			objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);
+		}
+		
 		$("#getchartmenutarget"+i).parent().attr("height","200");
 		var SVGBox = $("#getchartmenutarget"+i)[0].getBBox();
 		if (SVGBox.width && SVGBox.height) {

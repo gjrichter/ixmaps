@@ -179,6 +179,10 @@
 					szUnit += (value + " ");
 				}
 			})
+			if ( szUnit.match(/\%/) ){
+				szUnit = szUnit.replace("\%","");
+				szValue += " %";
+			}
 			szTooltip = "<div style='font-size:0.9em;line-height:1.2em;color:#aaaaaa;max-width:100px'>"+szUnit+"</div><div style='font-size:1.5em;margin:-0em 0.5em -0.1em 0em'>"+szValue+"</div>";
 		
 			event.target.style.setProperty("fill-opacity","1");
@@ -245,7 +249,19 @@
 				(__themeObj.szFlag.match(/POINTER/) ? "VALUES|XAXIS" :
 					"VALUES|XAXIS|ZOOM");
 			if (szId.match(/chart/i)) {
-				var ptNull = __themeObj.drawChart($("#getchartmenutarget")[0], szIdA[1] + "::" + szIdA[3], 30, szFlag);
+				// if plot -> show all plots off this item !!
+				if ( __themeObj.szFlag.match(/PLOT/) ){
+					var themesA = ixmaps.getThemes();
+					for ( var t=0; t<themesA.length; t++ ){
+						var objTheme = themesA[t];
+						if ( objTheme.szFlag.match(/PLOT/) ){
+							objTheme.drawChart($("#getchartmenutarget")[0], szIdA[1] + "::" + szIdA[3], 30, szFlag);
+						}
+					}
+				}else{
+					ptNull = __themeObj.drawChart($("#getchartmenutarget")[0], szIdA[1] + "::" + szIdA[3], 30, szFlag);
+				}
+				//var ptNull = __themeObj.drawChart($("#getchartmenutarget")[0], szIdA[1] + "::" + szIdA[3], 30, szFlag);
 			} else {
 				__themeObj.parent.getChartAll(szId, $("#getchartmenutarget")[0], szFlag);
 			}

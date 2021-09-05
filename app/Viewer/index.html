@@ -89,6 +89,14 @@
 			    $(document).getUrlParam('minimal') == "1") {
 				ixmaps.tools = false;
 			}
+			
+			// initial basemap, depending on url params
+			var szMapType = "Stamen - toner-lite";
+			if ( ixmaps.project || 
+				 ixmaps.data 	||
+			   	 ixmaps.story	){
+				szMapType = "white";
+			}
 
 			// ====================
 			// create viewer app
@@ -96,7 +104,7 @@
 
 			ixmaps.embedMap("map-div", {
 					mapService: "leaflet",
-					mapType: "white",
+					mapType: szMapType,
 					mapUrl: "",
 					mapName: "map",
 					mapStory: ixmaps.story || "../../app/Viewer/stories/Master/index.html",
