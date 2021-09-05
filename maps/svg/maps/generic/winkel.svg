@@ -1,0 +1,100 @@
+<?xml version="1.0" standalone="no"?>
+<!-- Creator: SVGGIS -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+   "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd"  >
+<svg xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xmap="http://www.medienobjekte.de"
+    xml:space="preserve"
+	  preserveAspectRatio="xMinYMin meet"
+    width="640px" height="480px" viewBox="0 0 12800 9600"  
+    onload="svggis_initLoadedScript(evt)">
+   
+  <script type="text/ecmascript"><![CDATA[
+    function svggis_initLoadedScript(evt){
+      if ( typeof(initAll) != "undefined" && typeof(initAll) == "function" )
+          initAll(evt);
+    }
+  ]]></script>
+
+  <script type="text/ecmascript" xlink:href="../../js/mapscript.js"/>
+   
+ <defs>
+  <g id="mapinclude" >
+    <g id="localstore" xlink:href="maplocal.svg">
+    </g>
+    <g id="menustore" xlink:href="mapmenu.svg">
+    </g>
+    <g id="symbolstore" xlink:href="mapsymbol.svg">
+    </g>
+    <g id="patternstore" xlink:href="mappattern.svg">
+    </g>
+    <g id="filterstore" xlink:href="mapfilter.svg">
+    </g>
+    <g id="widgetstore" xlink:href="mapwidget.svg">
+    </g>
+    <g id="imagestore" xlink:href="mapimages.svg">
+    </g>
+    <g id="scriptstore" xlink:href="mapscripts.svg">
+    </g>
+  </g>
+ </defs>
+ <defs>
+<g id="marker_symbols" >
+</g>
+</defs>
+<defs>
+</defs>
+<defs>
+</defs>
+<metadata>
+  <xmap:creation generator="SvgGis 1.1" version="1.1" build="4170" generation-time="Sun Apr 11 18:26:36 2021" />
+  <xmap:extension minboundx="-37683613.9014759060" maxboundx="47555708.4208790210" minboundy="-25987328.8775496410" maxboundy="37942162.8642165590" minx="-6400" maxx="6400" miny="-4800" maxy="4800" />
+  <xmap:coordsys projection="WinkelTripel" datum="(null)" UTMZone="(null)" falseeasting="0.0000000000" falsenorthing="0.0000000000" correcteasting="0.0000000000" correctnorthing="0.0000000000" />
+  <xmap:scale mapscale="177165354" mapscalestr="1:177165354" mapunits="0" mapunitsstr="decimal_degrees" />
+  <xmap:features featurescaling="1.000000" borderscaling="0.100000" linescaling="1.000000" labelscaling="1.000000" objectscaling="1.000000" symbolscaling="1.000000"  />
+  <xmap:alignments map="" legend="" toolbar="" popupwindow=""  />
+  <xmap:scaledependencies >
+  </xmap:scaledependencies >
+  <xmap:themes >
+    <xmap:theme name="World Mercator" legendname="World Mercator" type="none" items="0" renderer="0" rendererfield="" label="" flag="" info="" selection="FeatureId" filter="ID" filtervalue="none" highlightstyle="" display="none" displaylabel="none" >
+      <xmap:category type="single" fill="#d6cd68" stroke="#000000" />
+    </xmap:theme>
+  </xmap:themes>
+</metadata>
+<g id="mapbackground">
+<rect id="mapbackground:largeeventrect" x="-12800" y="-9600" width="38400" height="28800" style="fill:white;stroke:none;opacity:0" />
+  <g id="mapbackground:logo" style="pointer-events:none">
+  </g>
+</g>
+<g id="mapoffset" transform='matrix(1 0 0 1 0 0)'>
+<g id="mapclipdef">
+  <clipPath id="mapclippath" style="pointer-events:all">
+    <rect id="mapcliprect" x="0" y="0" width="12800" height="9600" style="fill:none;stroke:none;" />
+  </clipPath>
+  <clipPath id="mapclippath2" style="pointer-events:all">
+    <rect id="mapcliprect2" x="-6400" y="-4800" width="12800" height="9600" style="fill:none;stroke:none;" />
+  </clipPath>
+</g>
+<g id="mapclip" clip-path="url(#mapclippath)">
+<g id="mapcanvas" style="display:none" transform='matrix(1 0 0 1 6400 4800) rotate(0)'>
+  <rect id="mapbackground:eventrect" x="-12800" y="-9600" width="38400" height="28800" style="fill:white;stroke:none;opacity:0" />
+<g id="mapzoomandpan" transform="matrix(1 0 0 1 0 0)">
+<g id="maplayer" clip-path="url(#mapclippath2)">
+<g id='World Mercator' class='World Mercator0s1' pointer-events='none' >
+<g id='World Mercator::bbox'  minboundx="-3555.5642089844"  maxboundx="2207.7214355469"  minboundy="-357.5972900391"  maxboundy="2245.3149414063" ></g>
+</g>
+<g id='mapobjects_below_label'></g>
+<g id='World Mercator:label' class='World Mercator0s0'  >
+</g>
+</g>
+<g id='mapobjects'></g>
+</g>
+</g>
+</g>
+</g>
+<g id="extension" minboundx="-37683613.9014759060"  maxboundx="47555708.4208790210"  minboundy="-25987328.8775496410"  maxboundy="37942162.8642165590"  maxx="12800"  maxy="9600" ></g>
+<g id='objects'></g>
+<g id="widgets:antizoomandpan" style="">
+</g>
+</svg>
