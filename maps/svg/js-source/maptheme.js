@@ -16392,10 +16392,6 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						newText.setAttributeNS(null, "id", this.szId + ":" + a + ":text");
 						newShape.parentNode.removeChild(newShape);
 					} else
-					if (szFlag.match(/ZOOM/) && (nFontSize < map.Scale.normalX(6))) {
-						szTextColor = "black";
-						newText = map.Dom.newText(shapeGroup, nRadius + nMaxRadius * 0.1, -nRadius / 2, this.szValuesTextStyle, szText);
-					} else
 					if (szFlag.match(/LABEL/) || (nFontSize > map.Scale.normalX(1))) {
 						var nOpacity = this.nValueSizeMin ? (nFontSize / map.Scale.normalX(5)) : 1;
 						newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:"+(this.szTextFont||"arial")+";font-size:" + nFontSize + "px;font-weight:bold;text-anchor:middle;fill:" + szTextColor + ";opacity:" + nOpacity + ";stroke:none;pointer-events:none", szText);
@@ -17480,7 +17476,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					newShape.setAttributeNS(null, "style", "fill:" + szColor + ";stroke:" + szLineColor);
 				}
 
-				if (newShape && szFlag.match(/VALUES/) && !szFlag.match(/TEXTONLY/) && (!this.fHideValues || szFlag.match(/ZOOM/))) {
+				if (newShape && szFlag.match(/VALUES/) && !szFlag.match(/TEXTONLY/) && (!this.fHideValues)) {
 					var newText = null;
 
 					var szText = tValue;
@@ -17508,10 +17504,6 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						newText.setAttributeNS(null, "opacity", "0.9");
 						//textOnTopGroup.fu.setPosition(-map.Scale.normalX(nFontSize) * 1.7, - map.Scale.normalY(nFontSize) * 0.3 / (this.nGridX||1) );
 						textOnTopGroup.fu.setPosition(-map.Scale.normalX(nFontSize* scalefont) * 0.7, - map.Scale.normalY(5/(this.nGridX||1)) );
-					} else
-					if (szFlag.match(/ZOOM/) && !szFlag.match(/SEQUENCE/)) { // && (nFontSize<map.Scale.normalX(6)) ){
-						szTextColor = "black";
-						newText = map.Dom.newText(shapeGroup, nRadius * 0.5 + nMaxRadius * 0.2, -nRadius / 2, this.szValuesTextStyle, szText);
 					} else {
 						if (szSymbol == "circle" || szSymbol == "square" || szSymbol == "triangle" || szSymbol == "hexagon" || szSymbol == "label" || szSymbol == "empty") {
 							if (szFlag.match(/CENTERVALUES/)) {
