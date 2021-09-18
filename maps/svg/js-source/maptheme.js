@@ -195,6 +195,8 @@ var themeStyleTranslateA = [
 	,{ style: "glowlower"		,obj: "szGlowLower"  }
 	,{ style: "chartupper"		,obj: "szChartUpper"  }
 	,{ style: "chartlower"		,obj: "szChartLower"  }
+	,{ style: "featureupper"	,obj: "szFeatureUpper"  }
+	,{ style: "featurelower"	,obj: "szFeatureLower"  }
 	,{ style: "boxupper"		,obj: "szBoxUpper"  }
 	,{ style: "shadowupper"		,obj: "szShadowUpper"  }
 	,{ style: "shadowlower"		,obj: "szShadowLower"  }
@@ -1098,6 +1100,16 @@ Map.Themes.prototype.parseStyle = function (mapTheme, styleObj) {
 		if (__isdef(styleObj.chartlower)) {
 			mapTheme.szChartLower = styleObj.chartlower;
 			mapTheme.nChartLower = __scanScaleValue(mapTheme.szChartLower);
+		}
+		// GR 10.09.2021 define scaledependency for features (layer) 
+		if (__isdef(styleObj.featureupper)) {
+			mapTheme.szFeatureUpper = styleObj.featureupper;
+			mapTheme.nFeatureUpper = __scanScaleValue(mapTheme.szFeatureUpper);
+		}
+		// GR 10.09.2021 define scaledependency for features (layer)
+		if (__isdef(styleObj.featurelower)) {
+			mapTheme.szFeatureLower = styleObj.featurelower;
+			mapTheme.nFeatureLower = __scanScaleValue(mapTheme.szFeatureLower);
 		}
 		// GR 24.01.2018 define scaledependency for shadow 
 		if (__isdef(styleObj.shadowupper)) {
@@ -12991,11 +13003,11 @@ MapTheme.prototype.zoomTo = function () {
  * is called once
  */
 MapTheme.prototype.createChartGroup = function (objectGroup) {
-
+	
 	if (this.chartGroup) {
 		return;
 	}
-	
+
 	if (this.szFlag.match(/FEATURE/)) {
 		this.chartGroup = map.Dom.newGroup(map.Layer.layerNode, this.szThemesA[0]);
 						  map.Dom.newGroup(map.Layer.layerNode, this.szThemesA[0] + ":label");
@@ -13004,6 +13016,15 @@ MapTheme.prototype.createChartGroup = function (objectGroup) {
 		map.Layer.listA[this.szThemesA[0]].szHighlight = 
 			"fill:url(#DiagUp200000000);stroke:black;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;";
 		map.Layer.listA[this.szThemesA[0]].szSelection = this.szItemField;
+		if (this.nFeatureLower || this.nFeatureUpper){
+			map.Layer.depListA[this.szThemesA[0]] = {};
+			map.Layer.depListA[this.szThemesA[0]].nLower = (this.nFeatureLower||0);
+			map.Layer.depListA[this.szThemesA[0]].nUpper = (this.nFeatureUpper||1000000000);
+			map.Layer.depListA[this.szThemesA[0]].shapeId = this.szThemesA[0];
+			map.Layer.depListA[this.szThemesA[0]].szDisplayAttribute = "none";
+			map.Layer.depListA[this.szThemesA[0]].szFeature = this.szThemesA[0];
+			setTimeout("map.Layer.switchScaleDependentLayer(null)",10);
+			}
 	}else{
 		this.chartGroup = map.Dom.newGroup(objectGroup, this.szId + ":chartgroup");
 	}
@@ -16911,7 +16932,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					}
 					szLineColor = this.szLineColor || szLineColor;
 
-					if (szSymbol == "circle" || szSymbol == "square" || szSymbol == "label" || szSymbol == "carot" || szSymbol == "diamond" || szSymbol == "triangle" || szSymbol == "hexagon" || szSymbol == "cross" || szSymbol == "empty") {
+					if (szSymbol == "circle" || szSymbol == "square" || szSymbol == "roundrect" || szSymbol == "label" || szSymbol == "carot" || szSymbol == "diamond" || szSymbol == "triangle" || szSymbol == "hexagon" || szSymbol == "cross" || szSymbol == "empty") {
 						var nRadius = map.Scale.normalX(nChartSize / 2);
 						// GR 10.05.2015 explicit size field
 						if (this.szSizeField && a && this.itemA[a]) {
@@ -16928,6 +16949,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								break;
 							case "square":
 								newShape = map.Dom.newShape('rect', shapeGroup, -nRadius * 0.8, -nRadius * 0.8, nRadius * 2 * 0.8, nRadius * 2 * 0.8, "fill:" + szColor + ";stroke:" + szLineColor + ";stroke-width:" + nLineWidth + ";");
+								break;
+							case "roundrect":
+								newShape = map.Dom.newShape('rect', shapeGroup, -nRadius * 0.8, -nRadius * 0.8, nRadius * 2 * 0.8, nRadius * 2 * 0.8, "fill:" + szColor + ";stroke:" + szLineColor + ";stroke-width:" + nLineWidth + ";");
+								newShape.setAttributeNS(null, "rx", nRadius * 0.3);
 								break;
 							case "cross":
 								var A = nRadius * 0.4;
@@ -17273,7 +17298,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				
 				this.nSymbolScale = nRadius/map.Scale.normalX(nChartSize);
 
-				if (szSymbol == "circle" || szSymbol == "square" || szSymbol == "carot" || szSymbol == "diamond" || szSymbol == "triangle" || szSymbol == "hexagon" || szSymbol == "empty" || szSymbol == "label" || szSymbol == "cross") {
+				if (szSymbol == "circle" || szSymbol == "square"|| szSymbol == "roundrect" || szSymbol == "carot" || szSymbol == "diamond" || szSymbol == "triangle" || szSymbol == "hexagon" || szSymbol == "empty" || szSymbol == "label" || szSymbol == "cross") {
 					szLineColor = this.szLineColor || szLineColor;
 					var nLineWidth = (this.nLineWidth || 1) * map.Scale.normalX(Math.min(2 * nRadius / nMaxRadius, 0.2)); // map.Scale.normalX(0.2); //*map.Scale.nFeatureScaling*map.Scale.nObjectScaling;
 					switch (szSymbol) {
@@ -17314,6 +17339,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							break;
 						case "square":
 							newShape = map.Dom.newShape('rect', shapeGroup, -nRadius, -nRadius, nRadius * 2, nRadius * 2, "fill:" + szColor + ";stroke:" + szLineColor + ";stroke-width:" + nLineWidth + ";");
+							break;
+						case "roundrect":
+							newShape = map.Dom.newShape('rect', shapeGroup, -nRadius, -nRadius, nRadius * 2, nRadius * 2, "fill:" + szColor + ";stroke:" + szLineColor + ";stroke-width:" + nLineWidth + ";");
+							newShape.setAttributeNS(null, "rx", nRadius * 0.3);
 							break;
 						case "cross":
 							newShape = map.Dom.newShape('rect', shapeGroup, -nRadius * 1.6, -nRadius * 0.4, nRadius * 2 * 1.6, nRadius * 2 * 0.4, "fill:" + szColor + ";stroke:" + szLineColor + ";stroke-width:" + map.Scale.nFeatureScaling * map.Scale.nObjectScaling + ";");
@@ -17505,7 +17534,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						//textOnTopGroup.fu.setPosition(-map.Scale.normalX(nFontSize) * 1.7, - map.Scale.normalY(nFontSize) * 0.3 / (this.nGridX||1) );
 						textOnTopGroup.fu.setPosition(-map.Scale.normalX(nFontSize* scalefont) * 0.7, - map.Scale.normalY(5/(this.nGridX||1)) );
 					} else {
-						if (szSymbol == "circle" || szSymbol == "square" || szSymbol == "triangle" || szSymbol == "hexagon" || szSymbol == "label" || szSymbol == "empty") {
+						if (szSymbol == "circle" || szSymbol == "square"|| szSymbol == "roundrect" || szSymbol == "triangle" || szSymbol == "hexagon" || szSymbol == "label" || szSymbol == "empty") {
 							if (szFlag.match(/CENTERVALUES/)) {
 								if (nClass === 0) {
 									newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:"+(this.szTextFont||"arial")+";font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szText);
