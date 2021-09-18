@@ -538,7 +538,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 			for ( var t=0; t<themesA.length; t++ ){
 				var objTheme = themesA[t];
 				if ( objTheme.szFlag.match(/PLOT/) ){
-					objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, "");
+					objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);
 				}
 			}
 		}else{
@@ -551,8 +551,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 			var scale = Math.max(1, 4000 / SVGBox.width);
 			SVGBox.width *= scale;
 			SVGBox.height *= scale;
-			SVGBox.y -= (SVGBox.y+SVGBox.height)/4; //60;
-			SVGBox.height -= 60;
+			SVGBox.y *= scale;
 
 			var size = objTheme.szFlag.match(/PLOT|HORZ|STACKED/) ? 400 : 300;
 			var width = size;
