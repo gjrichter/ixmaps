@@ -135,7 +135,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 		var objThemesA = ixmaps.getThemes();
 		for ( a in objThemesA ){
 			objTheme = objThemesA[a];
-			if ( !objTheme.szFlag.match(/FEATURE/) ){
+			if ( objTheme.szFlag.match(/CHART|CHOROPLETH/) ){
                 if ( szFilter ){
                     ixmaps.changeThemeStyle(objTheme.szId, "filter:" + (szFilter || " "), "set");
                 }else{

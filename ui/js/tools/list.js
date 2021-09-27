@@ -496,7 +496,18 @@ window.ixmaps.data = window.ixmaps.data || {};
 	ixmaps.data.drawChart = function(szId,i,szIdA,szFlag){ 
 		
 		var objTheme = ixmaps.getThemeObj(szId);
-		objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);
+		
+		if ( objTheme.szFlag.match(/PLOT/) ){
+			var themesA = ixmaps.getThemes();
+			for ( var t=0; t<themesA.length; t++ ){
+				objTheme = themesA[t];
+				if ( objTheme.szFlag.match(/PLOT/) ){
+					objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);
+				}
+			}
+		}else{
+			objTheme.drawChart($("#getchartmenutarget"+i)[0], szIdA, 30, szFlag);
+		}
 		
 		$("#getchartmenutarget"+i).parent().attr("height","240");
 		$("#getchartmenutarget"+i).parent().attr("width","330");

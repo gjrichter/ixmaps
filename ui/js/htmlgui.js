@@ -2751,8 +2751,6 @@ $Log: htmlgui.js,v $
 	 */
 	ixmaps.setExternalData = function (data, opt) {
 
-		ixmaps.showLoadingArrayStop();
-		ixmaps.hideLoading();
 		if (opt && opt.type && (opt.type != "jsonDB") && (opt.type != "dbtable")) {
 			if ((typeof (Data) != "undefined") && Data.object) {
 				// load the data using data.js
@@ -2781,6 +2779,8 @@ $Log: htmlgui.js,v $
 					});
 			}
 		} else {
+			ixmaps.showLoadingArrayStop();
+			ixmaps.hideLoading();
 			ixmaps.embeddedSVG.window.map.Api.setThemeExternalData(null, data, opt.name);
 		}
 	}
