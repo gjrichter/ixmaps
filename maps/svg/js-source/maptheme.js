@@ -15758,11 +15758,19 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			// only positive values make a pie part!
 			if ( (nPartsA[nI] > 0) || 
 				((nPartsA[nI] === 0) && !szFlag.match(/ZEROISNOTVALUE/)) ) {
-				var donutPart = donut.addPart(nPartsA[nI]
-                                              ,nHeight
-                                              ,szColor
-                                              ,0
-                                              ,(this.szAggregation && this.szAggregation.match(/sum/)) ? this.formatValue(nPartsA[nI], this.nValueDecimals || (nPartsA[nI] < 1 ? 2 : 0), "ROUND") + szUnit : this.formatValue(nPartsA[nI], this.nValueDecimals || (nPartsA[nI] < 1 ? 2 : 0), "ROUND") + szUnit, szLabel);
+				if (szFlag.match(/COUNT/)){
+					var donutPart = donut.addPart(nPartsA[nI]
+												  ,nHeight
+												  ,szColor
+												  ,0
+												  ,this.formatValue(this.itemA[a].nCountA[nI], this.nValueDecimals || (this.itemA[a].nCountA[nI] < 1 ? 2 : 0), "ROUND") + szUnit, szLabel);
+				}else{
+					var donutPart = donut.addPart(nPartsA[nI]
+												  ,nHeight
+												  ,szColor
+												  ,0
+												  ,(this.szAggregation && this.szAggregation.match(/sum/)) ? this.formatValue(nPartsA[nI], this.nValueDecimals || (nPartsA[nI] < 1 ? 2 : 0), "ROUND") + szUnit : this.formatValue(nPartsA[nI], this.nValueDecimals || (nPartsA[nI] < 1 ? 2 : 0), "ROUND") + szUnit, szLabel);
+				}
 				donutPart.nClass = nI;
 
 				// GR 03.03.2019 new, donut/startburst part will be directed to the position of the source of the aggregated data
@@ -16815,7 +16823,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			var nIndex = i;
 			var nValue = nPartsA[nIndex];
 			var tValue = nPartsA[nIndex];
-
+			if (szFlag.match(/COUNT/)){
+				tValue = this.itemA[a].nCountA[nIndex];
+			}
+			
 			if (this.sortedIndex) {
 				nValue = this.sortedIndex[nIndex].value;
 				tValue = this.sortedIndex[nIndex].tvalue;
