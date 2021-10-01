@@ -716,7 +716,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                     }
                     var nCount = Math.min(50 / nColors, 8);
                     var nOpacity = (1 / (row + 1));
-                    if (themeObj.szFlag.match(/DOPACITY/)) {
+                    if ( (nRows == 1) && themeObj.szFlag.match(/DOPACITY/)) {
                         nOpacity = (i + (nColors / 10)) / nColors;
                     }
                     szHtml += "<td><a " + ((nCount <= 1) ? "style='margin-right:-0.5px'" : "") + " class='legend-color-button' href='#' title='" + szMinMax + " click to see'><span onclick='javascript:ixmaps.markThemeClass(\"" + szId + "\"," + ix + ");event.stopPropagation();return false;' style='background:" + colorA[ix] + ";opacity:" + nOpacity + "'>";
@@ -1068,6 +1068,14 @@ window.ixmaps.legend = window.ixmaps.legend || {};
             return;
         }
 
+		
+		if (themeObj.nDoneCount == 0){
+			var szThemeA = ixmaps.getThemes();
+			if ( szThemesA.length > 1 ){
+				return;
+			}
+		}
+		
         if (themeObj.szFlag.match(/SUBTHEME/) || themeObj.szFlag.match(/NOLEGEND/) || themeObj.szFlag.match(/NOINFO/)) {
             return;
         }

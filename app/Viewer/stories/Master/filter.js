@@ -818,7 +818,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 		
 		var szThemeId = ixmaps.filterThemeId = null;
 	
- 		if ( ixmaps.legend.legendA[ixmaps.legend.activeLegendId] ){
+ 		if ( ixmaps.legend && ixmaps.legend.legendA[ixmaps.legend.activeLegendId] ){
 			szThemeId = ixmaps.filterThemeId = ixmaps.legend.legendA[ixmaps.legend.activeLegendId].szId || null;
 		}
         if ( !szThemeId ){
