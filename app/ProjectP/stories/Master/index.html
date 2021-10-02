@@ -234,7 +234,6 @@
 			text-rendering: optimizeLegibility;
 		}
 
-		h1,
 		iframe {
 			width: 960px;
 		}
@@ -1147,7 +1146,7 @@
 					nCount = 0;
 					for (p in __projects) {
 						console.log(__projects[p].name);
-						szHtml += '<div id="project'+p+'" style="border-bottom:solid #888888 1px;margin-bottom:0.5em;max-width:700px"></div>';
+						szHtml += '<div id="project'+p+'" style="border-bottom:solid #888888 0px;margin-bottom:0.5em;max-width:700px"></div>';
 						$("#readme").html(szHtml);
 					}
 					setTimeout("__doShowDir('"+szUrl+"')",100);
@@ -1198,6 +1197,8 @@
 									dataType: "text",
 								})
 								.done(function (result,textStatus, jqXHR) {
+								
+									++nCount;
 
 									szHtml = "";
 									var json = JSON.parse(result);
@@ -1208,7 +1209,7 @@
 									x[5] = "blob/"+x[5];
 									szHtml += '<a class="dropdown-item text-black" style="height:100%" href="' + x.join("/") +	'" target="_blank">';
 								
-									szHtml += this.url.split('id=')[1];
+									szHtml += nCount; // this.url.split('id=')[1];
 									var x = this.url.split('/');
 									szHtml += "<span style='font-size:0.5em'> "+x[x.length-1].split('?')[0]+"</span>";
 								
@@ -1227,7 +1228,7 @@
 										szHtml += "</h5>";
 									}else
 									if ( json.map.legend && json.map.legend.length ){
-										szHtml += "<div style='font-size:0.6em;margin-bottom:2em'>";
+										szHtml += "<div style='font-size:0.6em;margin-bottom:2em;'>";
 										szHtml += json.map.legend;
 										szHtml += "</div>";
 									}else
