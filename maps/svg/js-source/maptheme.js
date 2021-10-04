@@ -15758,7 +15758,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			// only positive values make a pie part!
 			if ( (nPartsA[nI] > 0) || 
 				((nPartsA[nI] === 0) && !szFlag.match(/ZEROISNOTVALUE/)) ) {
-				if (szFlag.match(/COUNT/)){
+				if (szFlag.match(/COUNT/) && this.itemA[a].nCountA){
 					var donutPart = donut.addPart(nPartsA[nI]
 												  ,nHeight
 												  ,szColor
