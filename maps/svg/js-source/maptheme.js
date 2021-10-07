@@ -16381,6 +16381,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				if (szFlag.match(/VALUES/) &&
 					(!this.szValueUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nValueUpper))) {
 					var szText = null;
+					if (this.szValueField && (this.szValueField == "$title$")) {
+						szText = this.itemA[a].szTitle;
+					} else
 					if (this.szValueField && this.itemA[a].szValue) {
 						// GR 25.05.2015 explizit value display field
 						szText = this.formatValue(__scanValue(this.itemA[a].szValue), this.nValueDecimals || ((this.itemA[a].szValue < 1) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
@@ -16837,6 +16840,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				// GR 25.05.2015 explizit value display field, take it as is
 				tValue = __scanValue(this.itemA[a].szValue);
 			}
+			if (this.szValueField && this.itemA[a] && (this.szValueField == "$title$")) {
+				tValue = this.itemA[a].szTitle;
+			} 
 			
 			if (this.szShowParts) {
 				var skipIt = true;
@@ -17248,6 +17254,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				if (this.szValueField && szFlag.match(/CATEGORICAL/) && this.szValuesA) {
 					tValue = this.szValuesA[nIndex];
 				}
+				if (this.szValueField && this.itemA[a] && (this.szValueField == "$title$")) {
+					tValue = this.itemA[a].szTitle;
+				} 
 
 				// get the symbol color
 				// ---------------------
@@ -19540,6 +19549,12 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				}
 				if (this.szAlign.match(/10\%right/)) {
 					ptNull.x = map.Scale.normalX(nChartSize*0.90*nPartsA.length/(this.nGridX||1));
+				}
+				if (this.szAlign.match(/10\%eft/)) {
+					ptNull.x = map.Scale.normalX(nChartSize*0.10*nPartsA.length/(this.nGridX||1));
+				}
+				if (this.szAlign.match(/23left/)) {
+					ptNull.x = map.Scale.normalX(nChartSize*0.33*nPartsA.length/(this.nGridX||1));
 				}
 			}else	
 			if (this.nGridX && !szFlag.match(/ZOOM/)) {
