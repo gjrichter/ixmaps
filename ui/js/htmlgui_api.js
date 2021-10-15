@@ -2581,11 +2581,11 @@ $Log: htmlgui_api.js,v $
 		
 			var szUrl = "";
 			if ( opt.story ) {
-				szUrl = "https://gjrichter.github.io/ixmaps/ui/dispatch.htm?ui=story&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName+"&story="+opt.story;
+				szUrl = "/ui/dispatch.htm?ui=story&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName+"&story="+opt.story;
 			}else if ( opt.mapStory ) {
-				szUrl = "https://gjrichter.github.io/ixmaps/ui/dispatch.htm?ui=story&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName+"&story="+opt.mapStory;
+				szUrl = "/ui/dispatch.htm?ui=story&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName+"&story="+opt.mapStory;
 			}else{
-				szUrl = "https://gjrichter.github.io/ixmaps/ui/ui/dispatch.htm?ui=embed&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName;
+				szUrl = "/ui/dispatch.htm?ui=embed&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName;
 			}
 
 			var scripts = window.document.scripts;
