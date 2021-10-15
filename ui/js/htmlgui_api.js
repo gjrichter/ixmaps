@@ -2559,6 +2559,114 @@ $Log: htmlgui_api.js,v $
 			}
 		//});
 	}
+	ixmaps.embedMapMe = function(szTargetDiv,opt,callback){
+	
+		//return new Promise(function(resolve, reject){
+
+			var target = window.document.getElementById(szTargetDiv);
+			if ( !target ){
+				alert("embed map target-element '" + szTargetDiv + "' not found!");
+				return;
+			}
+			var szName = opt.mapName || opt.name || "map" + String(Math.random()).split(".")[1];
+			var szBasemap = opt.mapService || opt.basemap || "leaflet";
+			var szMapType = opt.mapType || opt.maptype || "CartoDB - Positron";
+
+			// make sure than a map name exists only once
+			while ( ixmaps.embeddedApiA[szName] ){
+				szName += "1";
+			}
+			// register map name
+			ixmaps.embeddedApiA[szName] = {};
+		
+			var szUrl = "";
+			if ( opt.story ) {
+				szUrl = "/ui/dispatch.htm?ui=story&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName+"&story="+opt.story;
+			}else if ( opt.mapStory ) {
+				szUrl = "/ui/dispatch.htm?ui=story&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName+"&story="+opt.mapStory;
+			}else{
+				szUrl = "/ui/dispatch.htm?ui=embed&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName;
+			}
+
+			var scripts = window.document.scripts;
+			for ( a in scripts ){
+				if ( scripts[a].src && scripts[a].src.match(/htmlgui_api/)){
+					opt.mapCdn = scripts[a].src.split("/ui")[0];
+				}
+			}
+			if ( opt.mapCdn ){
+				szUrl = opt.mapCdn+szUrl;
+			}else{
+				szUrl = "../.."+szUrl;
+			}
+
+			if ( opt.mapUrl ){
+				szUrl += "&svggis="+opt.mapUrl;
+			}
+			if ( opt.search ){
+				szUrl += "&search="+opt.search;
+			}
+			if ( opt.align ){
+				szUrl += "&align="+opt.align;
+			}
+			if ( opt.legend ){
+				szUrl += "&legend="+opt.legend;
+			}
+			if ( opt.themeLegend ){
+				szUrl += "&themelegend="+opt.themeLegend;
+			}
+			if ( opt.mode ){
+				szUrl += "&mode="+opt.mode;
+			}
+			if ( opt.scrollsafe ){
+				szUrl += "&scrollsafe="+(opt.scrollsafe?"1":"0");
+			}
+			if ( opt.tools ){
+				szUrl += "&tools="+(opt.tools?"1":"0");
+			}
+			if ( opt.footer ){
+				szUrl += "&footer="+(opt.footer?"1":"0");
+			}
+			if ( opt.silent ){
+				szUrl += "&silent="+(opt.silent?"1":"0");
+			}
+			if ( opt.mapControl ){
+				for ( o in opt.mapControl )	{
+					szUrl += "&"+o+'='+opt.mapControl[o];
+				}
+			}
+			if ( opt.mapOpt ){
+				for ( o in opt.mapOpt )	{
+					szUrl += "&"+o+'='+opt.mapOpt[o];
+				}
+			}
+			if ( opt.project ){
+				szUrl += "&project="+opt.project;
+			}
+
+			var szHeight = opt.height || "640px";
+			var szWidth  = opt.width  || "100%";
+		
+			if ( target ){
+				target.innerHTML = "<iframe id=\""+szName+"\" style=\"border:0;width:"+szWidth+";height:"+szHeight+"\" src=\""+szUrl+"\" ></iframe>";
+                // GR 08.09.2019 adapt the created frame on window resize 
+			}
+        
+ 			if ( callback )	{
+				ixmaps.waitForMap(szName,callback);
+			}else{
+				ixmaps.waitForMap(szName,
+					function(map) {
+						if (map ){
+							resolve(map);
+						}else{
+							reject("error");
+						}
+					}
+				);
+			}
+		//});
+	}
 
 
 }( window.ixmaps = window.ixmaps || {} ));
