@@ -2665,6 +2665,8 @@ $Log: htmlgui_api.js,v $
 					}
 				);
 			}
+		
+		return "<div id='html'></div>"
 		//});
 	}
 
