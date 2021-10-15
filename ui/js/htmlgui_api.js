@@ -2562,6 +2562,8 @@ $Log: htmlgui_api.js,v $
 	ixmaps.embedMapMe = function(szTargetDiv,opt,callback){
 	
 		//return new Promise(function(resolve, reject){
+			var div = window.document.createElement('div');
+			div.id = szTargetDiv;
 
 			var target = window.document.getElementById(szTargetDiv);
 			if ( !target ){
@@ -2666,7 +2668,8 @@ $Log: htmlgui_api.js,v $
 				);
 			}
 		
-		return "<div id='html'></div>"
+
+		return div;
 		//});
 	}
 
