@@ -2562,10 +2562,14 @@ $Log: htmlgui_api.js,v $
 	ixmaps.embedMapMe = function(szTargetDiv,opt,callback){
 	
 		//return new Promise(function(resolve, reject){
-			var div = window.document.createElement('div');
-			div.id = szTargetDiv;
 
 			var target = window.document.getElementById(szTargetDiv);
+			if ( !target ){
+				var div = document.createElement('div');
+				div.id = szTargetDiv;
+				document.getElementsByTagName('body')[0].appendChild(div);	
+				target = div;
+			}
 			if ( !target ){
 				alert("embed map target-element '" + szTargetDiv + "' not found!");
 				return;
