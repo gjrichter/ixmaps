@@ -2559,7 +2559,7 @@ $Log: htmlgui_api.js,v $
 			}
 		//});
 	}
-	ixmaps.embedMapMe = function(szTargetDiv,opt,callback){
+	ixmaps.embed = function(szTargetDiv,opt,callback){
 	
 		//return new Promise(function(resolve, reject){
 
@@ -2567,13 +2567,14 @@ $Log: htmlgui_api.js,v $
 			if ( !target ){
 				var div = document.createElement('div');
 				div.id = szTargetDiv;
-				document.getElementsByTagName('body')[0].appendChild(div);	
+				document.activeElement.appendChild(div);	
 				target = div;
 			}
 			if ( !target ){
 				alert("embed map target-element '" + szTargetDiv + "' not found!");
 				return;
 			}
+
 			var szName = opt.mapName || opt.name || "map" + String(Math.random()).split(".")[1];
 			var szBasemap = opt.mapService || opt.basemap || "leaflet";
 			var szMapType = opt.mapType || opt.maptype || "CartoDB - Positron";
@@ -2657,8 +2658,8 @@ $Log: htmlgui_api.js,v $
 				target.innerHTML = "<iframe id=\""+szName+"\" style=\"border:0;width:"+szWidth+";height:"+szHeight+"\" src=\""+szUrl+"\" ></iframe>";
                 // GR 08.09.2019 adapt the created frame on window resize 
 			}
-        
- 			if ( callback )	{
+
+			if ( callback )	{
 				ixmaps.waitForMap(szName,callback);
 			}else{
 				ixmaps.waitForMap(szName,
