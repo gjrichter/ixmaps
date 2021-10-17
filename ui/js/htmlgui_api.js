@@ -2562,18 +2562,10 @@ $Log: htmlgui_api.js,v $
 	ixmaps.embed = function(szTargetDiv,opt,callback){
 	
 		//return new Promise(function(resolve, reject){
+		
+			var iFrame = null;
 
 			var target = window.document.getElementById(szTargetDiv);
-			if ( !target ){
-				var div = document.createElement('div');
-				div.id = szTargetDiv;
-				document.activeElement.appendChild(div);	
-				target = div;
-			}
-			if ( !target ){
-				alert("embed map target-element '" + szTargetDiv + "' not found!");
-				return;
-			}
 
 			var szName = opt.mapName || opt.name || "map" + String(Math.random()).split(".")[1];
 			var szBasemap = opt.mapService || opt.basemap || "leaflet";
@@ -2654,11 +2646,6 @@ $Log: htmlgui_api.js,v $
 			var szHeight = opt.height || "640px";
 			var szWidth  = opt.width  || "100%";
 		
-			if ( target ){
-				target.innerHTML = "<iframe id=\""+szName+"\" style=\"border:0;width:"+szWidth+";height:"+szHeight+"\" src=\""+szUrl+"\" ></iframe>";
-                // GR 08.09.2019 adapt the created frame on window resize 
-			}
-
 			if ( callback )	{
 				ixmaps.waitForMap(szName,callback);
 			}else{
@@ -2672,9 +2659,18 @@ $Log: htmlgui_api.js,v $
 					}
 				);
 			}
-		
 
-		return div;
+			if ( target ){
+				target.innerHTML = "<iframe id=\""+szName+"\" style=\"border:0;width:"+szWidth+";height:"+szHeight+"\" src=\""+szUrl+"\" ></iframe>";
+                // GR 08.09.2019 adapt the created frame on window resize 
+			}else{
+				iFrame = document.createElement('iframe');
+				iFrame.id = szName;
+				iFrame.style = "border:0;width:"+szWidth+";height:"+szHeight+";";
+				iFrame.src = szUrl; 
+			}
+
+		return iFrame;
 		//});
 	}
 
