@@ -14841,8 +14841,8 @@ MapTheme.prototype.chartMap = function (startIndex) {
 	}
 
 	if (this.szFlag.match(/SHOW/)) {
-		this.zoomTo();
-		this.zoomTo();
+		setTimeout("map.Themes.zoomTo(null,'"+this.szId+"')",100);
+		setTimeout("map.Themes.zoomTo(null,'"+this.szId+"')",100);
 		this.removeDefinitionFromFlag("SHOW");
 	}
 		
