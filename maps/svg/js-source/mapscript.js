@@ -598,6 +598,7 @@ Map.prototype.setFeatures = function(szFeatures){
 Map.prototype.getFeatures = function(){
 	var szFeatures = this.szFeatures;
 	this.szFeatures += ";mapopacity:"+String(this.nOpacity||1);
+	this.szFeatures += ";flushChartDraw:"+String(this.Themes.nflushChartDraw||100000);
 	return this.szFeatures;
 };
 /**

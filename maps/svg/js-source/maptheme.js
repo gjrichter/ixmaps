@@ -14840,6 +14840,13 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		//map.Themes.execute();
 	}
 
+	if (this.szFlag.match(/SHOW/)) {
+		this.zoomTo();
+		this.zoomTo();
+		this.removeDefinitionFromFlag("SHOW");
+	}
+		
+	
 };
 
 /**
