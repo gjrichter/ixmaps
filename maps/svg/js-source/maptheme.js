@@ -6441,6 +6441,7 @@ MapTheme.prototype.realize_draw = function () {
 	if (this.szFlag.match(/SHOW/)) {
 		this.removeDefinitionFromFlag("SHOW");
 		this.zoomTo();
+		this.zoomTo();
 		this.realize_draw();
 		return;
 	}
