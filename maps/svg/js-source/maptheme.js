@@ -6437,6 +6437,14 @@ MapTheme.prototype.realize_draw = function () {
 		this.szShapeType = "line";
 	}
 
+	// GR 20.10.2021 new theme type modifier flag to show theme extend
+	if (this.szFlag.match(/SHOW/)) {
+		this.removeDefinitionFromFlag("SHOW");
+		this.zoomTo();
+		this.realize_draw();
+		return;
+	}
+
 	_TRACE("===========================> ");
 	_TRACE("  MapTheme.realize_draw() ");
 	_TRACE("===========================> ");
@@ -13173,6 +13181,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		if (!this.partsA) {
 			return;
 		}
+		
 		var a = 0;
 		startIndex = 0;
 		this.indexA = [];
@@ -14840,13 +14849,6 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		//map.Themes.execute();
 	}
 
-	if (this.szFlag.match(/SHOW/)) {
-		setTimeout("map.Themes.zoomTo(null,'"+this.szId+"')",100);
-		setTimeout("map.Themes.zoomTo(null,'"+this.szId+"')",100);
-		this.removeDefinitionFromFlag("SHOW");
-	}
-		
-	
 };
 
 /**
