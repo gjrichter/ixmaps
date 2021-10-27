@@ -189,7 +189,7 @@ window.ixmaps = window.ixmaps || {};
 	 */
 	ixmaps.__switchLayer = function (el, szLayer) {
 		szLayer = szLayer.replace(/\'/g, "&#x27;");
-		ixmaps.switchLayer(null,szLayer, $(el).is(":checked"));
+		ixmaps.map().switchLayer(szLayer, $(el).is(":checked"));
 		ixmaps.makeLayerLegend();
 	}
 
