@@ -29,6 +29,7 @@ $Log: maptheme.js,v $
 	szMapNs, 
 	thisversion, 
 	szShadowFilterId, 
+	szShadowFilterShapeId, 
 	alert, 
 	console, 
 	_TRACE, 
@@ -7446,6 +7447,14 @@ MapTheme.prototype.getSelectionId = function (szTheme, j) {
 			// GR 22.05.2015 geo-json line definition
 			if (szId.match(/MultiLineString/)) {
 				this.fSelection = "MultiLineString";
+			} else
+			// GR 22.05.2015 geo-json poligon definition
+			if (szId.match(/Polygon/)) {
+				this.fSelection = "MultiPolygon";
+			} else
+			// GR 22.05.2015 geo-json poligon definition
+			if (szId.match(/MultiPolygon/)) {
+				this.fSelection = "MultiPolygon";
 			}
 		}
 
@@ -7486,17 +7495,21 @@ MapTheme.prototype.getSelectionId = function (szTheme, j) {
 	// b) selection by geoJson geometry
 	// ------------------------------
 	if (this.fSelection == "Point" || 
-		this.fSelection == "MultiPoint" ||
-		this.fSelection == "LineString" ||
-		this.fSelection == "MultiLineString" 
+		this.fSelection == "MultiPoint" 		
 	   ) {
-
 		szId = this.objTheme.dbRecords[j][this.objTheme.nFieldSelectionIndex];
 		var szMA = null;
 		if ((szMA = szId.match(positionRegExp))) {
 			return szTheme + "::" + (szMA[2] + ',' + szMA[1]) + (this.szSelectionFieldSuffix || "");
 		}
 		return null;
+	}
+	if (this.fSelection == "LineString" ||
+		this.fSelection == "MultiLineString" ||
+		this.fSelection == "Polygon" ||
+		this.fSelection == "MultiPolygon"		
+	   ) {
+		return szTheme + "::" + String(j) + (this.szSelectionFieldSuffix || "") 
 	}
 
 	// c) selection by lookup field
@@ -13192,6 +13205,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		this.szValuesLineStyle = "stroke:white;stroke-width:" + map.Scale.normalX(1.5) + ";opacity:0.5;";
 		this.szValuesLineBgStyle = "stroke:" + szLColor + ";stroke-width:" + map.Scale.normalX(0.5) + ";opacity:1;";
 		this.szValuesTextStyle = "font-family:" + (this.szTextFont || "arial") + ";font-size:" + map.Scale.normalX(nFontSize) + "px;fill:" + szColor + ";pointer-events:none";
+		this.szValuesTextBgStyle = "font-family:" + (this.szTextFont || "arial") + ";font-size:" + map.Scale.normalX(nFontSize) + "px;fill:none;stroke:white;stroke-width:" + map.Scale.normalY(nFontSize) / 5 + ";stroke-opacity:0.8;pointer-events:none;stroke-linejoin:bevel;pointer-events:none";
 
 		var objectGroup = map.Layer.objectGroup;
 
@@ -13739,6 +13753,45 @@ MapTheme.prototype.chartMap = function (startIndex) {
 			szInfo += (i?"|":"")+this.objTheme.dbFields[i].id;
 		}
 		this.chartGroup.setAttributeNS(szMapNs,"info",szInfo);
+		
+			// GR 28.10.2021 make shadow for the FEATURES
+			if ((this.fShadow === true) && SVGDocument.getElementById(szShadowFilterShapeId)) {
+				this.chartGroup.style.setProperty("filter", "url(#" + szShadowFilterShapeId + ")", "");
+			} else
+			if ((this.fShadow === true)) {
+				_TRACE("create shadow filter for objects ! --------------------------------------");
+				var filterNode = map.Dom.newNode('filter', this.chartGroup.parentNode);
+
+				filterNode.setAttributeNS(null, "id", szShadowFilterShapeId);
+				filterNode.setAttributeNS(null, "x", "-1");
+				filterNode.setAttributeNS(null, "y", "-1");
+				filterNode.setAttributeNS(null, "width", "2000%");
+				filterNode.setAttributeNS(null, "height", "2000%");
+
+				var filter = map.Dom.newNode('feGaussianBlur', filterNode);
+				filter.setAttributeNS(null, "stdDeviation", "0.3");
+				filter.setAttributeNS(null, "result", "BlurAlpha");
+
+				filter = map.Dom.newNode('feOffset', filterNode);
+				filter.setAttributeNS(null, "in", "BlurAlpha");
+				filter.setAttributeNS(null, "dx", "0.2");
+				filter.setAttributeNS(null, "dy", "0.5");
+				filter.setAttributeNS(null, "result", "OffsetBlurAlpha");
+
+				filter = map.Dom.newNode('feColorMatrix', filterNode);
+				filter.setAttributeNS(null, "in", "OffsetBlurAlpha");
+				filter.setAttributeNS(null, "type", "matrix");
+				filter.setAttributeNS(null, "values", "0.1 0.1 0.1 0 0 0.1 0.1 0.1 0 0 0.1 0.1 0.1 0 0 0 0 0 1 0");
+				filter.setAttributeNS(null, "result", "matrixOut");
+
+				filter = map.Dom.newNode('feMerge', filterNode);
+				var merge = map.Dom.newNode('feMergeNode', filter);
+				merge.setAttributeNS(null, "in", "matrixOut");
+				merge = map.Dom.newNode('feMergeNode', filter);
+				merge.setAttributeNS(null, "in", "SourceGraphic");
+
+				this.chartGroup.style.setProperty("filter", "url(#" + szShadowFilterShapeId + ")", "");
+			}
 	}
 	
 	// ---------------------------------
@@ -17582,10 +17635,22 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 									newText.fu.setPosition(xPos, yPos);
 									if (a && (szFlag.match(/ZOOM/) || szFlag.match(/NORMSIZE/)) && this.szLabelA) {
 										var tWidth = newText.fu.getBox().width;
-										newText = map.Dom.newText(shapeOnTopGroup, 0, 0, this.szValuesTextStyle + ";color:#000;", this.szLabelA[nIndex]);
+										
+										newTextBg = map.Dom.newText(shapeOnTopGroup, 0, 0, this.szValuesTextBgStyle, this.szLabelA[nIndex]);
+										newTextBg.fu.setPosition(xPos + tWidth + map.Scale.normalX(6), yPos - map.Scale.normalX(-1));
+										newTextBg.fu.scale(0.6, 0.6);
+										
+										newText = map.Dom.newText(shapeOnTopGroup, 0, 0, this.szValuesTextStyle + ";fill:#000;fill-opacity:0.8", this.szLabelA[nIndex]);
 										newText.fu.setPosition(xPos + tWidth + map.Scale.normalX(6), yPos - map.Scale.normalX(-1));
 										newText.fu.scale(0.6, 0.6);
 									}
+									/** alternative 25.10.2021
+										var tWidth = newText.fu.getBox().width;
+										//newText = map.Dom.newText(shapeOnTopGroup, 0, 0, this.szValuesTextStyle + ";color:#000;", this.szLabelA[nIndex]);
+										newText = this.createTextLabel(SVGDocument, shapeOnTopGroup, "", this.szLabelA[nIndex], nTextSize, "", "RGBA(255,255,255,0.3)", "RGBA(0,0,0,0.5)");
+										newText.fu.setPosition(xPos + tWidth + map.Scale.normalX(1), yPos);
+										newText.fu.scale(1,1);
+									**/
 									newText.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
 									newText = null; // important , see below
 									nNonZeroValuesDone++;

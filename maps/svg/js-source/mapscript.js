@@ -84,7 +84,7 @@ var fNotify = false;
 var szObjectGroupId = "mapobjects";
 var szShadowFilterId = "DropShadowFilterObjects:antizoomandpan";
 var szShadowFilterToolsId = "DropShadowFilterTools:antizoomandpan";
-var szShadowFilterShapeId = "DropShadowFilterShape";
+var szShadowFilterShapeId = "DropShadowFilterShape:antizoomandpan";
 
 var fAntiZoomAndPan = true;
 var fFeatureScaling = true;
