@@ -7058,8 +7058,8 @@ MapTheme.prototype.addItemValues = function (szId, nValuesA, nValue100, nValueSi
 	if (nValueSize && this.szSizeField) {
 		if (!isNaN(nValueSize)) {
 			this.itemA[szId].nSize = nValueSize;
-			this.nMinSize = this.nMin = Math.min(this.nMinSize, nValueSize);
-			this.nMaxSize = this.nMax = Math.max(this.nMaxSize, nValueSize);
+			this.nMinSize = Math.min(this.nMinSize, nValueSize);
+			this.nMaxSize = Math.max(this.nMaxSize, nValueSize);
 			this.nSumSize += nValueSize;
 		}
 	}
@@ -16889,7 +16889,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			var nIndex = i;
 			var nValue = nPartsA[nIndex];
 			var tValue = nPartsA[nIndex];
-			if (szFlag.match(/COUNT/)){
+			if (szFlag.match(/COUNT/) && this.itemA[a].nCountA){
 				tValue = this.itemA[a].nCountA[nIndex];
 			}
 			
@@ -17290,7 +17290,22 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					// GR 03.09.2007 explicit size field
 					else
 					if (!szFlag.match(/GRIDSIZE/) && this.szSizeField && a && this.itemA[a]) {
-						nRadius = nMaxRadius / Math.sqrt(this.nMaxSize) * Math.sqrt(this.itemA[a].nSize);
+						
+						if (szFlag.match(/LINEAR||SIZEP1/)) {
+							nRadius = nMaxRadius / this.nMaxSize * this.itemA[a].nSize;
+						} else
+						if (szFlag.match(/SIZELOG/)) {
+							nRadius = Math.max(1,nMaxRadius / Math.log(this.nMaxSize) * Math.log(this.itemA[a].nSize));
+						} else
+						if (szFlag.match(/SIZEP4/)) {
+							nRadius = nMaxRadius / Math.pow(this.nMaxSize, 1 / 4) * Math.pow(this.itemA[a].nSize, 1 / 4);
+						} else
+						if (szFlag.match(/SIZEP3/) || szFlag.match(/SIZEVOLUME/)) {
+							nRadius = nMaxRadius / Math.pow(this.nMaxSize, 1 / 3) * Math.pow(this.itemA[a].nSize, 1 / 3);
+						} else {
+							nRadius = nMaxRadius / Math.sqrt(this.nMaxSize) * Math.sqrt(this.itemA[a].nSize);
+						}
+						
 						if (szFlag.match(/PLOTXY/)) {
 							nRadius /= 5;
 						}
