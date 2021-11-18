@@ -5434,12 +5434,14 @@ function ObjTheme(szTheme, nIndex, coTable, szSelectionField, szItemField) {
  * @type boolean
  */
 ObjTheme.prototype.getFields = function () {
-
+	
 	this.szFields = this.theme.szFields;
 	this.szFieldsA = this.theme.szFields.split('|');
 	for (var i in this.szFieldsA) {
 		this.szFieldsA[i] = this.szFieldsA[i].trim();
 	}
+	// GR 17.11.2021 update fields array also in theme object
+	this.theme.szFieldsA = this.szFieldsA;
 
 	this.szField100 = this.theme.szField100;
 	this.szColorField = this.theme.szColorField;
@@ -6408,11 +6410,11 @@ MapTheme.prototype.realize_analyze = function () {
 	var x = new Date();
 
 	_TRACE("distributeValues ---->");
-	this.distributeValues();
+	this.fDraw = this.distributeValues();
 	_TRACE("---> done");
 
 	this.timeAggregating = new Date() - x;
-	this.fDraw = true;
+	//this.fDraw = true;
 	if ((this.timeLoading > 1000 || this.szFlag.match(/VERBOSE/)) && !this.szFlag.match(/SILENT/)) {
 		executeWithMessage("map.Themes.executeContinue();", "drawing");
 	} else {
@@ -10466,6 +10468,12 @@ MapTheme.prototype.distributeValues = function () {
 	}
 
 	_TRACE("set range values ==>");
+	
+	if ( isNaN(nRange) || !isFinite(nRange) ){
+		_ERROR("ERROR on distributeValues: infinite range !");
+		displayMessage("ERROR: infinite value range !", 3000);
+		return false;
+	}
 
 	// GR 23.01.2019 if colorfield is defined, ranges must follow this values to calcolate color distribution
 	// but this exeption must be reverted after the calculation of the ranges, for CATEGORICAL theme types  
