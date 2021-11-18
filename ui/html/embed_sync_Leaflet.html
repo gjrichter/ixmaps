@@ -612,6 +612,10 @@
 				$("#map-popout-button").show();
 				ixmaps.footer = 20;
 			}
+			
+			if ($(document).getUrlParam('item')) {
+				ixmaps.item = $(document).getUrlParam('item');
+			}
 
 			// ----------------------
 			// align user interface
@@ -936,11 +940,18 @@
                     $("#switchinfobutton").hide();
                 }else{
 					var szItemUrl = "./tools/item.html";
-					if ( ixmaps.loadedProject.map.item && (ixmaps.loadedProject.map.item != "html") )  {
+					if ( ixmaps.item && 
+						(ixmaps.item != "html") )  {
+						szItemUrl = ixmaps.item;
+						szItemUrl = szItemUrl.replace("../../../..","../..");
+					}
+					if ( ixmaps.loadedProject && 
+						 ixmaps.loadedProject.map.item && 
+						(ixmaps.loadedProject.map.item != "html") )  {
 						szItemUrl = ixmaps.loadedProject.map.item;
 						szItemUrl = szItemUrl.replace("../../../..","../..");
 					}
-					if (ixmaps.loadedProject.map.item){
+					if (ixmaps.item || ixmaps.loadedProject.map.item){
 						ixmaps.szMapItemId = ixmaps.parentApi.szMapItemId = szId;
 						window.idialog = this.openDialog(null,'item',szItemUrl,'Item info','70,100',480,660);
 						ixmaps.onDialogClose = function(){

@@ -2312,6 +2312,10 @@ $Log: htmlgui_api.js,v $
 			ixmaps.setView(this.szMap,center,zoom);
 			return this;
 		},
+		view: function(center,zoom){
+			ixmaps.setView(this.szMap,center,zoom);
+			return this;
+		},
 
 		setScaleParam: function(szParam){
 			ixmaps.setScaleParam(this.szMap,szParam);
@@ -2327,8 +2331,16 @@ $Log: htmlgui_api.js,v $
 			ixmaps.setOptions(this.szMap,options);
 			return this;
 		},
+		options: function(options){
+			ixmaps.setOptions(this.szMap,options);
+			return this;
+		},
 
 		setData: function(data,options){
+			ixmaps.setExternalData(this.szMap,data,options);
+			return this;
+		},
+		data: function(data,options){
 			ixmaps.setExternalData(this.szMap,data,options);
 			return this;
 		},
@@ -2366,6 +2378,10 @@ $Log: htmlgui_api.js,v $
 		},
 
 		newTheme: function(title,theme,flag){
+			ixmaps.newTheme(this.szMap,title,theme,flag);
+			return this;
+		},
+		addTheme: function(title,theme,flag){
 			ixmaps.newTheme(this.szMap,title,theme,flag);
 			return this;
 		},
@@ -2613,6 +2629,9 @@ $Log: htmlgui_api.js,v $
 			}
 			if ( opt.themeLegend ){
 				szUrl += "&themelegend="+opt.themeLegend;
+			}
+			if ( opt.item ){
+				szUrl += "&item="+opt.item;
 			}
 			if ( opt.mode ){
 				szUrl += "&mode="+opt.mode;

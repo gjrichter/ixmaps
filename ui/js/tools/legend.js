@@ -1456,6 +1456,26 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 	}
 
     /**
+     * get the first visible theme to display in Legend
+     * @type void
+     */
+	__firstVisibleLegendTheme = function(){
+		var szThemeA = ixmaps.getThemes();
+		__actualThemeId = szThemeA[0].szId;
+		var themeObj = ixmaps.getThemeObj(szThemeA[0].szId);
+		for ( var t = 0; t < szThemeA.length; t++ ){
+			var test = ixmaps.getThemeObj(szThemeA[t].szId);
+			if (test.nDoneCount > 0){
+ 				__actualThemeId = szThemeA[t].szId;
+				themeObj = ixmaps.getThemeObj(__actualThemeId);
+				break;
+			}
+		}
+		return themeObj;
+	}
+	
+	
+    /**
      * set legend background on map type change
      * @type void
      */

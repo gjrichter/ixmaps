@@ -1922,6 +1922,7 @@ $Log: htmlgui.js,v $
 	 * Is called by the svg map script to log error messages 
 	 */
 	ixmaps.htmlgui_errorLog = function (szMessage) {
+		ixmaps.error(szMessage);
 		ixmaps.status(szMessage,2000);
 	};
 

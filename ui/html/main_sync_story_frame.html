@@ -397,6 +397,9 @@
 			}else{
 				//$("#title").remove();
 			}
+			if ( $(document).getUrlParam('item') ){
+				src += "&item="+$(document).getUrlParam('item');
+			}
 			if ( $(document).getUrlParam('attribution') ){
 				src += "&attribution="+$(document).getUrlParam('attribution');
 			}
@@ -456,10 +459,10 @@
 		if ( $(document).getUrlParam('overlap') ){
 			ixmaps.overlap = Number($(document).getUrlParam('overlap'));
 		}
-		if ( $(document).getUrlParam('sidebarbutton') == 0 ){
+		//if ( $(document).getUrlParam('sidebarbutton') == 0 ){
 			//$( "#expandbutton" ).remove();
 			$( "#collapsbutton" ).remove();
-		}
+		//}
 		ixmaps.nSidebar = 50; // % !!
 		if ( $(document).getUrlParam('sidebar') ){
 			var szSidebar = String($(document).getUrlParam('sidebar'));

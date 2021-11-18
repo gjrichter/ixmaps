@@ -221,6 +221,9 @@
 		
 		ixmaps.registerMe();
 
+		// GR 22.10.2021 kill spinning splash image after 2 sec
+		setTimeout('$(".splash").css("background-image","")',2000);
+		
 	});
 
 
