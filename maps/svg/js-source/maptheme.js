@@ -3065,7 +3065,7 @@ Map.Themes.prototype.doSetTimeFrame = function (szId, nUMin, nUMax) {
 Map.Themes.prototype.changeThemeStyle = function (evt, szId, szStyle, szFlag) {
 	// GR 30.10.2017 style may contain "'" characters
 	_TRACE("changeThemeStyle" + ": '" + szId + "' , '" + szStyle.replace(/'/g, "\\\'") + "' , '" + szFlag + "'");
-	if (szFlag.match(/fast||silent||direct/)){
+	if (szFlag.match(/fast|silent|direct/)){
 		map.Themes.doChangeThemeStyle(szId,szStyle.replace(/'/g, "\\\'"),szFlag);
 	}else{
 		executeWithMessage("map.Themes.doChangeThemeStyle('" + szId + "','" + szStyle.replace(/'/g, "\\\'") + "','" + szFlag + "')", "... processing ...");
@@ -17299,7 +17299,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					else
 					if (!szFlag.match(/GRIDSIZE/) && this.szSizeField && a && this.itemA[a]) {
 						
-						if (szFlag.match(/LINEAR||SIZEP1/)) {
+						if (szFlag.match(/LINEAR|SIZEP1/)) {
 							nRadius = nMaxRadius / this.nMaxSize * this.itemA[a].nSize;
 						} else
 						if (szFlag.match(/SIZELOG/)) {
