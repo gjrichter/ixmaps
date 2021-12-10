@@ -10154,8 +10154,10 @@ MapTheme.prototype.distributeValues = function () {
 		this.nMax = (-Number.MAX_VALUE);
 		for (a in this.itemA) {
 			for (var v = 0; v < this.itemA[a].nValuesA.length; v++) {
-				this.nMin = Math.min(this.itemA[a].nValuesA[v], this.nMin);
-				this.nMax = Math.max(this.itemA[a].nValuesA[v], this.nMax);
+				if (!isNaN(this.itemA[a].nValuesA[v])){
+					this.nMin = Math.min(this.itemA[a].nValuesA[v], this.nMin);
+					this.nMax = Math.max(this.itemA[a].nValuesA[v], this.nMax);
+				}
 			}
 		}
 
@@ -10469,10 +10471,12 @@ MapTheme.prototype.distributeValues = function () {
 
 	_TRACE("set range values ==>");
 	
-	if ( isNaN(nRange) || !isFinite(nRange) ){
-		_ERROR("ERROR on distributeValues: infinite range !");
-		displayMessage("ERROR: infinite value range !", 3000);
-		return false;
+	if (this.szFlag.match(/CHART|CHOROPLETH/)) {
+		if ( isNaN(nRange) || !isFinite(nRange) ){
+			_ERROR("ERROR on distributeValues: infinite range !");
+			displayMessage("ERROR: infinite value range !", 3000);
+			return false;
+		}
 	}
 
 	// GR 23.01.2019 if colorfield is defined, ranges must follow this values to calcolate color distribution
