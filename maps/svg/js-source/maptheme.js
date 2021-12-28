@@ -6131,6 +6131,18 @@ function MapTheme(szThemes, szFields, szField100, szFlag, colorScheme, szTitle, 
 	/** array to hold all map shape nodes used; used to accellerate */
 	this.themeNodesPosA = this.szFlag.match(/AGGREGATE|GROUP/) ? [] : map.Themes.themeNodesPosA;
 
+	/** object to define style getter and setter */
+	this.style = {theme:this};
+	/** set theme properties  */
+	this.setProperties = function(obj){
+		this.szFields = obj.field || obj.fields || this.szFields;
+		this.szField100 = obj.field100 || this.szField100;
+		this.szFieldsA = szFields.split('|');
+	}
+	/** set theme.style properties  */
+	this.style.setProperties = function(styleObj){
+		map.Themes.parseStyle(this.theme,styleObj);
+	}
 }
 /**
  * check the theme; check presence of theme layers
@@ -7778,6 +7790,7 @@ MapTheme.prototype.loadValuesOfTheme = function (szThemeLayer) {
 				// add time value
 				if (this.szTimeField) {
 					this.itemA[szId].szTime = (this.szTimeField == "$index$") ? (j + 1) : __mpap_decode_utf8((this.objTheme.dbRecords[j][this.objTheme.nTimeFieldIndex]));
+					this.itemA[szId].szTime = this.itemA[szId].szTime.replace(/ /g,"");
 				}
 				// add label value
 				if (this.szLabelField) {
@@ -8407,6 +8420,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 		var szTime = null;
 		if (this.szTimeField) {
 			szTime = (this.szTimeField == "$index$") ? (j + 1) : __mpap_decode_utf8((this.objTheme.dbRecords[j][this.objTheme.nTimeFieldIndex]));
+			szTime = szTime.replace(/ /g,"");
 		}
 
 		var nX = null;
@@ -11705,14 +11719,14 @@ MapTheme.prototype.markClass = function (nClass, nStep) {
 			nCount = 99;
 		}
 	else {
-		nCount = this.partsA[nClass].nCount;
+		nCount = this.partsA[nClass]?this.partsA[nClass].nCount:0;
 	}
 	if (nCount > 500 && this.evidenceMode == "highlight") {
 		displayMessage("Sorry ! to many members");
 		return;
 	}
 	if (nCount === 0) {
-		displayMessage("No members !");
+		displayMessage("class has no members !",3000);
 		return;
 	}
 
@@ -14124,7 +14138,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 						pp = count[p];
 					}
 				}
-				shapeGroup.setAttributeNS(null,"style","stroke:"+this.chart.szColor+";fill-opacity:0.5");
+				shapeGroup.setAttributeNS(null,"style","fill:"+this.chart.szColor+";fill-opacity:0.5");
 			}
 
 			continue;
@@ -14772,10 +14786,11 @@ MapTheme.prototype.chartMap = function (startIndex) {
 								var szTitle = HTMLWindow.ixmaps.htmlgui_onInfoTitle(this.itemA[a].szTitle, this.itemA[a]);
 							} catch (e) {}
 							var textColor = this.szTextColor || "#888888";
+							var posY = this.szFlag.match(/BOTTOMTITLE/) ? nFontSize * 1.3 : (bBox.y - nFontSize * 0.7); 
 							if ( this.szAlign && this.szAlign.match(/right/) ){
-								var newText = map.Dom.newText(shapeGroup, bBox.x+bBox.width, bBox.y - nFontSize * 0.7, "font-family:arial;font-size:" + nFontSize + "px;text-anchor:end;fill:" + textColor + ";stroke:none;pointer-events:none;", String(szTitle || " "));
+								var newText = map.Dom.newText(shapeGroup, bBox.x+bBox.width, posY, "font-family:arial;font-size:" + nFontSize + "px;text-anchor:end;fill:" + textColor + ";stroke:none;pointer-events:none;", String(szTitle || " "));
 							}else{
-								var newText = map.Dom.newText(shapeGroup, bBox.x, bBox.y - nFontSize * 0.7, "font-family:arial;font-size:" + nFontSize + "px;text-anchor:start;fill:" + textColor + ";stroke:none;pointer-events:none;", String(szTitle || " "));
+								var newText = map.Dom.newText(shapeGroup, bBox.x, posY, "font-family:arial;font-size:" + nFontSize + "px;text-anchor:start;fill:" + textColor + ";stroke:none;pointer-events:none;", String(szTitle || " "));
 							}
 
 							// make multi line text if necessary and possible
