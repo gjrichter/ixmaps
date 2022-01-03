@@ -5903,16 +5903,16 @@ function MapTheme(szThemes, szFields, szField100, szFlag, colorScheme, szTitle, 
 	/** number of no data values of the theme */
 	this.nNoData = 0;
 
-	this.szThemes = szThemes;
+	this.szThemes = szThemes || "";
 	this.szThemesA = szThemes.split('|');
 
 	this.checkTheme();
 
 	this.objThemesA = [];
 
-	this.szFields = szFields;
-	this.szFieldsA = szFields.split('|');
-	this.szField100 = szField100;
+	this.szFields = szFields || "";
+	this.szFieldsA = this.szFields.split('|');
+	this.szField100 = szField100 || "";
 
 	this.nFieldsA = [];
 	this.nFields100A = [];
@@ -10957,7 +10957,8 @@ MapTheme.prototype.paintMap = function (startIndex) {
 	this.fillOpacity = this.fillOpacity ? this.fillOpacity : this.nOpacity;
 	this.szStyle = "fill-opacity:" + String(this.fillOpacity ? this.fillOpacity : (fTransparentMap ? 0.6 : 1.0));
 	if (this.autoOpacity) {
-		this.szStyle = "fill-opacity:" + String(Math.max(0.3, (Math.min(1, 0.3 + 0.7 / Math.max(1, Math.log(map.Zoom.nZoom))))));
+		var dx = (map.Scale.nTrueMapScale*map.Scale.nZoomScale)/map.Scale.nNormalSizeScale;
+		this.szStyle = "fill-opacity:" + String(Math.max(0.3, (Math.min(1, 0.3 + 0.7 / Math.max(1, Math.log(map.Zoom.nZoom/dx))))));
 	}
 	if (this.szShapeType.match(/line/)) {
 		this.szStyle = this.fillOpacity ? "stroke-opacity:" + this.fillOpacity + ";" : "stroke-opacity:1";
@@ -11162,7 +11163,8 @@ MapTheme.prototype.paintMap = function (startIndex) {
 
 							// flag for auto opacity = more zoom, more transparency
 							if (this.autoOpacity) {
-								nOpacity *= Math.max(0.3, (Math.min(1, 0.3 + 0.7 / Math.max(1, Math.log(map.Zoom.nZoom)))));
+								var dx = (map.Scale.nTrueMapScale*map.Scale.nZoomScale)/map.Scale.nNormalSizeScale;
+								nOpacity *= Math.max(0.3, (Math.min(1, 0.3 + 0.7 / Math.max(1, Math.log(map.Zoom.nZoom/dx)))));
 							}
 
 							paintShape.style.setProperty("fill-opacity", String(nOpacity), "");
@@ -11216,7 +11218,8 @@ MapTheme.prototype.paintMap = function (startIndex) {
 							} else {
 								paintShape.setAttributeNS(szMapNs, "tooltip", this.formatValue(nValue, 2) + this.szUnit); //+"  ["+this.szTitle+"]");
 								
-								paintShape.setAttributeNS(szMapNs, "tooltip", this.itemA[a].szTitle + " " + this.formatValue(nValue, 2) + this.szUnit);
+								paintShape.setAttributeNS(szMapNs, "tooltip", 
+									(this.itemA[a].szTitle?this.itemA[a].szTitle:"") + " " + this.formatValue(nValue, 2) + this.szUnit);
 								
 							}
 							// dynamic alpha / opacity
@@ -11305,7 +11308,8 @@ MapTheme.prototype.paintMap = function (startIndex) {
 
 								// flag for auto opacity = more zoom, more transparency
 								if (this.autoOpacity) {
-									nOpacity *= Math.max(0.3, (Math.min(1, 0.3 + 0.7 / Math.max(1, Math.log(map.Zoom.nZoom)))));
+									var dx = (map.Scale.nTrueMapScale*map.Scale.nZoomScale)/map.Scale.nNormalSizeScale;
+									nOpacity *= Math.max(0.3, (Math.min(1, 0.3 + 0.7 / Math.max(1, Math.log(map.Zoom.nZoom/dx)))));
 								}
 
 								paintShape.style.setProperty("fill-opacity", String(nOpacity), "");
@@ -13244,7 +13248,8 @@ MapTheme.prototype.chartMap = function (startIndex) {
 
 		// GR 26.09.2017 auto opacity -> fillOpacity
 		if (this.autoOpacity) {
-			this.fillOpacity = 1 * Math.max(0.1, (Math.min(1, 20 / Math.max(1, Math.pow(map.Zoom.nZoom, 0.5)))));
+			var dx = (map.Scale.nTrueMapScale*map.Scale.nZoomScale)/map.Scale.nNormalSizeScale;
+			this.fillOpacity = 1 * Math.max(0.1, (Math.min(1, 20 / Math.max(1, Math.pow(map.Zoom.nZoom/dx, 0.5)))));
 		}
 
 		if (this.mapSleep) {
