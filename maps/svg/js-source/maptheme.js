@@ -1375,12 +1375,12 @@ Map.Themes.prototype.cleanUpThemeObj = function (themeObj) {
 		}
 	}
 
-	if (style.aggregationfield) {
-		style.aggregationscale = null;
+	if (style.aggregationscale) {
+		style.aggregationfield = null;
 		style.gridwidth = null;
 		style.gridwidthpx = null;
 	} else
-	if (style.aggregationscale) {
+	if (style.aggregationfield) {
 		style.gridwidth = null;
 		style.gridwidthpx = null;
 	} else
@@ -7790,7 +7790,7 @@ MapTheme.prototype.loadValuesOfTheme = function (szThemeLayer) {
 				// add time value
 				if (this.szTimeField) {
 					this.itemA[szId].szTime = (this.szTimeField == "$index$") ? (j + 1) : __mpap_decode_utf8((this.objTheme.dbRecords[j][this.objTheme.nTimeFieldIndex]));
-					this.itemA[szId].szTime = this.itemA[szId].szTime.replace(/ /g,"");
+					this.itemA[szId].szTime = this.itemA[szId].szTime.replace(/ - /g,"");
 				}
 				// add label value
 				if (this.szLabelField) {
@@ -8420,7 +8420,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 		var szTime = null;
 		if (this.szTimeField) {
 			szTime = (this.szTimeField == "$index$") ? (j + 1) : __mpap_decode_utf8((this.objTheme.dbRecords[j][this.objTheme.nTimeFieldIndex]));
-			szTime = szTime.replace(/ /g,"");
+			szTime = szTime.replace(/ - /g," ");
 		}
 
 		var nX = null;
@@ -18159,12 +18159,14 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 										}
 									}
 									// GR 29.10.2019 clip plot to grid
-									map.Dom.setClipRect(shapeGroup, {
-										x: -100,
-										y: -(nMaxValue - nMinValue) * nScale,
-										width: 100 + (nMaxI/(this.nGridX||1)) * nStep,
-										height: 100 + (nMaxValue - nMinValue) * nScale
-									});
+									if (!szFlag.match(/NOCLIP/)) {
+										map.Dom.setClipRect(shapeGroup, {
+											x: -100,
+											y: -(nMaxValue - nMinValue) * nScale,
+											width: 100 + (nMaxI/(this.nGridX||1)) * nStep,
+											height: 100 + (nMaxValue - nMinValue) * nScale
+										});
+									}
 									
 								}
 
