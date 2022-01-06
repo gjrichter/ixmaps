@@ -861,7 +861,12 @@ $Log: htmlgui_api.js,v $
 			ixmaps.error("illegal or incomplete function call on:\nixmaps.newTheme\nargs:"+args.join(',')+"");
 		}
 		//ixmaps.message("... creating theme ...");
+		
+		// GR 06.01.2022 must go this way now, opt has more substructures 
+		this.dispatchToEmbeddedApi(szMap,"newTheme",[szThemeName,opt,fClear]);
+		return;
 
+		/**
 		if ( typeof(opt.field) != 'string' ){
 			s = "";
 			for ( x=0; x<opt.field.length; x++ ){
@@ -905,6 +910,8 @@ $Log: htmlgui_api.js,v $
 		var szScript = "map.Api.newMapTheme(\""+(opt.layer||"")+"\",\""+(opt.field||"")+"\",\""+(opt.field100||"")+"\",\""+opt.style+"\",\""+szThemeName+"\",\""+opt.axis+"\")";
 
 		this.dispatchToEmbeddedApi(szMap,"execScript",[szScript,fClear]);
+		**/
+		
 	};
 
 	/**
