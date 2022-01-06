@@ -5910,7 +5910,7 @@ function MapTheme(szThemes, szFields, szField100, szFlag, colorScheme, szTitle, 
 
 	this.objThemesA = [];
 
-	this.szFields = szFields || "";
+	this.szFields = szFields || "$item$";
 	this.szFieldsA = this.szFields.split('|');
 	this.szField100 = szField100 || "";
 
