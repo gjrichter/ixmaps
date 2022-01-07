@@ -1070,8 +1070,16 @@ $Log: htmlgui.js,v $
 					theme.style[i] = theme.data[i];
 				}
 			}
+			// GR 07.01.2022 new: user defined a data processing function given by string
+			if (theme.data["process"]){
+				eval("ixmaps."+theme.style["dbtable"]+" = ixmaps."+theme.style["dbtable"]+" || {}");
+				eval("ixmaps."+theme.style["dbtable"]+".process = "+theme.data[i]);
+			}
 		}
 
+
+		
+		
 		try {
 			ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(theme);
 		} catch (e) {}
@@ -2843,6 +2851,17 @@ $Log: htmlgui.js,v $
 		for (g in localizeObj) {
 			ixmaps.setLocal(g, localizeObj[g]);
 		}
+	};
+
+	/**
+	 * set attribution
+	 * @param {String} attribution stringlocalizeObj the json object with the global/local string pairs
+	 * @return void
+	 * @example
+	 * ixmaps.setAttribution("powered by iXMaps");
+	 */
+	ixmaps.setAttribution = function (attribution) {
+		ixmaps.htmlgui_setAttributionString(attribution);
 	};
 
 	/**

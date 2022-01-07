@@ -1771,6 +1771,19 @@ $Log: htmlgui_api.js,v $
 	};
 
 	/**
+	 * set attribution strings
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szAttribution the attribution string 
+	 * @return void
+	 * @example
+	 *	ixmaps.setAttribution("map","powered by iXMaps");
+	 *	});
+	 */
+	ixmaps.setAttribution = function(szMap,szAttribution){
+		this.dispatchToEmbeddedApi(szMap,"setAttribution",[szAttribution]);
+	};
+
+	/**
 	 * set external data
 	 * make data present as JavaScript object usable by theme definitions
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
@@ -2342,6 +2355,12 @@ $Log: htmlgui_api.js,v $
 			ixmaps.setOptions(this.szMap,options);
 			return this;
 		},
+		
+		attribution: function(attribution){
+			ixmaps.setAttribution(this.szMap,attribution);
+			return this;
+		},
+		
 
 		setData: function(data,options){
 			ixmaps.setExternalData(this.szMap,data,options);
@@ -2622,8 +2641,14 @@ $Log: htmlgui_api.js,v $
 				szUrl = "../.."+szUrl;
 			}
 
+			if ( opt.map ){
+				szUrl += "&svggis="+opt.map;
+			}
 			if ( opt.mapUrl ){
 				szUrl += "&svggis="+opt.mapUrl;
+			}
+			if ( opt.mapSVG ){
+				szUrl += "&svggis="+opt.mapSVG;
 			}
 			if ( opt.search ){
 				szUrl += "&search="+opt.search;
