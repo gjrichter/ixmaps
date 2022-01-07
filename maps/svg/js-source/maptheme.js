@@ -97,6 +97,7 @@ var themeStyleTranslateA = [
 	,{ style: "dbtableUrl"		,obj: "coTableUrl" }
 	,{ style: "dbtableType"		,obj: "coTableType" }
 	,{ style: "dbtableExt"		,obj: "coTableExt" }
+	,{ style: "dbtableProcess"	,obj: "coTableProcess" }
 	,{ style: "datacache"		,obj: "fDataCache" }
 	,{ style: "itemfield"		,obj: "szItemField" }
 	,{ style: "lookupfield"		,obj: "szSelectionField" }
@@ -773,6 +774,9 @@ Map.Themes.prototype.parseStyle = function (mapTheme, styleObj) {
 		}
 		if (__isdef(styleObj.dbtableExt)) {
 			mapTheme.coTableExt = styleObj.dbtableExt;
+		}
+		if (__isdef(styleObj.dbtableProcess)) {
+			mapTheme.coTableProcess = styleObj.dbtableProcess;
 		}
 		if (__isdef(styleObj.lookupfield)) {
 			mapTheme.szSelectionField = mapTheme.szItemField = styleObj.lookupfield;

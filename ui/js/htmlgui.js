@@ -1058,6 +1058,9 @@ $Log: htmlgui.js,v $
 				if (i == "ext") {
 					theme.style["dbtableExt"] = theme.data[i];
 				} else
+				if (i == "process") {
+					theme.style["dbtableProcess"] = theme.data[i].replace(/\r\n|\r|\n|\t/g," ");
+				} else
 				if (i == "cache") {
 					theme.style["datacache"] = theme.data[i];
 				} else
@@ -1070,16 +1073,14 @@ $Log: htmlgui.js,v $
 					theme.style[i] = theme.data[i];
 				}
 			}
-			// GR 07.01.2022 new: user defined a data processing function given by string
-			if (theme.data["process"]){
-				eval("ixmaps."+theme.style["dbtable"]+" = ixmaps."+theme.style["dbtable"]+" || {}");
-				eval("ixmaps."+theme.style["dbtable"]+".process = "+theme.data[i]);
-			}
 		}
 
+		// GR 07.01.2022 new: user defined a data processing function given by string
+		if (theme.style["dbtableProcess"]){
+			eval("ixmaps."+theme.style["dbtable"]+" = ixmaps."+theme.style["dbtable"]+" || {}");
+			eval("ixmaps."+theme.style["dbtable"]+".process = "+theme.style["dbtableProcess"]);
+		}
 
-		
-		
 		try {
 			ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(theme);
 		} catch (e) {}
