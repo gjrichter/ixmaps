@@ -2335,6 +2335,10 @@ $Log: htmlgui_api.js,v $
 			ixmaps.setMapTypeId(this.szMap,szMapTypeId);
 			return this;
 		},
+		maptype: function(szMapTypeId){
+			ixmaps.setMapTypeId(this.szMap,szMapTypeId);
+			return this;
+		},
 		
 		setBounds: function(bounds){
 			ixmaps.setBounds(this.szMap,bounds);
