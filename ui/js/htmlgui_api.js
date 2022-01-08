@@ -2428,6 +2428,10 @@ $Log: htmlgui_api.js,v $
 			ixmaps.newTheme(this.szMap,title,theme,flag);
 			return this;
 		},
+		layer: function(theme,flag){
+			ixmaps.newTheme(this.szMap,"layer",theme,flag);
+			return this;
+		},
 
 		changeThemeStyle: function(szTheme,style,flag){
 			ixmaps.changeThemeStyle(this.szMap,szTheme,style,flag);
