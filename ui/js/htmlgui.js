@@ -2866,6 +2866,18 @@ $Log: htmlgui.js,v $
 	};
 
 	/**
+	 * set legend
+	 * @param {String} legend (html)
+	 * @return void
+	 * @example
+	 * ixmaps.setLegend("Title");
+	 */
+	ixmaps.setLegend = function (legend) {
+		ixmaps.legend = ixmaps.legend || {};
+		ixmaps.legend.url = (typeof (legend) != "undefined") ? legend : ixmaps.legend.url;
+	};
+
+	/**
 	 * set an ixmaps project from JSON   
 	 * @param project the JSON object to define the project
 	 * @param szFlag optional switches to set only parts of a project

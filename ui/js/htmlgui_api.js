@@ -1784,6 +1784,19 @@ $Log: htmlgui_api.js,v $
 	};
 
 	/**
+	 * set legend by string
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szLegend the legend definition string (HTML)
+	 * @return void
+	 * @example
+	 *	ixmaps.setLegend("map","Title");
+	 *	});
+	 */
+	ixmaps.setLegend = function(szMap,szLegend){
+		this.dispatchToEmbeddedApi(szMap,"setLegend",[szLegend]);
+	};
+
+	/**
 	 * set external data
 	 * make data present as JavaScript object usable by theme definitions
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
@@ -2361,6 +2374,10 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 		
+		legend: function(legend){
+			ixmaps.setLegend(this.szMap,legend);
+			return this;
+		},
 
 		setData: function(data,options){
 			ixmaps.setExternalData(this.szMap,data,options);
