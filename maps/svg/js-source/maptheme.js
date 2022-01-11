@@ -17206,12 +17206,6 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			// --------------------------
 			else {
 
-				// GR 22.07.2017 no value -> no chart part
-				// exception PLOT - there we need zero symbols!
-				if (!nValue && !szFlag.match(/PLOT|NOSIZE/)) {
-					continue;
-				}
-
 				var nMaxRadius = map.Scale.normalX(nChartSize / 2);
 				var nMaxValue = this.nNormalSizeValue || nAllMaxValue;
 
@@ -17238,6 +17232,12 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						nValue = nPartsA[nIndex] * (this.nClipFrames - 1 - this.nActualFrame) / (this.nClipFrames - 1) + nPartsA[nPartsA.length - 1] * this.nActualFrame / (this.nClipFrames - 1);
 					}
 					tValue = nValue;
+				}
+
+				// GR 22.07.2017 no value -> no chart part
+				// exception PLOT - there we need zero symbols!
+				if (!nValue && !szFlag.match(/PLOT|NOSIZE/)) {
+					continue;
 				}
 
 				// calc symbol size (nRadius)
