@@ -5774,7 +5774,7 @@ Map.Event.prototype.defaultMouseMove = function(evt){
 					szId.match(/unchecked/)	
 				) ){
 				if ( szMapToolType == "idle" || (szId == "mapbackground:eventrect") ){
-					HTMLWindow.ixmaps.htmlgui_onSVGPointerIdle();
+					setTimeout("HTMLWindow.ixmaps.htmlgui_onSVGPointerIdle()",1000);
 					return;
 				}
 			}
@@ -5882,6 +5882,11 @@ Map.Event.prototype.doDefaultZoom = function(evt){
 		map.Dom.clearGroup(SVGToolsGroup);
 		map.Dom.clearGroup(SVGFixedGroup);
 		map.removeAllHighlights();
+		// GR 20.01.2022 new remove item ifo display
+		map.Api.clearHighlight();
+		map.Api.clearAllOverlays();
+
+		HTMLWindow.ixmaps.htmlgui_onItemClick("mapbackground:eventrect");
 	}
 
 	// set the new zoom an pan
@@ -9656,7 +9661,11 @@ doDisplayInfo = function(xPos,yPos,szMode){
 
 				var chartBox = map.Dom.getBox(chartGroup);
 				if ( chartBox.width > 0 && chartBox.height > 0 ){
-					var nScale = Math.min(map.Scale.normalX(300)/chartBox.height,map.Scale.normalX(400)/chartBox.width);
+					if (chartTheme.szFlag.match(/PLOT/)){
+						var nScale = Math.min(map.Scale.normalX(300)/chartBox.height,map.Scale.normalX(400)/chartBox.width);
+				    }else{
+						var nScale = Math.min(map.Scale.normalX(150)/chartBox.height,map.Scale.normalX(200)/chartBox.width);
+					}
 					chartGroup.fu.scale(nScale,nScale);
 					chartGroup.fu.setPosition(map.Scale.normalX(nIndent)-chartBox.x*nScale,contentBox.height+map.Scale.normalY(nIndent)-chartBox.y*nScale);
 

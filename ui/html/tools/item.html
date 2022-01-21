@@ -162,11 +162,17 @@
         var oldOpacity = null;
         
 		ixmaps.onMouseOver = function() {
+			
+			if (oldTarget){
+				oldTarget.style.setProperty("fill-opacity",oldOpacity);
+				oldTarget = oldOpacity = null;
+			}
+			
 			var szTooltip = null;
 			var source = oldTarget = event.target;
             
             oldOpacity = oldOpacity || source.style.getPropertyValue("fill-opacity");
-            source.style.setProperty("fill-opacity","1");
+            //source.style.setProperty("fill-opacity","1");
             
 			while (!szTooltip && source) {
 				szTooltip = source.getAttribute("tooltip");
@@ -176,14 +182,36 @@
 				}
 				source = source.parentNode;
 			}
+			// try to format tooltip
+			var szTestA = szTooltip.split(" ");
+			var szValue = "";
+			var szUnit = "";
+			var fValue = true;
+			szTestA.forEach(function(value){
+				if ( fValue && !isNaN(value)){
+					szValue += (value + " ");
+				}else{
+					fValue = false;
+					szUnit += (value + " ");
+				}
+			})
+			if ( szUnit.match(/\%/) ){
+				szUnit = szUnit.replace("\%","");
+				szValue += " %";
+			}
+			szTooltip = "<div style='font-size:0.9em;line-height:1.2em;color:#aaaaaa;max-width:100px'>"+szUnit+"</div><div style='font-size:1.5em;margin:-0em 0.5em -0.1em 0em'>"+szValue+"</div>";
+		
+			event.target.style.setProperty("fill-opacity","1");
 			showTooltip(event, szTooltip);
 			event.stopPropagation();
 			event.preventDefault();
 		};
 
 		ixmaps.onMouseOut = function() {
-            oldTarget.style.setProperty("fill-opacity",oldOpacity);
-            oldTarget = oldOpacity = null;
+			if (oldTarget){
+				oldTarget.style.setProperty("fill-opacity",oldOpacity);
+				oldTarget = oldOpacity = null;
+			}
 			hideTooltip();
 		};
 
@@ -200,8 +228,19 @@
 		 */
 		ixmaps.makeChartHTML = function(szId, szTargetDiv) {
 			
-			var __themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
-
+			var __themeObj = ixmaps.getThemeObj();
+			if (szId.match(/chart/)){
+				__themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
+			}else{
+				// if not chart, get first CHOROPLETH theme
+				var themes = ixmaps.getThemes();
+				for ( i in themes ){
+					if (themes[i].szFlag.match(/CHOROPLETH/)){
+						__themeObj = themes[i];
+						break;
+					}
+				}
+			}
 			if (!__themeObj) {
 				return;
 			}
@@ -229,7 +268,20 @@
 
 
 			if (szId.match(/chart/i)) {
-				var ptNull = __themeObj.drawChart($("#getchartmenutarget")[0], szIdA[1] + "::" + szIdA[3], 30, szFlag);
+				// if plot -> show all plots off this item !!
+				if ( __themeObj.szFlag.match(/PLOT/) ){
+					var themesA = ixmaps.getThemes();
+					for ( var t=0; t<themesA.length; t++ ){
+						var objTheme = themesA[t];
+						if ( objTheme.szFlag.match(/PLOT/) ){
+							objTheme.drawChart($("#getchartmenutarget")[0], szIdA[1] + "::" + szIdA[3], 30, szFlag);
+						}
+					}
+				}else{
+					ptNull = __themeObj.drawChart($("#getchartmenutarget")[0], szIdA[1] + "::" + szIdA[3], 30, szFlag);
+					console.log($("#getchartmenutarget")[0]);
+				}
+				//var ptNull = __themeObj.drawChart($("#getchartmenutarget")[0], szIdA[1] + "::" + szIdA[3], 30, szFlag);
 			} else {
 				__themeObj.parent.getChartAll(szId, $("#getchartmenutarget")[0], szFlag);
 			}

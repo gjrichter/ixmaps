@@ -98,6 +98,7 @@ var themeStyleTranslateA = [
 	,{ style: "dbtableType"		,obj: "coTableType" }
 	,{ style: "dbtableExt"		,obj: "coTableExt" }
 	,{ style: "dbtableProcess"	,obj: "coTableProcess" }
+	,{ style: "dbtableQuery"	,obj: "coTableQuery" }
 	,{ style: "datacache"		,obj: "fDataCache" }
 	,{ style: "itemfield"		,obj: "szItemField" }
 	,{ style: "lookupfield"		,obj: "szSelectionField" }
@@ -612,6 +613,8 @@ Map.Themes.prototype.newThemeByObj = function (themeObj) {
 	mapTheme = new MapTheme(themeObj.layer, themeObj.field, themeObj.field100, styleObj.type, colorSchemeA, styleObj.title, szLabelA);
 	mapTheme.nOrder = this.getThemeCount();
 	mapTheme.szIdStr = szIdStr;
+	
+	mapTheme.origDef = themeObj;
 
 	// parse theme parameter 
 	this.parseStyle(mapTheme, styleObj);
@@ -777,6 +780,9 @@ Map.Themes.prototype.parseStyle = function (mapTheme, styleObj) {
 		}
 		if (__isdef(styleObj.dbtableProcess)) {
 			mapTheme.coTableProcess = styleObj.dbtableProcess;
+		}
+		if (__isdef(styleObj.dbtableQuery)) {
+			mapTheme.coTableQuery = styleObj.dbtableQuery;
 		}
 		if (__isdef(styleObj.lookupfield)) {
 			mapTheme.szSelectionField = mapTheme.szItemField = styleObj.lookupfield;
@@ -1348,7 +1354,13 @@ var __scanScaleValue = function (szScale) {
  * @return the cleared theme object
  * @type string
  */
-Map.Themes.prototype.cleanUpThemeObj = function (themeObj) {
+Map.Themes.prototype.cleanUpThemeObj = function (themeObj,origObj) {
+	
+	// GR 09.01.2022 get original values to save or share theme
+	themeObj.field 			= origObj.field;
+	themeObj.style.values	= origObj.style.value;
+	themeObj.style.label 	= origObj.style.label;
+	themeObj.style.xaxis 	= origObj.style.xaxis;
 
 	var style = themeObj.style;
     var first = null;
@@ -1488,8 +1500,8 @@ Map.Themes.prototype.getMapThemeDefinitionObj = function (szId) {
 		styleObj[a] = sObj[a];
 	}
 	newObj.style = styleObj;
-
-	return this.cleanUpThemeObj(newObj);
+	
+	return this.cleanUpThemeObj(newObj,themeObj.origDef);
 };
 
 /**

@@ -44,7 +44,7 @@
 	<link rel="stylesheet" type="text/css" href="../css/legend.css" />
 	<link rel="stylesheet" type="text/css" href="../css/main.css" />
 
-	<link rel="stylesheet" href="//unpkg.com/leaflet-gesture-handling/dist/leaflet-gesture-handling.min.css" type="text/css">
+	<link rel="stylesheet" href="../../ui/libs/leaflet-gesture-handling/leaflet-gesture-handling.min.css" type="text/css">
 	
 	<!--========================================================================= -->
 	<style>
@@ -394,11 +394,11 @@
 
 <script src="../../ui/libs/leaflet-1.3.4/leaflet.js"></script>
 
-<script src="//unpkg.com/leaflet-gesture-handling"></script>
+<script src="../../ui/libs/leaflet-gesture-handling/leaflet-gesture-handling.min.js"></script>
 
 <!--========================================================================= -->
 
-<script src="https://unpkg.com/topojson-client@3"></script>
+<script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 
 <!--========================================================================= -->
 
@@ -938,6 +938,9 @@
 			}else{
                 if (szId.match(/mapbackground:eventrect/)){
                     $("#switchinfobutton").hide();
+					$("#item").dialog("destroy");
+					ixmaps.embeddedSVG.window.map.Api.clearHighlight();
+					ixmaps.embeddedSVG.window.map.Api.clearAllOverlays();
                 }else{
 					var szItemUrl = "./tools/item.html";
 					if ( ixmaps.item && 
@@ -953,6 +956,10 @@
 					}
 					if (ixmaps.item || ixmaps.loadedProject.map.item){
 						ixmaps.szMapItemId = ixmaps.parentApi.szMapItemId = szId;
+						if ($("#item")[0]){
+							$("#item")[0].innerHTML = "";
+						}
+						
 						window.idialog = this.openDialog(null,'item',szItemUrl,'Item info','70,100',480,660);
 						ixmaps.onDialogClose = function(){
 							ixmaps.embeddedSVG.window.map.Api.clearHighlight();

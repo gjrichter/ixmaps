@@ -1059,7 +1059,10 @@ $Log: htmlgui.js,v $
 					theme.style["dbtableExt"] = theme.data[i];
 				} else
 				if (i == "process") {
-					theme.style["dbtableProcess"] = theme.data[i].replace(/\r\n|\r|\n|\t/g," ");
+					theme.style["dbtableProcess"] = theme.data[i].replace(/\s\s+/g, ' ');
+				} else
+				if (i == "query") {
+					theme.style["dbtableQuery"] = theme.data[i].replace(/\s\s+/g, ' ');
 				} else
 				if (i == "cache") {
 					theme.style["datacache"] = theme.data[i];
@@ -1077,8 +1080,20 @@ $Log: htmlgui.js,v $
 
 		// GR 07.01.2022 new: user defined a data processing function given by string
 		if (theme.style["dbtableProcess"]){
-			eval("ixmaps."+theme.style["dbtable"]+" = ixmaps."+theme.style["dbtable"]+" || {}");
-			eval("ixmaps."+theme.style["dbtable"]+".process = "+theme.style["dbtableProcess"]);
+			try {
+				eval("ixmaps."+theme.style["dbtable"]+" = ixmaps."+theme.style["dbtable"]+" || {}");
+				eval("ixmaps."+theme.style["dbtable"]+".process = "+theme.style["dbtableProcess"]);
+			} catch (e) {
+				ixmaps.error("data.process - function not valid: '" + e, 2000);
+			}
+		}
+		if (theme.style["dbtableQuery"]){
+			try {
+				eval("ixmaps."+theme.style["dbtable"]+" = ixmaps."+theme.style["dbtable"]+" || {}");
+				eval("ixmaps."+theme.style["dbtable"]+" = "+theme.style["dbtableQuery"]);
+			} catch (e) {
+				ixmaps.error("data.query - function not valid: '" + e, 2000);
+			}
 		}
 
 		try {
@@ -2549,7 +2564,7 @@ $Log: htmlgui.js,v $
 		}
 
 		ixmaps.showLoadingArray(["loading data ...", " ... "]);
-
+		
 		$.getScript("../../../data.min.js/data.js")
 			.done(function (script, textStatus) {
 
@@ -2960,7 +2975,7 @@ $Log: htmlgui.js,v $
 
 		szFlag = szFlag || "";
 
-		if (project) {
+		if (project && project.map) {
 			
 			if ((typeof (project.map) != "string") && !szFlag.match(/themeonly|add|replace/i)) {
 
@@ -3261,7 +3276,7 @@ $Log: htmlgui.js,v $
 			project.required = ixmaps.loadedProject.required;
 		}
 		
-		if (ixmaps.loadedProject && ixmaps.loadedProject.map.localize) {
+		if (ixmaps.loadedProject && ixmaps.loadedProject.map && ixmaps.loadedProject.map.localize) {
 			project.map.localize = ixmaps.loadedProject.map.localize;
 		}
 		

@@ -2273,7 +2273,8 @@ $Log: htmlgui_api.js,v $
 	// =====================================================
 
 	/**
-	 * Create a new ixmaps.themeApi instance.  
+	 * the ixmaps.themeApi class
+	 * provides methods to manipulate realized map themes
 	 * @class It realizes an object to hold a theme handle
 	 * @constructor
 	 * @param {String} [szMap] the name of the map, to define if more than one map present
@@ -2320,7 +2321,8 @@ $Log: htmlgui_api.js,v $
 	};
 
 	/**
-	 * Create a new ixmaps.mapApi instance.  
+	 * the ixmaps.mapApi class.  
+	 * provides methods to handle maps
 	 * @class It realizes an object to hold a map handle
 	 * @constructor
 	 * @param {String} [szMap] the name of the map, to define if more than one map present
@@ -2453,13 +2455,17 @@ $Log: htmlgui_api.js,v $
 		},
 
 		loadProject: function(szUrl,szFlag){
-			console.log(szUrl);
 			ixmaps.loadProject(this.szMap,szUrl,szFlag);
 			return this;
 		},
 
 		setProject: function(szProject){
 			ixmaps.setProject(this.szMap,szProject);
+			return this;
+		},
+
+		project: function(szUrl,szFlag){
+			ixmaps.loadProject(this.szMap,szUrl,szFlag);
 			return this;
 		},
 
@@ -2470,18 +2476,120 @@ $Log: htmlgui_api.js,v $
 		
 		getData: function(szItem){
 			return ixmaps.getData(this.szMap,szItem);
+		},
+		
+		require: function(szUrl){
+			ixmaps.require(this.szMap,szUrl);
+			return this;
+		},
+		
+		theme: function(szTheme){
+			return new ixmaps.themeApi(this.szMap,szTheme);
 		}
-
 	};
 
-	ixmaps.mapApi.prototype.theme = function(szTheme) {
-		return new ixmaps.themeApi(this.szMap,szTheme);
+	/**
+	 * ixmaps.themeConstruct  
+	 * @class It realizes an object to create a theme JSON 
+	 * @constructor
+	 * @param {Object} [map] a map object to define the theme for
+	 * @return A new ixmaps.themeConstruct object
+	 */
+	
+	ixmaps.themeConstruct = function(szMap,szLayer){
+		this.szMap = szMap || null;
+		this.def = {};
+		this.def.layer = szLayer || "generic";
+		this.def.data = {};	
+		this.def.style = {type:"CHART|DOT"};
+		this.def.field = "$item$";
 	};
-
+	ixmaps.themeConstruct.prototype = {
+		data: function(dataObj,szType,szName){
+			var szName = szName || "DBTABLE"+Math.floor(Math.random()*100000000);
+			this.def.data.name = szName;
+			if (dataObj){
+				if ( typeof(dataObj) == "string" ){
+					this.def.data.url = dataObj;
+					this.def.data.type = szType;
+				}else{
+					ixmaps.setData(this.szMap,dataObj,{type:szType,name:szName});
+				}
+			}else{
+				this.def.data.type = szType || "ext";
+			}
+			return this;
+		},
+		process: function(szProcess){
+			this.def.data.process = szProcess;
+			return this;
+		},
+		query: function(szQuery){
+			this.def.data.query = szQuery;
+			return this;
+		},
+		field: function(szName){
+			this.def.field = szName;
+			return this;
+		},
+		field100: function(szName){
+			this.def.field100 = szName;
+			return this;
+		},
+		lookup: function(szName){
+			this.def.style.lookupfield = szName;
+			return this;
+		},
+		geo: function(szName){
+			this.def.style.lookupfield = szName;
+			return this;
+		},
+		type: function(szType){
+			this.def.style.type = szType;
+			return this;
+		},
+		style: function(styleObj){
+			for (var i in styleObj){
+				this.def.style[i] = styleObj[i];
+			}
+			return this;
+		},
+		title: function(szTitle){
+			this.def.style.title = szTitle;
+			return this;
+		},
+		// get the theme definition object (JSON)
+		definition: function(){
+			return this.def;
+		},
+		// get the theme definition object (JSON)
+		json: function(){
+			return this.def;
+		}
+		
+	};
+	
+	/**
+	 * ixmaps.map 
+	 * get an ixmaps.mapApi instance
+	 * @param {String} [szMap] a map name to get the handle from
+	 * @return A new ixmaps.mapApi instance
+	 */
 	ixmaps.map = function(szMap){
 		return new ixmaps.mapApi(szMap);
 	};
+	
 
+	/**
+	 * ixmaps.theme 
+	 * get an ixmaps.themeConstructer instance
+	 * @param {Object} [map] a map handle to define the theme for
+	 * @return A new ixmaps.themeConstruct instance
+	 */
+	ixmaps.theme = function(szMap,szLayer){
+		return new ixmaps.themeConstruct(szMap,szLayer);
+	}
+	
 
 	// generate iframe and embed a map
 	// --------------------------------------
@@ -2634,7 +2742,7 @@ $Log: htmlgui_api.js,v $
 
 			var target = window.document.getElementById(szTargetDiv);
 
-			var szName = opt.mapName || opt.name || "map" + String(Math.random()).split(".")[1];
+			var szName = opt.mapName || opt.name || szTargetDiv || "map" + String(Math.random()).split(".")[1];
 			var szBasemap = opt.mapService || opt.basemap || "leaflet";
 			var szMapType = opt.mapType || opt.maptype || "CartoDB - Positron";
 
@@ -2750,6 +2858,27 @@ $Log: htmlgui_api.js,v $
 		//});
 	}
 
+	ixmaps.getGeoFields = function(data){
+		
+		var fields = data.columnNames();
+		var lat = null;
+		var lon = null;
+		
+		for (var i in fields) {
+			if (fields[i].match(/latitud/i) || (fields[i] == "lat") || (fields[i] == "LAT") || (fields[i] == "Y") || (fields[i] == "y")) {
+				lat = fields[i];
+			}
+			if (fields[i].match(/longitud/i) || (fields[i] == "lon") || (fields[i] == "long") || (fields[i] == "lng") || (fields[i] == "LON") || (fields[i] == "LNG") || (fields[i] == "X")|| (fields[i] == "x")) {
+				lon = fields[i];
+			}
+		}
+		if ( lat && lon ){
+			return lat + "|" + lon;
+		}
+		
+		return null;
+	};
+	
 
 }( window.ixmaps = window.ixmaps || {} ));
 

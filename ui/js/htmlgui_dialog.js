@@ -408,7 +408,6 @@ $Log: htmlgui.js,v $
 		var szProject = ixmaps.getProjectString();
 		// test project string size
 		// URL strings > 5000 lead to browser error
-		alert("hi");
 		if ( szProject.length > 4000 ){
 			// if we have a project URL (.json) return this
 			if ( ixmaps.loadedProjectUrl ){
@@ -418,7 +417,6 @@ $Log: htmlgui.js,v $
 			if ( ixmaps.loadedProject ){
 				szProject = JSON.stringify(ixmaps.loadedProject);
 			}
-			
 		}
 		var szQuery = "&legend=1&project=" + szProject;
 		// if szProject is JSON, encode URI
