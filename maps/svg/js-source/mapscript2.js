@@ -5885,8 +5885,6 @@ Map.Event.prototype.doDefaultZoom = function(evt){
 		// GR 20.01.2022 new remove item ifo display
 		map.Api.clearHighlight();
 		map.Api.clearAllOverlays();
-
-		HTMLWindow.ixmaps.htmlgui_onItemClick("mapbackground:eventrect");
 	}
 
 	// set the new zoom an pan
