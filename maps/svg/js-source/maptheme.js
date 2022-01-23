@@ -1358,7 +1358,7 @@ Map.Themes.prototype.cleanUpThemeObj = function (themeObj,origObj) {
 	
 	// GR 09.01.2022 get original values to save or share theme
 	themeObj.field 			= origObj.field;
-	themeObj.style.values	= origObj.style.value;
+	themeObj.style.values	= origObj.style.values;
 	themeObj.style.label 	= origObj.style.label;
 	themeObj.style.xaxis 	= origObj.style.xaxis;
 
