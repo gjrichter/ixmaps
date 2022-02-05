@@ -9667,7 +9667,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 					chartGroup.fu.scale(nScale,nScale);
 					chartGroup.fu.setPosition(map.Scale.normalX(nIndent)-chartBox.x*nScale,contentBox.height+map.Scale.normalY(nIndent)-chartBox.y*nScale);
 
-					var nYpos = chartBox.y+chartBox.height+map.Scale.normalY(nIndent);
+					var nYpos = chartBox.y+chartBox.height+map.Scale.normalY(nIndent)/nScale;
 
 					// add title
 					var nFontScale = 1.5/nScale;

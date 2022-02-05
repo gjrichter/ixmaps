@@ -8306,7 +8306,11 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 				if (this.fSelectionFieldToUpper) {
 					szId2 = String(szId2).toUpperCase();
 				}
-				ptPos2 = this.getNodePosition(szThemeLayer + "::" + szId2);
+				
+				// GR 28.01.2022 look for positions in all layer
+				for (var i = 0; i < this.szThemesA.length; i++) {
+					ptPos2 = ptPos2 || this.getNodePosition(this.szThemesA[i] + "::" + szId2);
+				}
 			}
 
 			// GR 10.03.2019 new fSelection2 defined, make item id and store position 2 (needed for DIRECTION or VECTOR)
@@ -11456,6 +11460,11 @@ MapTheme.prototype.unpaintMap = function () {
 					}
 				}
 			}
+			
+			// GR 04.02.2022 if chart is reference for autoscale, clear master scales
+			if (this.fAutoScaleLeader){
+				map.Themes.autoScale = null;
+			}
 
 			map.Dom.clearGroup(this.chartGroup);
 			//var szId = this.chartGroup.getAttributeNS(null, "id");
@@ -14026,7 +14035,8 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					// are most probably caused by coordinate transition (-180 -> 178) or so
 					// we treat them like coordinate overflow and add/subtract max width
 					if ( Math.abs(pt.x-ptAct.x) > (maxLenX*0.99) ) {
-						pt.x += (pt.x<0)?maxLenX:-maxLenX;
+						//pt.x += (pt.x<0)?maxLenX:-maxLenX;
+						pt = map.Scale.getMapPositionOfLatLon(coordinatesA[ii][1],coordinatesA[ii][0]+((pt.x<0)?360:-360));
 					}
 					d += (pt.x-ptAct.x) +','+ (pt.y-ptAct.y) +" ";
 					ptAct = new point(pt.x, pt.y);
@@ -14057,7 +14067,8 @@ MapTheme.prototype.chartMap = function (startIndex) {
 						// are most probably caused by coordinate transition (-180 -> 178) or so
 						// we treat them like coordinate overflow and add/subtract max width
 						if ( Math.abs(pt.x-ptAct.x) > (maxLenX*0.99) ) {
-							pt.x += (pt.x<0)?maxLenX:-maxLenX;
+							//pt.x += (pt.x<0)?maxLenX:-maxLenX;
+							pt = map.Scale.getMapPositionOfLatLon(coordinatesA[ii][1],coordinatesA[ii][0]+((pt.x<0)?360:-360));
 						}
 						d += (pt.x-ptAct.x) +','+ (pt.y-ptAct.y) +" ";
 						ptAct = new point(pt.x, pt.y);
@@ -14090,7 +14101,8 @@ MapTheme.prototype.chartMap = function (startIndex) {
 						// are most probably caused by coordinate transition (-180 -> 178) or so
 						// we treat them like coordinate overflow and add/subtract max width
 						if ( Math.abs(pt.x-ptAct.x) > (maxLenX*0.99) ) {
-							pt.x += (pt.x<0)?maxLenX:-maxLenX;
+							//pt.x += (pt.x<0)?maxLenX:-maxLenX;
+							pt = map.Scale.getMapPositionOfLatLon(coordinatesA[ii][1],coordinatesA[ii][0]+((pt.x<0)?360:-360));
 						}
 						
 						x += pt.x;
@@ -14136,7 +14148,8 @@ MapTheme.prototype.chartMap = function (startIndex) {
 							// are most probably caused by coordinate transition (-180 -> 178) or so
 							// we treat them like coordinate overflow and add/subtract max width
 							if ( Math.abs(pt.x-ptAct.x) > (maxLenX*0.99) ) {
-								pt.x += (pt.x<0)?maxLenX:-maxLenX;
+								//pt.x += (pt.x<0)?maxLenX:-maxLenX;
+								pt = map.Scale.getMapPositionOfLatLon(coordinatesA[ii][1],coordinatesA[ii][0]+((pt.x<0)?360:-360));
 							}
 							
 							x[p] += pt.x;
@@ -14564,7 +14577,10 @@ MapTheme.prototype.chartMap = function (startIndex) {
 			// so, if we have another curve for the same map id (a), 
 			// me must know the size of the existing plot to fit the new one in
 			// map.Themes.autoScale holds a plot scale for every map chart position (a)
-			map.Themes.autoScale = map.Themes.autoScale || [];
+			if (!map.Themes.autoScale){
+				this.fAutoScaleLeader = true;
+				map.Themes.autoScale = [];
+			}
 			nAutoScale = map.Themes.autoScale[a] = map.Themes.autoScale[a] || nAutoScale;
 		}
 
@@ -19948,7 +19964,7 @@ MapTheme.prototype.getNodePosition = function (a) {
 				var bBox = map.Dom.getBox(sNode);
 			} else {
 				var szCenter = sNode.getAttributeNS(szMapNs, "center");
-				if (!szCenter) {
+				if (!szCenter && sNode.parentNode) {
 					szCenter = sNode.parentNode.getAttributeNS(szMapNs, "center");
 				}
 				if (szCenter && szCenter.length > 2) {
@@ -21545,7 +21561,7 @@ MapTheme.prototype.removeElements = function (evt) {
 	this.clearWMS();
 	
 	// remove FEATURE generated groups in layer pane
-	if (this.szFlag.match(/FEATURE/)) {
+	if (this.szFlag.match(/FEATURE/) && this.chartGroup) {
 		var labelGroup = SVGDocument.getElementById(this.chartGroup.getAttributeNS(null,"id") + ":label");
 		this.chartGroup.parentNode.removeChild(labelGroup);
 		this.chartGroup.parentNode.removeChild(this.chartGroup);
