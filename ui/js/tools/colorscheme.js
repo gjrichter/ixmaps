@@ -171,6 +171,16 @@ function _circ_createColorScheme(cc1, cc2, nSteps, nParam1, nParam2 ){
 		 cc1 == "Tableau" ){
 		return _circ_createPaletteColorScheme("tableau",nSteps,Number(cc2));
 	}
+	if ( cc1 == "tableau10" ||
+		 cc1 == "TABLEAU10" ||
+		 cc1 == "Tableau10" ){
+		return _circ_createPaletteColorScheme("tableau10",nSteps,Number(cc2));
+	}
+	if ( cc1 == "tableau20" ||
+		 cc1 == "TABLEAU20" ||
+		 cc1 == "Tableau20" ){
+		return _circ_createPaletteColorScheme("tableau20",nSteps,Number(cc2));
+	}
 	nSteps = Number(nSteps);	
 
 	if ( nSteps < 2 ){
@@ -1067,6 +1077,58 @@ var __tableauColors = new Array(
 	"#d7b5a6"
 	);
 
+var __tableauColors20 = new Array(
+	"#1F77B4",
+	"#AEC7E8",
+	"#FF7F0E",
+	"#FFBB78",
+	"#2CA02C",
+	
+	"#98DF8A",
+	"#D62728",
+	"#FF9896",
+	"#9467BD",
+	"#C5B0D5",
+	
+	"#8C564B",
+	"#C49C94",
+	"#E377C2",
+	"#F7B6D2",
+	"#7F7F7F",
+	
+	"#C7C7C7",
+	"#BCBD22",
+	"#DBDB8D",
+	"#17BECF",
+	"#9EDAE5"
+	);
+
+var __tableauColors10 = new Array(
+	"#1F77B4",
+	"#FF7F0E",
+	"#2CA02C",
+	"#D62728",
+	"#9467BD",
+	
+	"#8C564B",
+	"#E377C2",
+	"#7F7F7F",
+	"#BCBD22",
+	"#17BECF",
+	
+	"#1F77B4",
+	"#FF7F0E",
+	"#2CA02C",
+	"#D62728",
+	"#9467BD",
+	
+	"#8C564B",
+	"#E377C2",
+	"#7F7F7F",
+	"#BCBD22",
+	"#17BECF"
+	);
+
 var __colorPaletteA = new Array();
 __colorPaletteA["office"]  = __officeColors;
 __colorPaletteA["mineral"] = __mineralColors;
@@ -1079,6 +1141,8 @@ __colorPaletteA["pimp"]   = __pimpColors;
 __colorPaletteA["intense"]   = __intenseColors;
 __colorPaletteA["fluo"]   = __fluoColors;
 __colorPaletteA["tableau"]   = __tableauColors;
+__colorPaletteA["tableau10"]   = __tableauColors10;
+__colorPaletteA["tableau20"]   = __tableauColors20;
 
 function _circ_createPaletteColorScheme(szPalette,nColors,nOffset){
 	var colorPalette = __colorPaletteA[szPalette];

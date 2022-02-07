@@ -1039,12 +1039,26 @@ $Log: htmlgui.js,v $
 			theme.style.title = szThemeName;
 		}
 
+		// GR 30.01.2021 
+		//
+		if (theme.type) {
+			theme.style["type"] = theme.type;
+		}
+		
+		// GR 30.01.2021  
+		//
+		if (theme.meta) {
+			for (var i in theme.meta) {
+				theme.style[i] = theme.meta[i];
+			}
+		}
+		
 		// GR 10.01.2019 new theme object data{} --> old JSON structure -> object style 
 		//
 		if (theme.data) {
 			for (var i in theme.data) {
 				if (i == "obj") {
-					theme.style["dbtable"] = theme.data[i];
+					theme.style["dbtableObj"] = theme.data[i];
 				} else
 				if (i == "name") {
 					theme.style["dbtable"] = theme.data[i];
@@ -1076,6 +1090,69 @@ $Log: htmlgui.js,v $
 					theme.style[i] = theme.data[i];
 				}
 			}
+		}
+		
+		// GR 24.01.2022 new theme object binding{} --> old JSON structure -> object style 
+		//
+		if (theme.binding) {
+			for (var i in theme.binding) {
+				if ((i == "id") ||
+					(i == "item") ||
+				    (i == "itemfield")) {
+					theme.style["itemfield"] = theme.binding[i];
+				} else
+				if ((i == "geo") ||
+					(i == "georef") ||
+					(i == "position") ||
+					(i == "lookup") ||
+					(i == "lookupfield")) {
+					theme.style["lookupfield"] = theme.binding[i];
+				} else
+				if ((i == "geo2") ||
+					(i == "lookup2") ||
+					(i == "lookupfield2")) {
+					theme.style["lookupfield2"] = theme.binding[i];
+				} else
+				if ((i == "value") ||
+					(i == "values") ||
+					(i == "field") ||
+					(i == "fields")) {
+					theme["field"] = theme.binding[i];
+				} else
+				if ((i == "value100") ||
+					(i == "field100")){
+					theme["field100"] = theme.binding[i];
+				} else
+				if ((i == "size") ||
+					(i == "sizefield")) {
+					theme.style["sizefield"] = theme.binding[i];
+				} else
+				if ((i == "color") ||
+					(i == "colorfield")) {
+					theme.style["colorfield"] = theme.binding[i];
+				} else
+				if ((i == "alpha") || 
+					(i == "alphafield")) {
+					theme.style["alphfield"] = theme.binding[i];
+				} else
+				if ((i == "title") ||
+					(i == "titlefield")) {
+					theme.style["titlefield"] = theme.binding[i];
+				} else
+				if ((i == "aggregation") ||
+					(i == "aggregationfield")) {
+					theme.style["aggregationfield"] = theme.binding[i];
+				}
+			}
+		}
+
+		// GR 25.01.2022 new: user defined data given by object
+		if ( theme.style["dbtableObj"] ){
+			ixmaps.setExternalData(
+					   theme.style["dbtableObj"],
+					   {type:theme.style["dbtableType"],name:theme.style["dbtable"]});
+			theme.style["dbtableObj"] = null;
+			theme.style["dbtableType"] = null;
 		}
 
 		// GR 07.01.2022 new: user defined a data processing function given by string
@@ -2666,7 +2743,7 @@ $Log: htmlgui.js,v $
 						cache: options.theme.fDataCache
 					});
 
-					var broker = new Data.Broker();
+					var broker = new Data.Broker(options);
 					broker.addSource(szUrl, options.type)
 						.error(function (e) {
 							ixmaps.error("loading data error: " + e + "\n \n<span style='color:#ddd'>" + szUrl + "</span>");
@@ -2680,6 +2757,11 @@ $Log: htmlgui.js,v $
 							ixmaps.hideLoading();
 
 							var themeDataObj = dataA[0];
+
+							if ( !themeDataObj ){
+								ixmaps.error("loading data error: '" + szUrl + "' could not be loaded !", 2000);
+								return;
+							}
 
 							// if there is an ext data after processor defined, call it
 							// --------------------------------------------------

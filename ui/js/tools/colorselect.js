@@ -156,6 +156,8 @@
 		colorSchemesA['intense']	= "intense,,,";
 		colorSchemesA['fluo']		= "fluo,,,";
 		colorSchemesA['tableau']	= "tableau,,,";
+		colorSchemesA['tableau10']	= "tableau10,,,";
+		colorSchemesA['tableau20']	= "tableau20,,,";
 
 	__getThemeColorDef = function(szColor){
 		return colorSchemesA[szColor];

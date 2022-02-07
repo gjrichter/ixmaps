@@ -2330,6 +2330,7 @@ $Log: htmlgui_api.js,v $
 	 */
 	ixmaps.mapApi = function(szMap){
 		this.szMap = szMap||null;
+		ixmaps.__mapApi = this;
 	};
 	ixmaps.mapApi.prototype = {
 
@@ -2337,7 +2338,7 @@ $Log: htmlgui_api.js,v $
 			ixmaps.setMapTypeId(this.szMap,szMapTypeId);
 			return this;
 		},
-		maptype: function(szMapTypeId){
+		mapType: function(szMapTypeId){
 			ixmaps.setMapTypeId(this.szMap,szMapTypeId);
 			return this;
 		},
@@ -2396,6 +2397,11 @@ $Log: htmlgui_api.js,v $
 
 		setExternalData: function(data,options){
 			ixmaps.setExternalData(this.szMap,data,options);
+			return this;
+		},
+
+		localize: function(szGlobal,szLocal){
+			ixmaps.setLocal(this.szMap,szGlobal,szLocal);
 			return this;
 		},
 
@@ -2483,8 +2489,13 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 		
-		theme: function(szTheme){
-			return new ixmaps.themeApi(this.szMap,szTheme);
+		theme: function(szTheme,flag){
+			if ( typeof(szTheme) == "string" ){
+				return new ixmaps.themeApi(this.szMap,szTheme);
+			}else{
+				ixmaps.newTheme(this.szMap,"layer",szTheme,flag);
+				return this;
+			}
 		}
 	};
 
@@ -2496,8 +2507,8 @@ $Log: htmlgui_api.js,v $
 	 * @return A new ixmaps.themeConstruct object
 	 */
 	
-	ixmaps.themeConstruct = function(szMap,szLayer){
-		this.szMap = szMap || null;
+	ixmaps.themeConstruct = function(szLayer){
+		this.szMap = ixmaps.__mapApi.szMap;
 		this.def = {};
 		this.def.layer = szLayer || "generic";
 		this.def.data = {};	
@@ -2510,13 +2521,53 @@ $Log: htmlgui_api.js,v $
 			this.def.data.name = szName;
 			if (dataObj){
 				if ( typeof(dataObj) == "string" ){
-					this.def.data.url = dataObj;
-					this.def.data.type = szType;
+					if (szType == "ext" ){
+						this.def.data.ext = dataObj;
+						this.def.data.type = szType;
+					}else{
+						this.def.data.url = dataObj;
+						this.def.data.type = szType;
+					}
 				}else{
-					ixmaps.setData(this.szMap,dataObj,{type:szType,name:szName});
+					if ( szType ){
+						this.def.data.obj = dataObj;
+						this.def.data.szType = szType;
+					}else{
+						for (var i in dataObj){
+							this.def.data[i] = dataObj[i];
+						}
+					}
+					
+					if (dataObj.name){
+						this.def.data.name = dataObj.name;	
+					}
+					if (dataObj.url){
+						this.def.data.type = szType || dataObj.type;
+						if (this.def.data.type && (this.def.data.type == "ext") ){
+							this.def.data.ext = dataObj.url;
+						}else{
+							this.def.data.url = dataObj.url;
+						}
+					}else
+					if (dataObj.ext){
+						this.def.data.ext = dataObj.ext;
+						this.def.data.type = szType || dataObj.type || "ext";
+					}else
+					if (dataObj.query){
+						this.def.data.query = dataObj.query;
+						this.def.data.type = szType || dataObj.type || "ext";
+					}else{
+						this.def.data.type = szType;
+						//ixmaps.setData(this.szMap,dataObj,{type:szType,name:szName});
+					}
+					
 				}
 			}else{
 				this.def.data.type = szType || "ext";
+			}
+			if ( this.def.data.type && this.def.data.type.match(/geojson|topojson/i) ){
+				this.def.style.lookupfield = "geometry";	
+				this.def.style.type = "FEATURES|NOLEGEND";	
 			}
 			return this;
 		},
@@ -2544,13 +2595,28 @@ $Log: htmlgui_api.js,v $
 			this.def.style.lookupfield = szName;
 			return this;
 		},
+		binding: function(bObj){
+			this.def.binding = this.def.binding || {};
+			for (var i in bObj){
+				this.def.binding[i] = bObj[i];
+			}
+			return this;
+		},
 		type: function(szType){
 			this.def.style.type = szType;
 			return this;
 		},
 		style: function(styleObj){
+			this.def.style = this.def.style || {};
 			for (var i in styleObj){
 				this.def.style[i] = styleObj[i];
+			}
+			return this;
+		},
+		meta: function(styleObj){
+			this.def.meta = this.def.meta || {};
+			for (var i in styleObj){
+				this.def.meta[i] = styleObj[i];
 			}
 			return this;
 		},
@@ -2562,7 +2628,9 @@ $Log: htmlgui_api.js,v $
 		definition: function(){
 			return this.def;
 		},
-		// get the theme definition object (JSON)
+		define: function(){
+			return this.def;
+		},
 		json: function(){
 			return this.def;
 		}
@@ -2583,13 +2651,22 @@ $Log: htmlgui_api.js,v $
 	/**
 	 * ixmaps.theme 
 	 * get an ixmaps.themeConstructer instance
-	 * @param {Object} [map] a map handle to define the theme for
+	 * @param {String} [szLayer] the name of a layer to define or to refer
 	 * @return A new ixmaps.themeConstruct instance
 	 */
-	ixmaps.theme = function(szMap,szLayer){
-		return new ixmaps.themeConstruct(szMap,szLayer);
+	ixmaps.theme = function(szLayer){
+		return new ixmaps.themeConstruct(szLayer);
 	}
 	
+	/**
+	 * ixmaps.layer 
+	 * get an ixmaps.themeConstructer instance
+	 * @param {String} [szLayer] the name of a layer to define or to refer
+	 * @return A new ixmaps.themeConstruct instance
+	 */
+	ixmaps.layer = function(szLayer){
+		return new ixmaps.themeConstruct(szLayer);
+	}
 
 	// generate iframe and embed a map
 	// --------------------------------------

@@ -478,10 +478,12 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                 // switch theme class onclick
                 var szAction = "javascript:ixmaps.markThemeClass(\"" + szId + "\"," + sortA[i].index + ");event.stopPropagation();return false;"
 
-                if (fSelected) {
-                    szHtml += "<div valign='center' class='theme-legend-item-selected' style='margin-bottom:0.5em' onclick='" + szAction + "'>";
+				var szStyle = themeObj.szFlag.match(/SIMPLELEGEND|COMPACTLEGEND/) ? "margin-bottom:0.5em;margin-right:1em;float:left":"margin-bottom:0.5em";
+ 
+				if (fSelected) {
+                    szHtml += "<div valign='center' class='theme-legend-item-selected' style='" + szStyle + "' onclick='" + szAction + "'>";
                 } else {
-                    szHtml += "<div valign='center' class='theme-legend-item' style='margin-bottom:0.5em' onclick='" + szAction + "'>";
+                    szHtml += "<div valign='center' class='theme-legend-item' style='" + szStyle + "' onclick='" + szAction + "'>";
                 }
 
                 szHtml += "<div>";
@@ -496,7 +498,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 						
 					}else{
 
-						szHtml += "<div style='margin-top:0.2em;margin-bottom:0em'>";
+						szHtml += "<div style='margin-top:0.2em;margin-bottom:0em;align'>";
 
 						szHtml += "<span style='line-height:5px'>";
 						szHtml += "<a class='legend-color-button' style='pointer-events:all'  href='#' title='click to see'>";
