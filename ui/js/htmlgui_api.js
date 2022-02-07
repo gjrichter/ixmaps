@@ -2330,7 +2330,6 @@ $Log: htmlgui_api.js,v $
 	 */
 	ixmaps.mapApi = function(szMap){
 		this.szMap = szMap||null;
-		ixmaps.__mapApi = this;
 	};
 	ixmaps.mapApi.prototype = {
 
