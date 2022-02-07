@@ -2507,8 +2507,8 @@ $Log: htmlgui_api.js,v $
 	 * @return A new ixmaps.themeConstruct object
 	 */
 	
-	ixmaps.themeConstruct = function(szLayer){
-		this.szMap = ixmaps.__mapApi.szMap;
+	ixmaps.themeConstruct = function(szMap,szLayer){
+		this.szMap = szMap;
 		this.def = {};
 		this.def.layer = szLayer || "generic";
 		this.def.data = {};	
@@ -2655,7 +2655,7 @@ $Log: htmlgui_api.js,v $
 	 * @return A new ixmaps.themeConstruct instance
 	 */
 	ixmaps.theme = function(szLayer){
-		return new ixmaps.themeConstruct(szLayer);
+		return new ixmaps.themeConstruct(this.szMap,szLayer);
 	}
 	
 	/**
@@ -2665,7 +2665,7 @@ $Log: htmlgui_api.js,v $
 	 * @return A new ixmaps.themeConstruct instance
 	 */
 	ixmaps.layer = function(szLayer){
-		return new ixmaps.themeConstruct(szLayer);
+		return new ixmaps.themeConstruct(this.szMap,szLayer);
 	}
 
 	// generate iframe and embed a map
