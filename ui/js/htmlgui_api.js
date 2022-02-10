@@ -2509,11 +2509,12 @@ $Log: htmlgui_api.js,v $
 		
 		
 		theme: function(szTheme,flag){
-			if ( (typeof(szTheme) == "string") || (szTheme == null) ){
-				return new ixmaps.themeApi(this.szMap,szTheme);
-			}else{
+			if ( typeof(szTheme) == "object" ){
 				ixmaps.newTheme(this.szMap,"layer",szTheme,flag);
 				return this;
+			}else{
+				console.log(new ixmaps.themeApi(this.szMap,szTheme));
+				return new ixmaps.themeApi(this.szMap,szTheme);
 			}
 		}
 	};
@@ -2727,7 +2728,7 @@ $Log: htmlgui_api.js,v $
 				alert("embed map target-element '" + szTargetDiv + "' not found!");
 				return;
 			}
-			var szName = opt.mapName || opt.name || "map" + String(Math.random()).split(".")[1];
+			var szName = opt.mapName || opt.name || szTargetDiv || "map" + String(Math.random()).split(".")[1];
 			var szBasemap = opt.mapService || opt.basemap || "leaflet";
 			var szMapType = opt.mapType || opt.maptype || "CartoDB - Positron";
 
@@ -2928,7 +2929,17 @@ $Log: htmlgui_api.js,v $
 			var szHeight = opt.height || "640px";
 			var szWidth  = opt.width  || "100%";
 		
-			if ( callback )	{
+			if ( target ){
+				target.innerHTML = "<iframe id=\""+szName+"\" style=\"border:0;width:"+szWidth+";height:"+szHeight+"\" src=\""+szUrl+"\" ></iframe>";
+                // GR 08.09.2019 adapt the created frame on window resize 
+			}else{
+				iFrame = document.createElement('iframe');
+				iFrame.id = szName;
+				iFrame.style = "border:0;width:"+szWidth+";height:"+szHeight+";";
+				iFrame.src = szUrl; 
+			}
+
+ 			if ( callback )	{
 				ixmaps.waitForMap(szName,callback);
 			}else{
 				ixmaps.waitForMap(szName,
@@ -2941,17 +2952,6 @@ $Log: htmlgui_api.js,v $
 					}
 				);
 			}
-
-			if ( target ){
-				target.innerHTML = "<iframe id=\""+szName+"\" style=\"border:0;width:"+szWidth+";height:"+szHeight+"\" src=\""+szUrl+"\" ></iframe>";
-                // GR 08.09.2019 adapt the created frame on window resize 
-			}else{
-				iFrame = document.createElement('iframe');
-				iFrame.id = szName;
-				iFrame.style = "border:0;width:"+szWidth+";height:"+szHeight+";";
-				iFrame.src = szUrl; 
-			}
-
 		return iFrame;
 		//});
 	}
