@@ -2316,6 +2316,23 @@ $Log: htmlgui_api.js,v $
 		 **/
 		unmarkClass: function(nClass){
 			ixmaps.unmarkThemeClass(this.szMap,this.szTheme,nClass);
+		},
+		/**
+		 * remove theme
+		 * @example ixmaps.map().theme().remove();
+		 * @return void
+		 **/
+		remove: function(){
+			ixmaps.removeTheme(this.szMap,this.szTheme);
+		},
+		/**
+		 * replace theme
+		 * @example ixmaps.map().theme().replace(newTheme);
+		 * @return void
+		 **/
+		replace: function(theme,flag){
+			ixmaps.removeTheme(this.szMap,this.szTheme);
+			ixmaps.newTheme(this.szMap,"layer",theme,flag);
 		}
 
 	};
@@ -2342,6 +2359,11 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 		
+		loadMap: function(szUrl){
+			ixmaps.loadMap(this.szMap,szUrl);
+			return this;
+		},
+
 		setBounds: function(bounds){
 			ixmaps.setBounds(this.szMap,bounds);
 			return this;
@@ -2385,6 +2407,11 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 
+
+		setExternalData: function(data,options){
+			ixmaps.setExternalData(this.szMap,data,options);
+			return this;
+		},
 		setData: function(data,options){
 			ixmaps.setExternalData(this.szMap,data,options);
 			return this;
@@ -2394,23 +2421,42 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 
-		setExternalData: function(data,options){
-			ixmaps.setExternalData(this.szMap,data,options);
+
+		setLocalString: function(szGlobal,szLocal){
+			ixmaps.setLocal(this.szMap,szGlobal,szLocal);
 			return this;
 		},
-
+		setLocal: function(szGlobal,szLocal){
+			ixmaps.setLocal(this.szMap,szGlobal,szLocal);
+			return this;
+		},
 		localize: function(szGlobal,szLocal){
 			ixmaps.setLocal(this.szMap,szGlobal,szLocal);
 			return this;
 		},
 
-		setLocal: function(szGlobal,szLocal){
-			ixmaps.setLocal(this.szMap,szGlobal,szLocal);
+
+		newTheme: function(title,theme,flag){
+			ixmaps.newTheme(this.szMap,title,theme,flag);
+			return this;
+		},
+		addTheme: function(title,theme,flag){
+			ixmaps.newTheme(this.szMap,title,theme,flag);
+			return this;
+		},
+		layer: function(theme,flag){
+			ixmaps.newTheme(this.szMap,"layer",theme,flag);
 			return this;
 		},
 
-		setLocalString: function(szGlobal,szLocal){
-			ixmaps.setLocal(this.szMap,szGlobal,szLocal);
+		
+		changeThemeStyle: function(szTheme,style,flag){
+			ixmaps.changeThemeStyle(this.szMap,szTheme,style,flag);
+			return this;
+		},
+
+		removeTheme: function(szTheme){
+			ixmaps.removeTheme(this.szMap,szTheme);
 			return this;
 		},
 
@@ -2430,36 +2476,13 @@ $Log: htmlgui_api.js,v $
 			ixmaps.switchLayer(this.szMap,szLayerName,fState);
 			return this;
 		},
-
-		newTheme: function(title,theme,flag){
-			ixmaps.newTheme(this.szMap,title,theme,flag);
-			return this;
-		},
-		addTheme: function(title,theme,flag){
-			ixmaps.newTheme(this.szMap,title,theme,flag);
-			return this;
-		},
-		layer: function(theme,flag){
-			ixmaps.newTheme(this.szMap,"layer",theme,flag);
-			return this;
-		},
-
-		changeThemeStyle: function(szTheme,style,flag){
-			ixmaps.changeThemeStyle(this.szMap,szTheme,style,flag);
-			return this;
-		},
-
-		removeTheme: function(szTheme){
-			ixmaps.removeTheme(this.szMap,szTheme);
-			return this;
-		},
-
-		loadMap: function(szUrl){
-			ixmaps.loadMap(this.szMap,szUrl);
-			return this;
-		},
-
+		
+		
 		loadProject: function(szUrl,szFlag){
+			ixmaps.loadProject(this.szMap,szUrl,szFlag);
+			return this;
+		},
+		project: function(szUrl,szFlag){
 			ixmaps.loadProject(this.szMap,szUrl,szFlag);
 			return this;
 		},
@@ -2469,10 +2492,6 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 
-		project: function(szUrl,szFlag){
-			ixmaps.loadProject(this.szMap,szUrl,szFlag);
-			return this;
-		},
 
 		loadSidebar: function(szUrl){
 			ixmaps.loadSidebar(this.szMap,szUrl);
@@ -2488,8 +2507,9 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 		
+		
 		theme: function(szTheme,flag){
-			if ( typeof(szTheme) == "string" ){
+			if ( (typeof(szTheme) == "string") || (szTheme == null) ){
 				return new ixmaps.themeApi(this.szMap,szTheme);
 			}else{
 				ixmaps.newTheme(this.szMap,"layer",szTheme,flag);
@@ -2623,7 +2643,9 @@ $Log: htmlgui_api.js,v $
 			this.def.style.title = szTitle;
 			return this;
 		},
+		
 		// get the theme definition object (JSON)
+		
 		definition: function(){
 			return this.def;
 		},
