@@ -1109,6 +1109,8 @@ $Log: htmlgui.js,v $
 					theme.style["lookupfield"] = theme.binding[i];
 				} else
 				if ((i == "geo2") ||
+					(i == "georef2") ||
+					(i == "position2") ||
 					(i == "lookup2") ||
 					(i == "lookupfield2")) {
 					theme.style["lookupfield2"] = theme.binding[i];

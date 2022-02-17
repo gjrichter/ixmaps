@@ -4815,7 +4815,7 @@ function displayProgressBar(nActual,nMaximal,szMessage,nTimeout,szCancel,nElapse
 		barGroup.fu.scale(20,20);
 
 		var nBarWidth = SVGWidth;
-		var nBarHeight = 3; // /2.4; //10;
+		var nBarHeight = 1.5; // /2.4; //10;
 		var nStep	= nBarWidth/nMaximal;
 		var nHeight = nBarHeight;
 

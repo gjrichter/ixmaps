@@ -1553,6 +1553,9 @@ Map.Themes.prototype.refreshTheme = function (szId) {
 				return;
 			}
 		}
+		if ( mapTheme.animateTimeout ){
+			clearTimeout(mapTheme.animateTimeout);
+		}
 		executeWithMessage("map.Themes.execute()", "... processing ...");
 	}
 };
@@ -2214,6 +2217,12 @@ Map.Themes.prototype.realizeDone = function (mapTheme) {
 		setTimeout(function(){map.Layer.adaptLabel();}, 10);
 	}
 	
+	if (mapTheme.szFlag.match(/ANIMATEPOSITION/)) {
+		if ( mapTheme.animateTimeout ){
+			clearTimeout(mapTheme.animateTimeout);
+		}
+		mapTheme.animateTimeout = setTimeout(function(){map.Themes.animateChartPosition(null,mapTheme.szId);}, 100);
+	}
 	if ( mapTheme.userChartDrawError && (mapTheme.userChartDrawError == mapTheme.nDoneCount) ){
 		displayMessage("User draw function error! ",5000);
 	}
@@ -2531,6 +2540,38 @@ Map.Themes.prototype.makeChartOffsetPointer = function (node, nScale) {
 			newPath = map.Dom.newShape('path', node.pointShObj, 'M' + (-ptOffset.x) + ',' + (-ptOffset.y) + ' l ' + (ptOffset.x + bBox.width) + ',' + (pHeight - map.Scale.normalX(4 / nScale)) + ' 0,' + map.Scale.normalX(4 / nScale) + ' z', 'fill:black;fill-opacity:0.5');
 			newPath = map.Dom.newShape('path', node.pointerObj, 'M' + (-ptOffset.x) + ',' + (-ptOffset.y) + ' l ' + (ptOffset.x + bBox.width) + ',' + (pHeight - map.Scale.normalX(4 / nScale)) + ' 0,' + map.Scale.normalX(3 / nScale) + ' z', 'fill:white');
 		}
+	}
+};
+
+/**
+ * change the position of the chart objects
+ * @param evt the event
+ * @param szId the id of the chart group 
+  */
+Map.Themes.prototype.animateChartPosition = function (evt, szId) {
+	var mapTheme = this.getTheme(szId);
+	if (mapTheme) {
+		var nodesA = mapTheme.chartGroup.childNodes;
+
+		// remove old declutter position changes
+		// -------------------------------------
+		for (i = 0; i < nodesA.length; i++) {
+			var ptPos = nodesA[i].fu.getPosition();
+			var ptPos2 = new point(nodesA[i].getAttributeNS(szMapNs, "xEnd"), nodesA[i].getAttributeNS(szMapNs, "yEnd"));
+			var nDur = nodesA[i].getAttributeNS(szMapNs, "dur");
+			
+			dx = (ptPos2.x - ptPos.x)/nDur;
+			dy = (ptPos2.y - ptPos.y)/nDur;
+
+			nodesA[i].fu.setPosition(ptPos.x+dx,ptPos.y+dy);
+			
+			nodesA[i].setAttributeNS(szMapNs, "dur", --nDur );
+		}
+		
+		if ( mapTheme.animateTimeout ){
+			clearTimeout(mapTheme.animateTimeout);
+		}
+		mapTheme.animateTimeout = setTimeout(function(){map.Themes.animateChartPosition(null,mapTheme.szId);}, 100);
 	}
 };
 
@@ -8330,7 +8371,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 		if (ptPos2) {
 			if ((ptPos.x == ptPos2.x) &&
 				(ptPos.y == ptPos2.y)) {
-				continue;
+				//continue;
 			}
 		}
 		
@@ -8452,7 +8493,10 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 			nY = __scanValue((this.objTheme.dbRecords[j][this.objTheme.nYFieldIndex]));
 		}
 
-
+		var szValue = null;
+		if (this.szValueField) {
+			szValue = this.objTheme.dbRecords[j][this.objTheme.nValueFieldIndex];
+		}
 
 		// if we have a grid defined,
 		// map the position to a grid
@@ -8688,6 +8732,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 				this.itemA[szId].nAlpha = (nAlphaValue || 1);
 				this.itemA[szId].szColor = (szColor);
 				this.itemA[szId].szTime = (szTime);
+				this.itemA[szId].szValue = (szValue);
 
 				this.itemA[szId].dbIndexA = [j];
 				this.itemA[szId].ptPos = ptPos;
@@ -8790,6 +8835,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 
 			this.itemA[szId].szColor = (szColor);
 			this.itemA[szId].szTime = (szTime);
+			this.itemA[szId].szValue = (szValue);
 
 			this.nCount++;
 		}
@@ -13181,20 +13227,15 @@ MapTheme.prototype.createChartGroup = function (objectGroup) {
 MapTheme.prototype.chartMap = function (startIndex) {
 
 	_TRACE("== MapTheme.chartMap()  ");
-
-	if (this.nChartUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nChartUpper)) {
-		if (this.chartGroup) {
-			this.chartGroup.style.setProperty("display", "none", "");
-		}
-		//this.unpaintMap();
-		this.fVisible = false;
-		this.realizeDone();
-		return;
-	}
-	if (this.nChartLower && (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nChartLower)) {
-		if (this.chartGroup) {
-			this.chartGroup.style.setProperty("display", "none", "");
-		}
+	
+	// check if chart is scaledependent
+	if ( (this.nChartUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale >  this.nChartUpper)) ||
+	     (this.nChartLower && (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nChartLower)) )  {
+		// create chartgroup anyway to preserve layer sequence
+		if (!this.chartGroup) {
+			this.createChartGroup(map.Layer.objectGroup);
+		}	
+		this.chartGroup.style.setProperty("display", "none", "");
 		//this.unpaintMap();
 		this.fVisible = false;
 		this.realizeDone();
@@ -13355,7 +13396,8 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		var nToDraw = 0;
 		var nCharts = 0;
 		var nNoPos = 0;
-		if (this.fClipCharts && !this.szFlag.match(/BUFFER/) && !this.szFlag.match(/POSITION/) && !this.szFlag.match(/FEATURE/)) {
+		
+		if (this.fClipCharts && !this.szFlag.match(/BUFFER/) && !this.szFlag.match(/\bPOSITION\b/) && !this.szFlag.match(/FEATURE/)) {
 			for (i = 0; i < this.partsA.length; i++) {
 				this.partsA[i].nCount = 0;
 				this.partsA[i].nSum = 0;
@@ -13409,7 +13451,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 							}
 						}
 					}
-					if (this.itemA[a].ptPos && this.itemA[a].ptPos2 && (this.itemA[a].ptPos.x == this.itemA[a].ptPos2.x) && (this.itemA[a].ptPos.y == this.itemA[a].ptPos2.y)) {
+					if (0 && this.itemA[a].ptPos && this.itemA[a].ptPos2 && (this.itemA[a].ptPos.x == this.itemA[a].ptPos2.x) && (this.itemA[a].ptPos.y == this.itemA[a].ptPos2.y)) {
 						continue;
 					}
 					// chart is visibile !
@@ -13795,7 +13837,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 	
 	// GR 26.12.2020 define FEATURE style outside loop
 	//
-	if (this.szFlag.match(/POSITION|FEATURE/)) {
+	if (this.szFlag.match(/\bPOSITION\b|FEATURE/)) {
 		this.chartGroup.style.setProperty("fill", this.chart.szColor||"white");
 		this.chartGroup.style.setProperty("fill-opacity",  (this.fillOpacity || 0.1));
 		this.chartGroup.style.setProperty("stroke", this.szLineColor||"red");
@@ -13903,7 +13945,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 
 		var selectionId = this.itemA[a].szSelectionId;
 		
-		if (!this.szFlag.match(/POSITION|FEATURE/)) {
+		if (!this.szFlag.match(/\bPOSITION\b|FEATURE/)) {
 			// check, if we have a position, if not -> no chart
 			ptOff = this.itemA[a].ptPos || this.getNodePosition(selectionId);
 			// tbd maybe a flag to switch this behaviour
@@ -13946,7 +13988,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		// GR 28.02.2019 only position
 		// GR 26.11.2020 added geojson features LineString, MultiLineString e Polygon 
 		// ------------------------------------------------------------------------------
-		if (this.szFlag.match(/POSITION|FEATURE/)) {
+		if (this.szFlag.match(/\bPOSITION\b|FEATURE/)) {
 			shapeGroup = map.Dom.newGroup(this.chartGroup, a);
 			
 			// -------------------------------
@@ -14596,6 +14638,13 @@ MapTheme.prototype.chartMap = function (startIndex) {
 			} else {
 				shapeGroup.fu.setMatrix([this.nChartGroupScaleX*nAutoScale, 0, 0, this.nChartGroupScaleY*nAutoScale, ptOff.x - (ptNull.x) * map.Layer.nObjectScale * this.nScale, ptOff.y - (ptNull.y) * map.Layer.nObjectScale * this.nScale]);
 			}
+			
+			if ( this.itemA[a].ptPos && this.itemA[a].ptPos2 ) {
+				shapeGroup.setAttributeNS(szMapNs, "xEnd", this.itemA[a].ptPos2.x);
+				shapeGroup.setAttributeNS(szMapNs, "yEnd", this.itemA[a].ptPos2.y);
+				shapeGroup.setAttributeNS(szMapNs, "dur", 10);
+			}
+
 		}
 		this.nScale = __scale;
 
@@ -16963,9 +17012,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				nIndex = this.sortedIndex[nIndex].index;
 			}
 
-			if (this.szValueField && this.itemA[a]) {
+			if (this.szValueField && this.itemA[a] && this.itemA[a].szValue ) {
 				// GR 25.05.2015 explizit value display field, take it as is
-				tValue = __scanValue(this.itemA[a].szValue);
+				tValue = isNaN(this.itemA[a].szValue)?this.itemA[a].szValue:__scanValue(this.itemA[a].szValue);
 			}
 			if (this.szValueField && this.itemA[a] && (this.szValueField == "$title$")) {
 				tValue = this.itemA[a].szTitle;
