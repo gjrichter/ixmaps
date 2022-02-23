@@ -13710,7 +13710,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 
 		// GR 18.12.2020 clear charts here!
 		//
-		if (!this.szFlag.match(/DOT/)) {
+		if (!this.szFlag.match(/DOT/) && !this.fDone ) {
 			this.unpaintMap();
 		}
 
@@ -13809,7 +13809,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 	// GR 18.09.2018 get out of loop
 	this.fDoRedraw = false;
 	if ((this.indexA.length < 1000) || this.fRedraw || this.fRedrawAllCharts || ((this.szFlag.match(/BUFFER/)) && (this.szShapeType.match(/line/)))) {
-		this.fDoRedraw = true;
+		this.fDoRedraw = !this.fDone;
 	}
 
 	this.fHideValues = (this.szValueUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nValueUpper));
