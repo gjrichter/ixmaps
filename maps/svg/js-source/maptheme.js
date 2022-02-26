@@ -5378,6 +5378,14 @@ Map.Themes.prototype.actualizeActiveTheme = function (nZoomChangeFactor) {
 						this.themesA[i].fActualize = true;
 					}
 				} else {
+					if (this.themesA[i].nChartUpper ||
+						this.themesA[i].nChartLower ||
+						this.themesA[i].nValueUpper ||
+						this.themesA[i].nBoxUpper 	||
+						this.themesA[i].nTitleUpper ||
+						this.themesA[i].nLabelUpper ){
+						this.themesA[i].unpaintMap();
+					}
 					if (this.themesA[i].nMaxCharts) {
 						this.themesA[i].unpaintMap();
 					}
@@ -6654,6 +6662,7 @@ MapTheme.prototype.realizeNextClipFrame = function () {
 	if (this.szFlag.match(/CHART/)) {
 		this.chartPosA = [];
 		this.posItemA = [];
+		this.fDone = false;
 		this.fRedraw = true;
 		if (this.nMaxCharts) {
 			//this.unpaintMap();
@@ -6677,6 +6686,7 @@ MapTheme.prototype.setClipFrame = function (n) {
 	if (this.szFlag.match(/CHART/)) {
 		this.chartPosA = [];
 		this.posItemA = [];
+		this.fDone = false;
 		//this.unpaintMap();
 		this.chartMap();
 	} else {
@@ -13710,7 +13720,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 
 		// GR 18.12.2020 clear charts here!
 		//
-		if (!this.szFlag.match(/DOT/) && !this.fDone ) {
+		if (!this.fDone) {
 			this.unpaintMap();
 		}
 
@@ -14302,6 +14312,9 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				var y = (p2.y - p1.y);
 				var len = Math.sqrt(x * x + y * y);
                 
+				if ( len <= 0 ){
+					continue;
+				}
                 var nBow = this.nRangeScale;
                 if (this.szFlag.match(/\bRANDOM\b/)) {
                     nBow -= (this.nRangeScale * 0.66 * Math.random());
