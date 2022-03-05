@@ -1242,9 +1242,16 @@
 									}
 								
 									// image ??
-									szHtml += "<div style='margin-top:0.5em'>";
-									szHtml += "<img src=\""+this.url.replace(".json",".png")+"\">";
-									szHtml += "</div>";
+									for ( var i in __projects) {
+										if (__projects[i].name.match(/png/)) {
+											if ( this.url.match(__projects[i].name.replace(".png",".json")) ){
+												szHtml += "<div style='margin-top:0.5em'>";
+												szHtml += "<img src=\""+this.url.replace(".json",".png")+"\" alt=\"test\">";
+												szHtml += "</div>";
+												break;
+											}
+										}
+									}
 									
 									/**
 									
