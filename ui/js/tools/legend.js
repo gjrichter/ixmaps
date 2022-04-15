@@ -1137,8 +1137,9 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
 			szHtml += "<h4 id='map-legend-snippet' style='pointer-events:all'>" + (themeObj.szSnippet || "") + "</h4>";
 		}
-
-        szHtml += "<div id='map-legend-body' style='pointer-events:all'>";
+		
+		var szStyle = (ixmaps.legendAlign=="center")?"pointer-events:all;width:fit-content;margin:auto":"pointer-events:all";
+        szHtml += "<div id='map-legend-body' class='map-legend-body' style='"+szStyle+"'>";
 		
  		if ( $("#map-legend").attr("data-align") == "left" ){
         	szHtml += "<div style='max-height:"+window.innerHeight+"px;overflow:hidden;margin-right:24px;padding-right:1em;'>";

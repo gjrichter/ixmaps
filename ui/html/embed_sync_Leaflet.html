@@ -648,12 +648,14 @@
 					$("#ixmap").css("top", "75px");
 					ixmaps.legendAlign = "center";
 					$(".map-legend").attr("data-align","right");
-					$(".map-legend").css("font-size","0.5em");
-					$("#onmapbuttondiv").css("left", "");
-					$("#onmapbuttondiv").css("right", "60px");
-					$(".map-legend").css("left", "40%");
+					$(".map-legend").css("text-align","center");
+					$(".map-legend").css("font-size","0.7em");
+					$(".map-legend").css("margin-top","-10px");
 					$(".map-legend").css("width", "100%");
 					$(".map-legend").css("max-width", "100%");
+					$(".map-legend").css("left", "0px");
+					$("#onmapbuttondiv").css("left", "");
+					$("#onmapbuttondiv").css("right", "60px");
 					$(".title-field").css("right", "100px");
 				}
 			} else {
@@ -670,6 +672,10 @@
 			
 			if ($(document).getUrlParam('scrollsafe')) {
 				ixmaps.scrollsafe = true;
+			}
+			
+			if ($(document).getUrlParam('scrollsafesilent')) {
+				ixmaps.scrollsafesilent = true;
 			}
 
 			// ====================

@@ -1231,6 +1231,17 @@ $Log: htmlgui_api.js,v $
 			ixmaps.embeddedApi.embeddedApi.htmlgui_loadExternalData(szUrl,opt);
 		}
 	};
+	
+	/**
+	 * require
+	 * @param {String} szUrl the URL of the external script to add toi project * @return void
+	 * @return void
+	 * @private
+	 */
+	ixmaps.require = function(szMap,szUrl){
+		this.dispatchToEmbeddedApi(szMap,"require",[szUrl]);
+	};
+	
 	/**
 	 * show data table
 	 * @void
@@ -2318,6 +2329,22 @@ $Log: htmlgui_api.js,v $
 			ixmaps.unmarkThemeClass(this.szMap,this.szTheme,nClass);
 		},
 		/**
+		 * show theme
+		 * @example ixmaps.map().theme().show();
+		 * @return void
+		 **/
+		show: function(){
+			ixmaps.showTheme(this.szMap,this.szTheme);
+		},
+		/**
+		 * hide theme
+		 * @example ixmaps.map().theme().show();
+		 * @return void
+		 **/
+		hide: function(){
+			ixmaps.hideTheme(this.szMap,this.szTheme);
+		},
+		/**
 		 * remove theme
 		 * @example ixmaps.map().theme().remove();
 		 * @return void
@@ -2781,6 +2808,9 @@ $Log: htmlgui_api.js,v $
 			if ( opt.scrollsafe ){
 				szUrl += "&scrollsafe="+(opt.scrollsafe?"1":"0");
 			}
+			if ( opt.scrollsafesilent ){
+				szUrl += "&scrollsafesilent="+(opt.scrollsafesilent?"1":"0");
+			}
 			if ( opt.tools ){
 				szUrl += "&tools="+(opt.tools?"1":"0");
 			}
@@ -2902,6 +2932,9 @@ $Log: htmlgui_api.js,v $
 			}
 			if ( opt.scrollsafe ){
 				szUrl += "&scrollsafe="+(opt.scrollsafe?"1":"0");
+			}
+			if ( opt.scrollsafesilent ){
+				szUrl += "&scrollsafesilent="+(opt.scrollsafesilent?"1":"0");
 			}
 			if ( opt.tools ){
 				szUrl += "&tools="+(opt.tools?"1":"0");

@@ -90,9 +90,16 @@
 
             var themeObj = themeObjA[i];
 
+            szInfo += "<h1>Theme "+(Number(i)+1)+"</h1>";
+			
             szInfo += "<table cellpadding='0' style='margin-top:5px;' > ";
             szInfo += "<tr><td><b>title: </b></td><td>" + themeObj.szTitle + "</td></tr>";
             szInfo += "<tr><td><b>data: </b></td><td>" + themeObj.coTable + "</td></tr>";
+            szInfo += "<tr><td><b>rows: </b></td><td>" + themeObj.objTheme.dbTable.records + "</td></tr>";
+            szInfo += "<tr><td><b>load: </b></td><td>" + themeObj.timeLoading + " ms</td></tr>";
+            if (themeObj.timeAggregating) {
+                szInfo += "<tr><td><b>aggregate: </b></td><td>" + themeObj.timeAggregating + " ms</td></tr>";
+            }
             szInfo += "<tr><td><b>items: </b></td><td>" + themeObj.nCount + "</td></tr>";
             if (themeObj.szField100 && themeObj.szField100.length) {
                 szInfo += "<tr><td>field100: </td><td>" + themeObj.szField100 + "</td></tr>";
@@ -101,10 +108,6 @@
                 }
                 szInfo += "<tr><td><b>min: </b></td><td>" + themeObj.nMin100 + "</td></tr>";
                 szInfo += "<tr><td><b>max: </b></td><td>" + themeObj.nMax100 + "</td></tr>";
-            }
-            szInfo += "<tr><td><b>load: </b></td><td>" + themeObj.timeLoading + " ms</td></tr>";
-            if (themeObj.timeAggregating) {
-                szInfo += "<tr><td><b>aggregate: </b></td><td>" + themeObj.timeAggregating + " ms</td></tr>";
             }
             if (themeObj.timeRealizing) {
                 szInfo += "<tr><td><b>realize: </b></td><td>" + themeObj.timeRealizing + " ms</td></tr>";
@@ -115,9 +118,12 @@
             var count = themeObj.szFieldsA.length;
 
             for (var i = 0; i < count; i++) {
-                szInfo += "<hr> ";
+                szInfo += "<br> ";
                 szInfo += "<table cellpadding='0' style='margin-top:5px;' > ";
-                szInfo += "<tr><td>field: </td><td>" + themeObj.szFieldsA[i] + "</td></tr>";
+                szInfo += "<tr><td>value field: </td><td>" + themeObj.szFieldsA[i] + "</td></tr>";
+                if (themeObj.szSizeField) {
+                    szInfo += "<tr><td>size field: </td><td> " + themeObj.szSizeField + "</td></tr>";
+                }
                 szInfo += "<tr><td><b>min: </b></td><td>" + themeObj.nMinA[i] + "</td></tr>";
                 szInfo += "<tr><td><b>max: </b></td><td>" + themeObj.nMaxA[i] + "</td></tr>";
                 szInfo += "<tr><td><b>mean: </b></td><td>" + themeObj.nMeanA[i] + "</td></tr>";
@@ -133,16 +139,21 @@
                 var __nNotFound = 0;
                 var szNotFound = "";
 
-                szInfo += "<hr> ";
+                szInfo += "<br> ";
                 szInfo += "<table cellpadding='0' style='margin-top:5px;vertical-align:top' > ";
+				
+                szNotFound += "<tr><td>not found:</td><td></td></tr>";
 
                 for (a in themeObj.missedA) {
                     szNotFound += "<tr><td></td><td>" + a + "" + "</td></tr>";
                     __nNotFound++;
                 }
                 var nTotal = themeObj.nCount;
+				var nMapped = (100-100/nTotal*__nNotFound);
+				var szColor = (nMapped < 99)?"red":"black";
+				szInfo += "<tr><td><b>mapped:</b></td><td style='color:"+szColor+"'>"+ nMapped.toFixed(2) +" %</td></tr>";
                 if (themeObj.nMissingLookupCount) {
-                    szInfo += "<tr style='vertical-align:top'><td><b>missing lookups: </b></td><td>" + themeObj.nMissingLookupCount + " / " + nTotal + " records</td></tr>";
+                     szInfo += "<tr style='vertical-align:top'><td><b>missing lookups: </b></td><td style='color:red'>" + themeObj.nMissingLookupCount + " / " + nTotal + " records</td></tr>";
                 }
                 if (themeObj.nMissingPositionCount) {
                     szInfo += "<tr style='vertical-align:top'><td><b>missing positions: </b></td><td>" + themeObj.nMissingPositionCount + "</td></tr>";
@@ -178,8 +189,7 @@
             }
 
             szInfo += "<hr> ";
-            szInfo += "<br><br><br><br><br><br>";
-
+ 
         }
 
         $("#info-content").html(szInfo);

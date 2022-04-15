@@ -123,7 +123,10 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		// create map
 		// ---------------------
 
-		LMap = L.map(this.szGmapDiv,{zoomControl:false,gestureHandling:(ixmaps.scrollsafe?true:false)});
+		LMap = L.map(this.szGmapDiv,{zoomControl:false,
+									 gestureHandling:((ixmaps.scrollsafe|ixmaps.scrollsafesilent)?true:false),
+									 gestureHandlingOptions: {duration: ixmaps.scrollsafesilent?0:1000} 
+									});
 
 		// ---------------------
 		// define event handler
