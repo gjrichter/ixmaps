@@ -558,6 +558,9 @@ $Log: htmlgui_sync.js,v $
 	var synchronizeTimeout = null;
 	var fOrigDragSVGHidden = false;
 	var nLastSynchZoom = null;
+	
+	// using flyTo we must ignore the first ixmaps.showAll() in __doSynchronizeSVGMap() 
+	var __fFlyTo = false;
 
 	ixmaps.syncSlaveMaps = function (ptSW, ptNE, nZoom) {
 		if ((typeof(ixmaps.fSyncMap) != "undefined") && !ixmaps.fSyncMap){
@@ -678,6 +681,12 @@ $Log: htmlgui_sync.js,v $
 		if (ixmaps.fSVGInitializing) {
 			return;
 		}
+		
+		if (__fFlyTo){
+			__fFlyTo = false;
+			return;
+		}
+		
 		//showAll();
 
 		// get the HTML map bounds
@@ -945,6 +954,15 @@ $Log: htmlgui_sync.js,v $
 		if (htmlMap_getZoom() < nZoom) {
 			htmlMap_setZoom(nZoom);
 		}
+	};
+	/** 
+	 *	fly to HTML map center and zoom
+	 */
+	ixmaps.htmlgui_flyToCenterAndZoom = function (ptCenter, nZoom) {
+		ixmaps.hideAll();
+		__fFlyTo = true;
+		htmlMap_flyTo(ptCenter, nZoom);
+		ixmaps.htmlmap_view = true;
 	};
 	/** 
 	 *	get HTML map center

@@ -2504,6 +2504,21 @@ $Log: htmlgui.js,v $
 		return ixmaps;
 	};
 	/**
+	 * flyTo
+	 * @param center the new center of the view
+	 * @param nZoom the new zoomfactor of the view
+	 * @return void
+	 */
+	ixmaps.flyTo = function (center, nZoom) {
+		// GR 15.08.2018 call 2 times needed (magick)
+		ixmaps.htmlgui_flyToCenterAndZoom({
+			lat: center[0],
+			lng: center[1]
+		}, nZoom);
+		ixmaps.htmlgui_synchronizeSVG(false);
+		return ixmaps;
+	};
+	/**
 	 * minZoom
 	 * @param nZoom the zoomfactor of the view
 	 * @return void

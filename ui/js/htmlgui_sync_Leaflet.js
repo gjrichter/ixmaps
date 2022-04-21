@@ -570,6 +570,10 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		);		
 	}
 
+	htmlMap_flyTo = function(ptLatLon,zoom){
+		LMap.flyTo([ptLatLon.lat,ptLatLon.lng],zoom);
+	}
+	
 	// new parameter fZoomTo
 	// necessary because setBounds() used also for setCenter()
 	// in mapstraction setBounds() executes correct, while setCenter() fails position 

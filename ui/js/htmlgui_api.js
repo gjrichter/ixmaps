@@ -696,6 +696,18 @@ $Log: htmlgui_api.js,v $
 		this.dispatchToEmbeddedApi(szMap,"setZoom",[nZoom]);
 	};
 	/**
+	 * fly to the center and zoom of a map
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {Array} center the new center of the map; array of 2 coordinates
+	 * @param {Number} nZoom the new zoomfactor of the map
+	 * @return void
+     * @example ixmaps.flyTo("map1",[51.59898731096802,-0.33786544322673245],10);
+	 */
+	ixmaps.flyTo = function(szMap,center,nZoom){
+		__checkArguments(arguments,3,"setView()");
+		this.dispatchToEmbeddedApi(szMap,"flyTo",[center,nZoom]);
+	};
+	/**
 	 * define a minimal zoom level for the map; the user cannot zoom out beyond this level
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
 	 * @param {Number} nZoom the new minimal zoomm level of the view
@@ -2381,6 +2393,10 @@ $Log: htmlgui_api.js,v $
 			ixmaps.setMapTypeId(this.szMap,szMapTypeId);
 			return this;
 		},
+		setMapType: function(szMapTypeId){
+			ixmaps.setMapTypeId(this.szMap,szMapTypeId);
+			return this;
+		},
 		mapType: function(szMapTypeId){
 			ixmaps.setMapTypeId(this.szMap,szMapTypeId);
 			return this;
@@ -2402,6 +2418,11 @@ $Log: htmlgui_api.js,v $
 		},
 		view: function(center,zoom){
 			ixmaps.setView(this.szMap,center,zoom);
+			return this;
+		},
+		
+		flyTo: function(center,zoom){
+			ixmaps.flyTo(this.szMap,center,zoom);
 			return this;
 		},
 
