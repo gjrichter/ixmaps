@@ -2670,6 +2670,11 @@ $Log: htmlgui_api.js,v $
 			}
 			return this;
 		},
+		filter: function(szFilter){
+			this.def.style = this.def.style || {};
+			this.def.style.filter = szFilter;
+			return this;
+		},
 		type: function(szType){
 			this.def.style.type = szType;
 			return this;
