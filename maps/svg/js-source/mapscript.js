@@ -4395,13 +4395,18 @@ function displayTooltip(evt,infoShape){
 			catch (e){
 			}
 			try{
-				szText = HTMLWindow.ixmaps.htmlgui_onTooltipDisplay(szText,infoShape);
+				szText = HTMLWindow.ixmaps.htmlgui_onTooltipDisplay(szText,evt);
 				}
 			catch (e){
 			}
-			var position = map.Scale.getClientMousePosition(evt,SVGPopupGroup);
-			killTooltip();
-			idTooltipTimeout = setTimeout("doDisplayTooltip(\""+__stripQuotes(szText)+"\","+position.x+","+position.y+")",nTooltipTimeout);
+			if (idTooltipTimeout){
+				clearTimeout(idTooltipTimeout);
+			}
+			if (szText && szText.length ){
+				var position = map.Scale.getClientMousePosition(evt,SVGPopupGroup);
+				killTooltip();
+				idTooltipTimeout = setTimeout("doDisplayTooltip(\""+__stripQuotes(szText)+"\","+position.x+","+position.y+")",nTooltipTimeout);
+			}
 			return true;
 		}
 	}
@@ -4418,6 +4423,9 @@ function displayTooltipText(evt,szText){
 
 function __stripQuotes(szText){
 
+	if (!szText || !szText.length){
+		return szText;
+	}
 	var szTextA = szText.split('"');
 	szText = szTextA[0];
 	for (var i=1; i<szTextA.length; i++){
@@ -4427,6 +4435,9 @@ function __stripQuotes(szText){
 }
 function __encodeSingleQuote(szText){
 
+	if (!szText || !szText.length){
+		return szText;
+	}
 	var szTextA = szText.split('\'');
 	szText = szTextA[0];
 	for (var i=1; i<szTextA.length; i++){
@@ -4435,11 +4446,18 @@ function __encodeSingleQuote(szText){
 	return szText;
 }
 function __encodeDoubleQuotes(szText){
+
+	if (!szText || !szText.length){
+		return szText;
+	}
 	// GR 17.11.2017 encode also \" -> \\\"
 	return szText.replace(/\\/gi,"\\\\").replace(/\"/gi,"\\\"");
 }
 function __decodeSingleQuote(szText){
 
+	if (!szText || !szText.length){
+		return szText;
+	}
 	var szTextA = szText.split("`");
 	szText = szTextA[0];
 	for (var i=1; i<szTextA.length; i++){
@@ -4494,6 +4512,11 @@ function killTooltip(){
 	if (_tooltip){
 		SVGTltipGroup.fu.clear();
 		_tooltip=null;
+	}
+	try{
+		HTMLWindow.ixmaps.htmlgui_onTooltipDelete();
+		}
+	catch (e){
 	}
 }
 
