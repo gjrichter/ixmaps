@@ -14215,6 +14215,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				}
 				var shape = map.Dom.newShape('path', shapeGroup, d, "");
 				shapeGroup.setAttributeNS(szMapNs,"center","x:"+x/count+",y:"+y/count);
+				shapeGroup.setAttributeNS(szMapNs,"area",this.itemA[a].nSize);
 				shapeGroup.setAttributeNS(null,"style","fill:"+this.chart.szColor+";fill-opacity:0.5");
 			}
 
@@ -14269,6 +14270,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				for ( p in count ){
 					if ( count[p] > pp ){
 						shapeGroup.setAttributeNS(szMapNs,"center","x:"+x[p]/count[p]+",y:"+y[p]/count[p]);
+						shapeGroup.setAttributeNS(szMapNs,"area",this.itemA[a].nSize);
 						pp = count[p];
 					}
 				}
@@ -14395,6 +14397,11 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				var d = "M" + x0 + "," + y0 + " C" + (x / 4 + dx) + "," + (y / 4 - dy) + " " + (x / 2 + dx) + "," + (y / 2 - dy) + " " + (x) + "," + (y) + "";
 				var shape = map.Dom.newShape('path', shapeGroup, d, "stroke-linecap:butt;fill:none;stroke:" + this.chart.szColor + ";stroke-width:" + nLineWidth + ";stroke-opacity:" + (this.fillOpacity || 0.3) + ";");
 
+				if (this.szFlag.match(/DOPACITYMIN/)) {
+					var nPow = 1 / (this.nDopacityPow || 1);
+					var nOpacity = Math.pow((this.nMax - this.itemA[a].nSize), nPow) / Math.pow((this.nMax - this.nMin), nPow) * (this.fillOpacity || 1) * (this.nDopacityScale || 1);
+					shape.style.setProperty("stroke-opacity", String(nOpacity), "");
+				} else
 				if (this.szFlag.match(/DOPACITY/)) {
 					var nPow = 1 / (this.nDopacityPow || 1);
 					var nOpacity = Math.pow((this.itemA[a].nSize - this.nMin), nPow) / Math.pow((this.nMax - this.nMin), nPow) * (this.fillOpacity || 1) * (this.nDopacityScale || 1);
@@ -14493,6 +14500,11 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					if (1 || (len > nLineWidth * 3)) {
 						shape.setAttributeNS(null, "marker-end", "url(#" + arrowId + ")");
 					}
+					if (this.szFlag.match(/DOPACITYMIN/)) {
+						var nPow = 1 / (this.nDopacityPow || 1);
+						var nOpacity = Math.pow((this.nMax - this.itemA[a].nSize), nPow) / Math.pow((this.nMax - this.nMin), nPow) * (this.fillOpacity || 1) * (this.nDopacityScale || 1);
+						myShape.style.setProperty("opacity", String(nOpacity), "");
+					} else
 					if (this.szFlag.match(/DOPACITY/)) {
 						var nPow = 1 / (this.nDopacityPow || 1);
 						var nOpacity = Math.pow((this.itemA[a].nSize - this.nMin), nPow) / Math.pow((this.nMax - this.nMin), nPow) * (this.fillOpacity || 1) * (this.nDopacityScale || 1);
