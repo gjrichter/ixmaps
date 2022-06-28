@@ -205,7 +205,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 			subdomains: ['otile1','otile2','otile3','otile4']
 		});
-		__addTileLayer("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png", {
+		__addTileLayer("http://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png", {
 			name: "OpenStreetMap - wikipedia",
 			myname: "OpenStreetMap - wikipedia",
 			minZoom: 2,
