@@ -26,8 +26,9 @@
 		body {
 			overflow: auto;
 			border-left: solid #aaa 0.5px;
-			background-color: #f4f4f4;
-			padding-top: 2em;
+			background-color: #F4FAFC;
+			padding: 0;
+			margin: 0;
 		}
 
 		.container {
@@ -122,8 +123,12 @@
 
 		.container {
 			padding-bottom: 1em;
-			margin-bottom: 1em;
+			margin-bottom: 0.2em;
 			max-width: 650px;
+			border-top: solid #eee 1px;
+			border-left: solid #eee 1px;
+			border-bottom: solid #e8e8e8 2px;
+			border-radius: 1em;
 		}
 
 		.colorlist {
@@ -232,14 +237,138 @@
 			margin: 0;
 
 		}
+		
+.rich-select {
+    height: 81px; /* 75px + 6 */
+    position: relative;
+    border: none;
+    margin: 5px 0;
+    padding: 0;
+    background: none;
+}
+
+.rich-select-dropdown {
+    border: solid 1px #DDD;
+    border-radius: .25rem;
+}
+    .rich-select-dropdown:focus-within {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+.rich-select-dropdown-button {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+    .rich-select-dropdown-button + label,
+    .rich-select-option > input[type=radio] {
+        position: absolute;
+        display: block;
+        right: .5rem;
+        width: 2rem;
+        height: 1rem;
+        outline: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    .rich-select-dropdown-button + label {
+        top: .5rem;
+        padding: 25px 10px;
+    }
+    .rich-select-dropdown-button + label::before {
+        position: absolute;
+        top: 50%;
+		right:0;
+        width: 1rem;
+        height: 1rem;
+        content: "";
+        pointer-events: none;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 5L0 3h4z'/%3e%3c/svg%3e");
+    }
+
+.rich-select-dropdown > .rich-select-option > .rich-select-option-body {
+    display: none;
+}
+    .rich-select-dropdown > .rich-select-option input[type=radio]:checked + .rich-select-option-body {
+        display: inline-block;
+        width: 100%;
+    }
+
+.rich-select-options {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    border: solid 1px #DDD;
+    border-top: none;
+    border-radius: .25rem;
+    width: 100%;
+    max-height: 75vh;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: rgba(0,0,0,0.4) 5px 8px 15px;
+}
+
+.rich-select-option {
+    padding: 0 8px;
+}
+.rich-select-options > .rich-select-option:hover {
+    background-color: #f1f1f1;
+}
+.rich-select-option-body label {
+    width: 100%;
+    padding: 2px;
+    margin-bottom: 0;
+}
+.rich-select-option-body img {
+    height: 75px;
+    width: 75px;
+    min-height: 75px;
+    min-width: 75px;
+    object-fit: contain;
+    margin-right: .5rem;
+}
+.rich-select-option-body > button {
+    width: 100%;
+    text-align: left;
+    padding: 2px;
+    border: none;
+    outline: none;
+    background: none;
+} 
+
+.rich-select-dropdown-button:checked ~ .rich-select-options {
+    display: inline-block;
+}		
+		
+		
+		
+		
 
 	</style>
 </head>
 
 <body id="theme-editor">
+	
+	<div id="editor-apply" style="position:absolute;top:0px;right:10px;background-color:white;border:solid #dddddd 1px;z-index:9999">
+						<span class="pull-right">
+						<a href='javascript:ixmaps.editor.applyChanges();'>
+							<button type="button" class="btn btn-link btn-md">
+								apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i>
+							</button>
+						</a>
+					</span>
+	</div>
 
 
-	<div id="workspace" style="margin-top:-1.5em;height:600px;">
+	<div id="workspace" style="overflow-x:hidden">
 
 		<div class="container map-config">
 
@@ -259,7 +388,9 @@
 
 				<h3 id="chartDefinitionMap_header" class="disabled">
 					<span id="map-defined">map</span> and
-					<span id="data-defined">data</span> sources</h3>
+					<span id="data-defined">data</span> sources 
+					<span><i class="icon icon-checkmark" title="check-map-defined" ></i></span>
+				</h3>
 
 				<h5 class="subtitle">defines where to load maps and data</h5>
 
@@ -351,7 +482,8 @@
 
 				<h3 id="chartLookupFieldsHeader" class="disabled">
 					<span id="chartLookupFields">map</span> /
-					<span id="mapLookup">data</span> binding</h3>
+					<span id="mapLookup">data</span> binding
+					<span id="chartLookupFieldsCheck" style="display:none"><i class="icon icon-checkmark" title="check-map-defined" ></i></span>
 				</h3>
 				<h5 class="subtitle">defines the charts position</h5>
 
@@ -510,6 +642,84 @@
 					</div>
 				</div>
 
+ 				<div class="row">
+  					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+						<div class="form-group">
+							<div class="rich-select custom-select">
+								<div class="rich-select-dropdown">
+									<div class="rich-select-option">
+										<input type="radio" name="game" id="Dots" checked="">
+										<div class="rich-select-option-body">
+											<label tabindex="-1">
+												<img src="../../resources/images/points.png" alt="">Dots
+											</label>
+										</div>
+									</div>
+									<div class="rich-select-option">
+										<input type="radio" name="game" id="sized-Bubbles">
+										<div class="rich-select-option-body">
+											<label tabindex="-1">
+												<img src="../../resources/images/bubbles.png" alt="">sized Bubbles
+											</label>
+										</div>
+									</div>
+									<div class="rich-select-option">
+										<input type="radio" name="game" id="HexBin">
+										<div class="rich-select-option-body">
+											<label tabindex="-1">
+												<img src="../../resources/images/hexbin.png" alt="">HexBin
+											</label>
+										</div>
+									</div>
+									<div class="rich-select-option">
+										<input type="radio" name="game" id="HexBinSized">
+										<div class="rich-select-option-body">
+											<label tabindex="-1">
+												<img src="../../resources/images/hexbin_size.png" alt="">HexBin sized
+											</label>
+										</div>
+									</div>
+								</div>
+								<input type="checkbox" id="rich-select-dropdown-button" class="rich-select-dropdown-button">
+								<label for="rich-select-dropdown-button" style="width:1000px;height:50px"></label>
+								<div class="rich-select-options">
+									<div class="rich-select-option">
+										<div class="rich-select-option-body">
+											<label for="Dots" tabindex="-1" onclick="document.getElementById('rich-select-dropdown-button').click();ixmaps.editor.setChartStyle('CHART|DOT|RAW|FAST')">
+												<img src="../../resources/images/points.png" alt=""> Dots
+											</label>
+										</div>
+									</div>
+									<div class="rich-select-option">
+										<div class="rich-select-option-body">
+											<label for="sized-Bubbles" tabindex="-1" onclick="document.getElementById('rich-select-dropdown-button').click();ixmaps.editor.setChartStyle('CHART|BUBBLE|SIZE')">
+												<img src="../../resources/images/bubbles.png" alt=""> sized Bubbles
+											</label>
+										</div>
+									</div>
+									<div class="rich-select-option">
+										<div class="rich-select-option-body">
+											<label for="HexBin" tabindex="-1" onclick="document.getElementById('rich-select-dropdown-button').click();ixmaps.editor.setChartStyle('CHART|SYMBOL|GRIDSIZE|FAST|AGGREGATE|SUM|DOPACITY')">
+												<img src="../../resources/images/hexbin.png" alt=""> HexBin
+											</label>
+										</div>
+									</div>
+									<div class="rich-select-option">
+										<div class="rich-select-option-body">
+											<label for="HexBinSized" tabindex="-1" onclick="document.getElementById('rich-select-dropdown-button').click();ixmaps.editor.setChartStyle('CHART|SYMBOL|AUTOSIZE|FAST|AGGREGATE|SUM')">
+												<img src="../../resources/images/hexbin_size.png" alt=""> HexBin sized
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+               </div>
+
+				
+				
+				
 				<div class="row">
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 						<div class="form-group">
@@ -1138,7 +1348,7 @@
 				<!-- ----------------------- -->
 
 				<div class="container map-config">
-					<h3 id="chartExtraTitle" class="disabled">theme behaviour</h3>
+					<h3 id="chartExtraTitle" class="disabled">behaviour</h3>
 
 					<div class="row">
 						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
@@ -1318,16 +1528,22 @@
 
 				var resize = function() {
 					var height = (window.parent.$("#editor").height() || ($(window.parent).height() + 60) || ($(window).height() + 60));
-					$("#workspace").css("height", (height - 60) + "px");
+					$("#theme-editor").css("height", (height - 60) + "px");
 				};
 				window.onresize = function() {
 					resize();
 				};
 				window.onscroll = function() {
-					$("#editor-apply").css("top", $("body").scrollTop() + 20);
+					if ($(document).scrollTop() > 100){
+						$("#editor-apply").show();
+						$("#editor-apply").css("top", ($(document).scrollTop()+10) + "px");
+					} else {
+						$("#editor-apply").hide();
+					}
 				};
-
+				$("#editor-apply").hide();
 				$("#editor-apply-button").button();
+				
 				$("#editor-div").show();
 
 				// -----------------------------------------------------------
@@ -1380,7 +1596,7 @@
 					ixmaps.editorColorschemeType = "colorscheme";
 
 					ixmaps.editorColorscheme = szColorscheme;
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, "colorscheme:" + szColorscheme, "set");
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, "colorscheme:" + szColorscheme, "set");
 					ixmaps.setColors(szColorscheme);
 					$("#dialog").dialog("close");
 				};
@@ -1438,17 +1654,17 @@
 				function toggle_dopacity() {
 					var szThemeStyle = ixmaps.getThemeStyleString();
 					if (szThemeStyle && szThemeStyle.match(/DOPACITYLOG/)) {
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:DOPACITYLOG;', 'remove');
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:DOPACITYMAX;dopacityscale:5;', 'toggle');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:DOPACITYLOG;', 'remove');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:DOPACITYMAX;dopacityscale:5;', 'toggle');
 					} else
 					if (szThemeStyle && szThemeStyle.match(/DOPACITYMAX/)) {
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:DOPACITYMAX;', 'remove');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:DOPACITYMAX;', 'remove');
 					} else
 					if (szThemeStyle && szThemeStyle.match(/DOPACITY/)) {
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:DOPACITY;', 'remove');
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:DOPACITYLOG;dopacityscale:5;', 'toggle');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:DOPACITY;', 'remove');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:DOPACITYLOG;dopacityscale:5;', 'toggle');
 					} else {
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:DOPACITY;dopacityscale:5;', 'toggle');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:DOPACITY;dopacityscale:5;', 'toggle');
 					}
 					setTimeout("init_theme_line()", 100);
 				}
@@ -1456,52 +1672,52 @@
 				function toggle_values() {
 					var szThemeStyle = ixmaps.getThemeStyleString();
 					if (szThemeStyle && szThemeStyle.match(/VALUES/)) {
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:VALUES;', 'remove');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:VALUES;', 'remove');
 					} else {
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:VALUES;', 'add');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:VALUES;', 'add');
 					}
 				}
 
 				function toggle_glow() {
 					var szThemeStyle = ixmaps.getThemeStyleString();
 					if (szThemeStyle && szThemeStyle.match(/GLOW/)) {
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:GLOW;', 'remove');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:GLOW;', 'remove');
 					} else {
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:GLOW;', 'add');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:GLOW;', 'add');
 					}
 				}
 
 				function toggle_aura() {
 					var szThemeStyle = ixmaps.getThemeStyleString();
 					if (szThemeStyle && szThemeStyle.match(/AURA/)) {
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:AURA;', 'remove');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:AURA;', 'remove');
 					} else {
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:AURA;', 'add');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:AURA;', 'add');
 					}
 				}
 
 				function toggle_relocate() {
 					var szThemeStyle = ixmaps.getThemeStyleString();
 					if (szThemeStyle && szThemeStyle.match(/RELOCATE/)) {
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:RELOCATE;', 'remove');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:RELOCATE;', 'remove');
 					} else {
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:RELOCATE;', 'add');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:RELOCATE;', 'add');
 					}
 				}
 
 				function toggle_shadow() {
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'shadow:toggle');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'shadow:toggle');
 				}
 
 				function toggle_data() {
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'showdata:toggle');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'showdata:toggle');
 				}
 
 				function setChartScale(nDelta) {
 					if (event.keyCode == 13) {
 						var newScale = Number($("#chartScaleValue").val());
 						if (!isNaN(newScale)) {
-							ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'scale:' + String(newScale), 'set');
+							ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'scale:' + String(newScale), 'set');
 						} else {
 							alert("Input type error: only numbers allowed!");
 						}
@@ -1516,13 +1732,13 @@
 						nScale = (nScale * 1.5).toPrecision(2);
 					}
 					$("#chartScaleValue").val(nScale)
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'scale:' + String(nScale), 'set');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'scale:' + String(nScale), 'set');
 				}
 
 				function setLineColor() {
 					if (event.keyCode == 13) {
 						var newColor = String($("#chartLineColor").val());
-						ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'linecolor:' + newColor, 'set');
+						ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'linecolor:' + newColor, 'set');
 					}
 				}
 
@@ -1530,7 +1746,7 @@
 					if (event.keyCode == 13) {
 						var newScale = Number($("#chartLineWidth").val());
 						if (!isNaN(newScale)) {
-							ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'linewidth:' + String(newScale), 'set');
+							ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'linewidth:' + String(newScale), 'set');
 						} else {
 							alert("Input type error: only numbers allowed!");
 						}
@@ -1545,14 +1761,14 @@
 						nScale = (nScale * 1.5).toPrecision(2);
 					}
 					$("#chartLineWidth").val(nScale)
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'linewidth:' + String(nScale), 'set');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'linewidth:' + String(nScale), 'set');
 				}
 
 				function setValueScale(nDelta) {
 					if (event.keyCode == 13) {
 						var newScale = Number($("#chartValueScale").val());
 						if (!isNaN(newScale)) {
-							ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'valuescale:' + String(newScale), 'set');
+							ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'valuescale:' + String(newScale), 'set');
 						} else {
 							alert("Input type error: only numbers allowed!");
 						}
@@ -1567,7 +1783,7 @@
 						nScale = (nScale * 1.5).toPrecision(2);
 					}
 					$("#chartValueScale").val(nScale)
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'valuescale:' + String(nScale), 'set');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'valuescale:' + String(nScale), 'set');
 				}
 
 				function setChartOpacity() {
@@ -1869,12 +2085,12 @@
 					return (u);
 				};
 
-				ixmaps.editor.setChartStyle = function() {
+				ixmaps.editor.setChartStyle = function(szValue) {
 
 					var szFlag = ixmaps.editor.themeObj.style.type || "";
 					var szCategorical = szFlag.match(/CATEGORICAL/) ? "|CATEGORICAL" : "";
 
-					var szValue = $("#theme-type-select").val();
+					szValue = szValue || $("#theme-type-select").val();
 					switch (szValue) {
 						case "CHOROPLETH":
 							ixmaps.editor.themeObj.style.type = szValue + szCategorical;
@@ -1976,18 +2192,18 @@
 
 				ixmaps.editor.setDistribution = function() {
 					var szDistribution = $("#theme-distribution-select").val();
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:EQUIDISTANT;', 'remove');
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:QUANTILE;', 'remove');
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:RANGE;', 'remove');
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:LOG;', 'remove');
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:LOGARITHMICAL;', 'remove');
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:DOMINANT;', 'remove');
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:DEVIATION;', 'remove');
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'type:' + szDistribution + ';', 'add');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:EQUIDISTANT;', 'remove');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:QUANTILE;', 'remove');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:RANGE;', 'remove');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:LOG;', 'remove');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:LOGARITHMICAL;', 'remove');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:DOMINANT;', 'remove');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:DEVIATION;', 'remove');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'type:' + szDistribution + ';', 'add');
 				};
 
 				ixmaps.editor.setClasses = function() {
-					ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'classes:"' + $("#theme-classes-select").val() + '"', 'set');
+					ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'classes:"' + $("#theme-classes-select").val() + '"', 'set');
 				};
 
 				ixmaps.editor.setNewLabel = function(i) {
@@ -2098,10 +2314,13 @@
 
 				ixmaps.editor.makeDefaultTheme = function(color_selected) {
 
-					if (!ixmaps.editor.dbtable) {
+					if (!ixmaps.editor.dbtable ||
+						!ixmaps.editor.dbtable.table ||
+						!ixmaps.editor.dbtable.table.records
+					   ) {
 						return {};
 					}
-
+	
 					objTheme = {
 						fields: "$item$"
 					};
@@ -2110,26 +2329,38 @@
 					objTheme.style.dbtableType = ixmaps.editor.dbtableType || "";
 					objTheme.style.dbtable = "themeDataObj";
 					objTheme.style.lookupfield = " ";
-
+					objTheme.style.title = "[title]";
+					objTheme.style.colorscheme = [1, "#eeeeff", "#0000dd"];
+					objTheme.style.editor = true;
+					
+					var x = (ixmaps.editor.dbtable.records[0][ixmaps.editor.dbtable.table.fields-1]);
+					if(x.match(/Polygon|Line/)){
+						objTheme.layer = "FEATURE";
+						$('#map-layer-select').append($('<option>', {value:"FEATURE", text:'FEATURE'}));
+						$("#map-layer-select").val("FEATURE");
+						objTheme.style.type = "FEATURE";
+						objTheme.style.colorscheme = "#eeeeee";
+						objTheme.style.fillopacity = "0.1";
+						objTheme.style.linecolor = "#0088dd";
+						objTheme.style.linewidth = "0.5";
+					} else
 					if (ixmaps.editor.dbtable && ixmaps.editor.dbtable.table && (ixmaps.editor.dbtable.table.records > 250000)) {
-						objTheme.style.type = "CHART|SYMBOL|GRIDSIZE|DOPACITY|AGGREGATE|FAST|SUM|ZOOMTO";
-						//objTheme.style.type = "CHART|SYMBOL|AUTOSIZE|AGGREGATE|SUM|ZOOMTO";
+						objTheme.style.type = "CHART|SYMBOL|GRIDSIZE|DOPACITY|AGGREGATE|FAST|SUM|ZOOMTO|SHOW";
+						//objTheme.style.type = "CHART|SYMBOL|AUTOSIZE|AGGREGATE|SUM|ZOOMTO|SHOW";
 						objTheme.style.gridwidth = "10px";
 						objTheme.style.symbols = ["hexagon"];
 						objTheme.style.dopacitypow = 2;
 						objTheme.style.dopacityscale = 2;
 					} else
 					if (ixmaps.editor.dbtable && ixmaps.editor.dbtable.table && (ixmaps.editor.dbtable.table.records > 100000)) {
-						objTheme.style.type = "CHART|BUBBLE|AGGREGATE|FAST|SUM|ZOOMTO";
+						objTheme.style.type = "CHART|BUBBLE|AGGREGATE|FAST|SUM|ZOOMTO|SHOW";
 						objTheme.style.gridwidth = "2px";
 						objTheme.style.fillopacity = "0.3";
 					} else {
 						//objTheme.style.type = "CHART|DOT|RAW|FAST";
-						objTheme.style.type = "CHART|DOT|RAW|FAST|ZOOMTO";
+						objTheme.style.type = "CHART|DOT|RAW|FAST|ZOOMTO|SHOW";
 						objTheme.style.fillopacity = "0.2";
 					}
-					objTheme.style.colorscheme = [1, "#eeeeff", "#0000dd"];
-					objTheme.style.editor = true;
 					ixmaps.editor.themeObj = objTheme;
 
 					return objTheme;
@@ -2239,6 +2470,12 @@
 						// ------------------------------
 
 						objTheme = ixmaps.editor.makeDefaultTheme(color_selected);
+						
+						if (!objTheme.fields){
+							var szHtml = "<p style='padding:1em'>no data defined or data not valid</p>";	
+							$("#editor-footer").html(szHtml);
+						}
+							
 						objThemeObj = {
 							szFieldsA: [objTheme.fields]
 						};
@@ -2268,7 +2505,7 @@
 
 						if (objTheme.style.type.match(/ZOOMTO/)) {
 							objTheme.style.type = __removeTypeFlag(objTheme.style.type, "ZOOMTO");
-							ixmaps.changeThemeStyle(ixmaps.editor.themeId, "type:ZOOMTO", "remove");
+							ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, "type:ZOOMTO", "remove");
 						}
 
 						ixmaps.editor.alert(
@@ -2390,6 +2627,16 @@
 											$("#theme-data-lookup-select").val(fields[i].id);
 											break;
 										}
+										if (matchA &&
+											(matchA.length == 3) &&
+											(Number(matchA[1]) < 180) && (Number(matchA[1]) > -180) &&
+											(Number(matchA[2]) < 80) && (Number(matchA[2]) > -80) &&
+											matchA[1] % 1 &&
+											matchA[2] % 1
+										) {
+											$("#theme-data-lookup-select").val(fields[i].id);
+											break;
+										}
 									}
 								}
 							}
@@ -2416,6 +2663,8 @@
 							ixmaps.editor.alert('<p><b>automatic</b> lookup field selection ! Please control !', "lookup-alert", "warning");
 							$("#define-latlon-title").css("color", color_selected);
 							$("#chartLookupFields").css("color", color_selected);
+							$("#chartLookupFieldsCheck").show();
+							
 
 						} else {
 
@@ -2423,10 +2672,11 @@
 							clearTimeout(ixmaps.editor.applyChangesTimeout);
 
 							ixmaps.editor.alert(
-								'<p><b>automatic</b> coordinate field lookup <b>failed</b> !</p><p>Please select a <b>lookup</b> field or <b>lat/lon</b> fields and then click <a onclick="javascript:ixmaps.editor.applyChanges();">apply changes</a></p>',
+								'<p><b>automatic</b> coordinate field lookup <b>failed</b> !</p><p>Please select a <b>lookup</b> field or <b>lat/lon</b> fields and then click <a onclick="javascript:ixmaps.editor.applyChanges();">apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i></a></p>',
 								"lookup-alert", "danger");
 
 							$("#chartLookupFields").css("color", color_error);
+							$("#chartLookupFieldsCheck").hide();
 
 							$("#define-latlon-title").css("color", color_error);
 							$("#define-lookup-title").css("color", color_error);
@@ -2442,6 +2692,7 @@
 						// -----------------------------
 
 						$("#chartLookupFields").css("color", color_unselected);
+						$("#chartLookupFieldsCheck").hide();
 						$("#define-lookup-title").css("color", color_unselected);
 						$("#define-latlon-title").css("color", color_unselected);
 						if (objTheme.style.lookupfield.match(/\|/)) {
@@ -2449,11 +2700,13 @@
 							$("#theme-data-lon-select").val(objTheme.style.lookupfield.split("|")[1]);
 							$("#define-latlon-title").css("color", color_selected);
 							$("#chartLookupFields").css("color", color_selected);
+							$("#chartLookupFieldsCheck").show();
 						} else {
 							$("#theme-data-lookup-select").val(objTheme.style.lookupfield);
 							$("#define-lookup-title").css("color", color_selected);
 							$("#define-latlon-div").hide();
 							$("#chartLookupFields").css("color", color_selected);
+							$("#chartLookupFieldsCheck").show();
 						}
 					}
 
@@ -2868,7 +3121,6 @@
 					var objTheme = ixmaps.getThemeDefinitionObj() || ixmaps.editor.themeObj;
 
 					objTheme.style.dbtableUrl = $("#define-data").val();
-
 					objTheme.layer = $("#map-layer-select").val();
 					objTheme.field = $("#theme-data-fields-select").val();
 
@@ -3021,7 +3273,10 @@
 					ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(objTheme);
 
 					if (!oldTheme) {
-						//setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()",100);
+						setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()",100);
+						setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()",200);
+						setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()",500);
+						setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()",1000);
 					}
 
 					ixmaps.editor.alert('<b>generating theme ...</b><img src="../../../ui/resources/images/loading_blue.gif" id="load-file-spinner" style="height:48px;margin:-0.4em 0 0 0;">', "generating-on-bottom", "default");
@@ -3054,7 +3309,7 @@
 						if (i % 4 == 0) {
 							szHtml += "<div style='clear:both'>";
 						}
-						szHtml += "<a href=\"javascript:ixmaps.changeThemeStyle('" + ixmaps.themeObj.szId + "','type:" + szTypelistA[i] + "','set');\"><div style='float:left;height:60px;width:60px;'></div></a>";
+						szHtml += "<a href=\"javascript:ixmaps.changeThemeStyle(null,'" + ixmaps.themeObj.szId + "','type:" + szTypelistA[i] + "','set');\"><div style='float:left;height:60px;width:60px;'></div></a>";
 					}
 					szHtml += "</div>";
 
@@ -3432,6 +3687,138 @@
 					$("#getchartmenutarget" + index)[0].parentNode.setAttribute("viewBox", SVGBox.x + ' ' + SVGBox.y + ' ' + SVGBox.width + ' ' + SVGBox.height);
 
 				};
+
+    // ---------------------------------------------------
+    // format number display 
+    // ---------------------------------------------------
+
+    /**
+     * convert a number into a formatted string; if the number > 1000 it will be formatted like 1 023 234 
+     * @param nValue the number to format
+     * @param nPrecision the wanted decimal points 
+     * @param szFlag "CEIL" or "FLOOR" (round either up or down)
+     */
+    ixmaps.__formatValue = function (nValue, nPrecision, szFlag) {
+
+        nValue = Number(nValue);
+
+        if (!isFinite(nValue) || !isFinite(nPrecision)) {
+            return String(nValue);
+        }
+        if (nValue == 0) {
+            return String(nValue);
+        }
+        if (nValue > 1000000000000) {
+            return String(nValue);
+        }
+        if (nValue < -1000000000000) {
+            return String(nValue);
+        }
+
+        if (!nPrecision) {
+            nPrecision = 0;
+        }
+        nPrecision = Math.max(0, nPrecision);
+
+        // GR 02.12.2011 make that low values do not collapse to 0
+        if ((nValue > 0.0000001) && (nPrecision > 0)) {
+            while (nValue.toFixed(nPrecision - 1) == 0) {
+                nPrecision++;
+            }
+        }
+
+        // GR 11.03.2009 fix precision before CEIL or FLOOR to avoid JS errors eg. 0.0000000000003
+        nValue = nValue.toFixed(nPrecision + 1);
+
+        nClipDecimal = Math.pow(10, nPrecision);
+        if (szFlag && szFlag.match(/CEIL/)) {
+            nValue = Math.ceil(nValue * nClipDecimal) / nClipDecimal;
+        } else
+        if (szFlag && szFlag.match(/FLOOR/)) {
+            nValue = Math.floor(nValue * nClipDecimal) / nClipDecimal;
+        } else {
+            nValue = Math.round(nValue * nClipDecimal) / nClipDecimal;
+        }
+        // format numbers > 1000
+        if (0 && (nValue < 1000)) {
+            return String(nValue);
+        } else {
+            var szDecimals = String(nValue);
+            if (szDecimals.match(/\./)) {
+                szDecimals = szDecimals.split(".")[1];
+                while (szDecimals.length < nPrecision) {
+                    szDecimals += '0';
+                }
+            } else {
+                szDecimals = "";
+            }
+            var szReturn = nValue < 0 ? "-" : "";
+            var szLeading = "";
+
+            nValue = Math.floor(Math.abs(nValue));
+
+            // GR new flag
+            if (!szFlag || !szFlag.match(/NOBREAKS/)) {
+                var nClip = 1000;
+                while (nValue > nClip) {
+                    nClip *= 1000;
+                }
+                nClip /= 1000;
+
+                var nPart = 0;
+                var szBreak = " ";
+                while (nClip >= 1000) {
+                    nPart = Math.floor(nValue / nClip);
+                    szReturn += __maptheme_formatpart(nPart, szLeading);
+                    nValue = nValue % nClip;
+                    nClip /= 1000;
+                    if (nPart) {
+                        szLeading = "0";
+                        if (szFlag && szFlag.match(/BLANK/)) {
+                            szBreak = "&nbsp;";
+                        } else {
+                            szBreak = ".";
+                        }
+                    }
+                    szReturn += szBreak;
+                }
+            }
+
+            szReturn += __maptheme_formatpart(nValue, szLeading);
+
+            if (!szReturn.length || (szReturn == "-")) {
+                szReturn += "0";
+            }
+
+            if (szDecimals.length && szDecimals != "00") {
+                szReturn += ((szFlag && szFlag.match(/BLANK/)) ? "." : ",") + szDecimals;
+            }
+        }
+        return szReturn;
+    }
+    /**
+     * helper to format a number from 0 to 999 into a string with leading character (sample 32 -> "032" )
+     * @param nPart the number to format
+     * @param szLeading the leading character to insert if necessary 
+     */
+    function __maptheme_formatpart(nPart, szLeading) {
+        if (!szLeading) {
+            szLeading = "";
+        }
+        var szPart = "";
+        if (nPart < 100) {
+            szPart += szLeading;
+        }
+        if (nPart < 10) {
+            szPart += szLeading;
+        }
+        if (nPart == 0) {
+            szPart += szLeading;
+        } else {
+            szPart += String(nPart);
+        }
+        return szPart;
+    }
 
 
 				$(document).ready(function() {

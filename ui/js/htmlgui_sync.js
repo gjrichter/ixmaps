@@ -424,7 +424,7 @@ $Log: htmlgui_sync.js,v $
 	 **	keyboard handler
 	 **/
 
-	ixmaps.do_keydown = function (evt) {
+	ixmaps.do_keydown = function (evt,source) {
 
 		// evoke theme editor by key ctrl+alt+E
 		if (evt.keyCode == 69) {
@@ -464,8 +464,10 @@ $Log: htmlgui_sync.js,v $
 				fEnableSwitchEvents = false;
 			}
 		}
+		
+		ixmaps.mapTool("pan");
 	};
-	ixmaps.do_keyup = function (evt) {
+	ixmaps.do_keyup = function (evt, source) {
 
 		if (fShareEvents) {
 			// switch back event target on 'shift' key up
@@ -474,6 +476,8 @@ $Log: htmlgui_sync.js,v $
 				__activateSVGElements(true);
 			}
 		}
+		
+		ixmaps.mapTool("info");
 	};
 
 
@@ -1033,6 +1037,11 @@ $Log: htmlgui_sync.js,v $
 		}
 	};
 	ixmaps.htmlgui_setCurrentCenterByGeoBounds = function (ptCenter) {
+			htmlMap_setCenter({
+				lat: ptCenter.y,
+				lng: ptCenter.x
+			});
+		return;
 		ixmaps.svgmap_view = true;
 		if (ixmaps.htmlmap_view && ixmaps.htmlMap && !ixmaps.fInSVGSync) {
 			ixmaps.htmlgui_synchronizeSVG(false);

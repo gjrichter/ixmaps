@@ -5291,7 +5291,7 @@ Map.Event.prototype.defaultMouseOver = function(evt){
                 mapObject =  new MapObject(mapObject.objNode.ownerDocument.getElementById(szId));
             }
 			szMapToolType = "";
-			if ( HTMLWindow.ixmaps.htmlgui_onItemClick(mapObject.szId) ){
+			if ( HTMLWindow.ixmaps.htmlgui_onItemClick(evt,mapObject.szId) ){
 				__circleHighlight(evt,mapObject);
                 SVGPopupGroup.fu.clear();
 				killTooltip();
@@ -5310,6 +5310,21 @@ Map.Event.prototype.defaultMouseOver = function(evt){
 		( szMapToolType === "info"  || szMapToolType === "clickinfo"  || szMapToolType === "" )
 		){
 
+		try{
+			if ( HTMLWindow.ixmaps.htmlgui_onItemOver(evt,mapObject.szId) ){
+				SVGPopupGroup.fu.clear();
+				highLightList.unlock();
+				highLightList.removeAll();
+				highLightList.addItem(mapObject.objNode,"scale");
+				highLightList.lock();
+				HTMLWindow.ixmaps.htmlgui_onSVGPointerIdle();
+				return null;
+			}
+		}
+		catch (e){
+		}
+			
+		
 		displayInfo(evt,onoverShape,"delayed|pointer");
 		this.onoverShape = onoverShape;
 
@@ -5320,6 +5335,17 @@ Map.Event.prototype.defaultMouseOver = function(evt){
 		}
 	}else{
 		__simpleHighlight(evt,onoverShape);
+		
+		try{
+			console.log(mapObject.szId)
+			if ( HTMLWindow.ixmaps.htmlgui_onItemOver(evt,mapObject.szId) ){
+				return null;
+			}
+		}
+		catch (e){
+		}
+		
+		
 		this.tooltipDone = displayTooltip(evt,onoverShape);
 		this.onoverShape = onoverShape;
 	}
@@ -5553,10 +5579,10 @@ Map.Event.prototype.defaultMouseClick = function(evt){
 	}
 	// HTML interface interception
 	try{
-		if ( HTMLWindow.ixmaps.htmlgui_onItemClick(szId) ){
-			__circleHighlight(evt,mapObject);
-                SVGPopupGroup.fu.clear();
-			killTooltip();
+		if ( HTMLWindow.ixmaps.htmlgui_onItemClick(evt,szId) ){
+			//__circleHighlight(evt,mapObject);
+            //SVGPopupGroup.fu.clear();
+			//killTooltip();
 			return null;
 		}
 	}
@@ -5845,6 +5871,7 @@ Map.Event.prototype.defaultKeyUp = function(evt){
  * @param evt the event
  */
 Map.Event.prototype.doDefaultZoom = function(evt){
+	
 
 	if ( fFroozeDynamicContent ){
 		return;
@@ -8140,7 +8167,9 @@ MapTool.prototype.onMouseUp = function(evt){
  * begin panning: hide the toolsGroup, ...
  * @param evt the actual event
  */
-MapTool.prototype.beginPan = function(evt){
+MapTool.prototype.beginPan = function(evt){ 
+	fFroozeDynamicContent = true;
+	return;
 	if ( fPanToolByViewer && fPanHideTools && !fPDFEmbed ){
 		this.endPanTimeout = false;
 		map.Zoom.activateClipping(evt);
@@ -8161,7 +8190,9 @@ MapTool.prototype.beginPan = function(evt){
  * end panning: hide the toolsGroup, ...
  * @param evt the actual event
  */
-MapTool.prototype.endPan = function(evt){
+MapTool.prototype.endPan = function(evt){ 
+	fFroozeDynamicContent = false;
+	return;
 	if( fEndPan != "delayed"){
 		if ( fPanToolByViewer && fPanHideTools && !fPDFEmbed ){
 			map.Zoom.removeClipping(evt);
@@ -8179,7 +8210,9 @@ MapTool.prototype.endPan = function(evt){
  * end panning: hide the toolsGroup, ...
  * @param evt the actual event
  */
-MapTool.prototype.doEndPan = function(evt){
+MapTool.prototype.doEndPan = function(evt){ 
+	fFroozeDynamicContent = false;
+	return;
 	if ( this.endPanTimeout === true) {
         if ( fPanToolByViewer && fPanHideTools && !fPDFEmbed ){
 			map.Zoom.removeClipping(evt);
@@ -9089,7 +9122,7 @@ HighLight.prototype.unlock = function(){
  * @return A new HighLightItem Object
  */
 function HighLightItem(itemNode,szMode) {
-	if ( (szMode != "circle") && (szMode != "isolate") ){
+	if ( (szMode != "circle") && (szMode != "isolate") && (szMode != "scale") ){
 		itemNode = map.Layer.getLayerItemNodeOfNode(itemNode);
 		if ( !itemNode ){
 			return null;
@@ -9185,6 +9218,74 @@ HighLightItem.prototype.doHighLight = function(){
                 
                return true;
             }
+		}
+		if ( this.szMode && this.szMode == "scale"){
+ 			if ( this.node.parentNode.fu && this.node.parentNode.fu.getPosition ){
+                var clonedNode = onoverShape.cloneNode(1000);
+                this.highlightGroup = this.highlightGroup || map.Dom.newGroup(map.Layer.objectGroup.parentNode,":highlightgroup");
+				this.highlightGroup.style.setProperty("pointer-events","none");
+                this.itemNode = this.highlightGroup.appendChild(clonedNode);
+                this.itemNode.setAttributeNS(null,"id","");
+                this.itemNode.style.removeProperty("fill");
+                this.itemNode.style.removeProperty("fill-opacity");
+                if ( 0 && this.itemNode.hasChildNodes ){
+                    var cNodes = this.itemNode.childNodes;
+                    for ( var i=0; i<cNodes.length; i++ ){
+                        if ( cNodes.item(i).nodeType == 1 ){
+                            cNodes.item(i).style.setProperty("stroke","yellow","");
+                        }
+                    }
+                }
+                var box = map.Dom.getBox(this.node);
+                var scale = this.node.parentNode.fu.getScale();
+                var dx = this.node.fu.getPosition().x*scale.x;// + box.width/2*scale.x;
+                var dy = this.node.fu.getPosition().y*scale.y;// - box.height/2*scale.y;
+                var posX = this.node.parentNode.fu.getPosition().x + dx;
+                var posY = this.node.parentNode.fu.getPosition().y + dy;
+                this.itemNode.fu = new Methods(this.itemNode);
+                this.itemNode.fu.setPosition(posX,posY);
+				
+                var scale1 = this.node.fu.getScale();
+                var scale2 = this.node.parentNode.fu.getScale();
+                this.itemNode.fu.scale(scale1.x*scale2.x,scale1.y*scale2.y);
+                
+                //this.objectGroupOpacity = map.Layer.objectGroup.style.getPropertyValue("opacity") || 1;
+                //map.Layer.objectGroup.style.setProperty("opacity","0.3");
+                
+                // add circle
+                
+				var itemNode = map.Dom.newGroup(this.itemNode);
+				var nRadius		 = map.Scale.normalX(10) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+				var nStrokeWidth = map.Scale.normalX(2) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+				var nDash = map.Scale.normalX(1) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+				var nRadiusX = nRadius;
+				var nRadiusY = nRadius;
+				map.Dom.newShape('circle',itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:black;stroke-dasharray:"+nDash+" "+nDash+";stroke-width:"+(nStrokeWidth*1.1)+"px;pointer-events:none");
+				map.Dom.newShape('circle',itemNode,0,0,nRadius,"fill:none;fill-opacity:0.1;stroke:white;stroke-dasharray:"+nDash+" "+nDash+";stroke-width:"+nStrokeWidth+"px;pointer-events:none");
+				var box = map.Dom.getBox(this.node);
+				var scale = this.node.parentNode.fu.getScale();
+				var dx = this.node.fu.getPosition().x*scale.x;// + box.width/2*scale.x;
+				var dy = this.node.fu.getPosition().y*scale.y;// - box.height/2*scale.y;
+				var posX = this.node.parentNode.fu.getPosition().x + dx;
+				var posY = this.node.parentNode.fu.getPosition().y + dy;
+				//this.itemNode.fu.setPosition(posX,posY);
+                itemNode.fu.scale(1/scale.x,1/scale.y);
+				itemNode.fu.scaleBy(1,1/map.Zoom.nZoomY*map.Zoom.nZoomX);
+                
+               return true;
+            }
+		}
+		if ( this.szMode && this.szMode == "scalex"){
+ 			if ( this.node.parentNode.fu && this.node.parentNode.fu.getPosition ){
+                var clonedNode = onoverShape.cloneNode(1000);
+                this.highlightGroup = this.highlightGroup || map.Dom.newGroup(map.Layer.objectGroup.parentNode,":highlightgroup");
+                this.itemNode = this.highlightGroup.appendChild(clonedNode);
+                this.itemNode.setAttributeNS(null,"id","");
+                this.itemNode.fu = new Methods(this.itemNode);
+				this.itemNode.fu.scaleBy(0,0);
+              
+ 			}
+            return true;
 		}
 
 		var mapObj = new MapObject(onoverShape);
@@ -9489,12 +9590,18 @@ doDisplayInfo = function(xPos,yPos,szMode){
 		var shapeNodesA = map.Layer.getLayerItemNodes(infoShape);
 
 		if ( shapeNodesA && (shapeNodesA.length > 0) ){
+			
+			var __doneFields = "";
 
 			// insert the charts of all themes, bound to the shape
 			// ===================================================
 			for ( var t=0; t<map.Themes.themesA.length; t++ ){
 
 				var objTheme = map.Themes.themesA[t];
+				
+				if ( objTheme.szFields == __doneFields ){
+					continue;
+				}
 
 				// try to get the chart of a theme 
 				// ===============================================
@@ -9518,6 +9625,11 @@ doDisplayInfo = function(xPos,yPos,szMode){
 				// check if we we succeeded to get a chart and position and comment it
 				// 
 				if ( chartGroup.hasChildNodes() ){
+					
+					// if we have a theme info, memorize theme fields and don't show shape info
+					__doneFields = objTheme.szFields;
+					text= "";
+					
 					killTooltip();
 					newInfo.fClipped = false;
 					var chartBox = map.Dom.getBox(chartGroup);
@@ -9537,7 +9649,7 @@ doDisplayInfo = function(xPos,yPos,szMode){
 						}
 
 						// scale and position chart 
-						var nChartScale = 2.0;
+						var nChartScale = map.Scale.normalX(objTheme.szFlag.match(/PLOT/)?200:100)/chartBox.width; // 2.0;
 						chartGroup.fu.scale(nChartScale,nChartScale);
 						chartBox = map.Dom.getBox(chartGroup);
 						chartGroup.fu.setPosition(map.Scale.normalX(nIndent)-chartBox.x*nChartScale,contentBox.height+nYpos-chartBox.y*nChartScale);

@@ -321,18 +321,26 @@
 				var szIdA = szId.split(":");
 				var item = __themeObj.itemA[szIdA[1] + "::" + szIdA[3]];
 				if (item) {
-					szHtml += "<div><h1>";
+					szHtml += "<div><h4>";
 					var szValue = ixmaps.__formatValue(item.nSize, 2, "SPACE");
 					var szColor = item.szColor;
 					if (item.szSelectionId) {
-						szHtml += "<span>" + item.szSelectionId;
-						if (item.szSelectionId2) {
-							szHtml += " &rarr; " + item.szSelectionId2;
+						if (__themeObj.szFlag.match(/\b(REVERSE)\b/)){
+							szHtml += "<span>" + item.szSelectionId2;
+							if (item.szSelectionId) {
+								szHtml += " &rarr; " + item.szSelectionId;
+							}
+							szHtml += "</span></h4>";
+						}else{
+							szHtml += "<span>" + item.szSelectionId;
+							if (item.szSelectionId2) {
+								szHtml += " &rarr; " + item.szSelectionId2;
+							}
+							szHtml += "</span></h4>";
 						}
-						szHtml += "</span><br>";
 					}
-					szHtml += "<span style='color:" + (__themeObj.szLineColor || item.szColor) + ";margin-top:0.5em'>" + szValue + " " + __themeObj.szUnits + "<h1>";
-					szHtml += "</span>";
+					szHtml += "<h1 style='margin:0'><span style='color:" + (__themeObj.szLineColor || item.szColor) + ";margin-top:0.5em'>" + szValue + " " + __themeObj.szUnits + "";
+					szHtml += "</span></h1></div>";
 
 					$("#chartDiv").html(szHtml);
 					$("#chartDiv").height("auto");

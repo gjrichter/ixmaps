@@ -2070,6 +2070,8 @@ Map.Themes.prototype.execute = function () {
 		}
 		if (this.themesA[i].fRedraw) {
 			_TRACE("Redraw =====> " + this.themesA[i].szId);
+			this.themesA[i].fRedraw = false;
+			this.themesA[i].fActualize = false;
 			if (this.themesA[i].checkHiddenLayerState && this.themesA[i].checkHiddenLayerState()) {
 				this.themesA[i].fRealize = true;
 				this.themesA[i].fRedraw = false;
@@ -2079,6 +2081,9 @@ Map.Themes.prototype.execute = function () {
 				continue;
 			}
 			this.themesA[i].fEnableProgressBar = true;
+			if ( !this.themesA[i].szFlag.match(/FEATURES/) ){
+				this.themesA[i].unpaintMap();
+			}
 			this.themesA[i].redraw(false);
 			continue;
 		}
@@ -3340,6 +3345,10 @@ Map.Themes.prototype.doChangeThemeStyle = function (szId, szStyle, szFlag) {
 					mapTheme.fRedrawInfo = true;
 				}
 
+				if (styleObj.type.match(/VALUES/) != oldFlag.match(/VALUES/)) {
+					mapTheme.fRedraw = true;
+				}
+				
 				if (styleObj.type.match(/DTEXT/) != oldFlag.match(/DTEXT/)) {
 					mapTheme.unlabelMap();
 				}
@@ -3372,7 +3381,7 @@ Map.Themes.prototype.doChangeThemeStyle = function (szId, szStyle, szFlag) {
 					mapTheme.fNegativeValuePossible = !styleObj.type.match(/NEGATIVEISNOTVALUE/);
 					mapTheme.fRealize = true;
 					mapTheme.fRedraw = true;
-					//mapTheme.unpaintMap();
+					mapTheme.unpaintMap();
 				}
 
 			} else
@@ -3465,8 +3474,11 @@ Map.Themes.prototype.doChangeThemeStyle = function (szId, szStyle, szFlag) {
 
 					mapTheme.fRedraw = true;
 					if (!mapTheme.szFlag.match(/CHART/)) {
-						mapTheme.fRealize = true;
+						mapTheme.unpaintMap();
+					}else{
+						mapTheme.unpaintMap();
 					}
+
 					mapTheme.fRedrawInfo = true;
 					mapTheme.showInfo();
 				}
@@ -3568,11 +3580,13 @@ Map.Themes.prototype.doChangeThemeStyle = function (szId, szStyle, szFlag) {
 			if (__isdef(styleObj.opacity)) {
 				mapTheme.fOpacity = __calcNewValue(mapTheme.fOpacity, Number(styleObj.opacity), szFlag);
 				mapTheme.autoOpacity = false;
+				mapTheme.fRedraw = true;
 			}
 			if (__isdef(styleObj.fillopacity)) {
 				mapTheme.fillOpacity = __calcNewValue(mapTheme.fillOpacity || ((Number(styleObj.fillopacity) < 1) ? 1 : 0), Number(styleObj.fillopacity), szFlag);
 				mapTheme.autoOpacity = false;
 				mapTheme.fillOpacity = Math.min(Math.max(mapTheme.fillOpacity, 0.001), 1);
+				mapTheme.unpaintMap();
 				mapTheme.fRedraw = true;
 			}
 			if (__isdef(styleObj.shadow)) {
@@ -5279,7 +5293,7 @@ Map.Themes.prototype.showErrorInfo = function (evt, szId) {
  * @parameter nZoomChangeFactor 1 if zoom not! changed
  */
 Map.Themes.prototype.actualizeActiveTheme = function (nZoomChangeFactor) {
-
+	
 	_TRACE("A C T U A L I Z E");
 
 	var lastExecutionTime = 0;
@@ -5292,17 +5306,18 @@ Map.Themes.prototype.actualizeActiveTheme = function (nZoomChangeFactor) {
 			executeWithMessage("map.Themes.execute()", "...", 100);
 			continue;
 		}
+		if (this.themesA[i].szFlag.match(/FEATURES/)) {
+			this.themesA[i].fActualize = true;
+			continue;
+		}
+		
 		if (this.themesA[i].szFlag.match(/CHART/)) {
 			if (this.themesA[i].__fClipToGeoBounds) {
 				this.themesA[i].fRealize = true;
-				this.themesA[i].fRedraw = false;
-				//this.themesA[i].unpaintMap();
 			}
 			if (nZoomChangeFactor && (nZoomChangeFactor != 1) && this.themesA[i].szFlag.match(/DYNAMICSCALE/)) {
 				this.themesA[i].nScale *= Math.sqrt(nZoomChangeFactor);
 				this.themesA[i].fRealize = true;
-				this.themesA[i].fRedraw = false;
-				this.themesA[i].unpaintMap();
 			}
 			if (nZoomChangeFactor && (nZoomChangeFactor != 1) && this.themesA[i].szFlag.match(/BEZIER/)) {
 				this.themesA[i].fRedraw = true;
@@ -5311,22 +5326,8 @@ Map.Themes.prototype.actualizeActiveTheme = function (nZoomChangeFactor) {
 				this.themesA[i].fDeclutter = true;
 				map.Themes.execute();
 			}
-			if (nZoomChangeFactor && ((nZoomChangeFactor != 1) || (this.themesA[i].szFlag.match(/FIXGRID/))) &&
-				(this.themesA[i].nChartSizeMin ||
-					this.themesA[i].nValueSizeMin ||
-					this.themesA[i].szAggregationFieldA ||
-					this.themesA[i].nGridWidth ||
-					this.themesA[i].nGridMatrix ||
-					this.themesA[i].nGridWidthPx ||
-					this.themesA[i].nChartUpper ||
-					this.themesA[i].nChartLower ||
-					this.themesA[i].nValueUpper ||
-					this.themesA[i].nBoxUpper ||
-					this.themesA[i].nTitleUpper ||
-					this.themesA[i].nLabelUpper)
-			) {
-
-				if (this.themesA[i].fRealizeDone && (this.themesA[i].szFlag.match(/AUTOGRID/) || this.themesA[i].nGridWidthPx || this.themesA[i].szAggregationFieldA) || this.themesA[i].nMaxCharts) {
+			if (nZoomChangeFactor && (nZoomChangeFactor != 1) ) {
+				if (this.themesA[i].fRealizeDone ) {
 					if (this.themesA[i].szAggregationFieldA) {
 						var oldGridWidth = this.themesA[i].nGridWidth;
 						var oldAggregationField = this.themesA[i].szAggregationField;
@@ -5349,11 +5350,8 @@ Map.Themes.prototype.actualizeActiveTheme = function (nZoomChangeFactor) {
 						}
 						if ((this.themesA[i].szAggregationField != oldAggregationField) || (this.themesA[i].nGridWidth != oldGridWidth)) {
 							this.themesA[i].fRealize = true;
-							this.themesA[i].fRedraw = false;
-							this.themesA[i].unpaintMap();
 							this.themesA[i].themeNodesPosA = [];
 						} else {
-							//this.themesA[i].unpaintMap();
 							this.themesA[i].fRedraw = true;
 						}
 					}
@@ -5361,7 +5359,7 @@ Map.Themes.prototype.actualizeActiveTheme = function (nZoomChangeFactor) {
 						var maxDist = map.Scale.getDistanceInMeter(1000, 1000, 1000 + map.Scale.normalX(this.themesA[i].nGridWidthPx), 1000);
 						this.themesA[i].nGridWidth = maxDist / map.Scale.nZoomScale;
 						this.themesA[i].fRealize = true;
-						this.themesA[i].fRedraw = false;
+						// important! to avoid rendering of intermediate scaled charts
 						this.themesA[i].unpaintMap();
 						this.themesA[i].themeNodesPosA = [];
 					} else
@@ -5370,41 +5368,44 @@ Map.Themes.prototype.actualizeActiveTheme = function (nZoomChangeFactor) {
 						var maxDist = map.Scale.getDistanceInMeter(1000, 1000, 1000 + mapArea.width, 1000);
 						this.themesA[i].nGridWidth = maxDist / (this.themesA[i].nGridMatrix || 20) / map.Scale.nZoomScale;
 						this.themesA[i].fRealize = true;
-						this.themesA[i].fRedraw = false;
+						// important! to avoid rendering of intermediate scaled charts
 						this.themesA[i].unpaintMap();
 						this.themesA[i].themeNodesPosA = [];
-					} else
-					if (this.themesA[i].nGridWidth) {
-						this.themesA[i].fActualize = true;
-					}
-				} else {
-					if (this.themesA[i].nChartUpper ||
-						this.themesA[i].nChartLower ||
-						this.themesA[i].nValueUpper ||
-						this.themesA[i].nBoxUpper 	||
-						this.themesA[i].nTitleUpper ||
-						this.themesA[i].nLabelUpper ){
-						this.themesA[i].unpaintMap();
-					}
-					if (this.themesA[i].nMaxCharts) {
-						this.themesA[i].unpaintMap();
-					}
-					if (this.themesA[i].fRealizeDone && (nZoomChangeFactor < 1) && (this.themesA[i].nChartSizeMin || this.themesA[i].nValueSizeMin)) {
-						this.themesA[i].unpaintMap();
-					}
+					} 
+				} 
+
+				if (this.themesA[i].autoOpacity) {
 					this.themesA[i].fRedraw = true;
 				}
-			} else {
-				if (this.themesA[i].nMaxCharts && (nZoomChangeFactor != 1) ) {
-					this.themesA[i].unpaintMap();
+				if (this.themesA[i].nValueUpper ||
+					this.themesA[i].nValueLower	||
+					this.themesA[i].nChartUpper ||
+					this.themesA[i].nChartLower ||
+					this.themesA[i].nBoxUpper 	||
+					this.themesA[i].nTitleUpper ||
+					this.themesA[i].nLabelUpper ||
+					this.themesA[i].nMaxCharts){
+					this.themesA[i].fRedraw = true;
 				}
-				this.themesA[i].fActualize = true;
+			
 			}
-		} else if (this.themesA[i].isChecked && !this.themesA[i].fMarkClass) {
-			this.themesA[i].fRedraw = true;
+			
+		} 
+
+		if ( this.themesA[i].fRealize ){
+			this.themesA[i].fRedraw = false;
+			this.themesA[i].fActualize = false;
+		}else
+		if ( this.themesA[i].fRedraw ){
+			this.themesA[i].fActualize = false;
+		}else{
+			this.themesA[i].fActualize = true;
 		}
+		
 		lastExecutionTime += this.themesA[i].timeAggregating;
 	}
+	
+	
 	if (1 || (lastExecutionTime > 10)) {
 		executeWithMessage("map.Themes.execute()", "...", 100);
 	} else {
@@ -6432,17 +6433,21 @@ MapTheme.prototype.realize = function () {
 		this.fDone = true;
 		return;
 	}
-	
+
+	// check if chart theme (visible) depends on FEATURE layer theme and control FEATURE theme done 
 	if (this.szFlag.match(/CHART/) ){
-		var themes = map.Themes.getAllThemes();
-		for ( i in themes ){
-			if ( (themes[i] != this) && 
-				 (themes[i].szFlag.match(/FEATURE/)) && 
-				 (themes[i].szThemesA[0] == this.szThemesA[0]) && 
-				 !themes[i].fDone ) {
-				this.fRealize = true;
-				setTimeout("map.Themes.execute()",500);
-				return;
+		if ( (!this.nChartLower || (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nChartLower)) &&
+		     (!this.nChartUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nChartUpper)) ){
+			var themes = map.Themes.getAllThemes();
+			for ( i in themes ){
+				if ( (themes[i] != this) && 
+					 (themes[i].szFlag.match(/FEATURE/)) && 
+					 (themes[i].szThemesA[0] == this.szThemesA[0]) && 
+					 !themes[i].fDone ) {
+					this.fRealize = true;
+					setTimeout("map.Themes.execute()",500);
+					return;
+				}
 			}
 		}
 	}
@@ -6461,12 +6466,13 @@ MapTheme.prototype.realize = function () {
 		this.fRemove = true;
 		return;
 	}
+	
 	// GR 27.02.2021 POSITION now all here 
 	// don't create SVG objects but only entries in map.Themes.themeNodesPosA[]
 	// --------------------------------------------------------------------------
 	if (this.szFlag.match(/\bPOSITION\b/)) {
 		_LOG("start");
-		console.log(this);
+
 		var szTheme  = this.szThemesA[0];
 		var objTheme = this.objThemesA[szTheme];
 		var itemIndex = objTheme.nFieldItemIndex;
@@ -6480,7 +6486,7 @@ MapTheme.prototype.realize = function () {
 				);
 		}
 		_LOG("stop");
-		console.log(map.Themes.themeNodesPosA);
+
 		this.fAnalyze = false;
 		this.fDraw = false;
 		this.fDone = true;
@@ -7897,7 +7903,9 @@ MapTheme.prototype.loadValuesOfTheme = function (szThemeLayer) {
 				// add time value
 				if (this.szTimeField) {
 					this.itemA[szId].szTime = (this.szTimeField == "$index$") ? (j + 1) : __mpap_decode_utf8((this.objTheme.dbRecords[j][this.objTheme.nTimeFieldIndex]));
-					this.itemA[szId].szTime = this.itemA[szId].szTime.replace(/ - /g,"");
+					if (isNaN(this.itemA[szId].szTime)){
+						this.itemA[szId].szTime = this.itemA[szId].szTime.replace(/ - /g,"");
+					}
 				}
 				// add label value
 				if (this.szLabelField) {
@@ -8334,7 +8342,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 			this.fSelection == "MultiLineString" 
 		   ) {
 			szId = this.objTheme.dbRecords[j][this.objTheme.nFieldSelectionIndex];
-			var szMA = szId.match(positionRegExp);
+			var szMA = String(szId).match(positionRegExp);
 			if (szMA){
 				ptPos = map.Scale.getMapPositionOfLatLon(parseFloat(szMA[2]), parseFloat(szMA[1]));
 			}
@@ -8349,7 +8357,6 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 			if (this.fSelectionFieldToNumber) {
 				szId = String(Number(szId));
 			}
-
 			ptPos = this.getNodePosition(szThemeLayer + "::" + szId);
 		}
 
@@ -9149,6 +9156,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 		for (a in this.itemA) {
 			this.itemA[a].szValue = String(this.itemA[a].nSize);
 		}
+		this.szValueField = null;
 	}
 
 	if (this.oldSizefield) {
@@ -10215,7 +10223,6 @@ MapTheme.prototype.distributeValues = function () {
 		if (this.szFlag.match(/CATEGORICAL/)) {
 			//_ERROR("ERROR on 'CATEGORICAL' theme: no matching values !");
 			displayMessage("theme: no matching values !", 3000);
-
 		}
 		return false;
 	}
@@ -10623,7 +10630,7 @@ MapTheme.prototype.distributeValues = function () {
 	} else {
 		this.nRangesA = this.szRangesA || this.szExactA;
 	}
-
+	
 	if (this.nRangesA && this.nRangesA.length) {
 
 		// explicit ranges
@@ -10675,6 +10682,7 @@ MapTheme.prototype.distributeValues = function () {
 				nSum: 0
 			};
 		}
+
 		if (this.szFlag.match(/CATEGORICAL/) && this.exactCountA) {
 			for (i = 0; i < nParts; i++) {
 				this.partsA[i].nCount = this.exactCountA[i];
@@ -13900,6 +13908,19 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		this.chartGroup.style.setProperty("fill-opacity",  (this.fillOpacity || 0.1));
 		this.chartGroup.style.setProperty("stroke", this.szLineColor||"red");
 		this.chartGroup.style.setProperty("stroke-width", map.Scale.normalX(this.nLineWidth||1)*this.nChartGroupScaleY);
+		if (typeof (this.szBorderStyle) != 'undefined') {
+			switch (this.szBorderStyle) {
+				case "dotted":
+					this.chartGroup.style.setProperty("stroke-dasharray", "0.1 0.2");
+					break;
+				case "dashed":
+					this.chartGroup.style.setProperty("stroke-dasharray", "0.5 0.2");
+					break;
+			}
+		}
+		if (this.szFlag.match(/DASH/)) {
+			this.chartGroup.style.setProperty("stroke-dasharray", "0.1 0.2");
+		}
 		this.chartGroup.style.setProperty("stroke-opacity", "1");
 		this.chartGroup.style.setProperty("stroke-linecap", "butt");
 		this.chartGroup.style.setProperty("stroke-linejoin", "round");
@@ -14085,6 +14106,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				szInfo += (i?"|":"")+data[i];
 			}
 			shapeGroup.setAttributeNS(szMapNs,"info",szInfo);
+			shapeGroup.setAttributeNS(szMapNs,"tooltip",a);
 			
 			// if part of a theme, set the color
 			// ----------------------------------
@@ -14365,6 +14387,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				if ( len <= 0 ){
 					continue;
 				}
+				
                 var nBow = this.nRangeScale;
                 if (this.szFlag.match(/\bRANDOM\b/)) {
                     nBow -= (this.nRangeScale * 0.66 * Math.random());
@@ -14495,7 +14518,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					});
 					var myShape = map.Dom.constructNode('path', myMarker, {
 						"d": "M0," + nP + " L" + nP + "," + nP / 2 + " L0,0 Z",
-						"style": "fill:" + this.chart.szColor + ";opacity:" + ((this.fillOpacity || 0.3) * 2) + ";stroke:#dddddd;stroke-width:0.03"
+						"style": "fill:" + this.chart.szColor + ";opacity:" + ((this.fillOpacity || 0.3) * 2) + ";stroke:none;stroke-width:0.03"
 					});
 					if (1 || (len > nLineWidth * 3)) {
 						shape.setAttributeNS(null, "marker-end", "url(#" + arrowId + ")");
@@ -14508,7 +14531,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 					if (this.szFlag.match(/DOPACITY/)) {
 						var nPow = 1 / (this.nDopacityPow || 1);
 						var nOpacity = Math.pow((this.itemA[a].nSize - this.nMin), nPow) / Math.pow((this.nMax - this.nMin), nPow) * (this.fillOpacity || 1) * (this.nDopacityScale || 1);
-						myShape.style.setProperty("fill-opacity", String(nOpacity*3), "");
+						myShape.style.setProperty("opacity", String(nOpacity), "");
 					}
 				}
 				// text on path
@@ -14681,7 +14704,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		// ------------------------------------------------
 		// ===== here we do the chart ===================== 
 		// ------------------------------------------------
-
+		
 		ptNull = this.drawChart(shapeGroup, a, nChartSize, this.szFlag + "|SILENT");
 
 		// ------------------------------------------------
@@ -15993,9 +16016,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			}
 
 			if (this.szLabelA && this.szLabelA[nI]) {
-				szLabel = "  " + this.szLabelA[nI];
+				szLabel = " '" + this.szLabelA[nI]+"'";
 			} else {
-				szLabel = "  " + this.szFieldsA[nI];
+				szLabel = " '" + this.szFieldsA[nI]+"'";
 			}
 
 			var szColor = a ? (this.itemA[a].szColor || this.colorScheme[nI]) : this.colorScheme[nI];
@@ -16660,6 +16683,16 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							szText = "+" + szText;
 						}
 					} else
+					if (this.szSizeField && nSizeValue) {
+						// GR 25.05.2015 explizit size display field
+						szText = this.formatValue(__scanValue(nSizeValue), this.nValueDecimals || ((nSizeValue < 1) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
+						if ((nSizeValue === 0) && (this.szFlag.match(/DIFFERENCE/) || this.szFlag.match(/RELATIVE/) || this.szFlag.match(/\bSIGN\b/))) {
+							szText = "+/-" + szText;
+						}else
+						if ((nSizeValue > 0) && (this.szFlag.match(/DIFFERENCE/) || this.szFlag.match(/RELATIVE/) || this.szFlag.match(/\bSIGN\b/))) {
+							szText = "+" + szText;
+						}
+					} else
 					if (szFlag.match(/CATEGORICAL/) && this.szLabelA) {
 						szText = this.szLabelA[nValue - 1] || "?";
 					} else {
@@ -17081,6 +17114,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			}
 		}
 		
+		// GR 21.09.2016 valuate 'biggest' text of theme to decide font-size
+		var nAllMaxValueText = Math.max(nAllMaxValue, this.nMax);
+		var szMaxText = this.formatValue(nAllMaxValueText, this.nValueDecimals || "") + (this.szUnit.length <= 5 ? this.szUnit : "");
+		
 		// --------------------------------------------------------
 		// draw the chart parts ( n symbols )
 		// --------------------------------------------------------
@@ -17101,15 +17138,18 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				tValue = this.sortedIndex[nIndex].tvalue;
 				nIndex = this.sortedIndex[nIndex].index;
 			}
-
+			
+			if (this.szValueField && this.itemA[a] && (this.szValueField == "$title$")) {
+				tValue = this.itemA[a].szTitle;
+			} else
 			if (this.szValueField && this.itemA[a] && this.itemA[a].szValue ) {
 				// GR 25.05.2015 explizit value display field, take it as is
 				tValue = isNaN(this.itemA[a].szValue)?this.itemA[a].szValue:__scanValue(this.itemA[a].szValue);
-			}
-			if (this.szValueField && this.itemA[a] && (this.szValueField == "$title$")) {
-				tValue = this.itemA[a].szTitle;
+			} else
+			if ( !szFlag.match(/SEQUENCE/) && this.szSizeField && this.itemA[a] && this.itemA[a].nSize ) {
+				tValue = this.itemA[a].nSize;
 			} 
-			
+
 			if (this.szShowParts) {
 				var skipIt = true;
 				for (p in this.szShowPartsA) {
@@ -17170,7 +17210,6 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			// a) symbol equals value
 			// ----------------------
 			if (szFlag.match(/CATEGORICAL/) && !(szFlag.match(/AGGREGATE/) || szFlag.match(/GROUP/))) {
-
 				var szSymbol = "";
 				if (this.nRangesA && this.nRangesA.length) {
 					for (ii = 0; ii < this.nRangesA.length; ii++) {
@@ -17296,10 +17335,21 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							}
 						} else {
 							if (szFlag.match(/VALUES/) && (!this.fHideValues || szFlag.match(/ZOOM/))) {
+								
 								var cColor = __maptheme_getChartColors(szColor);
-								szLineColor = cColor.textColor;
-								var newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:"+(this.szTextFont||"arial")+";font-size:" + String(nRadius / 2) + "px;text-anchor:start;baseline-shift:-45%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", szLabel);
-								newText.fu.setPosition(nRadius + map.Scale.normalX(3), -nIndex * (nRadius * 2 - map.Scale.normalY(0)));
+								var szTextColor = this.szTextColor || cColor.textColor;
+								var szMaxTextLength = Math.max((tValue.length || 0) + 1, szMaxText.length);
+								if( szFlag.match(/INLINETEXT/) ){
+									var nFontSize = String(Math.min(nMaxRadius * 1, nMaxRadius * (((szSymbol == "hexagon") ? 2.7 : 3.2) / szMaxTextLength)));
+									nFontSize *= nRadius / nMaxRadius * this.nValueScale;
+									var newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:"+(this.szTextFont||"arial")+";font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", tValue);
+								}else{
+									var cColor = __maptheme_getChartColors(szColor);
+									szLineColor = cColor.textColor;
+									var szText = this.formatValue(tValue, this.nValueDecimals || (((tValue < 1) || (nMaxValue <= 1)) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
+									var newText = map.Dom.newText(shapeTextGroup, 0, 0, "font-family:"+(this.szTextFont||"arial")+";font-size:" + String(nRadius/2*this.nValueScale) + "px;text-anchor:start;baseline-shift:-45%;fill:" + "#bbbbbb" + ";stroke:none;pointer-events:none", szText);
+									newText.fu.setPosition(nRadius + map.Scale.normalX(3), -nIndex * (nRadius * 2 - map.Scale.normalY(0)));
+								}
 							}
 							newShape.setAttributeNS(szMapNs, "tooltip", szTooltip);
 							newShape.fu.setPosition(0, -nIndex * (nRadius * 2 - map.Scale.normalY(0)));
@@ -17530,7 +17580,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				// ---------------
 
 				var szSymbol = this.szSymbolsA[nIndex];
-
+				/**
 				// GR 31.10.2015 set exact value as text label
 				if (this.szValueField && szFlag.match(/CATEGORICAL/) && this.szValuesA) {
 					tValue = this.szValuesA[nIndex];
@@ -17538,6 +17588,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				if (this.szValueField && this.itemA[a] && (this.szValueField == "$title$")) {
 					tValue = this.itemA[a].szTitle;
 				} 
+				**/
 
 				// get the symbol color
 				// ---------------------
@@ -17808,19 +17859,14 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 				if (newShape && szFlag.match(/VALUES/) && !szFlag.match(/TEXTONLY/) && (!this.fHideValues)) {
 					var newText = null;
-
 					var szText = tValue;
 					if (!isNaN(tValue)) {
 						szText = this.formatValue(tValue, this.nValueDecimals || "") + (this.szUnit.length <= 5 ? this.szUnit : "");
 					}
 
-					// GR 21.09.2016 valuate 'biggest' text of theme to decide font-size
-					var nAllMaxValueText = Math.max(nAllMaxValue, this.nMax);
-					var szMaxText = this.formatValue(nAllMaxValueText, this.nValueDecimals || "") + (this.szUnit.length <= 5 ? this.szUnit : "");
-					var szMaxTextLength = Math.max((tValue.length || 0) + 1, szMaxText.length);
-
 					var cColor = __maptheme_getChartColors(szColor);
 					var szTextColor = this.szTextColor || cColor.textColor;
+					var szMaxTextLength = Math.max((tValue.length || 0) + 1, szMaxText.length);
 
 					var nFontSize = String(Math.min(nMaxRadius * 1, nMaxRadius * (((szSymbol == "hexagon") ? 2.7 : 3.2) / szMaxTextLength)));
 					nFontSize *= nRadius / nMaxRadius * this.nValueScale;
@@ -19679,11 +19725,11 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					if (this.szLabelA && this.szLabelA[nIndex]) {
 						szLabel = this.szLabelA[nIndex];
 					}
-					szValue += this.szUnit;
+					szValue += this.szUnit?" ["+this.szUnit+"]":"";
 					if (nMySum && !this.nGridX && !(this.szField100 && !this.szFlag.match(/FRACTION/))) {
-						szValue += " (" + this.formatValue(100 / nMySum * nValue, 2) + "%)";
+						//szValue += " (" + this.formatValue(100 / nMySum * nValue, 2) + "%)";
 					}
-					barShape.setAttributeNS(szMapNs, "tooltip", szValue + " " + szLabel + "");
+					barShape.setAttributeNS(szMapNs, "tooltip", szValue + " '" + szLabel + "'");
 				}
 			}
 
@@ -19917,7 +19963,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				szLabel += (this.szLabelUnits || "");
 			}
 		}
-		var nTextSize = map.Scale.normalX(6);
+		var nTextSize = map.Scale.normalX(6) * (this.nTextScale||1);
+		
 		var szTextStyle = "opacity:0.7;font-family:arial;font-size:" + (nTextSize) + "px;text-anchor:middle;fill:#000000;pointer-events:none";
 		var szBgStyle = "opacity:1;fill:white;fill-opacity:0.4;stroke:#000000;stroke-width:" + map.Scale.normalX(1) + "pointer-events:none;";
 		var nTextLen = (szLabel.length + 2) * nTextSize * 0.50;
@@ -20023,8 +20070,10 @@ MapTheme.prototype.getItemNodes = function (a) {
  * @param a the (map) id of the item
  */
 MapTheme.prototype.getShapeA = function (a) {
+	
 	a = __mpap_decode_utf8(a);
 	var sNode = SVGDocument.getElementById(a.trim());
+
 	if (sNode) {
 		return new Array(sNode);
 	}
@@ -20068,7 +20117,7 @@ MapTheme.prototype.getNodePosition = function (a) {
 	}
 	
 	var themeNodesPosA = this.themeNodesPosA;
-
+	
 	if (!themeNodesPosA[a]) {
 		if (a.match(/:clone/)) {
 			return null;

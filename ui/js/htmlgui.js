@@ -336,15 +336,15 @@ $Log: htmlgui.js,v $
 		// -----------------------------------
 
 		if (this.gmapDiv) {
-			this.gmapDiv.setAttribute("onmousedown", "javascript:ixmaps.do_mapmousedown(event);");
-			this.gmapDiv.setAttribute("onmouseup", "javascript:ixmaps.do_mapmouseup(event);");
-			this.gmapDiv.setAttribute("onmouseout", "javascript:ixmaps.do_mapmouseout(event);");
-			this.gmapDiv.setAttribute("onmouseover", "javascript:ixmaps.do_mapmouseover(event);");
-			this.gmapDiv.setAttribute("onmousemove", "javascript:ixmaps.do_mapmousemove(event);");
-			this.gmapDiv.setAttribute("onclick", "javascript:ixmaps.do_mapclick(event);");
-			this.gmapDiv.setAttribute("ondblclick", "javascript:ixmaps.do_mapclick(event);");
-			this.gmapDiv.setAttribute("onKeyDown", "javascript:ixmaps.do_keydown(event);");
-			this.gmapDiv.setAttribute("onKeyUp", "javascript:ixmaps.do_keyup(event);");
+			this.gmapDiv.setAttribute("onmousedown", "ixmaps.do_mapmousedown(event);");
+			this.gmapDiv.setAttribute("onmouseup", "ixmaps.do_mapmouseup(event);");
+			this.gmapDiv.setAttribute("onmouseout", "ixmaps.do_mapmouseout(event);");
+			this.gmapDiv.setAttribute("onmouseover", "ixmaps.do_mapmouseover(event);");
+			this.gmapDiv.setAttribute("onmousemove", "ixmaps.do_mapmousemove(event);");
+			this.gmapDiv.setAttribute("onclick", "ixmaps.do_mapclick(event);");
+			this.gmapDiv.setAttribute("ondblclick", "ixmaps.do_mapclick(event);");
+			this.gmapDiv.setAttribute("onKeyDown", "ixmaps.do_keydown(event,1);");
+			this.gmapDiv.setAttribute("onKeyUp", "ixmaps.do_keyup(event,1);");
 
 			$(this.gmapDiv).css({
 				'pointer-events': 'all',
@@ -367,13 +367,13 @@ $Log: htmlgui.js,v $
 		// ------------------------------------
 
 		if (this.svgDiv) {
-			this.svgDiv.setAttribute("onmousedown", "javascript:ixmaps.do_svgtriggerevent();");
-			this.svgDiv.setAttribute("onmouseup", "javascript:ixmaps.do_svgtriggerevent();");
-			this.svgDiv.setAttribute("onmouseout", "javascript:ixmaps.do_svgtriggerevent();");
-			this.svgDiv.setAttribute("onmousemove", "javascript:ixmaps.do_svgtriggerevent();");
-			this.svgDiv.setAttribute("onmousewheel", "javascript:ixmaps.do_wheelEvent();");
-			this.svgDiv.setAttribute("onKeyDown", "javascript:ixmaps.do_keydown(event);");
-			this.svgDiv.setAttribute("onKeyUp", "javascript:ixmaps.do_keyup(event);");
+			this.svgDiv.setAttribute("onmousedown", "ixmaps.do_svgtriggerevent();");
+			this.svgDiv.setAttribute("onmouseup", "ixmaps.do_svgtriggerevent();");
+			this.svgDiv.setAttribute("onmouseout", "ixmaps.do_svgtriggerevent();");
+			this.svgDiv.setAttribute("onmousemove", "ixmaps.do_svgtriggerevent();");
+			this.svgDiv.setAttribute("onmousewheel", "ixmaps.do_wheelEvent();");
+			this.svgDiv.setAttribute("onKeyDown", "ixmaps.do_keydown(event,2);");
+			this.svgDiv.setAttribute("onKeyUp", "ixmaps.do_keyup(event,2);");
 
 			$(this.svgDiv).css({
 				'pointer-events': 'none',
@@ -1189,6 +1189,7 @@ $Log: htmlgui.js,v $
 			ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(theme);
 		} catch (e) {}
 	};
+	
 	ixmaps.newStyleThemeJson = function (origTheme) {
 		var theme = {};
 		theme.layer = origTheme.layer;
@@ -1263,6 +1264,11 @@ $Log: htmlgui.js,v $
 	ixmaps.clearAllOverlays = function () {
 		try {
 			ixmaps.embeddedSVG.window.map.Api.clearAllOverlays();
+		} catch (e) {}
+	};
+	ixmaps.clearHighlight = function () {
+		try {
+			ixmaps.embeddedSVG.window.map.Api.clearHighlight();
 		} catch (e) {}
 	};
 	ixmaps.changeObjectScaling = function (nDelta) {
@@ -2043,9 +2049,15 @@ $Log: htmlgui.js,v $
 	// foreward these events to an hosting window, if present
 	// ---------------------------------------------------------
 
-	ixmaps.htmlgui_onItemClick = function (szId) {
+	ixmaps.htmlgui_onItemOver = function (evt,szId) {
 		if (ixmaps.parentApi != ixmaps) {
-			return ixmaps.parentApi.htmlgui_onItemClick(szId);
+			return ixmaps.parentApi.htmlgui_onItemOver(evt,szId);
+		}
+	};
+	
+	ixmaps.htmlgui_onItemClick = function (evt,szId) {
+		if (ixmaps.parentApi != ixmaps) {
+			return ixmaps.parentApi.htmlgui_onItemClick(evt,szId);
 		}
 	};
 
@@ -2100,8 +2112,12 @@ $Log: htmlgui.js,v $
 		return (ixmaps.parentApi != ixmaps) ? ixmaps.parentApi.htmlgui_drawChartAfter(SVGDoc, args) : null;
 	};
 
-	ixmaps.htmlgui_onTooltipDisplay = function (szText) {
-		return (ixmaps.parentApi != ixmaps) ? ixmaps.parentApi.htmlgui_onTooltipDisplay(szText) : szText;
+	ixmaps.htmlgui_onTooltipDisplay = function (evt,szText,args) {
+		return (ixmaps.parentApi != ixmaps) ? ixmaps.parentApi.htmlgui_onTooltipDisplay(evt,szText,args) : szText;
+	};
+
+	ixmaps.htmlgui_onTooltipDelete = function (szText,args) {
+		return (ixmaps.parentApi != ixmaps) ? ixmaps.parentApi.htmlgui_onTooltipDelete(szText,args) : szText;
 	};
 
 	ixmaps.htmlgui_onInfoTitle = function (szText, item) {
@@ -2562,7 +2578,29 @@ $Log: htmlgui.js,v $
 		return ixmaps.embeddedSVG.window.map.Api.getMapScale();
 	};
 
+	/**
+	 * zoomIn
+	 * @param void
+	 * @type int
+	 * @return zoomfactor
+	 */
+	ixmaps.zoomIn = function () {
+		var nZoom = ixmaps.htmlgui_getZoom();
+		ixmaps.htmlgui_setZoom(++nZoom);
+		return nZoom;
+	};
 
+	/**
+	 * zoomOut
+	 * @param void
+	 * @type int
+	 * @return zoomfactor
+	 */
+	ixmaps.zoomOut = function () {
+		var nZoom = ixmaps.htmlgui_getZoom();
+		ixmaps.htmlgui_setZoom(--nZoom);
+		return nZoom;
+	};
 
 	// -----------------------------------------------------------
 	// map layer handling

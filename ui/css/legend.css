@@ -203,6 +203,7 @@
 		xxbackground:#ddd;
 	}
 	a {
+		pointer-events: all;
 		color: #aaaaaa;
 	}
 	.fa:focus {

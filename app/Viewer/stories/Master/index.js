@@ -151,6 +151,34 @@
 	var __noSlideRefresh = false;
 	var __sliderRange = null;
 
+	ixmaps.setSliderRange = function(range){
+		$("#rangeBtnHour").removeClass("active");
+		$("#rangeBtnDay").removeClass("active");
+		$("#rangeBtnWeek").removeClass("active");
+		$("#rangeBtnMonth").removeClass("active");
+		$("#rangeBtnYear").removeClass("active");
+		if (range == "hour"){
+			__sliderRange = 1000*60*60;
+			$("#rangeBtnHour").addClass("active");
+		}else
+		if (range == "day"){
+			__sliderRange = 1000*60*60*24;
+			$("#rangeBtnDay").addClass("active");
+		}else
+		if (range == "week"){
+			__sliderRange = 1000*60*60*24*7;
+			$("#rangeBtnWeek").addClass("active");
+		}else
+		if (range == "month"){
+			__sliderRange = 1000*60*60*24*28;
+			$("#rangeBtnMonth").addClass("active");
+		}else
+		if (range == "year"){
+			__sliderRange = 1000*60*60*24*356;
+			$("#rangeBtnYear").addClass("active");
+		}
+	};
+
 	// intercept theme creation done, and make the legend
 	//
 	ixmaps.htmlgui_onDrawTheme = function(szId){ 
@@ -319,6 +347,7 @@
 		var uMin = 10000000000000;
 		var uMax = -100000000000000;
 		if (themeObj.szTimeField  ){
+			
 			szHtml += "<h4 style='margin-top:0.5em;margin-bottom:0.5em'>time <span id='time-span'></span></h4>";
 			if ( themeObj.szTimeField == "$item$" ){
 				uMin = new Date(themeObj.szFieldsA[0]).getTime();
@@ -336,27 +365,27 @@
 			var days = (uMax-uMin)/uDay;
 			
 			szHtml += "<div class='btn-group btn-group-toggle' data-toggle='buttons' style='margin-left:-0.6em;margin-top:0.5em'>";
-			szHtml += "  <label class='btn btn-secondary' onclick='javascript:__sliderRange=1000*60*60*24;'>";
+			szHtml += "  <label id='rangeBtnDay' class='btn btn-secondary active' onclick='javascript:ixmaps.setSliderRange(\"day\");'>";
 			szHtml += "	<input type='radio' name='options' id='option1'> day";
 			szHtml += "  </label>";
 			if ( days < 2 ){
-				szHtml += "  <label class='btn btn-secondary' onclick='javascript:__sliderRange=1000*60*60;'>";
+				szHtml += "  <label id='rangeBtnHour' class='btn btn-secondary' onclick='javascript:ixmaps.setSliderRange(\"hour\");'>";
 				szHtml += "	<input type='radio' name='options' id='option1'> hour";
 				szHtml += "  </label>";
 			}
 			if ( days > 13 ){
-				szHtml += "  <label class='btn btn-secondary' onclick='javascript:__sliderRange=1000*60*60*24*7;'>";
-				szHtml += "	<input type='radio' name='options' id='option1'> week";
+				szHtml += "  <label id='rangeBtnWeek' class='btn btn-secondary' onclick='javascript:ixmaps.setSliderRange(\"week\");'>";
+				szHtml += "	<input type='radio' name='options' id='option2'> week";
 				szHtml += "  </label>";
 			}
 			if ( days > 55 ){
-				szHtml += "  <label class='btn btn-secondary' onclick='javascript:__sliderRange=1000*60*60*24*28;'>";
-				szHtml += "	<input type='radio' name='options' id='option2'> month";
+				szHtml += "  <label id='rangeBtnMonth' class='btn btn-secondary' onclick='javascript:ixmaps.setSliderRange(\"month\");'>";
+				szHtml += "	<input type='radio' name='options' id='option3'> month";
 				szHtml += "  </label>";
 			}
 			if ( days > 365 ){
-				szHtml += "  <label class='btn btn-secondary' onclick='javascript:__sliderRange=1000*60*60*24*365;'>";
-				szHtml += "	<input type='radio' name='options' id='option3' > year";
+				szHtml += "  <label id='rangeBtnYear' class='btn btn-secondary' onclick='javascript:ixmaps.setSliderRange(\"year\");'>";
+				szHtml += "	<input type='radio' name='options' id='option4' > year";
 				szHtml += "  </label>";
 			}
 			szHtml += "</div>";
@@ -1004,6 +1033,19 @@
 
 	};
 
+	
+	ixmaps.htmlgui_onTooltipDisplay = function(evt,szText) {
+		var xHalf = evt.view.innerWidth/2;
+		var xOff = evt.clientX<xHalf?10:-50;
+		var yHalf = evt.view.innerHeight/2;
+		var yOff = evt.clientY<yHalf?10:-80;
+		console.log(evt.clientX);
+		ixmaps.setMapOverlayHTML("<div style='position:absolute;left:"+(evt.clientX+xOff)+"px;top:"+(evt.clientY+yOff)+"px;font-family: arial narrow, system;font-size:28px;color: #444;background: white;border: 0.5px solid black;border-radius: 5px;	padding: 5px;max-width:80%'>"+szText+"</div");
+	}
+	
+	ixmaps.htmlgui_onTooltipDelete = function(){
+		ixmaps.setMapOverlayHTML("");
+	}
 
 // -----------------------------
 // EOF

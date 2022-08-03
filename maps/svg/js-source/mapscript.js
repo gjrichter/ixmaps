@@ -4514,8 +4514,11 @@ function killTooltip(){
 		_tooltip=null;
 	}
 	try{
-		HTMLWindow.ixmaps.htmlgui_onTooltipDelete();
+		if ( HTMLWindow.ixmaps.htmlgui_onTooltipDelete()){
+			highLightList.unlock();
+			highLightList.removeAll();
 		}
+	}
 	catch (e){
 	}
 }
@@ -6080,9 +6083,9 @@ function SVGLoaderMap(){
 			map.Query = new Map.Query();
 			
 			// magick !!!
-			var rectArea = map.Zoom.getBox();
-			var pt1 = map.Scale.getMapCoordinate(rectArea.x+rectArea.width/2,rectArea.y+rectArea.height/2);
-			map.Zoom.doSetCenterByParentMap(pt1.x,pt1.y);
+			//var rectArea = map.Zoom.getBox();
+			//var pt1 = map.Scale.getMapCoordinate(rectArea.x+rectArea.width/2,rectArea.y+rectArea.height/2);
+			//map.Zoom.doSetCenterByParentMap(pt1.x,pt1.y);
 
 			map.Layer.switchScaleDependentLayer();
 			map.Scale.refreshCSSStyles();

@@ -304,10 +304,10 @@ ixmaps.legend = ixmaps.legend || {};
 		
         var colorA = themeObj.colorScheme;
         var labelA = themeObj.szFlag.match(/CATEGORICAL/) ? themeObj.szLabelA : themeObj.szOrigLabelA ;
-		
-        // if color field defined, we collect the colors and make legend label here
-        // -----------------------------------------------------------------------
-        if (!labelA && themeObj.colorFieldA) {
+
+		// if color field defined, we collect the colors and make legend label here
+		// -----------------------------------------------------------------------
+        if (themeObj.colorFieldA && (!labelA || (labelA.length != Object.keys(themeObj.colorFieldA).length))) {
             labelA = [];
             for (a in themeObj.colorFieldA) {
                 labelA.push(a);
@@ -319,7 +319,7 @@ ixmaps.legend = ixmaps.legend || {};
             }
         }
 
-		var nDecimals = (typeof(themeObj.szValueDecimals) != 'undefined')?themeObj.szValueDecimals:2; 		
+		var nDecimals = (typeof(themeObj.nValueDecimals) != 'undefined')?themeObj.nValueDecimals:2; 		
 
 		// compose the units suffix
         // ---------------------------
@@ -528,39 +528,40 @@ ixmaps.legend = ixmaps.legend || {};
                     // simple one line legend item
                     // ---------------------------
 
-                    if (fSelected) {
-                        szHtml += "<div valign='center' class='theme-legend-item-selected' onclick='" + szAction + "' style='border:none'>";
-                    } else {
-                        szHtml += "<div valign='center' class='theme-legend-item' onclick='" + szAction + "' style='border:none'>";
-                    }
-
-                    szHtml += "<div style='margin-top:0em;margin-bottom:-0.4em;white-space:nowrap;'>";
+					szHtml += "<div onclick='" + szAction + "'>";
+					
+					var szClass = fSelected?"theme-legend-item-selected":"theme-legend-item";
+					
+					// 1. part: colored bar and label, flaot:left with ellipis clip
+					// ------------------------------------------------------------
+					
+                    szHtml += "<div class='"+szClass+"' style='border:none;margin-bottom:0.1em;padding:0.1em;white-space:nowrap;overflow: hidden;text-overflow:ellipsis;width:80%;float:left'>";
 
                     szHtml += "<span style='line-height:5px'>";
-                    szHtml += "<a class='legend-color-button' href='#' title='"+szCount+" - click to see'>";
+                    szHtml += "<a class='legend-color-button' href='#' title='"+labelA[sortA[i].index]+" - click to see'>";
 
 					if ( themeObj.szFlag.match(/CHART/) ){
 						if ((colorA[sortA[i].color] == "none") || (themeObj.szLineColor && themeObj.nLineWidth)) {
 							if (themeObj.fillOpacity < 0.1) {
-								szHtml += "<span style='background:none;border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:1em;border-radius:1em;margin-right:1em;'>";
+								szHtml += "<span style='background:none;border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:1em;border-radius:1em;margin-right:0.5em;'>";
 							} else 
 							if ( themeObj.szFlag.match(/BAR/) ){
-								szHtml += "<span style='background:" + colorA[sortA[i].color] + ";border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:1.3em;margin-right:1em;'>";
+								szHtml += "<span style='background:" + colorA[sortA[i].color] + ";border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:1.1em;margin-right:0.5em;'>";
 							}else{
 								/**
 								szHtml += "<span class='icon icon-arrow-up' style='background:" + colorA[sortA[i].color] + ";float:left;padding:0.2em 0.5em;'></span>";
 								**/
-								szHtml += "<span style='background:" + colorA[sortA[i].color] + ";border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:1em;border-radius:1em;margin-right:1em;'>";
+								szHtml += "<span style='background:" + colorA[sortA[i].color] + ";border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:1em;border-radius:1em;margin-right:0.5em;'>";
 							}
 						} else {
 							if ( themeObj.szFlag.match(/BAR/) && themeObj.szFlag.match(/POINTER/) ){
 								szHtml += "<span class='icon icon-arrow-up' style='color:" + colorA[sortA[i].color] + ";font-size:1.2em;margin-right:-0.17em;float:left'></span>";
 							}else {
-								szHtml += "<span style='background:" + (themeObj.szLineColor||colorA[sortA[i].color]) + ";opacity:0.7;font-size:1em;border-radius:1em;margin-right:1em;'>";
+								szHtml += "<span style='background:" + (themeObj.szLineColor||colorA[sortA[i].color]) + ";opacity:0.7;font-size:1em;border-radius:1em;margin-right:0.66em;'>";
 							}
 						}
 					}else{
-						szHtml += "<span style='background:" + (colorA[sortA[i].color]) + ";opacity:0.7;font-size:1em;border-radius:1em;margin-right:1em;'>";
+						szHtml += "<span style='background:" + (colorA[sortA[i].color]) + ";opacity:0.7;font-size:1em;border-radius:1em;margin-right:0.5em;'>";
 					}
 
                     if (fCountBars && !themeObj.szFlag.match(/SIMPLELEGEND/) && !(ixmaps.layout == "minimal") ) {
@@ -582,7 +583,7 @@ ixmaps.legend = ixmaps.legend || {};
                     var szValue = sortA[i].count?(""+ixmaps.__formatValue(sortA[i].count, nDecimals, "SPACE")+""):"";
                     szHtml += "<span class='theme-legend' style='white-space:nowrap'>";
                     szHtml += "<a class='theme-button' href='#' title='click to see'>";
-                    szHtml += "<span title='" + szLabel + "' style=''>";
+                    szHtml += "<span title='" + szLabel + "' style='font-size:0.8em'>";
                     
                     // --------------------------------
                     // add label
@@ -592,12 +593,22 @@ ixmaps.legend = ixmaps.legend || {};
                     szHtml += szLabel;
                     szHtml += "</span>";
 
-                    // --------------------------------
+                    szHtml += "</span>";
+                    szHtml += "</a>";
+                    szHtml += "</span>";
+
+                    szHtml += "</div>";
+					
+					// 2. part div: values with float:right 
+					
+					szHtml += "<div style='margin-bottom:0.1em;padding:0.1em;'>"
+
+					// --------------------------------
                     // add values
                     // --------------------------------
                     
                     if (sortA[i].count) {
-                        szHtml += "<span class='theme-legend-count' style='float:right;font-size:0.9em;'> " + szValue + " " + szUnit + "</span>";
+                        szHtml += "<span class='theme-legend-count' style='font-size:1em;float:right'> " + szValue + " " + szUnit + "</span>";
                     } else
                     if (themeObj.szLabelA && !themeObj.szFlag.match(/SIMPLELEGEND/) && !(ixmaps.layout == "minimal") ) {
                         if ((typeof (themeObj.nMinA[i]) != "undefined") &&
@@ -619,10 +630,6 @@ ixmaps.legend = ixmaps.legend || {};
                         }
                     }
                     
-                    szHtml += "</span>";
-                    szHtml += "</a>";
-                    szHtml += "</span>";
-
                     //szHtml += "<span style='float:right'>" + szCount + "</span>";
                    
 
@@ -880,7 +887,7 @@ ixmaps.legend = ixmaps.legend || {};
                 var nRows = (themeObj.szFlag.match(/DOPACITY/) && themeObj.szAlphaField) ? 3 : 1;
                 nLegendWidth = (themeObj.szFlag.match(/DOPACITY/) && themeObj.szAlphaField && themeObj.nMaxAlpha) ? (nLegendWidth-100) : nLegendWidth;
 
-                var nWidth = Math.min(50,nLegendWidth / nColors);
+                var nWidth = Math.min(33,nLegendWidth / nColors);
                 var nGap = (nColors<25) ? (nWidth / 10) : 0;
 
                 for (var row = 0; row < nRows; row++) {
@@ -1298,7 +1305,7 @@ ixmaps.legend = ixmaps.legend || {};
             $("#title").html("").hide();
         }
 		
-		ixmaps.embeddedApi.setTitle(szTitle);
+		//ixmaps.embeddedApi.setTitle(szTitle);
 
     };
 

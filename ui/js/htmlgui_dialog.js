@@ -29,6 +29,7 @@ $Log: htmlgui.js,v $
 	ixmaps.beforeDialogTool = "";
 	ixmaps.openDialog = function(event,szElement,szUrl,szTitle,szPosition,nMaxWidth,nMaxHeight,nOpacity){
 
+ 		ixmaps.beforeDialogTool = ixmaps.getMapTool();
 		if ( typeof($("#"+szElement)[0]) != "undefined" ){
 			if ( $("#"+szElement)[0].innerHTML.length > 10 ){
 				$("#"+szElement)[0].innerHTML = "";
@@ -38,9 +39,6 @@ $Log: htmlgui.js,v $
 			}
 		}
 		// GR 05.06.2014 restore input mode after dialog closed
-        // GR 12.11.2019 always set to "" !!
-		ixmaps.beforeDialogTool = ""; //ixmaps.getMapTool();
-
 		var offsetLeft = null;
 		var offsetTop  = null;
 		if ( event && (typeof(event) != "undefined") ){
@@ -126,10 +124,14 @@ $Log: htmlgui.js,v $
 		}else{
 			$("#"+szElement).parent().css("height",String(dialogHeight)+"px");
 		}
+		
 		// GR 13.10.2011 set opacity
 		if (nOpacity){
 			$("#"+szElement).parent().css("opacity",String(nOpacity));
 		}
+		// make close button visible in any case
+		$(".ui-dialog-titlebar-close").css("z-index","10000");
+		
 		$("#"+szElement).parent().css("z-index","10000");
 		// load content
 		if ( typeof(szUrl) == "string" && szUrl.length ){
@@ -187,6 +189,10 @@ $Log: htmlgui.js,v $
 							ixmaps.openSidebar(e,'dialog','','','auto',350,800);
 							});
 		ixmaps.sidebar = $("#"+szElement)[0];
+	};
+	ixmaps.resizeDialog = function(newWidth,newHeight){
+		$("#item").parent().css("width", newWidth);
+		$("#item").parent().css("height", newHeight);
 	};
 	ixmaps.closeSidebar = function(){
 		if ( ixmaps.sidebar ){

@@ -650,10 +650,11 @@
 					$(".map-legend").attr("data-align","right");
 					$(".map-legend").css("text-align","center");
 					$(".map-legend").css("font-size","0.7em");
-					$(".map-legend").css("margin-top","-10px");
+					$(".map-legend").css("margin-top","-15px");
 					$(".map-legend").css("width", "100%");
 					$(".map-legend").css("max-width", "100%");
 					$(".map-legend").css("left", "0px");
+					
 					$("#onmapbuttondiv").css("left", "");
 					$("#onmapbuttondiv").css("right", "60px");
 					$(".title-field").css("right", "100px");
@@ -916,6 +917,7 @@
 		// -------------------------------------------
 
 		ixmaps.setMapTool = function (szId) {
+			ixmaps.mapTool(szId);
 			$("#" + szId).click();
 		};
 
@@ -937,9 +939,9 @@
 		};
 
 		var __olditemclick = ixmaps.htmlgui_onItemClick;
-		ixmaps.htmlgui_onItemClick = function(szId){
+		ixmaps.htmlgui_onItemClick = function(evt,szId){ 
 			// check __olditemclick when parent Api has no map; magick - tested 
-			if ( (ixmaps.parentApi.isMap == false) && __olditemclick(szId) ){
+			if ( (ixmaps.parentApi.isMap == false) && __olditemclick(evt,szId) ){
 				return true;
 			}else{
                 if (szId.match(/mapbackground:eventrect/)){
@@ -966,11 +968,19 @@
 							$("#item")[0].innerHTML = "";
 						}
 						
-						window.idialog = this.openDialog(null,'item',szItemUrl,'Item info','70,100',480,660);
+						window.idialog = this.openDialog(null,'item',szItemUrl,'','70,100');
 						ixmaps.onDialogClose = function(){
 							ixmaps.embeddedSVG.window.map.Api.clearHighlight();
 							ixmaps.embeddedSVG.window.map.Api.clearAllOverlays();
 						};
+						$("#item").css("height", "100%");
+						$("#item").css("width", "90%");
+						$("#item").css("position", "absolute");
+						$("#item").css("top", "10px");
+						$("#item").css("overflow", "hidden");
+						// avoid dialog size flashing
+						$("#item").parent().css("display", "none");
+						setTimeout('$("#item").parent().fadeIn("slow")',200);
 
 						//ixmaps.loadPopUp(ixmaps.loadedProject.map.item||'./item.html',{frame:true});
 						return true;
@@ -978,6 +988,9 @@
                     $("#onmapbuttondiv").show();
                     $("#switchinfobutton").show();
                 }
+				if (__olditemclick && __olditemclick(szId,evt)){
+					return true;
+				}
 				return false;
 			}
 		}

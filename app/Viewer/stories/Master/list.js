@@ -178,7 +178,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 		}
 		
 		// GR 11.02.2021 if theme = PLOT, make charts
-		if ( objTheme.szFlag.match(/PLOT|PIE|BAR/) ){
+		if ( objTheme.szFlag.match(/PLOT|PIE|BAR|SYMBOL/) ){
 			ixmaps.data.makeItemList_charts(szFilter,szDiv,szId);
 			return;
 		}

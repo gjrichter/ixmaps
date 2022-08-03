@@ -7,7 +7,7 @@ $Source : htmlgui_api.js,v $
 $InitialAuthor: guenter richter $
 $InitialDate: 2011/10/29 $
 $Author: guenter richter $
-$Id: htmlgui_api.js 1 2011-10-29 10:51:41Z Guenter Richter $
+$Id: htmlgui_api.js 1 2011-10-29 10:51:41Z Guenter Richter $map
 
 Copyright (c) Guenter Richter
 $Log: htmlgui_api.js,v $
@@ -669,7 +669,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void
      * @example ixmaps.setView("map1",[51.59898731096802,-0.33786544322673245],10);
 	 */
-	ixmaps.setView = function(szMap,center,nZoom){
+	ixmaps.setView = function(szMap,center,nZoom){ 
 		__checkArguments(arguments,3,"setView()");
 		this.dispatchToEmbeddedApi(szMap,"setView",[center,nZoom]);
 	};
@@ -996,6 +996,14 @@ $Log: htmlgui_api.js,v $
 	 */
 	ixmaps.clearAllChoropleth = function(szMap) {
 		this.dispatchToEmbeddedApi(szMap,"clearAllChoropleth",[]);
+	};
+	/**
+	 * remove all themes itme highlights from the map
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @return void
+	 */
+	ixmaps.clearHighlight = function(szMap) {
+		this.dispatchToEmbeddedApi(szMap,"clearHighlight",[]);
 	};
 	
 	/**
@@ -1544,7 +1552,19 @@ $Log: htmlgui_api.js,v $
 	 */
 	ixmaps.setTitle = function(szTitle){
 		for ( a in ixmaps.embeddedApiA ){
-			ixmaps.embeddedApiA[a].setTitle(szId);
+			ixmaps.embeddedApiA[a].setTitle(szTitle);
+		}
+	};
+
+	/**
+	 * set title with box 
+	 * @param {String}	a new title to show on the map
+	 * @param {String}	a color for the background
+	 * @return void
+	 */
+	ixmaps.setTitleBox = function(szTitle,szColor){
+		for ( a in ixmaps.embeddedApiA ){
+			ixmaps.embeddedApiA[a].setTitleBox(szTitle,szColor);
 		}
 	};
 
@@ -2149,9 +2169,16 @@ $Log: htmlgui_api.js,v $
 	//
 	// ---------------------------------------------------
 
-	ixmaps.htmlgui_onItemClick = function(szId){
+	ixmaps.htmlgui_onItemOver = function(evt,szId){
 		if ( ixmaps.parentApi != ixmaps ){
-			return ixmaps.parentApi.htmlgui_onItemClick(szId);
+			return ixmaps.parentApi.htmlgui_onItemOver(evt,szId);
+		}
+		return false;
+	};
+
+	ixmaps.htmlgui_onItemClick = function(evt,szId){
+		if ( ixmaps.parentApi != ixmaps ){
+			return ixmaps.parentApi.htmlgui_onItemClick(evt,szId);
 		}
 		return false;
 	};
@@ -2217,8 +2244,13 @@ $Log: htmlgui_api.js,v $
 		return ( ixmaps.parentApi != ixmaps ) ? ixmaps.parentApi.htmlgui_drawChartAfter(SVGDoc,args) : null;
 	};
 
-	ixmaps.htmlgui_onTooltipDisplay = function(szText){
-		return ( ixmaps.parentApi != ixmaps ) ? ixmaps.parentApi.htmlgui_onTooltipDisplay(szText) : szText
+	ixmaps.htmlgui_onTooltipDisplay = function(evt,szText,args){
+		console.log(ixmaps.parentApi.htmlgui_onTooltipDisplay);
+		return ( ixmaps.parentApi != ixmaps ) ? ixmaps.parentApi.htmlgui_onTooltipDisplay(evt,szText,args) : szText
+	};
+
+	ixmaps.htmlgui_onTooltipDelete = function(szText,args){
+		return ( ixmaps.parentApi != ixmaps ) ? ixmaps.parentApi.htmlgui_onTooltipDelete(szText,args) : szText
 	};
 
 	ixmaps.htmlgui_onInfoTitle = function(szText,item){
@@ -2282,6 +2314,17 @@ $Log: htmlgui_api.js,v $
 		}
 	};
 
+	ixmaps.onKeyDown = function(keyCode){
+		ixmaps.setMapTool("pan");
+		console.log("htmlgui_api keyDown: "+keyCode);
+	};
+	
+	ixmaps.onKeyUp = function(keyCode){
+		ixmaps.setMapTool("info");
+		console.log("htmlgui_api keyUp: "+keyCode);
+	};
+	
+	
 	// =====================================================
 	// =====================================================
 	//
@@ -2412,7 +2455,7 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 
-		setView: function(center,zoom){
+		setView: function(center,zoom){ 
 			ixmaps.setView(this.szMap,center,zoom);
 			return this;
 		},
@@ -2479,6 +2522,10 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 		localize: function(szGlobal,szLocal){
+			ixmaps.setLocal(this.szMap,szGlobal,szLocal);
+			return this;
+		},
+		local: function(szGlobal,szLocal){
 			ixmaps.setLocal(this.szMap,szGlobal,szLocal);
 			return this;
 		},

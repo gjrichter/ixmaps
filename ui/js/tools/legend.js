@@ -992,7 +992,8 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			szHtml += '<b><a href="javascript:ixmaps.legend.removeExternalLegend(\'' + "" + '\')" style="text-decoration:none">...</a></b></div>';
 		}
         $("#map-legend").html(szHtml);
-        $("#map-legend-body").css("pointer-events","all");
+        $("#map-legend").css("pointer-events","none");
+        $("#map-legend-body").css("pointer-events","none");
         $("#map-legend-delete").css("pointer-events","all");
         $("#map-legend").show();
 
