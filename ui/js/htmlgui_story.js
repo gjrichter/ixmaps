@@ -332,9 +332,9 @@ $Log: htmlgui_story.js,v $
 				target.html("<iframe id='embed-tool' src=\"" + szStoryRoot + szUrl + "\" " +
 					" style='border:0;margin:0px;width:" + width + "px;height:" + height + "px;pointer-events:all' /><a href='javascript:ixmaps.hideStoryTool()' class='hide-story-tool-button' ><span style='font-size:24px;color:#aaaaaa;vertical-align:10px'><i class='fa fa-times fa-fw' ></i></span></a>");
 			} else {
-				target.css("pointer-events", "all");
+				//target.css("pointer-events", "all");
 				// make content div for height
-				target.html("<div id='story-tool-content'></div>");
+				target.html("<div id='story-tool-content' style='pointer-events:all'></div>");
 				$('#story-tool-content').load(szStoryRoot + szUrl, function (response, status, xhr) {
 					if (status == "error") {
 						var msg = "Sorry but there was an error: ";
