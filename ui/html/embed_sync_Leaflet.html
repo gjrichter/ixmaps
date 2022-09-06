@@ -312,6 +312,9 @@
 	<div id="projects" style="visibility:hidden;">
 	</div>
 
+	<div id="tooltip" style="position:absolute;top:0;left:0;z-index:999999">
+	</div>
+
 	<!--========================================================================= 
 		context menu
 	<!--========================================================================= -->
@@ -678,6 +681,14 @@
 			if ($(document).getUrlParam('scrollsafesilent')) {
 				ixmaps.scrollsafesilent = true;
 			}
+			
+			ixmaps.fMapControls = true;
+			if ($(document).getUrlParam('ui')) {
+				if ($(document).getUrlParam('ui') == "hidden"){
+					ixmaps.switchUi(false);
+					ixmaps.fMapControls = false;
+				}
+			}
 
 			// ====================
 			// create the map app
@@ -931,10 +942,12 @@
 				$("#onmapbuttondiv").show();
 				$("#onmapbuttondivbottom").show();
 				htmlMap_showMapControl();
+				ixmaps.fMapControls = true;
 			} else {
 				$("#onmapbuttondiv").hide();
 				$("#onmapbuttondivbottom").hide();
 				htmlMap_hideMapControl();
+				ixmaps.fMapControls = false;
 			}
 		};
 

@@ -465,7 +465,7 @@ $Log: htmlgui_sync.js,v $
 			}
 		}
 		
-		ixmaps.mapTool("pan");
+		//ixmaps.mapTool("pan");
 	};
 	ixmaps.do_keyup = function (evt, source) {
 
@@ -477,7 +477,7 @@ $Log: htmlgui_sync.js,v $
 			}
 		}
 		
-		ixmaps.mapTool("info");
+		//ixmaps.mapTool("info");
 	};
 
 

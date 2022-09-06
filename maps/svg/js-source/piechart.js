@@ -357,19 +357,19 @@ DonutChart.prototype.realize = function(){
 	if ( this.szStyle.match(/STARBURST/) && this.szStyle.match(/POLAR/) ) {
 
 		var radius = Math.max(1,this.nRadInner + nMaxRadius/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
-		var c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:white;fill-opacity:0.85;stroke:#aaaaaa;stroke-width:10px;"); 
-		c.setAttributeNS(null,"tooltip","75-100");
+		var c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:white;fill-opacity:0.85;stroke:#444444;stroke-width:1px;"); 
+		c.setAttributeNS(null,"tooltip","range "+String((this.nMaxValue||100)*0.75) +"-"+ String((this.nMaxValue||100)*1));
 		
 		var radius = Math.max(1,this.nRadInner + nMaxRadius75/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
-		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#aaaaaa;stroke-width:10px;stroke-dasharray:50 50"); 	
-		c.setAttributeNS(null,"tooltip","50-75");
+		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#444444;stroke-width:3px;stroke-dasharray:50 50"); 	
+		c.setAttributeNS(null,"tooltip","range "+String((this.nMaxValue||100)*0.50) +"-"+ String((this.nMaxValue||100)*0.75));
 		
 		var radius = Math.max(1,this.nRadInner + nMaxRadius50/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
-		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#aaaaaa;stroke-width:5px;"); 		c.setAttributeNS(null,"tooltip","25-50");
+		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#444444;stroke-width:1px;"); 			c.setAttributeNS(null,"tooltip","range "+String((this.nMaxValue||100)*0.25) +"-"+ String((this.nMaxValue||100)*0.50));
 	
 		var radius = Math.max(1,this.nRadInner + nMaxRadius25/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
-		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#aaaaaa;stroke-width:10px;stroke-dasharray:50 50"); 
-		c.setAttributeNS(null,"tooltip","0-25");
+		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#444444;stroke-width:3px;stroke-dasharray:50 50"); 
+		c.setAttributeNS(null,"tooltip","range "+String((this.nMaxValue||100)*0) +"-"+ String((this.nMaxValue||100)*0.25));
 
 	}
 

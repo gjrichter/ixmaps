@@ -1521,6 +1521,10 @@ Map.Themes.prototype.getTheme = function (szId) {
 			return this.themesA[i];
 		}
 	}
+	// GR 27.08.2022 theme "0","1","2"...
+	if ( !isNaN(Number(szId)) && (Number(szId) < this.themesA.length) ){
+		return this.themesA[Number(szId)];
+	}
 	return this.activeTheme;
 };
 /**
@@ -3557,9 +3561,9 @@ Map.Themes.prototype.doChangeThemeStyle = function (szId, szStyle, szFlag) {
 				mapTheme.markedClassesA.forEach(function (item, index) {
 					if (item >= 0) {
 						mapTheme.markedClasses[item] = true;
-						mapTheme.markClass(item);
 					}
 				});
+				mapTheme.markClass();
 			}
 			if (__isdef(styleObj.field100min)) {
 				mapTheme.nField100Min = styleObj.field100min;
@@ -9060,7 +9064,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 
 		// filter by media aggregation count/2 or given minimum
 		for (a in this.itemA) {
-			if (this.itemA[a].nCount && (this.itemA[a].nCount < (this.nMinAggregation || nMediaCount / 2))) {
+			if (this.itemA[a].nCount && (this.itemA[a].nCount < (this.nMinAggregation || Math.sqrt(nMediaCount)-1))) {
 				delete this.itemA[a];
 			}
 		}
@@ -11106,6 +11110,11 @@ MapTheme.prototype.paintMap = function (startIndex) {
 		}
 
 		this.nDoneCount = 0;
+		
+		// GR 24.08.2022 do this at the beginning of every paint 
+		if (this.szFlag.match(/COMPOSECOLOR/)) {
+			__maptheme_initComposedColor(this.colorScheme.slice(0));
+		}
 	}
 
 	for (var nAi = startIndex; nAi < this.indexA.length; nAi++) {
@@ -12496,9 +12505,15 @@ MapTheme.prototype.setTimeFrame = function (nUMin, nUMax) {
  * @parameter nClass the index of the class to create the SubTheme
  */
 MapTheme.prototype.createSubTheme = function (nClass) {
-
+	
 	if (this.subTheme) {
 		this.removeSubTheme();
+	}
+	
+	if ( nClass == null ){
+		if ( !this.markedClasses || !this.markedClasses.length ){
+			return;
+		}
 	}
 
 	// collect attributes to keep from trhe original theme
@@ -12516,6 +12531,9 @@ MapTheme.prototype.createSubTheme = function (nClass) {
 	}
 	if (this.szAlphaField100 && (typeof (this.szAlphaField100) != "undefined")) {
 		szAttributes += "alphafield100:" + this.szAlphaField100 + ";";
+	}
+	if (this.szTitleField && (typeof (this.szTitleField) != "undefined")) {
+		szAttributes += "titlefield:" + this.szTitleField + ";";
 	}
 	if (this.nDopacityScale && (typeof (this.nDopacityScale) != "undefined")) {
 		szAttributes += "dopacityscale:" + this.nDopacityScale + ";";
@@ -12613,13 +12631,15 @@ MapTheme.prototype.createSubTheme = function (nClass) {
 			var fieldsA = this.szFields.split("|");
 			var fields = "";
 			var colorScheme = "";
+			var label = "";
 			for (i = 0; i < this.markedClassesA.length; i++) {
 				fields += ((fields.length ? "|" : "") + fieldsA[this.markedClassesA[i]]);
 				colorScheme += ((colorScheme.length ? "|" : "") + this.colorScheme[this.markedClassesA[i]]);
+				label += ((label.length ? "|" : "") + this.szLabelA[this.markedClassesA[i]]);
 			}
 			this.subTheme =
 				map.Themes.newTheme(this.szThemes, fields, this.szField100,
-					"type:" + this.szFlag + "|NOINFO" + ";colorscheme:" + colorScheme + ";" + szAttributes, this.szLabelA ? this.szLabelA[nClass] : "", "");
+					"type:" + this.szFlag + "|NOINFO" + ";colorscheme:" + colorScheme + ";label:" + label + ";" + szAttributes);
 
 		} else {
 
@@ -14737,8 +14757,8 @@ MapTheme.prototype.chartMap = function (startIndex) {
 
 			// GR 05.03.2017 place plots to the center of the plot box
 			if (this.szFlag.match(/PLOT/) && this.nGridSize && this.nAutoScale) {
-				ptNull.x += this.nGridSize / this.nAutoScale / 2;
-				ptNull.y -= this.nGridSize / this.nAutoScale / 2;
+				ptNull.x += this.nGridSize / 2 / this.nAutoScale * nAutoScale;
+				ptNull.y -= this.nGridSize / 2 / this.nAutoScale * nAutoScale;
 			}
 			if (this.szFlag.match(/NOSCALE/)) {
 				shapeGroup.fu.setMatrix([this.nScale, 0, 0, this.nScale, ptOff.x - (ptNull.x * this.nScale), ptOff.y - (ptNull.y * this.nScale)]);
@@ -15593,7 +15613,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		} else if (szFlag.match(/DEVIATION/)) {
 			szFlag = "BAR|DEVIATION|POINTER" + "|VALUES|ZOOM";
 		} else {
-			szFlag = "BAR|3D" + "|VALUES|ZOOM";
+			szFlag = "BAR|XAXIS|HORZ|SORT" + "|VALUES|ZOOM";
 		}
 	}
 

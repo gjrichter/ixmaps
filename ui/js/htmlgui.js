@@ -3040,6 +3040,17 @@ $Log: htmlgui.js,v $
 	};
 
 	/**
+	 * require
+	 * @param {String} szUrl the URL of the external script to add toi project * @return void
+	 * @return void
+	 * @private
+	 */
+	ixmaps.require = function(szUrl){
+		ixmaps.requiredUrlA = ixmaps.requiredUrlA || [];
+		ixmaps.requiredUrlA.push(szUrl);
+	};
+
+	/**
 	 * set an ixmaps project from JSON   
 	 * @param project the JSON object to define the project
 	 * @param szFlag optional switches to set only parts of a project
@@ -3425,6 +3436,10 @@ $Log: htmlgui.js,v $
 		
 		if (ixmaps.loadedProject && ixmaps.loadedProject.map && ixmaps.loadedProject.map.localize) {
 			project.map.localize = ixmaps.loadedProject.map.localize;
+		}
+		
+		if (ixmaps.requiredUrlA){
+			project.require = ixmaps.requiredUrlA;
 		}
 		
 		project.themes = themeDefA;

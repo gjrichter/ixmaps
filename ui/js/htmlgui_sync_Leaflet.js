@@ -500,12 +500,14 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		// --------------------
 		// map controls
 		// --------------------
-
-		ixmaps.addControls({
-			pan: false, 
-			zoom: {position:'bottomleft'},
-			map_type: (ixmaps.mapTypeSelection?true:false)
-			});
+		
+		if (ixmaps.fMapControls){
+			ixmaps.addControls({
+				pan: false, 
+				zoom: {position:'bottomleft'},
+				map_type: (ixmaps.mapTypeSelection?true:false)
+				});
+		}
 
 		if ( ixmaps.scrollWheelZoom ){
 			LMap.scrollWheelZoom.enable();

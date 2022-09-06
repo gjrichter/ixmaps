@@ -5437,7 +5437,7 @@ var __normalHighlight = function(evt,onoverShape){
 			if (_activeTheme != map.Tiles.getMasterId(legendId.split(':')[0]) ){
 				var layerObj = map.Layer.getLayerObj(legendId);
 				if ( layerObj && layerObj.szSelection && !map.Event.tooltipDone && (szMapToolType == "clickinfo" || szMapToolType == "info" || szMapToolType === "") ){
-					displayTooltipText(evt, map.Dictionary.getLocalText("click to activate"));
+					//displayTooltipText(evt, map.Dictionary.getLocalText("click to activate"));
 				}
 				if ( fHighlightHint ){
 					szMode = "hint";
@@ -5912,6 +5912,11 @@ Map.Event.prototype.doDefaultZoom = function(evt){
 		// GR 20.01.2022 new remove item ifo display
 		map.Api.clearHighlight();
 		map.Api.clearAllOverlays();
+		try	{
+			HTMLWindow.ixmaps.htmlgui_onItemClick(evt,"mapbackground:eventrect");
+		}
+		catch (e){
+		}
 	}
 
 	// set the new zoom an pan
