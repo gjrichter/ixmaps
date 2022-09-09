@@ -15086,6 +15086,11 @@ MapTheme.prototype.chartMap = function (startIndex) {
 
 	_TRACE("== drawing done === ");
 
+	// GR 08.09.2022 add new FEATURE elements to nodes cache (and evtl. override old ones)
+	if (this.szFlag.match(/FEATURE/)) {
+		map.Themes.addToThemeNodesCache(this.chartGroup);
+	}
+
 	// GR 11.06.2015 if filter defined, apply on new items
 	if (this.szItemFilter && this.szItemFilter.length) {
 		this.filterItems(this.szItemFilter, this.itemFilterOpt);
