@@ -993,7 +993,7 @@
 						$("#item").css("overflow", "hidden");
 						// avoid dialog size flashing
 						$("#item").parent().css("display", "none");
-						setTimeout('$("#item").parent().fadeIn("slow")',200);
+						setTimeout('ixmaps._fadeInItem()',200);
 
 						//ixmaps.loadPopUp(ixmaps.loadedProject.map.item||'./item.html',{frame:true});
 						return true;
@@ -1007,7 +1007,9 @@
 				return false;
 			}
 		}
-
+		ixmaps._fadeInItem = function(){
+			$("#item").parent().fadeIn("slow");
+		}
 		var __oldSelection = ixmaps.htmlgui_onSelection;
 		ixmaps.htmlgui_onSelection = function(szId){
 			if ( __oldSelection(szId) ){
