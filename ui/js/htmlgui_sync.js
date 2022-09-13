@@ -203,6 +203,7 @@ $Log: htmlgui_sync.js,v $
 
 		switch (ixmaps.getMapTool()) {
 			case 'info':
+			case 'clickinfo':
 				ixmaps.mapTool('idle');
 				break;
 			case 'pan':
@@ -356,7 +357,8 @@ $Log: htmlgui_sync.js,v $
 	ixmaps.lastMoveTime = 1;
 	ixmaps.do_mapmousemove = function (e) {
 		if ((ixmaps.mouseMoveX != e.clientX) ||
-			(ixmaps.mouseMoveY != e.clientY)) {
+		if ((ixmaps.mouseMoveX && (ixmaps.mouseMoveX != e.clientX)) ||
+			(ixmaps.mouseMoveY && (ixmaps.mouseMoveY != e.clientY))) {
 			var now = new Date();
 			ixmaps.lastMoveTime = now.getTime();
 		}

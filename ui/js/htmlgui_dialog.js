@@ -34,7 +34,7 @@ $Log: htmlgui.js,v $
 			if ( $("#"+szElement)[0].innerHTML.length > 10 ){
 				$("#"+szElement)[0].innerHTML = "";
 				$("#"+szElement).dialog( "destroy" );
-				ixmaps.mapTool(ixmaps.beforeDialogTool);
+				//ixmaps.mapTool(ixmaps.beforeDialogTool);
 				return;
 			}
 		}
@@ -112,7 +112,7 @@ $Log: htmlgui.js,v $
 								        close: function(event, ui) {
 				$("#"+szElement)[0].innerHTML = "";
 				$("#"+szElement).dialog("destroy");
-				ixmaps.mapTool(ixmaps.beforeDialogTool);
+				//ixmaps.mapTool(ixmaps.beforeDialogTool);
 				if (ixmaps.onDialogClose){
 					ixmaps.onDialogClose();
 				}
