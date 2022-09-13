@@ -381,7 +381,7 @@ $Log: htmlgui_sync.js,v $
 					ixmaps.mapTool("clickinfo");
 					ixmaps.fInputModeSwitched = true;
 					fEnableAutoDisable = true;
-					//setTimeout("ixmaps.htmlgui_onSVGPointerIdle()",2000);
+					setTimeout("ixmaps.htmlgui_onSVGPointerIdle()",2000);
 				}
 			}
 			ixmaps.mouseDownX = ixmaps.mouseMoveX = ixmaps.mouseDownY = ixmaps.mouseMoveY = null;
