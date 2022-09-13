@@ -356,7 +356,6 @@ $Log: htmlgui_sync.js,v $
 	ixmaps.nMapMouseMove = 0;
 	ixmaps.lastMoveTime = 1;
 	ixmaps.do_mapmousemove = function (e) {
-		if ((ixmaps.mouseMoveX != e.clientX) ||
 		if ((ixmaps.mouseMoveX && (ixmaps.mouseMoveX != e.clientX)) ||
 			(ixmaps.mouseMoveY && (ixmaps.mouseMoveY != e.clientY))) {
 			var now = new Date();
