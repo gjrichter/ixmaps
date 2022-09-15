@@ -221,9 +221,10 @@ $Log: htmlgui_story.js,v $
 		}
 		$('#story-board').hide();
 		
+		ixmaps.oldFSidebar = ixmaps.fSidebar;
+		
 		if (!ixmaps.fSidebar) {
 			ixmaps.toggleSidebar();
-			ixmaps.fSidebar = false;
 		}
 
 		var target = $('#story-tool');
@@ -374,7 +375,7 @@ $Log: htmlgui_story.js,v $
 		if (ixmaps.fStoryTool) {
 
 			$('#story-tool').fadeOut("fast", function () {
-				if (!ixmaps.fSidebar) {
+				if (!ixmaps.oldFSidebar) {
 					ixmaps.fSidebar = true;
 					ixmaps.toggleSidebar();
 					setTimeout("$('#story-board').show()", 500);

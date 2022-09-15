@@ -524,6 +524,11 @@
 	ixmaps.fSidebar = true;
 
 	ixmaps.showSidebar = function() {
+		
+		if(ixmaps.fSidebar){
+			return;
+		}
+		ixmaps.fSidebar = true;
 
 		setTimeout('$("#embed-cross").css("width","'+String(ixmaps.mapWidthPx)+'");',500);
 		setTimeout('$("#embed-cross").css("height","'+String(ixmaps.mapHeightPx)+'");',500);
@@ -543,12 +548,15 @@
 		ixmaps.mapWidthPx = null;
 		ixmaps.containerWidthPx = null;
 		ixmaps.sidebarLeftPx = null;
-
-		ixmaps.fSidebar = true;
 	};
 
 	ixmaps.hideSidebar = function() {
 
+		if(!ixmaps.fSidebar){
+			return;
+		}
+		ixmaps.fSidebar = false;
+		
 		ixmaps.containerWidthPx = $("#container").css("width");
 		ixmaps.mapWidthPx = $("#embed-cross").css("width");
 		ixmaps.mapHeightPx = $("#embed-cross").css("height");
@@ -572,8 +580,6 @@
 
 		$("#expandbutton").show();
 		$("#collapsbutton").hide();
-
-		ixmaps.fSidebar = false;
 	};
 
 	ixmaps.toggleSidebar = function() { 
