@@ -380,8 +380,9 @@ $Log: htmlgui_sync.js,v $
 				if (!this.isTouchDevice() || ((now.getTime() - ixmaps.lastMoveTime) > 50)) {
 					ixmaps.mapTool("clickinfo");
 					ixmaps.fInputModeSwitched = true;
+					ixmaps.fOnItemClicked = false;
 					fEnableAutoDisable = true;
-					setTimeout("ixmaps.htmlgui_onSVGPointerIdle()",2000);
+					setTimeout("ixmaps.htmlgui_onSVGPointerIdle()",500);
 				}
 			}
 			ixmaps.mouseDownX = ixmaps.mouseMoveX = ixmaps.mouseDownY = ixmaps.mouseMoveY = null;
@@ -1006,6 +1007,9 @@ $Log: htmlgui_sync.js,v $
 		// if we switched to SVG by clicking on the map, switch back to HTML
 		//
 		if (ixmaps.fInputModeSwitched) {
+			if (!ixmaps.fOnItemClicked){
+				ixmaps.message("double click to show info",1000);
+			}
 			__switchInputMode();
 			__activateSVGElements(false);
 			ixmaps.mouseDownX = ixmaps.mouseMoveX = ixmaps.mouseDownY = ixmaps.mouseMoveY = null;

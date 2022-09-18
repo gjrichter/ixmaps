@@ -953,6 +953,9 @@
 
 		var __olditemclick = ixmaps.htmlgui_onItemClick;
 		ixmaps.htmlgui_onItemClick = function(evt,szId){ 
+			
+			ixmaps.fOnItemClicked = true;
+			
 			// check __olditemclick when parent Api has no map; magick - tested 
 			if ( (ixmaps.parentApi.isMap == false) && __olditemclick(evt,szId) ){
 				return true;
