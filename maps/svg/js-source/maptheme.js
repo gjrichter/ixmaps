@@ -12068,7 +12068,7 @@ MapTheme.prototype.markClass = function (nClass, nStep) {
 							tilesNodesA[j].setAttributeNS(null, "style", tilesNodesA[j].getAttributeNS(szMapNs, "origthemestyle"));
 							// GR 11.11.2011 look for value node
 							var szId = tilesNodesA[j].getAttribute("id");
-							if (tilesNodesA[j].firstChild.nextSibling){
+							if (tilesNodesA[j].firstChild && tilesNodesA[j].firstChild.nextSibling){
 								szId = tilesNodesA[j].firstChild.nextSibling.getAttribute("id") || szId;
 							}
 							var nNode = SVGDocument.getElementById(szId + "L");
@@ -12201,7 +12201,7 @@ MapTheme.prototype.unmarkClass = function (nClass) {
 						tilesNodesA[j].removeAttributeNS(szMapNs, "themestyle");
 						// GR 11.11.2011 look for value node
 						var szId = tilesNodesA[j].getAttribute("id");
-						if (tilesNodesA[j].firstChild.nextSibling){
+						if (tilesNodesA[j].firstChild && tilesNodesA[j].firstChild.nextSibling){
 							szId = tilesNodesA[j].firstChild.nextSibling.getAttribute("id") || szId;
 						}
 						var nNode = SVGDocument.getElementById(szId + "L");
@@ -12649,7 +12649,7 @@ MapTheme.prototype.createSubTheme = function (nClass) {
 			//
 			this.subTheme =
 				map.Themes.newTheme(this.szThemes, this.szFields.split("|")[nClass], this.szField100,
-					"type:CHOROPLETH|QUANTILE|NOINFO|NOLEGEND|SUBTHEME|" + szFlag + ";colorscheme:7|white|" + this.colorScheme[nClass] + ";" + szAttributes, this.szLabelA ? this.szLabelA[nClass] : "", "");
+					"type:CHOROPLETH|LOG|DOPACITY|NOINFO|NOLEGEND|SUBTHEME|" + szFlag + ";colorscheme:7|white|" + this.colorScheme[nClass] + ";" + szAttributes, this.szLabelA ? this.szLabelA[nClass] : "", "");
 
 		}
 
