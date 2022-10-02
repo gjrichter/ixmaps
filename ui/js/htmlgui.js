@@ -3046,8 +3046,28 @@ $Log: htmlgui.js,v $
 	 * @private
 	 */
 	ixmaps.require = function(szUrl){
+		
+		// save for use in project
 		ixmaps.requiredUrlA = ixmaps.requiredUrlA || [];
 		ixmaps.requiredUrlA.push(szUrl);
+		
+		// try to load the required file
+		ixmaps.loading++;
+		$.ajax({
+			type: "GET",
+			url: szUrl,
+			dataType: "text",
+			success: function (script) {
+				eval(script);
+				ixmaps.loading--;
+			},
+			error: function (jqxhr, settings, exception) {
+				ixmaps.loading--;
+				ixmaps.showLoadingArrayStop();
+				ixmaps.hideLoading();
+				ixmaps.error("required resource '"+szUrl+"' could not be loaded !", 2000);
+			}
+		});
 	};
 
 	/**
