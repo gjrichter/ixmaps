@@ -4121,7 +4121,7 @@ Map.Label.prototype.execCheckLabelOverlappingOne = function(nIndex){
 						}
 						break;
 					}
-					if ( cItem.refBox ){
+					if ( cItem.fRef ){
 						// label on polygon, only vertical position changes allowed
 						// --------------------------------------------------------
 						if ( boxA.y > boxB.y ){
