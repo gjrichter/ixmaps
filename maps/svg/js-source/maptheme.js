@@ -13018,7 +13018,10 @@ MapTheme.prototype.labelMap = function (startIndex) {
 
 			var tilesNodesA = this.getItemNodes(a);
 			for (var j = 0; j < tilesNodesA.length; j++) {
-				var nValue = this.itemA[a].szLabel ? this.itemA[a].szLabel : this.itemA[a].nValue;
+				var nValue = this.itemA[a].nValue;
+				if ( !this.szValueField && this.itemA[a].szLabel ) {
+					nValue = this.itemA[a].szLabel;
+				}
 				this.labelShape(tilesNodesA[j], this.itemA[a].szColor, nValue);
 			}
 		}
@@ -13121,7 +13124,7 @@ MapTheme.prototype.labelShape = function (shapeNode, szColor, nValue) {
 			// ----------------------
 			if (this.szFlag.match(/DOPACITY/)) {
 				newText.style.setProperty("fill-opacity", szOpacity, "");
-				newTextbg.style.setProperty("stroke-opacity", szOpacity, "");
+				newTextbg.style.setProperty("stroke-opacity", szOpacity*0.3, "");
 			}
 			// ----------------------
 
