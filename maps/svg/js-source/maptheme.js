@@ -14991,7 +14991,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 						// 
 						if (this.szFlag.match(/TITLE/) && this.szTitleField && (!this.nTitleUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nTitleUpper))) {
 
-							var nFontSize = Math.max(map.Scale.normalX(0.9), Math.min(bBox.width / 10, map.Scale.normalX(100 / this.nScale)));
+							var nFontSize = Math.max(map.Scale.normalX(0.9), Math.min(bBox.width / 10, map.Scale.normalX(14 / this.nScale)));
 							if (this.szFlag.match(/GRIDSIZE/)) {
 								nFontSize = Math.max(bBox.width / 10, map.Scale.normalX(6));
 							}
@@ -20004,7 +20004,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		if (!szFlag.match(/MULTI/)) {
 			labelGroup.setAttributeNS(szMapNs, "class", String(nClass));
 		} else {
-			szTextStyle += ";fill:#888888";
+			szTextStyle += ";fill:#444444;text-anchor:start;";
 		}
 
 		var newBg = map.Dom.newShape('rect', labelGroup, -nTextLen / 2, -nTextSize * 0.95, nTextLen, nTextSize * 1.2, szBgStyle);
@@ -20020,7 +20020,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		newBg.setAttributeNS(null, "width", nWidth);
 
 		if (szFlag.match(/MULTI/)) {
-			labelGroup.fu.setPosition(map.Scale.normalX(15) + nWidth * 0.5, nTextSize * 0.77);
+			labelGroup.fu.setPosition(map.Scale.normalX(nChartSize*0.8), nTextSize * 0.77);
 			labelGroup.fu.scale(2, 2);
 			newBg.parentNode.removeChild(newBg);
 			//labelGroup.fu.setPosition(nWidth/3,nTextSize/3+ptNullOrig.y);
