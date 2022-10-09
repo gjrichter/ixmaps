@@ -12649,7 +12649,7 @@ MapTheme.prototype.createSubTheme = function (nClass) {
 			//
 			this.subTheme =
 				map.Themes.newTheme(this.szThemes, this.szFields.split("|")[nClass], this.szField100,
-					"type:CHOROPLETH|LOG|DOPACITY|NOINFO|NOLEGEND|SUBTHEME|" + szFlag + ";colorscheme:7|white|" + this.colorScheme[nClass] + ";" + szAttributes, this.szLabelA ? this.szLabelA[nClass] : "", "");
+					"type:CHOROPLETH|LOG|DOPACITY|NOINFO|NOLEGEND|SUBTHEME|" + szFlag + ";colorscheme:7|white|" + this.colorScheme[nClass] + ";" + szAttributes + ";alphafield:null;alphafield100:null;dopacitypow:1;dopacityscale:2;", this.szLabelA ? this.szLabelA[nClass] : "", "");
 
 		}
 
@@ -17174,7 +17174,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				// GR 25.05.2015 explizit value display field, take it as is
 				tValue = isNaN(this.itemA[a].szValue)?this.itemA[a].szValue:__scanValue(this.itemA[a].szValue);
 			} else
-			if ( !szFlag.match(/SEQUENCE/) && this.szSizeField && this.itemA[a] && this.itemA[a].nSize ) {
+			if ( !szFlag.match(/SEQUENCE|CATEGORICAL/) && this.szSizeField && this.itemA[a] && this.itemA[a].nSize ) {
 				tValue = this.itemA[a].nSize;
 			} 
 
@@ -19149,7 +19149,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			// --------------------------------------------------------------
 			// position -> color
 			// GR 09.04.2020 repetitive coloscheme with gridx
-			var nColor = this.colorScheme[nIndex%(this.nGridX||1000000)];
+			var nColor = this.colorScheme[nIndex]||this.colorScheme[nIndex%(this.nGridX||1000000)];
 			var nClass = nIndex%(this.nGridX||1000000);
 
 			// or: value -> class -> color 
