@@ -2944,7 +2944,7 @@ $Log: htmlgui_api.js,v $
 
 			var target = window.document.getElementById(szTargetDiv);
 
-			var szName = opt.mapName || opt.name || szTargetDiv || "map" + String(Math.random()).split(".")[1];
+			var szName = opt.mapName || opt.name || "map" + String(Math.random()).split(".")[1];
 			var szBasemap = opt.mapService || opt.basemap || "leaflet";
 			var szMapType = opt.mapType || opt.maptype || "CartoDB - Positron";
 
@@ -3054,13 +3054,17 @@ $Log: htmlgui_api.js,v $
 				target.setAttributeNS(null,"id",szName+"_target");
                 // GR 08.09.2019 adapt the created frame on window resize 
 			}else{
+				target = document.createElement('div');
+				target.style = "width:"+szWidth+";height:"+szHeight+";";
+				target.id = szTargetDiv;
 				iFrame = document.createElement('iframe');
 				iFrame.id = szName;
 				iFrame.style = "border:0;width:"+szWidth+";height:"+szHeight+";";
 				iFrame.src = szUrl; 
+				target.append(iFrame);
 			}
 
-		return iFrame;
+		return target;
 		//});
 	}
 
