@@ -3059,7 +3059,7 @@ $Log: htmlgui_api.js,v $
 				target.id = szTargetDiv;
 				iFrame = document.createElement('iframe');
 				iFrame.id = szName;
-				iFrame.style = "border:0;width:"+szWidth+";height:"+szHeight+";";
+				iFrame.style = "border:0;width:100%;height:100%";
 				iFrame.src = szUrl; 
 				target.append(iFrame);
 			}
