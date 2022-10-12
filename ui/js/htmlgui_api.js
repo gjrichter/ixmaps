@@ -3050,7 +3050,11 @@ $Log: htmlgui_api.js,v $
 			}
 
 			if ( target ){
-				target.innerHTML = "<iframe id=\""+szName+"\" style=\"border:0;width:"+szWidth+";height:"+szHeight+"\" src=\""+szUrl+"\" ></iframe>";
+				if ( target.style.width && target.style.height ){
+					target.innerHTML = "<iframe id=\""+szName+"\" style=\"border:0;width:100%;height:100%\" src=\""+szUrl+"\" ></iframe>";
+				}else{
+					target.innerHTML = "<iframe id=\""+szName+"\" style=\"border:0;width:"+szWidth+";height:"+szHeight+"\" src=\""+szUrl+"\" ></iframe>";
+				}
 				target.setAttributeNS(null,"id",szName+"_target");
                 // GR 08.09.2019 adapt the created frame on window resize 
 			}else{
