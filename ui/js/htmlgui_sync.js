@@ -1008,7 +1008,7 @@ $Log: htmlgui_sync.js,v $
 		//
 		if (ixmaps.fInputModeSwitched) {
 			if (!ixmaps.fOnItemClicked){
-				ixmaps.message("double click to show info",1000);
+				//ixmaps.message("double click to show info",1000);
 			}
 			__switchInputMode();
 			__activateSVGElements(false);
