@@ -297,7 +297,7 @@ window.ixmaps = window.ixmaps || {};
 					}
 				}
 				if ( d < data.length-1  ){
-					szHtml += "<tr><td style='font-size:0.5em'>&nbsp;</td><tr>";
+					szHtml += "<tr><td style='font-size:0.2em'>&nbsp;</td><tr>";
 				}	
 			}
 			szHtml += "</table>";
