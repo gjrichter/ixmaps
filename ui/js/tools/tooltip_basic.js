@@ -52,16 +52,31 @@ window.ixmaps = window.ixmaps || {};
 
 		var fontsize = Math.min(14, Math.max(11, (22 / 1200 * window.innerWidth)));
 
+		// make tooltip container 
+		//
 		szHtml += "<div id='tooltipDiv' style='position:absolute;left:" + xPos + "px;top:" + yPos + "px;font-family: arial narrow, system;font-size:" + fontsize + "px;color: #444;background: white;border: 0.5px solid black;border-radius: 5px;margin-top:0.7em;margin-right:0.7em;'>";
-		console.log(szText);
+
+		// insert tooltip content (szText) 
+		//
 		szHtml += "<div style='margin:0.5em 0.5em;max-width:" + width + "px;max-height:" + height + "px;overflow:auto'>" + szText + "</div>";
 
+		// add SVG target div 
+		//
 		szHtml += "<div id='chartDiv' style='margin:0.5em 1em;overflow:hidden'><svg width='300' height='300' viewBox='0 0 5000 5000'><g id='getchartmenutarget' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();' style='pointer-events:all'></g></svg></div>";
 
 
 		// create delete button 
-
+		//
 		if (__fTooltipPin) {
+			
+			ixmaps.htmlgui_deleteItemPinned = ixmaps.htmlgui_deleteItemPinned || function () {
+				__fTooltipPinned = false;
+				__fTooltipPin = false;
+				ixmaps.setMapOverlayHTML("");
+				window.document.getElementById("tooltip").innerHTML = "";
+				ixmaps.clearHighlight();
+			};
+			
 			szHtml += "<div onclick='ixmaps.htmlgui_deleteItemPinned()' style='position:absolute;top:-0.5em;right:-0.5em;font-size:16px;color:white;background:#444444;padding:0 0.25em;border-radius:1em;cursor:pointer;'>&Cross;</div>"
 			__fTooltipPinned = true;
 		}
@@ -73,7 +88,7 @@ window.ixmaps = window.ixmaps || {};
 		// -----------------------------------------------------
 
 		window.document.getElementById("tooltip").innerHTML = szHtml;
-		//szId = szId || evt.path[1].getAttributeNS(null, "id");
+		
 		if ( szId.match(/chart/i)){
 			console.log("=================");
 			console.log(szId);
@@ -119,6 +134,7 @@ window.ixmaps = window.ixmaps || {};
 			window.document.getElementById("chartDiv").remove();
 			var width = window.document.getElementById("tooltipDiv").clientWidth;
 			var height = window.document.getElementById("tooltipDiv").clientHeight;
+			
 			xPos = xPos > window.innerWidth / 2 ? (xPos - width - 30) : xPos + 30;
 			yPos = yPos > window.innerHeight / 3 ? (yPos - height + 150) : (yPos + 20);
 			window.document.getElementById("tooltipDiv").style.left = xPos + "px";
@@ -157,28 +173,51 @@ window.ixmaps = window.ixmaps || {};
 	// -------------------------------------------------------------
 
 	ixmaps.htmlgui_onItemOver = function (evt, szId) {
-		console.log("xxxxxxxxxxxxxxxxxxxx");
-		console.log(szId);
-		console.log("xxxxxxxxxxxxxxxxxxxx");
 
 		if (__fTooltipPinned) {
 			return true;
 		}
-		__themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
+		
+		// get the theme object from item id
+		//
+		var themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
+		
+		// check theme obj
+		//
+		if (!(themeObj.szId == szId.split(":")[0])){
+			
+			// if theme not corrisponds to item
+			// look in all themes for the corrisponding one (only CHOROPLETH themes)
+			//
+			var themes = ixmaps.getThemes();
+			for (i in themes){
+				if (themes[i].szThemes == szId.split(":")[0] && themes[i].szFlag.match(/CHOROPLETH/)){
+					console.log("found the right theme:"+i);
+					themeObj = themes[i];
+				}
+			}
+		}
+		
+		// ------------------------------------------
+		// ok, we start creating the tooltip content
+		// ------------------------------------------
 
 		var szHtml = "<div style='font-size:18px;min-width:150px;max-width:400px'>";
 
-		szHtml += "<p style='font-size:12px;margin-top:0em;margin-bottom:0.5em'>" + __themeObj.szTitle + "</p>";
+		szHtml += "<p style='font-size:12px;margin-top:0em;margin-bottom:0.5em'>" + themeObj.szTitle + "</p>";
 
+		// make a theme item list compatible id
+		//
 		var szItem = szId;
 		if (szId.match(/chartgroup/)){
 			szItem = szId.split(":chartgroup")[0].split(":");
 			szItem = szItem[1]+"::"+szItem[3];
 		}
-		var nValue = __themeObj.itemA[szItem] ? (__themeObj.itemA[szItem].nValue || __themeObj.itemA[szItem].nValuesA[0]) : "";
-		console.log(nValue);
-		var szSign = ((nValue > 0) && __themeObj.szFlag.match(/SIGN/)) ? "+" : "";
-		szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em'>" + (__themeObj.itemA[szItem] ? (__themeObj.itemA[szItem].szTitle || ("[" + szId + "]")) : "") + "</br>" + szSign + nValue.toFixed(2) + __themeObj.szUnit + "</h5>";
+		
+		var nValue = themeObj.itemA[szItem] ? (themeObj.itemA[szItem].nValue || themeObj.itemA[szItem].nValuesA[0]) : "";
+		var szSign = ((nValue > 0) && themeObj.szFlag.match(/SIGN/)) ? "+" : "";
+		
+		szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || ("[" + szId + "]")) : "") + "</br>" + szSign + nValue.toFixed(2) + themeObj.szUnit + "</h5>";
 
 		var normal = "#000000";
 		var highLight = "#000000";
@@ -191,33 +230,34 @@ window.ixmaps = window.ixmaps || {};
 		}
 		var suffix = "";
 
-		if (!szId.match(/chart/i)) {
+		// ------------------------------------------
+		// add data table ? 
+		// ------------------------------------------
+		
+		if (themeObj.fShowData) {
 
 			// item is not a chart -> item is a map shape
-			// then we have to get the id in another way
-
-			var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szId);
-
-			var szChartId = szId.match(/::/) ? szId : obj.parentNode.getAttribute("id");
-			var szIdA = szChartId.split("#");
-			if (szIdA.length > 1) {
-				var szIdAA = szIdA[1].split(/\b::\b/);
-				szChartId = szIdA[0] + "::" + szIdAA[1];
-				szTitle = szIdAA[1];
+			// then we have to get the id for tyhe data in another way
+			//
+			if (!szId.match(/chart/i)) {
+				var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szId);
+				var szChartId = szId.match(/::/) ? szId : obj.parentNode.getAttribute("id");
+				var szIdA = szChartId.split("#");
+				if (szIdA.length > 1) {
+					var szIdAA = szIdA[1].split(/\b::\b/);
+					szChartId = szIdA[0] + "::" + szIdAA[1];
+					szTitle = szIdAA[1];
+				}
+				szId = ixmaps.getThemes()[1].szId + ":" + szChartId + ":chartgroup";
 			}
-			//szId = ixmaps.getThemes()[1].szId + ":" + szChartId + ":chartgroup";
-
-		}
-
-		// get the theme object (for title, ...)
-		var themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
-
-		if (0 && __themeObj.fShowData) {
 
 			// get the data, and make tooltip content
 			// 
+			console.log(szId);
 			var data = ixmaps.map().getData(szId);
-
+			
+			console.log(data);
+			if (data)
 			for (d = 0; d < Math.min(50, data.length); d++) {
 
 				szHtml += "<table style='font-size:0.7em;spacing:0.5em;min-width:200px'>"
@@ -258,13 +298,23 @@ window.ixmaps = window.ixmaps || {};
 				szHtml += "</table>";
 			}
 		}
-		szHtml += "</div>"; //data[i];
-
-		console.log("arrivato!");
-
+		
+		// tooltip content ready 
+		
+		szHtml += "</div>"; 
+		
+		// show the tooltip
 		ixmaps.htmlgui_onTooltipDisplay(evt, szHtml, szId);
+		
 		return true;
 	}
+
+	// -------------------------------------------------------------
+	//
+	// intercept mouse click on map item and redirect to onItemOver()
+	// overwrites previous defined mouse click handling
+	//
+	// -------------------------------------------------------------
 
 	ixmaps.htmlgui_onItemClick = function (evt, szId) {
 		if (!evt) {
@@ -274,16 +324,6 @@ window.ixmaps = window.ixmaps || {};
 		__fTooltipPin = true;
 		return ixmaps.htmlgui_onItemOver(evt, szId);
 	}
-	ixmaps.htmlgui_deleteItemPinned = function () {
-		__fTooltipPinned = false;
-		__fTooltipPin = false;
-		ixmaps.setMapOverlayHTML("");
-		window.document.getElementById("tooltip").innerHTML = "";
-		ixmaps.clearHighlight();
-	}
-
-
-
 
 })();
 
