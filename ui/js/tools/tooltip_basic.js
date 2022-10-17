@@ -257,10 +257,11 @@ window.ixmaps = window.ixmaps || {};
 			var data = ixmaps.map().getData(szId);
 			
 			console.log(data);
+			szHtml += "<table style='font-size:0.7em;spacing:0.5em;min-width:200px'>"
+
 			if (data)
 			for (d = 0; d < Math.min(50, data.length); d++) {
 
-				szHtml += "<table style='font-size:0.7em;spacing:0.5em;min-width:200px'>"
 				var dataObject = data[d];
 				for (i in dataObject) {
 					console.log(i);
@@ -295,8 +296,12 @@ window.ixmaps = window.ixmaps || {};
 						} else {}
 					}
 				}
-				szHtml += "</table>";
+				if ( d < data.length-1  ){
+					szHtml += "<tr><td style='font-size:0.5em'>&nbsp;</td><tr>";
+				}	
 			}
+			szHtml += "</table>";
+
 		}
 		
 		// tooltip content ready 
