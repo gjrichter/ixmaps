@@ -307,12 +307,9 @@ window.ixmaps = window.ixmaps || {};
 
 			SVGBox.width *= scale;
 			SVGBox.height *= scale;
-			SVGBox.y -= 30;
-			SVGBox.height += 30;
 
-			var size = width;
-			width = size / Math.max(1, (3 / themeObj.itemA[szItem].nValuesA.length));
-			height = size / SVGBox.width * SVGBox.height;
+			width /= Math.max(1, (3 / themeObj.itemA[szItem].nValuesA.length));
+			height = width / SVGBox.width * SVGBox.height;
 			while (height > width) {
 				height *= 0.9;
 			}
