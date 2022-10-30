@@ -1422,7 +1422,7 @@
               },
               "textcolor": {
                 "$id": "#/properties/themes/items/properties/style/properties/textcolor",
-                "type": "string",
+                "type": ["array","string"],
                 "title": "The Textcolor Schema",
                 "default": "",
                 "examples": [
