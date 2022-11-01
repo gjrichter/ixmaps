@@ -68,7 +68,7 @@ window.ixmaps = window.ixmaps || {};
 			ixmaps.htmlgui_deleteItemPinned = ixmaps.htmlgui_deleteItemPinned || function () {
 				__fTooltipPinned = false;
 				__fTooltipPin = false;
-				ixmaps.setMapOverlayHTML("");
+				//ixmaps.setMapOverlayHTML("");
 				window.document.getElementById("tooltip").innerHTML = "";
 				ixmaps.clearHighlight();
 			};
@@ -111,7 +111,7 @@ window.ixmaps = window.ixmaps || {};
 		if (__fTooltipPinned) {
 			return false;
 		}
-		ixmaps.setMapOverlayHTML("");
+		//ixmaps.setMapOverlayHTML("");
 		window.document.getElementById("tooltip").innerHTML = "";
 		return true;
 	}
@@ -167,23 +167,6 @@ window.ixmaps = window.ixmaps || {};
 			return;
 		}
 
-		// here we go
-		//
-		var szHtml = "<div style='font-size:18px;min-width:150px;max-width:400px'>";
-
-		// insert theme title
-		szHtml += "<p style='font-size:12px;margin-top:0em;margin-bottom:0.5em'>" + themeObj.szTitle + "</p>";
-
-		// insert item title and value, if theme has only one value
-		if (themeObj.itemA[szItem] && (themeObj.itemA[szItem].nValuesA.length == 1)) {
-			var nValue = themeObj.itemA[szItem] ? (themeObj.itemA[szItem].nValue || themeObj.itemA[szItem].nValuesA[0]) : "";
-			var szSign = ((nValue > 0) && themeObj.szFlag.match(/SIGN/)) ? "+" : "";
-			szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || ("[" + szId + "]")) : "") + "</br>" + szSign + nValue.toFixed(2) + themeObj.szUnit + "</h5>";
-		} else {
-			// if theme has more values, insert only item title
-			szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || ("[" + szId + "]")) : "") + "</h5>";
-		}
-
 		// adapt content to map style
 		//
 		var normal = "#000000";
@@ -195,8 +178,87 @@ window.ixmaps = window.ixmaps || {};
 			highLight = "#ffffff";
 			highLightBg = "#808080";
 		}
+		
+		// here we go
+		//
+		var szHtml = "<div style='font-size:18px;color:"+normal+";min-width:150px;max-width:400px'>";
+
+		// insert theme title
+		szHtml += "<p style='font-size:12px;margin-top:0em;margin-bottom:0.5em'>" + themeObj.szTitle + "</p>";
+
+		// insert item title and value, if theme has only one value
+		if (themeObj.szFlag.match(/CHOROPLETH||VECTOR/) && themeObj.itemA[szItem] && (themeObj.itemA[szItem].nValuesA.length == 1)) {
+			console.log(themeObj.itemA[szItem]);
+			var nValue = themeObj.itemA[szItem] ? (Number(themeObj.itemA[szItem].szValue) || themeObj.itemA[szItem].nValue || themeObj.itemA[szItem].nValuesA[0]) : "";
+			var szSign = ((nValue > 0) && themeObj.szFlag.match(/SIGN/)) ? "+" : "";
+			szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || ("[" + szId + "]")) : "") + "</br>" + szSign + nValue.toFixed(themeObj.nValueDecimals) + themeObj.szUnit + "</h5>";
+		} else {
+			// if theme has more values, insert only item title
+			szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || ("[" + szId + "]")) : "") + "</h5>";
+		}
+
 		var suffix = "";
 
+		if (themeObj.szFlag.match(/TOOLTIPNOCHART/)){
+			ixmaps.htmlgui_onTooltipDisplay(evt, szHtml, szId);
+			return true;
+		}
+		
+		// ------------------------------------------
+		// add chart 
+		// ------------------------------------------
+		
+		if (!window.document.getElementById("chartDiv")) {
+			var div = document.createElement("div");
+			div.setAttributeNS(null, "id", "chartDiv");
+			div.setAttributeNS(null, "style", "margin:0.5em 1em;overflow:hidden");
+			document.activeElement.appendChild(div);
+		}
+		
+		// prepare chart hosting SVG div (is not the final host of the chart)
+		//
+		var szTarget = "</div><svg width='300' height='300' viewBox='0 0 5000 5000'><g id='getchartmenutarget' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();' style='pointer-events:all'></g></svg>";
+		try {
+			window.document.getElementById("getchartmenutarget").remove();
+		} catch (e) {}
+		window.document.getElementById("chartDiv").innerHTML = szTarget;
+			
+		// request chart from map 
+		// -----------------------
+		themeObj.drawChart(window.document.getElementById("getchartmenutarget"), szItem, 30, "VALUES|XAXIS|ZOOM|BOX|GRID");
+		
+		// check if chart has been created 
+		//
+		var SVGBox = window.document.getElementById("getchartmenutarget").getBBox();
+		if (SVGBox && SVGBox.width && SVGBox.height) {
+			
+			// if yes, scale the chart
+			//
+			var width = Math.min(400, window.innerWidth / 2.5);
+			var height = window.innerHeight / 2;
+			var scale = 1; //Math.max(1, width / SVGBox.width);
+
+			SVGBox.width *= scale;
+			SVGBox.height *= scale;
+
+			width /= Math.max(1, (3 / themeObj.itemA[szItem].nValuesA.length));
+			height = width / SVGBox.width * SVGBox.height;
+			while (height > window.innerHeight / 3) {
+				height *= 0.9;
+			}
+
+			window.document.getElementById("getchartmenutarget").parentNode.setAttribute("width", width);
+			window.document.getElementById("getchartmenutarget").parentNode.setAttribute("height", height);
+			window.document.getElementById("getchartmenutarget").parentNode.setAttribute("viewBox", SVGBox.x + ' ' + SVGBox.y + ' ' + SVGBox.width + ' ' + SVGBox.height);
+			
+			// then get the chart code (html,svg) and insert into the tooltip HTML code
+			szHtml += window.document.getElementById("chartDiv").innerHTML;
+			// and delete the temporary chart hosting div !!
+			window.document.getElementById("chartDiv").remove();
+		}
+
+		szHtml += "</div>";
+		
 		// ------------------------------------------
 		// add data table ? 
 		// ------------------------------------------
@@ -270,61 +332,8 @@ window.ixmaps = window.ixmaps || {};
 			}
 		}
 
-
-		// ------------------------------------------
-		// add chart 
-		// ------------------------------------------
 		
-		if (!window.document.getElementById("chartDiv")) {
-			var div = document.createElement("div");
-			div.setAttributeNS(null, "id", "chartDiv");
-			div.setAttributeNS(null, "style", "margin:0.5em 1em;overflow:hidden");
-			document.activeElement.appendChild(div);
-		}
 		
-		// prepare chart hosting SVG div (is not the final host of the chart)
-		//
-		var szTarget = "</div><svg width='300' height='300' viewBox='0 0 5000 5000'><g id='getchartmenutarget' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();' style='pointer-events:all'></g></svg>";
-		try {
-			window.document.getElementById("getchartmenutarget").remove();
-		} catch (e) {}
-		window.document.getElementById("chartDiv").innerHTML = szTarget;
-		
-		// request chart from map 
-		// -----------------------
-		themeObj.drawChart(window.document.getElementById("getchartmenutarget"), szItem, 30, "VALUES|XAXIS|ZOOM|BOX|GRID");
-		
-		// check if chart has been created 
-		//
-		var SVGBox = window.document.getElementById("getchartmenutarget").getBBox();
-		if (SVGBox && SVGBox.width && SVGBox.height) {
-			
-			// if yes, scale the chart
-			//
-			var width = Math.min(400, window.innerWidth / 2);
-			var height = window.innerHeight / 2;
-			var scale = 1; //Math.max(1, width / SVGBox.width);
-
-			SVGBox.width *= scale;
-			SVGBox.height *= scale;
-
-			width /= Math.max(1, (3 / themeObj.itemA[szItem].nValuesA.length));
-			height = width / SVGBox.width * SVGBox.height;
-			while (height > width) {
-				height *= 0.9;
-			}
-
-			window.document.getElementById("getchartmenutarget").parentNode.setAttribute("width", width);
-			window.document.getElementById("getchartmenutarget").parentNode.setAttribute("height", height);
-			window.document.getElementById("getchartmenutarget").parentNode.setAttribute("viewBox", SVGBox.x + ' ' + SVGBox.y + ' ' + SVGBox.width + ' ' + SVGBox.height);
-			
-			// then get the chart code (html,svg) and insert into the tooltip HTML code
-			szHtml += window.document.getElementById("chartDiv").innerHTML;
-			// and delete the temporary chart hosting div !!
-			window.document.getElementById("chartDiv").remove();
-		}
-
-		szHtml += "</div>";
 		
 		// tooltip content is ready 
 		// now show the tooltip using the tooltip hook ixmaps.htmlgui_onTooltipDisplay()
