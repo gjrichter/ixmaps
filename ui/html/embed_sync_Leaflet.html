@@ -209,6 +209,19 @@
 			</button>
 
 		</div>
+		
+		<div id="onmapbuttondivzoom" style="position:absolute;bottom:10px;left:10px;z-index:100000;display:none;">
+			<a href="javascript:ixmaps.zoomIn()" style="text-decoration:none">
+				<div style="padding:1em;background-color:rgba(255,255,255,1);border:solid black 0.1px;border-radius:0.5em;">
+				<i class="icon icon-context icon-plus" title="Layer" tabindex="-1" style="font-size:1em;color:#888888" ></i></div>
+			</a>
+			<a href="javascript:ixmaps.zoomOut()" style="text-decoration:none">
+				<div style="padding:1em;background-color:rgba(255,255,255,1);border:solid black 0.1px;border-radius:0.5em;">
+				<i class="icon icon-context icon-minus" title="Layer" tabindex="-1" style="font-size:1em;color:#888888" ></i></div>
+			</a>	
+		</div>
+		
+		
 
 		<!-- title -->
 		<div id="title" class="title-field" style="width:100%;z-index:1000;display:none;">
@@ -655,8 +668,8 @@
 					$(".map-legend").css("font-size","0.7em");
 					$(".map-legend").css("margin-top","-15px");
 					$(".map-legend").css("width", "100%");
-					$(".map-legend").css("max-width", "100%");
-					$(".map-legend").css("left", "0px");
+					$(".map-legend").css("max-width", "98%");
+					$(".map-legend").css("left", "1%");
 					
 					$("#onmapbuttondiv").css("left", "");
 					$("#onmapbuttondiv").css("right", "60px");
@@ -757,6 +770,9 @@
 				var mode = $(document).getUrlParam('mode');
 				ixmaps.execBookmark("map.Api.setMapTool('" + mode + "')", false);
 				__setInputMode(mode);
+				if ( mode == "info" ){
+					$("#onmapbuttondivzoom").show();
+				}
 			}
 
 			// set sync mode ?
@@ -850,6 +866,7 @@
 					$("#switchmodebutton").css("background", "#ffffff url(../resources/images/info.png) no-repeat 95% 55%");
 					$("#switchmodebutton").css("background-size", "13px");
 					$("#switchinfobutton").hide();
+					$("#onmapbuttondivzoom").hide();
 					break;
 				case 'pan':
 				default:
@@ -859,6 +876,7 @@
 					$("#switchmodebutton").css("background", "#ffffff url(../resources/images/mano.png) no-repeat 98% 55%");
 					$("#switchmodebutton").css("background-size", "13px");
 					$("#switchmodebuttonicon").css("opacity", "1");
+					$("#onmapbuttondivzoom").show();
 					break;
 			}
 		};
