@@ -190,6 +190,9 @@ window.ixmaps = window.ixmaps || {};
 			return true;
 		}
 
+		var fThemeChart = false;
+		var fThemeData = false;
+		
 		// ------------------------------------
 		// get the theme object from item id
 		// ------------------------------------
@@ -260,6 +263,7 @@ window.ixmaps = window.ixmaps || {};
 			}else{
 				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || themeObj.itemA[szItem].szSelectionId2.split("::")[1] || ("[" + szId.substr(0, 15) + " ... ]")) : "") + "</br>" + szSign + szValue + themeObj.szUnit + "</h5>";
 			}
+			fThemeData = true;
 		} else {
 			// if theme has more values, insert only item title
 			szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || "") : "") + "</h5>";
@@ -309,6 +313,8 @@ window.ixmaps = window.ixmaps || {};
 			//
 			var SVGBox = window.document.getElementById("getchartmenutarget").getBBox();
 			if (SVGBox && SVGBox.width && SVGBox.height) {
+				
+				fThemeChart = true;
 
 				// if yes, scale the chart
 				//
@@ -350,6 +356,7 @@ window.ixmaps = window.ixmaps || {};
 
 			szHtml += "</div>";
 		}
+
 		// ------------------------------------------
 		//
 		// add data table ? 
@@ -377,7 +384,7 @@ window.ixmaps = window.ixmaps || {};
 			// ---------------------------------------
 			//
 			var data = ixmaps.map().getData(szId);
-
+			
 			if (data) {
 
 				szHtml += "<table style='font-size:0.7em;spacing:0.5em;min-width:200px'>"
@@ -422,9 +429,65 @@ window.ixmaps = window.ixmaps || {};
 					}
 				}
 				szHtml += "</table>";
+				
+				fThemeData = true;
 			}
 
-			szHtml += "<div id='tooltip_2' style='position:absolute;font-family: arial narrow, system;color:#444;background:white;border:0.5px solid black;border-radius:5px;padding:5px;max-width:80%;'></div>";
+			szHtml += "<div id='tooltip_2' style='position:absolute;font-family: arial narrow, system;color:#444;background:white;border:0.5px solid black;border-radius:5px;padding:5px;max-width:80%;display:none'></div>";
+		}
+		
+		var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szItem);
+		if ( obj && !fThemeChart && !fThemeData ){
+
+			var szId =  ixmaps.embeddedSVG.window.map.Api.getShapeId(obj);
+			var szChartId = szId.match(/::/) ? szId : obj.parentNode.getAttribute("id");
+
+			// get shape info
+			// --------------------------
+			var layerA = ixmaps.getLayer();
+
+			var szLayer = (szChartId.split("::")[0]);
+			var szLayerName = layerA[szLayer].szLegendName || szLayerName;
+
+			var szItemName = (szChartId.split("::")[1]);
+			if (!isNaN(szItemName)) {
+				szItemName = layerA[szLayer].szSelection + ": " + szItemName;
+			} else {
+				szItemName = szItemName;
+				szLayerName += ":";
+			}
+
+			// get map shape metadata or theme data
+			// ------------------------------------
+			var child = obj.childNodes.item(1);
+			var data = ixmaps.embeddedSVG.window.map.Api.getShapeMetadataArray(child || obj);
+			
+			// list data
+			// ----------
+			if ( data ) {
+				szHtml += "<div style='font-size:18px;color:" + normal + ";min-width:150px;max-width:400px;>";
+				szHtml += "<div style='margin-left:auto>";
+				szHtml += "<table style='font-size:0.7em;spacing:0.5em;min-width:200px'>"
+				for (i in data) {
+					if ( i != "NIX" ) {
+						var szValue = data[i];
+						if (szValue.match(/http:/) || szValue.match(/https:/)) {
+							if (szValue.match(/.jpg/) || szValue.match(/.png/)) {
+								szValue = "<img  src='" + szValue + "' style='max-width:100%'>";
+								szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
+							} else {
+								szValue = "<a  href='" + szValue + "' target='_blank' style='width:100px'>" + szValue + "</a>";
+								szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
+							}
+						}else{	
+							szHtml += "<tr><td></td><td class='label' style='text-align:right;color:#aaaaaa'>" + i + "</td><td class='value' style='text-align:left'><b>" + data[i] + "</b></td></tr>";
+						}
+					}
+				}
+				szHtml += "</table>";
+				szHtml += "</div>";
+				szHtml += "</div>";
+			}
 		}
 		
 		// ------------------------------------------------------------------------------
