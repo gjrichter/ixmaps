@@ -572,13 +572,14 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                             szHtml += "<span style='background:" + colorA[sortA[i].color] + ";border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:0.5em'>";
                         }
                     } else {
-                        szHtml += "<span style='background:" + colorA[sortA[i].color] + ";opacity:1;font-size:0.6em;border-radius:0 0.6em 0.6em 0'>";
+					  szHtml += "<span style='background:" + colorA[sortA[i].color] + ";border:solid " + themeObj.szLineColor + " 1px;opacity:1;font-size:0.6em;border-radius:0.6em 0.6em 0.6em 0.6em'>";
+                      //szHtml += "<span style='background:" + colorA[sortA[i].color] + ";opacity:1;font-size:0.6em;border-radius:0 0.6em 0.6em 0'>";
                     }
 
                     // make the color bar
 
                     if (fCountBars) {
-                        var nMaxBar = ($("#map-legend").width() - 20) * 0.5;
+                        var nMaxBar = Math.min(200,($("#map-legend").width() - 20) * 0.5);
                         var nBar = Math.ceil(Math.pow(sortA[i].count, 1) * Math.min(10, nMaxBar / Math.pow(nMaxCount, 1)));
                         szHtml += "<span style='display:inline-block;width:" + nBar + "px;font-size:0.5em'>&nbsp;</span>";
                     } else {
@@ -1202,16 +1203,19 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 				szHtml += "  <label id='rangeBtnWeek' class='btn btn-secondary' onclick='javascript:ixmaps.setSliderRange(\"week\");'>";
 				szHtml += "	<input type='radio' name='options' id='option2'> week";
 				szHtml += "  </label>";
+				setTimeout("ixmaps.setSliderRange(\"week\")",1000);
 			}
 			if ( days > 55 ){
 				szHtml += "  <label id='rangeBtnMonth' class='btn btn-secondary' onclick='javascript:ixmaps.setSliderRange(\"month\");'>";
 				szHtml += "	<input type='radio' name='options' id='option3'> month";
 				szHtml += "  </label>";
+				setTimeout("ixmaps.setSliderRange(\"month\")",1000);
 			}
 			if ( days > 365 ){
 				szHtml += "  <label id='rangeBtnYear' class='btn btn-secondary' onclick='javascript:ixmaps.setSliderRange(\"year\");'>";
 				szHtml += "	<input type='radio' name='options' id='option4' > year";
 				szHtml += "  </label>";
+				setTimeout("ixmaps.setSliderRange(\"year\")",1000);
 			}
 			szHtml += "</div>";
 		}
@@ -1301,7 +1305,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			slider.oninput = function() {
 				var x = new Date(Number(this.value)) || this.value;
 				if (this.value == uMin ){
-					ixmaps.setThemeTimeFrame(null,uMin, uMax);
+					ixmaps.setThemeTimeFrame(themeObj.szId,uMin, uMax);
 					$("#time-span").html("");
 				}else{
 					var uDay = 1000*60*60*24;
@@ -1319,9 +1323,9 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 					}
 					range = __sliderRange||range;
 					if ( themeObj.szTimeField == "$item$" ){
-						ixmaps.setThemeTimeFrame(null,Number(this.value)-Number(range),this.value);
+						ixmaps.setThemeTimeFrame(themeObj.szId,Number(this.value)-Number(range),this.value);
 					}else{
-						ixmaps.setThemeTimeFrame(null,this.value,Number(this.value)+Number(range));
+						ixmaps.setThemeTimeFrame(themeObj.szId,this.value,Number(this.value)+Number(range));
 					}
 					if (range == 1){
 						$("#time-span").html(String(this.value));
