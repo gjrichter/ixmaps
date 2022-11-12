@@ -4395,7 +4395,7 @@ function displayTooltip(evt,infoShape){
 			catch (e){
 			}
 			try{
-				szText = HTMLWindow.ixmaps.htmlgui_onTooltipDisplay(szText,evt);
+				szText = HTMLWindow.ixmaps.htmlgui_onTooltipDisplay(evt,szText);
 				}
 			catch (e){
 			}

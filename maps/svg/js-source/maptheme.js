@@ -6568,7 +6568,8 @@ MapTheme.prototype.realize_draw = function () {
 	}
 
 	// GR 20.10.2021 new theme type modifier flag to show theme extend
-	if (this.szFlag.match(/SHOW/)) {
+	// now in realize done
+	if (0 && this.szFlag.match(/SHOW/)) {
 		this.removeDefinitionFromFlag("SHOW");
 		this.zoomTo();
 		this.zoomTo();
@@ -6822,6 +6823,13 @@ MapTheme.prototype.realizeDone = function () {
 	_TRACE(this.szFlag);
 	_TRACE(" ");
 	_LOG("stop");
+	
+	// GR 16.10.2022 theme type modifier flag to show theme extend now here
+	if (this.szFlag.match(/SHOW/)) {
+		this.removeDefinitionFromFlag("SHOW");
+		this.zoomTo();
+	}
+	
 	map.Themes.realizeDone(this);
 };
 
@@ -13162,6 +13170,15 @@ MapTheme.prototype.zoomTo = function () {
 	var pStart = new point(100000, 100000);
 	var pEnd = new point(-100000, -100000);
 
+	// GR 16.10.2022 zoom to for FEATURE themes
+	// ----------------------------------------
+	if (this.szFlag.match(/FEATURE/)) {
+		var node = SVGDocument.getElementById(this.szThemesA[0]);
+		var bBox = map.Dom.getBox(node);
+		map.Zoom.setNewArea(bBox);
+		return;
+	} 
+	
 	if (this.szFlag.match(/CHART/)) {
 		for (var a in this.itemA) {
 			var ptOff = this.itemA[a].ptPos || this.getNodePosition(this.itemA[a].szSelectionId);
@@ -17923,7 +17940,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 									nStarRadius = nStarRadius ? nStarRadius : nRadius;
 									var xPos = -map.Scale.normalX(1); //StarRadius*0.33;
 									var yPos = -map.Scale.normalX(nTextSize * 1.33) * (nNonZeroValues - nNonZeroValuesDone - 1); //(i==nPartsA.length-1)?(map.Scale.normalX(2)):(-nRadius*0.5+map.Scale.normalX(2));
-									newText = this.createTextLabel(SVGDocument, shapeOnTopGroup, "", szText, nTextSize, "", szColor, this.szTextColor);
+									newText = this.createTextLabel(SVGDocument, shapeOnTopGroup, "", szText, nTextSize, "", this.colorScheme[nIndex % (this.nGridX || 10000)], this.szTextColor);
 									newText.fu.setPosition(xPos, yPos);
 									if (a && (szFlag.match(/ZOOM/) || szFlag.match(/NORMSIZE/)) && this.szLabelA) {
 										var tWidth = newText.fu.getBox().width;
@@ -17960,7 +17977,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						} else {
 							nFontSize = Math.max(nRadius * 0.8, 1) * this.nValueScale;
 							shapeOnTopGroup = shapeOnTopGroup || map.Dom.newGroup(chartGroup, this.szId + ":" + a + ":chartontop");
-							newText = this.createTextLabel(SVGDocument, shapeOnTopGroup, "", szText, nFontSize / map.Scale.normalX(1), "", szColor);
+							// GR 27/10/2022 text label changed
+							//newText = this.createTextLabel(SVGDocument, shapeOnTopGroup, "", szText, nFontSize / map.Scale.normalX(1), "", szColor);
+							newText = this.createTextLabel(SVGDocument, shapeOnTopGroup, "", szText, nFontSize / map.Scale.normalX(1), "", "rgba(255,255,255,0.3)", cColor.lowColor, "GLOW");
 							newText.fu.setPosition(map.Scale.normalX(0) + nSymbolOffsetX, map.Scale.normalY(0) + nSymbolOffsetY);
 						}
 					}
@@ -18952,6 +18971,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			nTextSize *= nSizer;
 		}
 
+		nTextSize *= (this.nValueScale||1);
+
 		//nTextSize = Math.max(map.Scale.normalX(2),nTextSize);
 		var szTextStyle = "font-family:arial;font-size:" + (nTextSize * 0.95) + "px;fill:#606060;pointer-events:none;";
 		szTextStyle = map.Scale.tStyle.Values.szStyle + "font-size:" + (nTextSize * 0.95) + "px";
@@ -19239,8 +19260,6 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 			}
 
-			nTextSize *= (this.nValueScale||1);
-			
 			// =======================
 			// finally, make the bar !
 			// =======================
