@@ -261,7 +261,7 @@ window.ixmaps = window.ixmaps || {};
 				dest = dest[1]||dest[0];
 				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em;white-space:nowrap'>" + (themeObj.itemA[szItem] ? ((origin + " &rarr; " + dest) || themeObj.itemA[szItem].szTitle ) : "") + "</h4><h4 style='margin:0.5em'>" + szSign + szValue + themeObj.szUnit + "</h4>";
 			}else{
-				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || themeObj.itemA[szItem].szSelectionId2.split("::")[1] || ("[" + szId.substr(0, 15) + " ... ]")) : "") + "</br>" + szSign + szValue + themeObj.szUnit + "</h5>";
+				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || themeObj.itemA[szItem].szSelectionId2.split("::")[1] || "") : "") + "</br>" + szSign + szValue + themeObj.szUnit + "</h5>";
 			}
 			fThemeData = true;
 		} else {
@@ -296,7 +296,7 @@ window.ixmaps = window.ixmaps || {};
 
 			// request chart from map 
 			// -----------------------
-			if (themeObj.szFlag.match(/CHART|COMPOSECOLOR|SUBTHEME/)){
+			if (themeObj.szFlag.match(/CHART|COMPOSECOLOR|DOMINANT|SUBTHEME/)){
 				themeObj.drawChart(window.document.getElementById("getchartmenutarget"), szItem, 30, "VALUES|XAXIS|ZOOM|BOX|GRID");
 			}else{
 				var themesA = ixmaps.getThemes();
