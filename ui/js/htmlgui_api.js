@@ -2672,7 +2672,7 @@ $Log: htmlgui_api.js,v $
 						this.def.data.query = dataObj.query;
 						this.def.data.type = szType || dataObj.type || "ext";
 					}else{
-						this.def.data.type = szType;
+						this.def.data.type = szType || dataObj.type;
 						//ixmaps.setData(this.szMap,dataObj,{type:szType,name:szName});
 					}
 					
