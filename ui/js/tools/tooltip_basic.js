@@ -609,7 +609,18 @@ window.ixmaps = window.ixmaps || {};
 			szUnit = szUnit.replace("\%", "");
 			szValue += " %";
 		}
-		szTooltip = "<div style='font-size:0.9em;line-height:1.2em;color:#aaaaaa;max-width:100px'>" + szUnit + "</div><div style='font-size:1.5em;margin:-0em 0.5em -0.1em 0em'>" + szValue + "</div>";
+		if (szUnit.match(/\$/)) {
+			szUnit = szUnit.replace("\$", "");
+			szValue += " $";
+		}
+		if (szUnit.match(/\€/)) {
+			szUnit = szUnit.replace("\€", "");
+			szValue += " €";
+		}
+		szUnit = szUnit.replace("\[", "");
+		szUnit = szUnit.replace("\]", "");
+
+		szTooltip = "<div style='font-size:0.9em;line-height:1.2em;color:#aaaaaa;max-width:300px'>" + szUnit + "</div><div style='font-size:1.5em;margin:-0em 0.5em -0.1em 0em;white-space:nowrap'>" + szValue + "</div>";
 
 		event.target.style.setProperty("fill-opacity", "1");
 		showTooltip(event, szTooltip);
