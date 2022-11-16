@@ -1,0 +1,2098 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "metadata",
+    "map",
+    "themes",
+    "layerMask"
+  ],
+  "properties": {
+    "metadata": {
+      "$id": "#/properties/metadata",
+      "type": "object",
+      "title": "The Metadata Schema",
+      "required": [
+        "title",
+        "snippet",
+        "description",
+        "thumbnail",
+        "about",
+        "created"
+      ],
+      "properties": {
+        "title": {
+          "$id": "#/properties/metadata/properties/title",
+          "type": "string",
+          "title": "The Title Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": "^(.*)$"
+        },
+        "snippet": {
+          "$id": "#/properties/metadata/properties/snippet",
+          "type": "string",
+          "title": "The Snippet Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": "^(.*)$"
+        },
+        "description": {
+          "$id": "#/properties/metadata/properties/description",
+          "type": "string",
+          "title": "The Description Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": "^(.*)$"
+        },
+        "thumbnail": {
+          "$id": "#/properties/metadata/properties/thumbnail",
+          "type": "string",
+          "title": "The Thumbnail Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": "^(.*)$"
+        },
+        "about": {
+          "$id": "#/properties/metadata/properties/about",
+          "type": "string",
+          "title": "The About Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": "^(.*)$"
+        },
+        "created": {
+          "$id": "#/properties/metadata/properties/created",
+          "type": "string",
+          "title": "The Created Schema",
+          "default": "",
+          "examples": [
+            "Sat Nov 09 2019 23:33:30 GMT+0100 (Ora standard dell’Europa centrale)"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "map": {
+      "$id": "#/properties/map",
+      "type": "object",
+      "title": "The Map Schema",
+      "required": [
+        "map",
+        "basemap",
+        "scaleParam",
+        "options",
+        "center",
+        "zoom"
+      ],
+      "properties": {
+        "map": {
+          "$id": "#/properties/map/properties/map",
+          "type": "string",
+          "title": "The Map Schema",
+          "default": "",
+          "examples": [
+            "../../maps/svg/maps/generic/mercator.svg"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "basemap": {
+          "$id": "#/properties/map/properties/basemap",
+          "type": "string",
+          "title": "The Basemap Schema",
+          "default": "",
+          "examples": [
+            "CartoDB - Dark matter"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "scaleParam": {
+          "$id": "#/properties/map/properties/scaleParam",
+          "type": "object",
+          "title": "The Scaleparam Schema",
+		  "description": "object to define scaling parameter",		
+          "required": [
+            "normalSizeScale"
+          ],
+          "properties": {
+            "normalSizeScale": {
+              "$id": "#/properties/map/properties/scaleParam/properties/normalSizeScale",
+              "type": "string",
+              "title": "The Normalsizescale Schema",
+              "default": "",
+              "examples": [
+                "6920521"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "options": {
+          "$id": "#/properties/map/properties/options",
+          "type": "object",
+          "title": "The Options Schema",
+          "required": [
+            "featurescaling",
+            "objectscaling",
+            "labelscaling",
+            "flushChartDraw",
+            "mapopacity",
+            "basemapopacity"
+          ],
+          "properties": {
+            "featurescaling": {
+              "$id": "#/properties/map/properties/options/properties/featurescaling",
+              "type": "string",
+              "title": "The Featurescaling Schema",
+              "default": "",
+              "examples": [
+                "dynamic"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "objectscaling": {
+              "$id": "#/properties/map/properties/options/properties/objectscaling",
+              "type": "string",
+              "title": "The Objectscaling Schema",
+              "default": "",
+              "examples": [
+                "dynamic"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "clipmap": {
+              "$id": "#/properties/map/properties/options/properties/clipmap",
+              "type": "string",
+              "title": "The Clipmap Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "clipmapdynamic": {
+              "$id": "#/properties/map/properties/options/properties/clipmapdynamic",
+              "type": "string",
+              "title": "The Clipmapdynamic Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "dynamiclabel": {
+              "$id": "#/properties/map/properties/options/properties/dynamiclabel",
+              "type": "string",
+              "title": "The Dynamiclabel Schema",
+              "default": "",
+              "examples": [
+                "NOSIZE"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "labelspace": {
+              "$id": "#/properties/map/properties/options/properties/labelspace",
+              "type": "string",
+              "title": "The Labelspace Schema",
+              "default": "",
+              "examples": [
+                "1.0"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "checklabeloverlap": {
+              "$id": "#/properties/map/properties/options/properties/checklabeloverlap",
+              "type": "string",
+              "title": "The Checklabeloverlap Schema",
+              "default": "",
+              "examples": [
+                "NOSQUEEZE"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "dynamiclayer": {
+              "$id": "#/properties/map/properties/options/properties/dynamiclayer",
+              "type": "string",
+              "title": "The Dynamiclayer Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "dynamictiles": {
+              "$id": "#/properties/map/properties/options/properties/dynamictiles",
+              "type": "string",
+              "title": "The Dynamictiles Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "discardtiles": {
+              "$id": "#/properties/map/properties/options/properties/discardtiles",
+              "type": "string",
+              "title": "The Discardtiles Schema",
+              "default": "",
+              "examples": [
+                "false"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "loadmultitiles": {
+              "$id": "#/properties/map/properties/options/properties/loadmultitiles",
+              "type": "string",
+              "title": "The Loadmultitiles Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "loadsilent": {
+              "$id": "#/properties/map/properties/options/properties/loadsilent",
+              "type": "string",
+              "title": "The Loadsilent Schema",
+              "default": "",
+              "examples": [
+                "false"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "loadexternaldata": {
+              "$id": "#/properties/map/properties/options/properties/loadexternaldata",
+              "type": "string",
+              "title": "The Loadexternaldata Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "buttonsize": {
+              "$id": "#/properties/map/properties/options/properties/buttonsize",
+              "type": "string",
+              "title": "The Buttonsize Schema",
+              "default": "",
+              "examples": [
+                "15"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "fastpan": {
+              "$id": "#/properties/map/properties/options/properties/fastpan",
+              "type": "string",
+              "title": "The Fastpan Schema",
+              "default": "",
+              "examples": [
+                "false"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "panborder": {
+              "$id": "#/properties/map/properties/options/properties/panborder",
+              "type": "string",
+              "title": "The Panborder Schema",
+              "default": "",
+              "examples": [
+                "0"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "northarrow": {
+              "$id": "#/properties/map/properties/options/properties/northarrow",
+              "type": "string",
+              "title": "The Northarrow Schema",
+              "default": "",
+              "examples": [
+                "false"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "sidebarbuttons": {
+              "$id": "#/properties/map/properties/options/properties/sidebarbuttons",
+              "type": "string",
+              "title": "The Sidebarbuttons Schema",
+              "default": "",
+              "examples": [
+                "false"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "tooltipdelay": {
+              "$id": "#/properties/map/properties/options/properties/tooltipdelay",
+              "type": "string",
+              "title": "The Tooltipdelay Schema",
+              "default": "",
+              "examples": [
+                "250"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "popupdelay": {
+              "$id": "#/properties/map/properties/options/properties/popupdelay",
+              "type": "string",
+              "title": "The Popupdelay Schema",
+              "default": "",
+              "examples": [
+                "250"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "popupgridstyle": {
+              "$id": "#/properties/map/properties/options/properties/popupgridstyle",
+              "type": "string",
+              "title": "The Popupgridstyle Schema",
+              "default": "",
+              "examples": [
+                "firstright|firstitalic|firstbold|firstgray|firstsmall|background|alternate|full"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "popupalignment": {
+              "$id": "#/properties/map/properties/options/properties/popupalignment",
+              "type": "string",
+              "title": "The Popupalignment Schema",
+              "default": "",
+              "examples": [
+                "BOTTOM|LEFT"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "transparentbackground": {
+              "$id": "#/properties/map/properties/options/properties/transparentbackground",
+              "type": "string",
+              "title": "The Transparentbackground Schema",
+              "default": "",
+              "examples": [
+                "true"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "labelscaling": {
+              "$id": "#/properties/map/properties/options/properties/labelscaling",
+              "type": "string",
+              "title": "The Labelscaling Schema",
+              "default": "",
+              "examples": [
+                "dynamic"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "flushChartDraw": {
+              "$id": "#/properties/map/properties/options/properties/flushChartDraw",
+              "type": "string",
+              "title": "The Flushchartdraw Schema",
+              "default": "",
+              "examples": [
+                "5000"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "toolmargintop": {
+              "$id": "#/properties/map/properties/options/properties/toolmargintop",
+              "type": "string",
+              "title": "The Toolmargintop Schema",
+              "default": "",
+              "examples": [
+                "60"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "flushPaintShape": {
+              "$id": "#/properties/map/properties/options/properties/flushPaintShape",
+              "type": "string",
+              "title": "The Flushpaintshape Schema",
+              "default": "",
+              "examples": [
+                "5000"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "mapopacity": {
+              "$id": "#/properties/map/properties/options/properties/mapopacity",
+              "type": "string",
+              "title": "The Mapopacity Schema",
+              "default": "",
+              "examples": [
+                "1"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "basemapopacity": {
+              "$id": "#/properties/map/properties/options/properties/basemapopacity",
+              "type": "string",
+              "title": "The Basemapopacity Schema",
+              "default": "",
+              "examples": [
+                "1"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "center": {
+          "$id": "#/properties/map/properties/center",
+          "type": "object",
+          "title": "The Center Schema",
+          "required": [
+            "lat",
+            "lng"
+          ],
+          "properties": {
+            "lat": {
+              "$id": "#/properties/map/properties/center/properties/lat",
+              "type": "string",
+              "title": "The Lat Schema",
+              "default": "",
+              "examples": [
+                "43.68574971761676"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "lng": {
+              "$id": "#/properties/map/properties/center/properties/lng",
+              "type": "string",
+              "title": "The Lng Schema",
+              "default": "",
+              "examples": [
+                "13.831787109375002"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "zoom": {
+          "$id": "#/properties/map/properties/zoom",
+          "type": "string",
+          "title": "The Zoom Schema",
+          "default": "",
+          "examples": [
+            "7"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "themes": {
+      "$id": "#/properties/themes",
+      "type": "array",
+      "title": "The Themes Schema",
+      "items": {
+        "$id": "#/properties/themes/items",
+        "type": "object",
+        "title": "The Items Schema",
+        "required": [
+          "layer",
+          "field",
+           "style"
+        ],
+        "properties": {
+          "layer": {
+            "$id": "#/properties/themes/items/properties/layer",
+            "type": "string",
+            "title": "The Layer Schema",
+            "default": "",
+            "examples": [
+              "World Mercator"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "field": {
+            "$id": "#/properties/themes/items/properties/field",
+            "type": "string",
+            "title": "The Field Schema",
+            "default": "",
+            "examples": [
+              "patent_office"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "field100": {
+            "$id": "#/properties/themes/items/properties/field100",
+            "type": "string",
+            "title": "The Field100 Schema",
+            "default": "",
+            "examples": [
+              ""
+            ],
+            "pattern": "^(.*)$"
+          },
+          "data": {
+            "$id": "#/properties/themes/items/properties/data",
+            "type": "object",
+            "title": "The Data Schema",
+            "required": [
+              "name",
+              "url",
+              "type",
+              "ext",
+              "cache",
+              "field",
+              "field100"
+            ],
+            "properties": {
+              "name": {
+                "$id": "#/properties/themes/items/properties/data/properties/name",
+                "type": "string",
+                "title": "The Name Schema",
+                "default": "",
+                "examples": [
+                  "themeDataObj"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "url": {
+                "$id": "#/properties/themes/items/properties/data/properties/url",
+                "type": "string",
+                "title": "The Url Schema",
+                "default": "",
+                "examples": [
+                  "https://s3.eu-west-1.amazonaws.com/data.ixmaps.com/ItalyPatent/IT_patent_data_inv.csv.gz"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "type": {
+                "$id": "#/properties/themes/items/properties/data/properties/type",
+                "type": "string",
+                "title": "The Type Schema",
+                "default": "",
+                "examples": [
+                  "csv"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "ext": {
+                "$id": "#/properties/themes/items/properties/data/properties/ext",
+                "type": "string",
+                "title": "The Ext Schema",
+                "default": "",
+                "examples": [
+                  "../../projects/Italy_patent/process_data.js"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "cache": {
+                "$id": "#/properties/themes/items/properties/data/properties/cache",
+                "type": "string",
+                "title": "The Cache Schema",
+                "default": "",
+                "examples": [
+                  "true"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "field": {
+                "$id": "#/properties/themes/items/properties/data/properties/field",
+                "type": "string",
+                "title": "The Field Schema",
+                "default": "",
+                "examples": [
+                  "patent_office"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "field100": {
+                "$id": "#/properties/themes/items/properties/data/properties/field100",
+                "type": "string",
+                "title": "The Field100 Schema",
+                "default": "",
+                "examples": [
+                  ""
+                ],
+                "pattern": "^(.*)$"
+              }
+            }
+          },
+          "style": {
+            "$id": "#/properties/themes/items/properties/style",
+            "type": "object",
+            "title": "The Style Schema",
+            "required": [
+              "type",
+              "colorscheme",
+              "dbtable",
+              "lookupfield",
+              "title"
+            ],
+            "properties": {
+              "type": {
+                "$id": "#/properties/themes/items/properties/style/properties/type",
+                "type": "string",
+                "title": "The Type Schema",
+                "default": "",
+                "examples": [
+                  "CHART|PIE|DONUT|CENTERVALUE|SIZE|AGGREGATE|FAST|HEX|RELOCATE|CATEGORICAL|SUM|DOPACITY"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "colorscheme": {
+                "$id": "#/properties/themes/items/properties/style/properties/colorscheme",
+                "type": "array",
+                "title": "The Colorscheme Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/colorscheme/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "39",
+                    "kmeans"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "opacity": {
+                "$id": "#/properties/themes/items/properties/style/properties/opacity",
+                "type": "string",
+                "title": "The Opacity Schema",
+                "default": "",
+                "examples": [
+                  "1"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "fillopacity": {
+                "$id": "#/properties/themes/items/properties/style/properties/fillopacity",
+                "type": "string",
+                "title": "The Fillopacity Schema",
+                "default": "",
+                "examples": [
+                  "0.7"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "autoopacity": {
+                "$id": "#/properties/themes/items/properties/style/properties/autoopacity",
+                "type": "string",
+                "title": "The Autoopacity Schema",
+                "default": "",
+                "examples": [
+                  "false"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "shadow": {
+                "$id": "#/properties/themes/items/properties/style/properties/shadow",
+                "type": "string",
+                "title": "The Shadow Schema",
+                "default": "",
+                "examples": [
+                  "true"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "blur": {
+                "$id": "#/properties/themes/items/properties/style/properties/blur",
+                "type": "string",
+                "title": "The Blur Schema",
+                "default": "",
+                "examples": [
+                  "0.5"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "filter": {
+                "$id": "#/properties/themes/items/properties/style/properties/filter",
+                "type": "string",
+                "title": "The Filter Schema",
+                "default": "",
+                "examples": [
+                  "WHERE \"ctry_code\" = \"IT\" AND \"filing_date\" BETWEEN 2004 AND 2014"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "dfilter": {
+                "$id": "#/properties/themes/items/properties/style/properties/dfilter",
+                "type": "string",
+                "title": "The Dfilter Schema",
+                "default": "",
+                "examples": [
+                  ""
+                ],
+                "pattern": "^(.*)$"
+              },
+              "filterfield": {
+                "$id": "#/properties/themes/items/properties/style/properties/filterfield",
+                "type": "string",
+                "title": "The Filterfield Schema",
+                "default": "",
+                "examples": [
+                  "ctry_code"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "dbtable": {
+                "$id": "#/properties/themes/items/properties/style/properties/dbtable",
+                "type": "string",
+                "title": "The Dbtable Schema",
+                "default": "",
+                "examples": [
+                  "themeDataObj"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "dbtableUrl": {
+                "$id": "#/properties/themes/items/properties/style/properties/dbtableUrl",
+                "type": "string",
+                "title": "The Dbtableurl Schema",
+                "default": "",
+                "examples": [
+                  "https://s3.eu-west-1.amazonaws.com/data.ixmaps.com/ItalyPatent/IT_patent_data_inv.csv.gz"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "dbtableType": {
+                "$id": "#/properties/themes/items/properties/style/properties/dbtableType",
+                "type": "string",
+                "title": "The Dbtabletype Schema",
+                "default": "",
+                "examples": [
+                  "csv"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "dbtableExt": {
+                "$id": "#/properties/themes/items/properties/style/properties/dbtableExt",
+                "type": "string",
+                "title": "The Dbtableext Schema",
+                "default": "",
+                "examples": [
+                  "../../projects/Italy_patent/process_data.js"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "datacache": {
+                "$id": "#/properties/themes/items/properties/style/properties/datacache",
+                "type": "string",
+                "title": "The Datacache Schema",
+                "default": "",
+                "examples": [
+                  "true"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "itemfield": {
+                "$id": "#/properties/themes/items/properties/style/properties/itemfield",
+                "type": "string",
+                "title": "The Itemfield Schema",
+                "default": "",
+                "examples": [
+                  "position"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "lookupfield": {
+                "$id": "#/properties/themes/items/properties/style/properties/lookupfield",
+                "type": "string",
+                "title": "The Lookupfield Schema",
+                "default": "",
+                "examples": [
+                  "lat|lng"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "lookuptoupper": {
+                "$id": "#/properties/themes/items/properties/style/properties/lookuptoupper",
+                "type": "string",
+                "title": "The Lookuptoupper Schema",
+                "default": "",
+                "examples": [
+                  "false"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "lookupsuffix": {
+                "$id": "#/properties/themes/items/properties/style/properties/lookupsuffix",
+                "type": "string",
+                "title": "The Lookupsuffix Schema",
+                "default": "",
+                "examples": [
+                  "00"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "lookupdigits": {
+                "$id": "#/properties/themes/items/properties/style/properties/lookupdigits",
+                "type": "string",
+                "title": "The Lookupdigits Schema",
+                "default": "",
+                "examples": [
+                  "8"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "lookuptonumber": {
+                "$id": "#/properties/themes/items/properties/style/properties/lookuptonumber",
+                "type": "string",
+                "title": "The Lookuptonumber Schema",
+                "default": "",
+                "examples": [
+                  "true"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "lookupfield2": {
+                "$id": "#/properties/themes/items/properties/style/properties/lookupfield2",
+                "type": "string",
+                "title": "The Lookupfield2 Schema",
+                "default": "",
+                "examples": [
+                  "position2"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "showdata": {
+                "$id": "#/properties/themes/items/properties/style/properties/showdata",
+                "type": "string",
+                "title": "The Showdata Schema",
+                "default": "",
+                "examples": [
+                  "true"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "datafields": {
+                "$id": "#/properties/themes/items/properties/style/properties/datafields",
+                "type": "array",
+                "title": "The Datafields Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/datafields/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "field1,field2"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "userdraw": {
+                "$id": "#/properties/themes/items/properties/style/properties/userdraw",
+                "type": "string",
+                "title": "The Userdraw Schema",
+                "default": "",
+                "examples": [
+                  "userDraw"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "child": {
+                "$id": "#/properties/themes/items/properties/style/properties/child",
+                "type": "string",
+                "title": "The Child Schema",
+                "default": "",
+                "examples": [
+                  "true"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "crsdatum": {
+                "$id": "#/properties/themes/items/properties/style/properties/crsdatum",
+                "type": "string",
+                "title": "The Crsdatum Schema",
+                "default": "",
+                "examples": [
+                  "WGS84"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "crsutmzone": {
+                "$id": "#/properties/themes/items/properties/style/properties/crsutmzone",
+                "type": "string",
+                "title": "The Crsutmzone Schema",
+                "default": "",
+                "examples": [
+                  "N33"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "ranges": {
+                "$id": "#/properties/themes/items/properties/style/properties/ranges",
+                "type": "array",
+                "title": "The Ranges Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/ranges/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "1",
+                    "2",
+                    "3",
+                    "9"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "rangecentervalue": {
+                "$id": "#/properties/themes/items/properties/style/properties/rangecentervalue",
+                "type": "string",
+                "title": "The Rangecentervalue Schema",
+                "default": "",
+                "examples": [
+                  "5"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "symbols": {
+                "$id": "#/properties/themes/items/properties/style/properties/symbols",
+                "type": "array",
+                "title": "The Symbols Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/symbols/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "circle",
+                    "square",
+                    "triangle"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "values": {
+                "$id": "#/properties/themes/items/properties/style/properties/values",
+                "type": "array",
+                "title": "The Values Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/values/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "IT",
+                    "EP",
+                    "US"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "label": {
+                "$id": "#/properties/themes/items/properties/style/properties/label",
+                "type": "array",
+                "title": "The Label Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/label/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "Italia",
+                    "Organizzazione Europea dei Brevetti",
+                    "Stati Uniti d'America"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "colorvalues": {
+                "$id": "#/properties/themes/items/properties/style/properties/colorvalues",
+                "type": "array",
+                "title": "The Colorvalues Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/colorvalues/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "open",
+                    "closed"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "symbolvalues": {
+                "$id": "#/properties/themes/items/properties/style/properties/symbolvalues",
+                "type": "array",
+                "title": "The Symbolvalues Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/symbolvalues/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "single",
+                    "priority",
+                    "company"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "valuemap": {
+                "$id": "#/properties/themes/items/properties/style/properties/valuemap",
+                "type": "object",
+                "title": "The Valuemap Schema",
+                "required": [
+                  "value_1",
+                  "value_2"
+                ],
+                "properties": {
+                  "value_1": {
+                    "$id": "#/properties/themes/items/properties/style/properties/valuemap/properties/value_1",
+                    "type": "string",
+                    "title": "The Value_1 Schema",
+                    "default": "",
+                    "examples": [
+                      "1"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "value_2": {
+                    "$id": "#/properties/themes/items/properties/style/properties/valuemap/properties/value_2",
+                    "type": "string",
+                    "title": "The Value_2 Schema",
+                    "default": "",
+                    "examples": [
+                      "2"
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              },
+              "xaxis": {
+                "$id": "#/properties/themes/items/properties/style/properties/xaxis",
+                "type": "array",
+                "title": "The Xaxis Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/xaxis/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "1990",
+                    "2000",
+                    "2010"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "units": {
+                "$id": "#/properties/themes/items/properties/style/properties/units",
+                "type": "string",
+                "title": "The Units Schema",
+                "default": "",
+                "examples": [
+                  "kg"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "labelunits": {
+                "$id": "#/properties/themes/items/properties/style/properties/labelunits",
+                "type": "string",
+                "title": "The Labelunits Schema",
+                "default": "",
+                "examples": [
+                  "kilogramm"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "units100": {
+                "$id": "#/properties/themes/items/properties/style/properties/units100",
+                "type": "string",
+                "title": "The Units100 Schema",
+                "default": "",
+                "examples": [
+                  "kg"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "sizevalueunits": {
+                "$id": "#/properties/themes/items/properties/style/properties/sizevalueunits",
+                "type": "string",
+                "title": "The Sizevalueunits Schema",
+                "default": "",
+                "examples": [
+                  "kg"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "alphavalueunits": {
+                "$id": "#/properties/themes/items/properties/style/properties/alphavalueunits",
+                "type": "string",
+                "title": "The Alphavalueunits Schema",
+                "default": "",
+                "examples": [
+                  "kg"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "legendunits": {
+                "$id": "#/properties/themes/items/properties/style/properties/legendunits",
+                "type": "string",
+                "title": "The Legendunits Schema",
+                "default": "",
+                "examples": [
+                  "kg"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "weights": {
+                "$id": "#/properties/themes/items/properties/style/properties/weights",
+                "type": "string",
+                "title": "The Weights Schema",
+                "default": "",
+                "examples": [
+                  "100"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "align": {
+                "$id": "#/properties/themes/items/properties/style/properties/align",
+                "type": "string",
+                "title": "The Align Schema",
+                "default": "",
+                "examples": [
+                  "center"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "refreshtimeout": {
+                "$id": "#/properties/themes/items/properties/style/properties/refreshtimeout",
+                "type": "string",
+                "title": "The Refreshtimeout Schema",
+                "default": "",
+                "examples": [
+                  "0"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "normalsizevalue": {
+                "$id": "#/properties/themes/items/properties/style/properties/normalsizevalue",
+                "type": "string",
+                "title": "The Normalsizevalue Schema",
+                "default": "",
+                "examples": [
+                  "10000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "normalsizescale": {
+                "$id": "#/properties/themes/items/properties/style/properties/normalsizescale",
+                "type": "string",
+                "title": "The Normalsizescale Schema",
+                "default": "",
+                "examples": [
+                  "1:10000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "scale": {
+                "$id": "#/properties/themes/items/properties/style/properties/scale",
+                "type": "string",
+                "title": "The Scale Schema",
+                "default": "",
+                "examples": [
+                  "1.5"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "rangescale": {
+                "$id": "#/properties/themes/items/properties/style/properties/rangescale",
+                "type": "string",
+                "title": "The Rangescale Schema",
+                "default": "",
+                "examples": [
+                  "1"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "sizepow": {
+                "$id": "#/properties/themes/items/properties/style/properties/sizepow",
+                "type": "string",
+                "title": "The Sizepow Schema",
+                "default": "",
+                "examples": [
+                  "2"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "dopacitypow": {
+                "$id": "#/properties/themes/items/properties/style/properties/dopacitypow",
+                "type": "string",
+                "title": "The Dopacitypow Schema",
+                "default": "",
+                "examples": [
+                  "1"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "dopacityramp": {
+                "$id": "#/properties/themes/items/properties/style/properties/dopacityramp",
+                "type": "string",
+                "title": "The Dopacityramp Schema",
+                "default": "",
+                "examples": [
+                  "1"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "dopacityscale": {
+                "$id": "#/properties/themes/items/properties/style/properties/dopacityscale",
+                "type": "string",
+                "title": "The Dopacityscale Schema",
+                "default": "",
+                "examples": [
+                  "10"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "brightness": {
+                "$id": "#/properties/themes/items/properties/style/properties/brightness",
+                "type": "string",
+                "title": "The Brightness Schema",
+                "default": "",
+                "examples": [
+                  "255"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "colorfield": {
+                "$id": "#/properties/themes/items/properties/style/properties/colorfield",
+                "type": "string",
+                "title": "The Colorfield Schema",
+                "default": "",
+                "examples": [
+                  "fieldname"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "symbolfield": {
+                "$id": "#/properties/themes/items/properties/style/properties/symbolfield",
+                "type": "string",
+                "title": "The Symbolfield Schema",
+                "default": "",
+                "examples": [
+                  "fieldname"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "valuefield": {
+                "$id": "#/properties/themes/items/properties/style/properties/valuefield",
+                "type": "string",
+                "title": "The Valuefield Schema",
+                "default": "",
+                "examples": [
+                  "fieldname"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "labelfield": {
+                "$id": "#/properties/themes/items/properties/style/properties/labelfield",
+                "type": "string",
+                "title": "The Labelfield Schema",
+                "default": "",
+                "examples": [
+                  "fieldname"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "sizefield": {
+                "$id": "#/properties/themes/items/properties/style/properties/sizefield",
+                "type": "string",
+                "title": "The Sizefield Schema",
+                "default": "",
+                "examples": [
+                  "fieldname"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "alphafield": {
+                "$id": "#/properties/themes/items/properties/style/properties/alphafield",
+                "type": "string",
+                "title": "The Alphafield Schema",
+                "default": "",
+                "examples": [
+                  "fieldname"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "alphafield100": {
+                "$id": "#/properties/themes/items/properties/style/properties/alphafield100",
+                "type": "string",
+                "title": "The Alphafield100 Schema",
+                "default": "",
+                "examples": [
+                  "fieldname"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "xfield": {
+                "$id": "#/properties/themes/items/properties/style/properties/xfield",
+                "type": "string",
+                "title": "The Xfield Schema",
+                "default": "",
+                "examples": [
+                  "fieldname"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "yfield": {
+                "$id": "#/properties/themes/items/properties/style/properties/yfield",
+                "type": "string",
+                "title": "The Yfield Schema",
+                "default": "",
+                "examples": [
+                  "fieldname"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "buffersize": {
+                "$id": "#/properties/themes/items/properties/style/properties/buffersize",
+                "type": "string",
+                "title": "The Buffersize Schema",
+                "default": "",
+                "examples": [
+                  "100"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "bufferstep": {
+                "$id": "#/properties/themes/items/properties/style/properties/bufferstep",
+                "type": "string",
+                "title": "The Bufferstep Schema",
+                "default": "",
+                "examples": [
+                  "10"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "field100min": {
+                "$id": "#/properties/themes/items/properties/style/properties/field100min",
+                "type": "string",
+                "title": "The Field100min Schema",
+                "default": "",
+                "examples": [
+                  "50"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "fractionscale": {
+                "$id": "#/properties/themes/items/properties/style/properties/fractionscale",
+                "type": "string",
+                "title": "The Fractionscale Schema",
+                "default": "",
+                "examples": [
+                  "1"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "minvalue": {
+                "$id": "#/properties/themes/items/properties/style/properties/minvalue",
+                "type": "string",
+                "title": "The Minvalue Schema",
+                "default": "",
+                "examples": [
+                  "100"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "maxvalue": {
+                "$id": "#/properties/themes/items/properties/style/properties/maxvalue",
+                "type": "string",
+                "title": "The Maxvalue Schema",
+                "default": "",
+                "examples": [
+                  "1000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "textfont": {
+                "$id": "#/properties/themes/items/properties/style/properties/textfont",
+                "type": "string",
+                "title": "The Textfont Schema",
+                "default": "",
+                "examples": [
+                  "arial"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "textcolor": {
+                "$id": "#/properties/themes/items/properties/style/properties/textcolor",
+                "type": ["array","string"],
+                "title": "The Textcolor Schema",
+                "default": "",
+                "examples": [
+                  "#888800"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "linecolor": {
+                "$id": "#/properties/themes/items/properties/style/properties/linecolor",
+                "type": ["array","string"],
+                "title": "The Linecolor Schema",
+                "default": "",
+                "examples": [
+                  "#000000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "linewidth": {
+                "$id": "#/properties/themes/items/properties/style/properties/linewidth",
+                "type": "string",
+                "title": "The Linewidth Schema",
+                "default": "",
+                "examples": [
+                  "2"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "bordercolor": {
+                "$id": "#/properties/themes/items/properties/style/properties/bordercolor",
+                "type": "string",
+                "title": "The Bordercolor Schema",
+                "default": "",
+                "examples": [
+                  "#dddddd"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "borderstyle": {
+                "$id": "#/properties/themes/items/properties/style/properties/borderstyle",
+                "type": "string",
+                "title": "The Borderstyle Schema",
+                "default": "",
+                "examples": [
+                  "dotted"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "borderwidth": {
+                "$id": "#/properties/themes/items/properties/style/properties/borderwidth",
+                "type": "string",
+                "title": "The Borderwidth Schema",
+                "default": "",
+                "examples": [
+                  "1"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "borderradius": {
+                "$id": "#/properties/themes/items/properties/style/properties/borderradius",
+                "type": "string",
+                "title": "The Borderradius Schema",
+                "default": "",
+                "examples": [
+                  "5"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "boxcolor": {
+                "$id": "#/properties/themes/items/properties/style/properties/boxcolor",
+                "type": "string",
+                "title": "The Boxcolor Schema",
+                "default": "",
+                "examples": [
+                  "#ffffff"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "boxopacity": {
+                "$id": "#/properties/themes/items/properties/style/properties/boxopacity",
+                "type": "string",
+                "title": "The Boxopacity Schema",
+                "default": "",
+                "examples": [
+                  "0.2"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "boxmargin": {
+                "$id": "#/properties/themes/items/properties/style/properties/boxmargin",
+                "type": "string",
+                "title": "The Boxmargin Schema",
+                "default": "",
+                "examples": [
+                  "10"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "textplacement": {
+                "$id": "#/properties/themes/items/properties/style/properties/textplacement",
+                "type": "string",
+                "title": "The Textplacement Schema",
+                "default": "",
+                "examples": [
+                  "center"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "infotitle": {
+                "$id": "#/properties/themes/items/properties/style/properties/infotitle",
+                "type": "string",
+                "title": "The Infotitle Schema",
+                "default": "",
+                "examples": [
+                  "title"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "titlefield": {
+                "$id": "#/properties/themes/items/properties/style/properties/titlefield",
+                "type": "string",
+                "title": "The Titlefield Schema",
+                "default": "",
+                "examples": [
+                  "column1"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "snippetfield": {
+                "$id": "#/properties/themes/items/properties/style/properties/snippetfield",
+                "type": "string",
+                "title": "The Snippetfield Schema",
+                "default": "",
+                "examples": [
+                  "column2"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "exclude": {
+                "$id": "#/properties/themes/items/properties/style/properties/exclude",
+                "type": "array",
+                "title": "The Exclude Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/exclude/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "value1",
+                    "value2"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "nodatacolor": {
+                "$id": "#/properties/themes/items/properties/style/properties/nodatacolor",
+                "type": "string",
+                "title": "The Nodatacolor Schema",
+                "default": "",
+                "examples": [
+                  "#888888"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "titleupper": {
+                "$id": "#/properties/themes/items/properties/style/properties/titleupper",
+                "type": "string",
+                "title": "The Titleupper Schema",
+                "default": "",
+                "examples": [
+                  "1:100000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "labelupper": {
+                "$id": "#/properties/themes/items/properties/style/properties/labelupper",
+                "type": "string",
+                "title": "The Labelupper Schema",
+                "default": "",
+                "examples": [
+                  "1:100000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "valueupper": {
+                "$id": "#/properties/themes/items/properties/style/properties/valueupper",
+                "type": "string",
+                "title": "The Valueupper Schema",
+                "default": "",
+                "examples": [
+                  "1:100000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "glowupper": {
+                "$id": "#/properties/themes/items/properties/style/properties/glowupper",
+                "type": "string",
+                "title": "The Glowupper Schema",
+                "default": "",
+                "examples": [
+                  "1:100000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "glowlower": {
+                "$id": "#/properties/themes/items/properties/style/properties/glowlower",
+                "type": "string",
+                "title": "The Glowlower Schema",
+                "default": "",
+                "examples": [
+                  "1:10000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "chartupper": {
+                "$id": "#/properties/themes/items/properties/style/properties/chartupper",
+                "type": "string",
+                "title": "The Chartupper Schema",
+                "default": "",
+                "examples": [
+                  "1:100000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "chartlower": {
+                "$id": "#/properties/themes/items/properties/style/properties/chartlower",
+                "type": "string",
+                "title": "The Chartlower Schema",
+                "default": "",
+                "examples": [
+                  "1:10000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "boxupper": {
+                "$id": "#/properties/themes/items/properties/style/properties/boxupper",
+                "type": "string",
+                "title": "The Boxupper Schema",
+                "default": "",
+                "examples": [
+                  "1:100000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "shadowupper": {
+                "$id": "#/properties/themes/items/properties/style/properties/shadowupper",
+                "type": "string",
+                "title": "The Shadowupper Schema",
+                "default": "",
+                "examples": [
+                  "1:100000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "shadowlower": {
+                "$id": "#/properties/themes/items/properties/style/properties/shadowlower",
+                "type": "string",
+                "title": "The Shadowlower Schema",
+                "default": "",
+                "examples": [
+                  "1:10000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "declutterupper": {
+                "$id": "#/properties/themes/items/properties/style/properties/declutterupper",
+                "type": "string",
+                "title": "The Declutterupper Schema",
+                "default": "",
+                "examples": [
+                  "1:100000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "valuescale": {
+                "$id": "#/properties/themes/items/properties/style/properties/valuescale",
+                "type": "string",
+                "title": "The Valuescale Schema",
+                "default": "",
+                "examples": [
+                  "1.2"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "minvaluesize": {
+                "$id": "#/properties/themes/items/properties/style/properties/minvaluesize",
+                "type": "string",
+                "title": "The Minvaluesize Schema",
+                "default": "",
+                "examples": [
+                  "7.5"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "valuedecimals": {
+                "$id": "#/properties/themes/items/properties/style/properties/valuedecimals",
+                "type": "string",
+                "title": "The Valuedecimals Schema",
+                "default": "",
+                "examples": [
+                  "2"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "fadevaluepow": {
+                "$id": "#/properties/themes/items/properties/style/properties/fadevaluepow",
+                "type": "string",
+                "title": "The Fadevaluepow Schema",
+                "default": "",
+                "examples": [
+                  "3"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "fadenegative": {
+                "$id": "#/properties/themes/items/properties/style/properties/fadenegative",
+                "type": "string",
+                "title": "The Fadenegative Schema",
+                "default": "",
+                "examples": [
+                  "0.5"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "centerpart": {
+                "$id": "#/properties/themes/items/properties/style/properties/centerpart",
+                "type": "string",
+                "title": "The Centerpart Schema",
+                "default": "",
+                "examples": [
+                  "max"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "clipframes": {
+                "$id": "#/properties/themes/items/properties/style/properties/clipframes",
+                "type": "string",
+                "title": "The Clipframes Schema",
+                "default": "",
+                "examples": [
+                  "8"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "clipframerate": {
+                "$id": "#/properties/themes/items/properties/style/properties/clipframerate",
+                "type": "string",
+                "title": "The Clipframerate Schema",
+                "default": "",
+                "examples": [
+                  "24"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "cliplegend": {
+                "$id": "#/properties/themes/items/properties/style/properties/cliplegend",
+                "type": "string",
+                "title": "The Cliplegend Schema",
+                "default": "",
+                "examples": [
+                  "true"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "clipparts": {
+                "$id": "#/properties/themes/items/properties/style/properties/clipparts",
+                "type": "string",
+                "title": "The Clipparts Schema",
+                "default": "",
+                "examples": [
+                  "3"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "minchartsize": {
+                "$id": "#/properties/themes/items/properties/style/properties/minchartsize",
+                "type": "string",
+                "title": "The Minchartsize Schema",
+                "default": "",
+                "examples": [
+                  "15"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "showparts": {
+                "$id": "#/properties/themes/items/properties/style/properties/showparts",
+                "type": "string",
+                "title": "The Showparts Schema",
+                "default": "",
+                "examples": [
+                  "3,4,5"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "gridx": {
+                "$id": "#/properties/themes/items/properties/style/properties/gridx",
+                "type": "string",
+                "title": "The Gridx Schema",
+                "default": "",
+                "examples": [
+                  "4"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "gridwidth": {
+                "$id": "#/properties/themes/items/properties/style/properties/gridwidth",
+                "type": "string",
+                "title": "The Gridwidth Schema",
+                "default": "",
+                "examples": [
+                  "50px"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "gridmatrix": {
+                "$id": "#/properties/themes/items/properties/style/properties/gridmatrix",
+                "type": "string",
+                "title": "The Gridmatrix Schema",
+                "default": "",
+                "examples": [
+                  "100"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "gridwidthpx": {
+                "$id": "#/properties/themes/items/properties/style/properties/gridwidthpx",
+                "type": "string",
+                "title": "The Gridwidthpx Schema",
+                "default": "",
+                "examples": [
+                  "20"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "gridoffsetx": {
+                "$id": "#/properties/themes/items/properties/style/properties/gridoffsetx",
+                "type": "string",
+                "title": "The Gridoffsetx Schema",
+                "default": "",
+                "examples": [
+                  "35"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "gridoffsety": {
+                "$id": "#/properties/themes/items/properties/style/properties/gridoffsety",
+                "type": "string",
+                "title": "The Gridoffsety Schema",
+                "default": "",
+                "examples": [
+                  "35"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "aggregationfield": {
+                "$id": "#/properties/themes/items/properties/style/properties/aggregationfield",
+                "type": "string",
+                "title": "The Aggregationfield Schema",
+                "default": "",
+                "examples": [
+                  "column4"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "aggregationscale": {
+                "$id": "#/properties/themes/items/properties/style/properties/aggregationscale",
+                "type": "array",
+                "title": "The Aggregationscale Schema",
+                "items": {
+                  "$id": "#/properties/themes/items/properties/style/properties/aggregationscale/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "1:100",
+                    "",
+                    "1:200000",
+                    "city",
+                    "1:1000000",
+                    "name_2",
+                    "1:3000000",
+                    "name_1"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "aggregation": {
+                "$id": "#/properties/themes/items/properties/style/properties/aggregation",
+                "type": "string",
+                "title": "The Aggregation Schema",
+                "default": "",
+                "examples": [
+                  "sum"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "minaggregation": {
+                "$id": "#/properties/themes/items/properties/style/properties/minaggregation",
+                "type": "string",
+                "title": "The Minaggregation Schema",
+                "default": "",
+                "examples": [
+                  "auto"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "aggregationupper": {
+                "$id": "#/properties/themes/items/properties/style/properties/aggregationupper",
+                "type": "string",
+                "title": "The Aggregationupper Schema",
+                "default": "",
+                "examples": [
+                  "1:100000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "aggregationlower": {
+                "$id": "#/properties/themes/items/properties/style/properties/aggregationlower",
+                "type": "string",
+                "title": "The Aggregationlower Schema",
+                "default": "",
+                "examples": [
+                  "1:1000"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "dominantfilter": {
+                "$id": "#/properties/themes/items/properties/style/properties/dominantfilter",
+                "type": "string",
+                "title": "The Dominantfilter Schema",
+                "default": "",
+                "examples": [
+                  "median"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "dominantdfilter": {
+                "$id": "#/properties/themes/items/properties/style/properties/dominantdfilter",
+                "type": "string",
+                "title": "The Dominantdfilter Schema",
+                "default": "",
+                "examples": [
+                  "0.5"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "overviewchart": {
+                "$id": "#/properties/themes/items/properties/style/properties/overviewchart",
+                "type": "string",
+                "title": "The Overviewchart Schema",
+                "default": "",
+                "examples": [
+                  "PIE"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "evidence": {
+                "$id": "#/properties/themes/items/properties/style/properties/evidence",
+                "type": "string",
+                "title": "The Evidence Schema",
+                "default": "",
+                "examples": [
+                  "isolate_gray"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "markclass": {
+                "$id": "#/properties/themes/items/properties/style/properties/markclass",
+                "type": "string",
+                "title": "The Markclass Schema",
+                "default": "",
+                "examples": [
+                  "4"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "markclasses": {
+                "$id": "#/properties/themes/items/properties/style/properties/markclasses",
+                "type": "array",
+                "title": "The Markclasses Schema",
+                "default": "",
+                "examples": [
+                  "2,3,4"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "name": {
+                "$id": "#/properties/themes/items/properties/style/properties/name",
+                "type": "string",
+                "title": "The Name Schema",
+                "default": "",
+                "examples": [
+                  "Theme name"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "title": {
+                "$id": "#/properties/themes/items/properties/style/properties/title",
+                "type": "string",
+                "title": "The Title Schema",
+                "default": "",
+                "examples": [
+                  "Theme Title"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "snippet": {
+                "$id": "#/properties/themes/items/properties/style/properties/snippet",
+                "type": "string",
+                "title": "The Snippet Schema",
+                "default": "",
+                "examples": [
+                  "some words about the theme"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "splash": {
+                "$id": "#/properties/themes/items/properties/style/properties/splash",
+                "type": "string",
+                "title": "The Splash Schema",
+                "default": "",
+                "examples": [
+                  "displayed while loading"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "description": {
+                "$id": "#/properties/themes/items/properties/style/properties/description",
+                "type": "string",
+                "title": "The Description Schema",
+                "default": "",
+                "examples": [
+                  "a long description of the theme"
+                ],
+                "pattern": "^(.*)$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "layerMask": {
+      "$id": "#/properties/layerMask",
+      "type": "object",
+      "title": "The Layermask Schema",
+      "required": [
+        "World Mercator"
+      ],
+      "properties": {
+        "World Mercator": {
+          "$id": "#/properties/layerMask/properties/World Mercator",
+          "type": "object",
+          "title": "The World mercator Schema",
+          "required": [
+            "display"
+          ],
+          "properties": {
+            "display": {
+              "$id": "#/properties/layerMask/properties/World Mercator/properties/display",
+              "type": "string",
+              "title": "The Display Schema",
+              "default": "",
+              "examples": [
+                "none"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        }
+      }
+    }
+  }
+}
