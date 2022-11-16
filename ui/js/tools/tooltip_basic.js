@@ -64,6 +64,8 @@ window.ixmaps = window.ixmaps || {};
 		// avoid empty tooltips
 
 		if (!szText || szText.length <= 0) {
+			__fTooltipPin = false;
+			__fTooltipPinned = false;
 			return false;
 		}
 
@@ -225,6 +227,8 @@ window.ixmaps = window.ixmaps || {};
 			szItem = szItem[1] + "::" + szItem[3];
 		}
 		if (!szItem || !szItem.length || szItem.match(/mapbackground/i)) {
+			__fTooltipPin = false;
+			__fTooltipPinned = false;
 			return;
 		}
 
