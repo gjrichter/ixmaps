@@ -613,9 +613,9 @@ window.ixmaps = window.ixmaps || {};
 			szUnit = szUnit.replace("\$", "");
 			szValue += " $";
 		}
-		if (szUnit.match(/\€/)) {
-			szUnit = szUnit.replace("\€", "");
-			szValue += " €";
+		if (szUnit.match(/\â‚¬/)) {
+			szUnit = szUnit.replace("\â‚¬", "");
+			szValue += " â‚¬";
 		}
 		szUnit = szUnit.replace("\[", "");
 		szUnit = szUnit.replace("\]", "");
