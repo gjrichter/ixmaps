@@ -123,7 +123,7 @@
           "$id": "#/properties/map/properties/scaleParam",
           "type": "object",
           "title": "The Scaleparam Schema",
-		  "description": "object to define scaling parameter",		
+		      "description": "object to define scaling parameter for the map",		
           "required": [
             "normalSizeScale"
           ],
@@ -131,7 +131,8 @@
             "normalSizeScale": {
               "$id": "#/properties/map/properties/scaleParam/properties/normalSizeScale",
               "type": "string",
-              "title": "The Normalsizescale Schema",
+              "title": "normalSizeScale",
+              "description": "Defines the map scale for the 'normal' size of theme charts if 'objectscaling' is set to 'dynamic'. It is the right part of a map scale of type '1:100000'",
               "default": "",
               "examples": [
                 "6920521"
