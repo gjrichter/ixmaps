@@ -132,7 +132,7 @@
               "$id": "#/properties/map/properties/scaleParam/properties/normalSizeScale",
               "type": "string",
               "title": "normalSizeScale",
-              "description": "Defines the map scale for the 'normal' size of theme charts if 'objectscaling' is set to 'dynamic'. It is the right part of a map scale of type '1:100000'",
+              "description": "<p>defines the normal scale (zoom level) for the dynamic sizing of <b>chart objects</b>;it is the scale where the chart objects have a 'normal' size</p><p>if \"objectscaling\" is set to \"dynamic\", the size of chart object is adapted to the map zoom level with a scale dependent dynamic.</p><p>for this procedure it is necessary to define a zoom level for the 'normal' size of the chart object.</p><p>the level is defined by a map scale.</p><p>Example: 1:1200000 -&gt; \"1200000\".</p>",
               "default": "",
               "examples": [
                 "6920521"
