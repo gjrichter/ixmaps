@@ -359,6 +359,8 @@ window.ixmaps = window.ixmaps || {};
 			}
 
 			szHtml += "</div>";
+
+			szHtml += "<div id='tooltip_2' style='position:absolute;font-family: arial narrow, system;color:#444;background:white;border:0.5px solid black;border-radius:5px;padding:5px;max-width:80%;display:none'></div>";
 		}
 
 		// ------------------------------------------
@@ -437,7 +439,6 @@ window.ixmaps = window.ixmaps || {};
 				fThemeData = true;
 			}
 
-			szHtml += "<div id='tooltip_2' style='position:absolute;font-family: arial narrow, system;color:#444;background:white;border:0.5px solid black;border-radius:5px;padding:5px;max-width:80%;display:none'></div>";
 		}
 		
 		var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szItem);
@@ -603,6 +604,10 @@ window.ixmaps = window.ixmaps || {};
 			} else {
 				fValue = false;
 				szUnit += (value + " ");
+			}
+			if (value == "..."){
+				szValue += (value + " ");
+				fValue = true;
 			}
 		})
 		if (szUnit.match(/\%/)) {
