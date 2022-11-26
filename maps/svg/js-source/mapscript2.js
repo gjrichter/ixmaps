@@ -1374,6 +1374,9 @@ Map.Zoom.prototype.doPanMap = function(nDeltaX,nDeltaY){
 		this.doPanFixed(newX-ptOld.x,newY-ptOld.y);
 	}
 
+	if ( map.Scale.szMapProjection == "WinkelTripel" ){
+		return;
+		}
 	// GR 17.06.2013 correct sync error 
 	try{
 		var rectArea = this.getBox();
