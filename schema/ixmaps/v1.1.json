@@ -148,8 +148,6 @@
           "required": [
             "featurescaling",
             "objectscaling",
-            "labelscaling",
-            "flushChartDraw",
             "mapopacity",
             "basemapopacity"
           ],

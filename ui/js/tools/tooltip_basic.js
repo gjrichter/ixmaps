@@ -252,7 +252,7 @@ window.ixmaps = window.ixmaps || {};
 		szHtml += "<p style='font-size:12px;margin-top:0em;margin-bottom:0.5em'>" + themeObj.szTitle + "</p>";
 
 		// insert item title and value, if theme has only one value
-		if (themeObj.szFlag.match(/CHOROPLETH||VECTOR/) && themeObj.itemA[szItem] && (themeObj.itemA[szItem].nValuesA.length == 1)) {
+		if (themeObj.szFlag.match(/CHOROPLETH|VECTOR/) && themeObj.itemA[szItem] && (themeObj.itemA[szItem].nValuesA.length == 1)) {
 			
 			var nValue = themeObj.itemA[szItem] ? (Number(themeObj.itemA[szItem].szValue) || themeObj.itemA[szItem].nValue || themeObj.itemA[szItem].nValuesA[0]) : "";
 			var szSign = ((nValue > 0) && themeObj.szFlag.match(/SIGN/)) ? "+" : "";

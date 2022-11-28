@@ -6097,6 +6097,8 @@ function MapTheme(szThemes, szFields, szField100, szFlag, colorScheme, szTitle, 
 	this.fNullIsValue = true;
 	/** flag: if true, negative values are allowed */
 	this.fNegativeValuePossible = true;
+	/** flag: if true, negative values are allowed */
+	this.fUndefinedValuePossible = true;
 	/** running counter to convert stringd (exact values) to number */
 	this.nStringToValue = 1;
 	/** running counter to convert stringd (exact values) to number */
@@ -6146,6 +6148,12 @@ function MapTheme(szThemes, szFields, szField100, szFlag, colorScheme, szTitle, 
 	}
 	if (this.szFlag.match(/NEGATIVEISVALUE/)) {
 		this.fNegativeValuePossible = true;
+	}
+	if (this.szFlag.match(/UNDEFINEDISVALUE/)) {
+		this.fUndefinedValuePossible = true;
+	}
+	if (this.szFlag.match(/UNDEFINEDISNOTVALUE/)) {
+		this.fUndefinedValuePossible = false;
 	}
 	if (this.szFlag.match(/SUM/)) {
 		this.szAggregation = "sum";
@@ -7804,8 +7812,12 @@ MapTheme.prototype.loadValuesOfTheme = function (szThemeLayer) {
 					} else {
 						nValue = parseFloat(nValue);
 					}
-					if (isNaN(nValue)) {
-						continue;
+					if (isNaN(nValue)){
+						if(!this.fUndefinedValuePossible) {
+							continue;
+						}else{
+							nValue = 0;
+						}
 					}
 					if (nValue === 0 && !this.fNullIsValue) {
 						continue;
@@ -8485,9 +8497,13 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 				} else {
 					nValue = parseFloat(nValue) * (this.szWeightsA[k] || 1);
 				}
-				if (isNaN(nValue)) {
-					suppress = true;
-					continue;
+				if (isNaN(nValue)){
+					if(!this.fUndefinedValuePossible) {
+						suppress = true;
+						continue;
+					}else{
+						nValue = 0;	
+					}
 				}
 				if (nValue === 0 && !this.fNullIsValue) {
 					suppress = true;
@@ -8732,6 +8748,9 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 		if (this.szAggregationField) {
 			var szAgId = __mpap_decode_utf8((this.objTheme.dbRecords[j][this.objTheme.nAggregationFieldIndex]));
 			szId = szThemeLayer + "::" + szAgId;
+			if (this.szTitleField == "$aggregation$"){
+				szTitle = szAgId;
+			}
 		} else {
 			szId = szThemeLayer + "::" + String(ptPos.x) + ',' + String(ptPos.y) + (this.__fMultiParts ? ("," + String(nValue)) : "");
 			this.themeNodesPosA[szId] = ptPos;
@@ -8864,7 +8883,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 				this.itemA[szId].dbIndexA.push(j);
 				this.itemA[szId].ptPosA.push(ptOrigPos);
 
-				if (szTitle != this.itemA[szId].szTitle) {
+				if (!szTitle || (szTitle != this.itemA[szId].szTitle)) {
 					//this.itemA[szId].szTitle = (this.itemA[szId].nCount + " items aggregated");
 					this.itemA[szId].szTitle = "(" + this.itemA[szId].nCount + ")";
 				}
@@ -18488,7 +18507,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								if (szFlag.match(/LINES/)) {
 									var plotShape = null;
 
-									if ((szFlag.match(/ZEROISVALUE/) && this.plot_last_position[yi] && (nValue || this.plot_last_position[yi].y)) ||
+									if ((szFlag.match(/ZEROISVALUE/) && !szFlag.match(/ZEROISNOTVALUE/) && this.plot_last_position[yi] && (nValue || this.plot_last_position[yi].y)) ||
 										(nValue && this.plot_last_position[yi] && this.plot_last_position[yi].y)) {
 										if (szFlag.match(/AREA/)) {
 											plotShape = map.Dom.newShape('path', plotGroup, 'M' + (this.plot_last_position[yi].x - 2) + ',' + (this.plot_last_position[yi].y) +
