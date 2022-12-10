@@ -174,7 +174,7 @@
             if ( !ixmaps.filterThemeId ){
 			    var themes = ixmaps.getThemes();
                 for ( i in themes ){
-                    if ( !themes[i].szFlag.match(/POSITION|FEATURE/) ){
+                    if ( !themes[i].szFlag.match(/POSITION|FEATURE/) && themes[i].fVisible ){
                         ixmaps.filterThemeId = themes[i].szId;
                         break;
                     }

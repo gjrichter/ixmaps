@@ -158,7 +158,7 @@
 		$("#rangeBtnMonth").removeClass("active");
 		$("#rangeBtnYear").removeClass("active");
 		if (range == "hour"){
-			__sliderRange = 1000*60*60;
+			__sliderRange = 1000*60*60*3;
 			$("#rangeBtnHour").addClass("active");
 		}else
 		if (range == "day"){
@@ -368,7 +368,7 @@
 			szHtml += "  <label id='rangeBtnDay' class='btn btn-secondary active' onclick='javascript:ixmaps.setSliderRange(\"day\");'>";
 			szHtml += "	<input type='radio' name='options' id='option1'> day";
 			szHtml += "  </label>";
-			if ( days < 2 ){
+			if ( days < 8 ){
 				szHtml += "  <label id='rangeBtnHour' class='btn btn-secondary' onclick='javascript:ixmaps.setSliderRange(\"hour\");'>";
 				szHtml += "	<input type='radio' name='options' id='option1'> hour";
 				szHtml += "  </label>";
@@ -377,16 +377,19 @@
 				szHtml += "  <label id='rangeBtnWeek' class='btn btn-secondary' onclick='javascript:ixmaps.setSliderRange(\"week\");'>";
 				szHtml += "	<input type='radio' name='options' id='option2'> week";
 				szHtml += "  </label>";
+				setTimeout("ixmaps.setSliderRange(\"week\")",1000);
 			}
 			if ( days > 55 ){
 				szHtml += "  <label id='rangeBtnMonth' class='btn btn-secondary' onclick='javascript:ixmaps.setSliderRange(\"month\");'>";
 				szHtml += "	<input type='radio' name='options' id='option3'> month";
 				szHtml += "  </label>";
+				setTimeout("ixmaps.setSliderRange(\"month\")",1000);
 			}
 			if ( days > 365 ){
 				szHtml += "  <label id='rangeBtnYear' class='btn btn-secondary' onclick='javascript:ixmaps.setSliderRange(\"year\");'>";
 				szHtml += "	<input type='radio' name='options' id='option4' > year";
 				szHtml += "  </label>";
+				setTimeout("ixmaps.setSliderRange(\"year\")",1000);
 			}
 			szHtml += "</div>";
 		}
@@ -559,7 +562,7 @@
 			slider.oninput = function() {
 				var x = new Date(Number(this.value)) || this.value;
 				if (this.value == uMin ){
-					ixmaps.setThemeTimeFrame(null,null,uMin, uMax);
+					ixmaps.setThemeTimeFrame(ixmaps.szMap,themeObj.szId,uMin, uMax);
 					$("#time-span").html("");
 				}else{
 					var uDay = 1000*60*60*24;
@@ -577,9 +580,9 @@
 					}
 					range = __sliderRange||range;
 					if ( themeObj.szTimeField == "$item$" ){
-						ixmaps.setThemeTimeFrame(null,null,Number(this.value)-Number(range),this.value);
+						ixmaps.setThemeTimeFrame(ixmaps.szMap,themeObj.szId,Number(this.value)-Number(range),this.value);
 					}else{
-						ixmaps.setThemeTimeFrame(null,null,this.value,Number(this.value)+Number(range));
+						ixmaps.setThemeTimeFrame(ixmaps.szMap,themeObj.szId,this.value,Number(this.value)+Number(range));
 					}
 					if (range == 1){
 						$("#time-span").html(String(this.value));

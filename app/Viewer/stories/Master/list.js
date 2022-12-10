@@ -161,7 +161,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 		if ( !szId ){
 			var themes = ixmaps.getThemes();
 			for ( i in themes ){
-				if ( themes[i].szFlag.match(/CHART|CHOROPLETH/) ){
+				if ( themes[i].szFlag.match(/CHART|CHOROPLETH/) && themes[i].fVisible ){
 					szId = themes[i].szId;
 					break;
 				}
@@ -243,7 +243,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 				var szText = "<h3><b>"+szSize+"</b>" + "  "+ szTitle + "</h3><h4>" + szValue +"</h4>";
 				var leftWidth = 0; //window.innerWidth/3;
 
-				szHtml += "<div id='"+objTheme.szId+":"+objTheme.indexA[i]+":chart' item='"+objTheme.indexA[i]+"' class='listitem' style='padding:0.7em 0em 1em 0.5em;margin-right:2em;border-bottom:#888 solid 0.5px'>";
+				szHtml += "<div id='"+objTheme.szId+":"+objTheme.indexA[i]+":chart' item='"+objTheme.indexA[i]+"' class='listitem' style='padding:1.7em 0em 1em 1.5em;margin-right:2em;border-bottom:#888 solid 0.5px'>";
 				
 				szHtml += "<div class='title' style='pointer-events:none'>"+szText+"</div>";
 				
@@ -461,7 +461,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 				var szText = "<h3><b>"+szSize+"</b>" + "  "+ szTitle + "</h3>";
 				var leftWidth = 0; //window.innerWidth/3;
 
-				szHtml += "<div id='"+objTheme.szId+":"+objTheme.indexA[i]+":chart' item='"+objTheme.indexA[i]+"' class='listitem' style='padding:0.5em 0em 0.7em 0.5em;margin-right:2em;border-bottom:#888 solid 0.5px;pointer-events:none'>";
+				szHtml += "<div id='"+objTheme.szId+":"+objTheme.indexA[i]+":chart' item='"+objTheme.indexA[i]+"' class='listitem' style='padding:1.5em 0em 1.7em 0.5em;margin-right:2em;border-bottom:#888 solid 0.5px;pointer-events:none'>";
 				
 				szHtml += "<div class='title' style='pointer-events:none'>"+szText+"</div>";
 				
@@ -548,7 +548,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 		$("#getchartmenutarget"+i).parent().attr("height","200");
 		var SVGBox = $("#getchartmenutarget"+i)[0].getBBox();
 		if (SVGBox.width && SVGBox.height) {
-			var scale = Math.max(1, 4000 / SVGBox.width);
+			var scale = Math.max(1, 400 / SVGBox.width);
 			SVGBox.width *= scale;
 			SVGBox.height *= scale;
 			SVGBox.y *= scale;

@@ -658,7 +658,9 @@
 
 		$('#fullpage').fadeIn( "slow");
 
-		ixmaps.htmlgui_onItemClick = function(evt,szId){
+		ixmaps.htmlgui_onItemClick = function(evt,szId){ 
+			
+			ixmaps.fOnItemClicked = true;
 			
 			var szItemUrl = "./item.html";
 			if ( ixmaps.loadedProject.map.item && (ixmaps.loadedProject.map.item != "html") )  {

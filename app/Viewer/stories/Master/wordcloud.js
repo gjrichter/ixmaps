@@ -215,7 +215,8 @@ window.ixmaps.data = window.ixmaps.data || {};
 		var words = [];
 		for (var i in wordsMap ){
 			if ( (i.length >= 6) && (wordsMap[i] >= 2) ){
-				words.push({"text":i,"size":wordsMap[i],"href":"javascript:ixmaps.map().changeThemeStyle(null,'filter:WHERE \""+szColumn+"\" like \""+i+"\"','set');"});
+				words.push({"text":i,"size":wordsMap[i],"href":"javascript:__setFilter(\''" + szField + "'\',"+i+");}"});
+				//words.push({"text":i,"size":wordsMap[i],"href":"javascript:ixmaps.map().changeThemeStyle(null,'filter:WHERE \""+szColumn+"\" like \""+i+"\"','set');"});
 			}
 		}
 		words.sort(function(a,b){

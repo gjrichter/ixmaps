@@ -190,7 +190,8 @@ window.ixmaps.data = window.ixmaps.data || {};
 		var words = [];
 		for (var i in wordsMap ){
 			if ( (i.length >= 3) && (wordsMap[i] >= 2) && !stopWord(i) ){
-				words.push({"text":i,"size":wordsMap[i],"href":"javascript:ixmaps.map().changeThemeStyle(null,'filter:WHERE \""+szColumn+"\" like \""+i+"\"','set');"});
+				words.push({"text":i,"size":wordsMap[i],"href":"javascript:__setFilter(\"" + szColumn + "\",\""+i+"\");"});
+				//words.push({"text":i,"size":wordsMap[i],"href":"javascript:ixmaps.map().changeThemeStyle(null,'filter:WHERE \""+szColumn+"\" like \""+i+"\"','set');"});
 			}
 		}
 		words.sort(function(a,b){
@@ -579,7 +580,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 				szHtml += '</div>'
 				
 				if (verbose){
-					szTarget = "thisismywordcloud"+facetsA[i].id.replace(" ","_");
+					szTarget = "thisismywordcloud"+facetsA[i].id.replace(/[\W_]/g, "_");
 					szHtml += "<div id='"+szTarget+"'></div>";
 					setTimeout("ixmaps.data.makeWordCloud('"+objTheme.szId+"','"+facetsA[i].id+"','"+szTarget+"')",100);
 				}
@@ -770,7 +771,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 					szHtml += "</div>";
 				}else{
 					if (verbose){
-						szTarget = "thisismywordcloud"+facetsA[i].id.replace(" ","_");
+						szTarget = "thisismywordcloud"+facetsA[i].id.replace(/[\W_]/g, "_");
 						szHtml += "<div id='"+szTarget+"'></div>";
 						setTimeout("ixmaps.data.makeWordCloud('"+objTheme.szId+"','"+facetsA[i].id+"','"+szTarget+"')",100);
 					}
@@ -825,7 +826,7 @@ window.ixmaps.data = window.ixmaps.data || {};
             var themesA = ixmaps.getThemes();
             if (themesA.length > 1){
                 for ( i in themesA ){
-                    if ( !themesA[i].szFlag.match(/POSITION|FEATURE/) ){
+                    if ( !themesA[i].szFlag.match(/POSITION|FEATURE/) && themesA[i].fVisible  ){
                         szThemeId = themesA[i].szId;
                         break;
                     }
