@@ -333,6 +333,7 @@ window.ixmaps = window.ixmaps || {};
 
 				height = width / SVGBox.width * SVGBox.height;
 				while (height > window.innerHeight / 3) {
+					width *= 0.9;
 					height *= 0.9;
 				}
 				// create some space around the chart, some need it 
@@ -393,7 +394,7 @@ window.ixmaps = window.ixmaps || {};
 			
 			if (data) {
 
-				szHtml += "<table style='font-size:0.7em;spacing:0.5em;min-width:200px'>"
+				szHtml += "<table style='font-size:0.85em;spacing:0.5em;min-width:300px'>"
 
 				for (d = 0; d < Math.min(50, data.length); d++) {
 
@@ -402,6 +403,18 @@ window.ixmaps = window.ixmaps || {};
 						if ((i == "geometry")) {
 							continue;
 						}
+						if (themeObj.szDataFieldsA) {
+							var fShow = false;
+							for (var f = 0; f < themeObj.szDataFieldsA.length; f++) {
+								if (themeObj.szDataFieldsA[f] == i) {
+									fShow = true;
+								}
+							}
+							if (!fShow){
+								continue;
+							}
+						}
+
 						var value = dataObject[i];
 						var szValue = (isNaN(value) || value < 10000) ? String(value) : String(value);
 						if (szValue.match(/http:/) || szValue.match(/https:/)) {
