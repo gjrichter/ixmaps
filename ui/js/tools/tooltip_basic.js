@@ -146,7 +146,7 @@ window.ixmaps = window.ixmaps || {};
 			window.document.getElementById("tooltipDiv").style.setProperty("background-color", "rgba(50,50,50,0.85)");
 			window.document.getElementById("tooltipDiv").style.setProperty("border-color", "#555");
 		} else {
-			window.document.getElementById("tooltipDiv").style.setProperty("background-color", "rgba(255,255,255,0.75)");
+			window.document.getElementById("tooltipDiv").style.setProperty("background-color", "rgba(255,255,255,0.8)");
 		}
 
 		// tooltip ready, return true!
@@ -202,7 +202,7 @@ window.ixmaps = window.ixmaps || {};
 		// 1.try
 		var themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
 
-		// check and if not the right theme (possilble if onOver on map shape)
+		// check and if not the right theme (possible if onOver on map shape)
 		if (!(themeObj.szId == szId.split(":")[0])) {
 
 			// look in all CHOROPLETH themes for the a corrisponding one
@@ -230,6 +230,11 @@ window.ixmaps = window.ixmaps || {};
 			__fTooltipPin = false;
 			__fTooltipPinned = false;
 			return;
+		}
+		if (!szId.match(/\:\:/)) {
+			if (evt.path[1].getAttribute("id") && evt.path[1].getAttribute("id").match(/\:\:/)){
+				szItem = evt.path[1].getAttribute("id");
+			}
 		}
 
 		// adapt content to map style
@@ -300,6 +305,9 @@ window.ixmaps = window.ixmaps || {};
 
 			// request chart from map 
 			// -----------------------
+			if (themeObj.szFlag.match(/BAR|STACKED/)){
+				themeObj.drawChart(window.document.getElementById("getchartmenutarget"), szItem, 60, "VALUES|XAXIS|NOSIZE|BOX|GRID");
+			} else
 			if (themeObj.szFlag.match(/CHART|COMPOSECOLOR|DOMINANT|SUBTHEME/)){
 				themeObj.drawChart(window.document.getElementById("getchartmenutarget"), szItem, 30, "VALUES|XAXIS|ZOOM|BOX|GRID");
 			}else{
@@ -325,12 +333,12 @@ window.ixmaps = window.ixmaps || {};
 				var width = Math.min(400, window.innerWidth / 2.5);
 				var height = window.innerHeight / 2;
 				
-				if (themeObj.szFlag.match(/BAR|SEQUENCE|CHOROPLETH/)) {
+				if (themeObj.szFlag.match(/(BAR)|PLOT|CHOROPLETH/)) {
 					width /= Math.max(1, (3 / themeObj.itemA[szItem].nValuesA.length));
 				} else {
 					width /= themeObj.szFlag.match(/PIE/) ? 2 : 3;
 				}
-
+				
 				height = width / SVGBox.width * SVGBox.height;
 				while (height > window.innerHeight / 3) {
 					width *= 0.9;
@@ -398,6 +406,11 @@ window.ixmaps = window.ixmaps || {};
 
 				for (d = 0; d < Math.min(50, data.length); d++) {
 
+					if (data.length > 1) {
+						szHtml += "<tr><td style='font-size:1em;'>&nbsp;</td><tr>";
+						szHtml += "<tr><td style='font-size:1.5em;border:solid black 1px;border-radius:1em;padding:0.1em 0.4em 0em 0.3em'>"+(d+1)+"</td><tr>";
+					}
+
 					var dataObject = data[d];
 					for (i in dataObject) {
 						if ((i == "geometry")) {
@@ -442,9 +455,6 @@ window.ixmaps = window.ixmaps || {};
 								}
 							} else {}
 						}
-					}
-					if (d < data.length - 1) {
-						szHtml += "<tr><td style='font-size:0.2em'>&nbsp;</td><tr>";
 					}
 				}
 				szHtml += "</table>";
