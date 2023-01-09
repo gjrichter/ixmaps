@@ -282,6 +282,8 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
         var colorA = themeObj.colorScheme;
         var labelA = themeObj.szLabelA;
+		
+		var nDecimals = (typeof(themeObj.nValueDecimals) != 'undefined')?themeObj.nValueDecimals:2; 		
 
         // if color field defined, we collect the colors and make legend label here
         // -----------------------------------------------------------------------
@@ -469,7 +471,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                 }
 
                 // show class count
-                var szCount = ixmaps.__formatValue(sortA[i].count, 2, "BLANK") + (themeObj.szFlag.match(/COUNT/) ? "" : (" " + szUnit));
+                var szCount = ixmaps.__formatValue(sortA[i].count, nDecimals, "BLANK") + (themeObj.szFlag.match(/COUNT/) ? "" : (" " + szUnit));
 
                 // -------------------------
                 // start legend row
@@ -478,7 +480,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                 // switch theme class onclick
                 var szAction = "javascript:ixmaps.markThemeClass(\"" + szId + "\"," + sortA[i].index + ");event.stopPropagation();return false;"
 
-				var szStyle = themeObj.szFlag.match(/SIMPLELEGEND|COMPACTLEGEND/) ? "margin-bottom:0.5em;margin-right:1em;float:left":"margin-bottom:0.5em";
+				var szStyle = themeObj.szFlag.match(/SIMPLELEGEND|COMPACTLEGEND/) ? "margin-bottom:0.5em;margin-right:1em;float:left":"margin-bottom:0.2em";
  
 				if (fSelected) {
                     szHtml += "<div valign='center' class='theme-legend-item-selected' style='" + szStyle + "' onclick='" + szAction + "'>";
@@ -539,7 +541,8 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                     // 2 line legend item with values
                     // ------------------------------
                     // make the color bar header
-
+					
+					
                     var szLabel = labelA[sortA[i].index];
                     szHtml += "<span class='theme-legend' >";
                     szHtml += "<a class='theme-button' href='#' title='click to see'>";
@@ -579,7 +582,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                     // make the color bar
 
                     if (fCountBars) {
-                        var nMaxBar = Math.min(200,($("#map-legend").width() - 20) * 0.5);
+                        var nMaxBar = Math.min(100,($("#map-legend").width() - 20) * 0.5);
                         var nBar = Math.ceil(Math.pow(sortA[i].count, 1) * Math.min(10, nMaxBar / Math.pow(nMaxCount, 1)));
                         szHtml += "<span style='display:inline-block;width:" + nBar + "px;font-size:0.5em'>&nbsp;</span>";
                     } else {
@@ -608,6 +611,9 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 						}
                     } else
                     if (themeObj.szLabelA) {
+                        if ((typeof (themeObj.partsA[i].min) != "undefined") && (typeof (themeObj.partsA[i].max) != "undefined")) {
+                            szHtml += "<span style='padding-left:10px'>" + ixmaps.__formatValue(themeObj.partsA[i].min, 2, "BLANK") + " " + szUnit + "</span>  ... <span style='padding-left:5px'>" + ixmaps.__formatValue(themeObj.partsA[i].max, 2, "BLANK") + " " + szUnit + "</span>";
+                        } else 
                         if ((typeof (themeObj.nMinA[i]) != "undefined") &&
                             (typeof (themeObj.nMaxA[i]) != "undefined") &&
                             (themeObj.nMinA[i] < themeObj.nMaxA[i])) {
@@ -620,9 +626,6 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                             (typeof (themeObj.nOrigMaxA[i]) != "undefined") &&
                             (themeObj.nOrigMinA[i] < themeObj.nOrigMaxA[i])) {
                             szHtml += "<span style='padding-left:10px'>" + ixmaps.__formatValue(themeObj.nOrigMinA[i], 2, "BLANK") + " " + szUnit + "</span>  ... <span style='padding-left:5px'>" + ixmaps.__formatValue(themeObj.nOrigMaxA[i], 2, "BLANK") + " " + szUnit + "</span>";
-                        } else
-                        if ((typeof (themeObj.partsA[i].min) != "undefined") && (typeof (themeObj.partsA[i].max) != "undefined")) {
-                            szHtml += "<span style='padding-left:10px'>" + ixmaps.__formatValue(themeObj.partsA[i].min, 2, "BLANK") + " " + szUnit + "</span>  ... <span style='padding-left:5px'>" + ixmaps.__formatValue(themeObj.partsA[i].max, 2, "BLANK") + " " + szUnit + "</span>";
                         } else {
                             console.log(themeObj);
                         }
@@ -668,7 +671,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
         var labelA = themeObj.szLabelA;
         var nColors = colorA.length;
 
-		var nDecimals = (typeof(themeObj.szValueDecimals) != 'undefined')?themeObj.szValueDecimals:2; 		
+		var nDecimals = (typeof(themeObj.nValueDecimals) != 'undefined')?themeObj.nValueDecimals:2; 		
 
 		var szUnit = themeObj.szLegendUnits || themeObj.szUnits || "";
         szUnit = szUnit.replace(/ /g, '&nbsp;');
@@ -796,11 +799,11 @@ window.ixmaps.legend = window.ixmaps.legend || {};
         }
         // check whether to make compact (one line) legend 
         // -----------------------------------------------
-        if (fLegendCompact &&
+        if (0 && fLegendCompact &&
 		   themeObj.szFlag.match(/\bCLIP\b/)){
        		return "";
 	   }
-       if (themeObj.szFlag.match(/\bCLIP\b/)) {
+       if (0 && themeObj.szFlag.match(/\bCLIP\b/)) {
             return ixmaps.legend.makeColorLegendHTMLCompact(szId, szLegendId);
         }
         if ((themeObj.partsA.length == 1) &&
@@ -808,7 +811,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
             !themeObj.szFlag.match(/CATEGORICAL/)) {
             return ixmaps.legend.makeColorLegendHTMLCompact(szId, szLegendId);
         }
-       if (fLegendCompact &&
+       if (0 && fLegendCompact &&
 		   themeObj.szFlag.match(/\bCLIP\b/)){
        		return "";
 	   }
@@ -1355,7 +1358,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			slider.oninput = function() {
 				__noSlideRefresh = true;
 				ixmaps.legend.toggleClipState(false);
-				ixmaps.setThemeClipFrame(null,this.value);
+				ixmaps.setThemeClipFrame(themeObj.szId,this.value);
 				$("#time-span").html(themeObj.szXaxisA[this.value]);
 			}
 			slider.onmouseup = function(){
