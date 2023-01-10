@@ -92,6 +92,7 @@ var themeStyleTranslateA = [
 	,{ style: "filter"			,obj: "szFilter" }
 	,{ style: "dfilter"			,obj: "nDeltaFilter" }
 	,{ style: "filterfield"		,obj: "szFilterField" }
+	,{ style: "visible"			,obj: "fVisible" }
 
 	,{ style: "dbtable"			,obj: "coTable" }
 	,{ style: "dbtableUrl"		,obj: "coTableUrl" }
@@ -1294,6 +1295,11 @@ Map.Themes.prototype.parseStyle = function (mapTheme, styleObj) {
 		if (__isdef(styleObj.valuemap)) {
 			mapTheme.valueMap = styleObj.valuemap;
 		}
+		// GR 13.12.2022 layer hidden ?
+		if (__isdef(styleObj.visible)) {
+			mapTheme.fVisible = JSON.parse(styleObj.visible);
+			mapTheme.fHide = !mapTheme.fVisible;
+		}
 	}
 };
 
@@ -2028,20 +2034,19 @@ Map.Themes.prototype.execute = function () {
 		if (this.themesA[i].fWaitingforData) {
 			return;
 		}
-
-		if (this.themesA[i].fShow) {
+		if (this.themesA[i].fShow && this.themesA[i].fDone) {
 			_TRACE("Show =====>");
 			this.themesA[i].toggle(true);
 			this.themesA[i].fShow = false;
 			break;
 		}
-		if (this.themesA[i].fHide) {
+		if (this.themesA[i].fHide && this.themesA[i].fDone) {
 			_TRACE("Hide =====>");
 			this.themesA[i].toggle(false);
 			this.themesA[i].fHide = false;
 			break;
 		}
-		if (this.themesA[i].fToggle) {
+		if (this.themesA[i].fToggle && this.themesA[i].fDone) {
 			_TRACE("Toggle =====>");
 			this.themesA[i].toggle();
 			this.themesA[i].fToggle = false;
@@ -7181,7 +7186,7 @@ MapTheme.prototype.addItemValues = function (szId, nValuesA, nValue100, nValueSi
 		if (!this.nSumA) {
 			return;
 		}
-		if (!isNaN(nValuesA[i])) {
+		if (!isNaN(nValuesA[i]) && isFinite(nValuesA[i])) {
 			this.nMin = Math.min(this.nMin, nValuesA[i]);
 			this.nMax = Math.max(this.nMax, nValuesA[i]);
 			this.nSum += nValuesA[i];
@@ -7197,7 +7202,7 @@ MapTheme.prototype.addItemValues = function (szId, nValuesA, nValue100, nValueSi
 		}
 	}
 
-	if (!isNaN(nValue100)) {
+	if (!isNaN(nValue100) && isFinite(nValue100)) {
 		this.nMin100 = Math.min(this.nMin100, nValue100);
 		this.nMax100 = Math.max(this.nMax100, nValue100);
 		this.nSum100 += nValue100;
@@ -7205,7 +7210,7 @@ MapTheme.prototype.addItemValues = function (szId, nValuesA, nValue100, nValueSi
 
 	// handle size value
 	if (nValueSize && this.szSizeField) {
-		if (!isNaN(nValueSize)) {
+		if (!isNaN(nValueSize) && isFinite(nValueSize)) {
 			this.itemA[szId].nSize = nValueSize;
 			this.nMinSize = Math.min(this.nMinSize, nValueSize);
 			this.nMaxSize = Math.max(this.nMaxSize, nValueSize);
@@ -7213,7 +7218,7 @@ MapTheme.prototype.addItemValues = function (szId, nValuesA, nValue100, nValueSi
 		}
 	}
 	// handle alpha value
-	if (this.szAlphaField && (nValueAlpha != null) && !isNaN(nValueAlpha)) {
+	if (this.szAlphaField && (nValueAlpha != null) && !isNaN(nValueAlpha) && isFinite(nValueAlpha) ) {
 		if (this.__fDensityAlpha) {
 			if (nArea) {
 				nValueAlpha = nValueAlpha / nArea;
@@ -7586,7 +7591,7 @@ MapTheme.prototype.getSelectionId = function (szTheme, j) {
 				this.fSelection = "MultiPoint";
 			} else
 			// GR 22.05.2015 geo-json point definition
-			if (szId.match(/Point/)) {
+			if (szId.match(/Point/i)) {
 				this.fSelection = "MultiPoint";
 			} else
 			// GR 22.05.2015 geo-json line definition
@@ -9187,7 +9192,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 		for (a in this.itemA) {
 			this.itemA[a].szValue = String(this.itemA[a].nSize);
 		}
-		this.szValueField = null;
+		//this.szValueField = null;
 	}
 
 	if (this.oldSizefield) {
@@ -11142,6 +11147,13 @@ MapTheme.prototype.paintMap = function (startIndex) {
 		if (this.szFlag.match(/COMPOSECOLOR/)) {
 			__maptheme_initComposedColor(this.colorScheme.slice(0));
 		}
+		
+		// GR 13.11.2022 if theme is SUBTHEME, clear shapes of parent theme colors 
+		if (this.parentTheme){
+			for (var j = 0; j < this.parentTheme.paintedShapeNodesA.length; j++) {
+				this.parentTheme.unPaintShape(this.parentTheme.paintedShapeNodesA[j]);
+			}
+		}
 	}
 
 	for (var nAi = startIndex; nAi < this.indexA.length; nAi++) {
@@ -12645,6 +12657,7 @@ MapTheme.prototype.createSubTheme = function (nClass) {
 			this.subTheme =
 				map.Themes.newTheme(this.szThemes, this.szFields, this.szField100,
 					"type:CHOROPLETH|CATEGORICAL|NOINFO|NOLEGEND|SUBTHEME|" + szFlag + ";colorscheme:7|white|" + this.colorScheme[nClass] + ";" + szAttributes, this.szLabelA[nClass], "");
+			this.subTheme.parentTheme = this;
 		}
 
 	} else
@@ -13277,7 +13290,11 @@ MapTheme.prototype.createChartGroup = function (objectGroup) {
 		this.chartGroup = map.Dom.newGroup(objectGroup, this.szId + ":chartgroup");
 	}
 	this.chartGroup.style.setProperty("opacity", String(this.nOpacity ? this.nOpacity : 1), "");
-
+	
+	// GR 21.12.2022 SILENT chart -> no pointer events	 
+	if (this.szFlag.match(/SILENT/)) {
+		this.chartGroup.style.setProperty("pointer-events", "none", "");
+	}
 	// GR 04.03.2017 vector charts must not be scaled	 
 	if (this.szFlag.match(/VECTOR/)) {
 		antiZoomAndPanList.addGroup(this.chartGroup);
@@ -14846,8 +14863,8 @@ MapTheme.prototype.chartMap = function (startIndex) {
 			} else
 			if ((this.szFlag.match(/MULTIFIX/) || this.szFlag.match(/MULTIGRID/)) && shapeGroup.lastChild) {
 				var offset = 1;
-				var dX = map.Scale.normalX(this.nChartSizeDone);
-				var dY = map.Scale.normalX(this.nChartSizeDone);
+				var dX = map.Scale.normalX(this.nChartSizeDone * (this.nRangeScale || 1));
+				var dY = map.Scale.normalX(this.nChartSizeDone * (this.nRangeScale || 1));
 
 				// GR 13.06.2017 check also selectionIds like names and see if they have the same position
 				if ((ptOff = this.getNodePosition(selectionId))) {
@@ -15053,8 +15070,9 @@ MapTheme.prototype.chartMap = function (startIndex) {
 
 							// make multi line text if necessary and possible
 							var nRows = map.Dom.wrapText(newText, bBox.width);
-							newText.fu.setPosition(newText.fu.getPosition().x, newText.fu.getPosition().y - (nFontSize * 1 * (nRows - 1)));
-
+							if ( !this.szFlag.match(/BOTTOMTITLE/) ){
+								newText.fu.setPosition(newText.fu.getPosition().x, newText.fu.getPosition().y - (nFontSize * 1 * (nRows - 1)));
+							}
 							if (!this.szFlag.match(/CLIPPEDTITLE/)) {
 								// enlarge the box to include all of the title
 								bBox = map.Dom.getBox(shapeGroup);
@@ -15358,7 +15376,7 @@ MapTheme.prototype.getChartSize = function (a, nChartSize, szFlag, nMySum) {
 		nSize = Math.max(nSize, nChartSize / 5);
 	}
 
-	return nSize;
+	return Math.abs(nSize);
 };
 
 /**
@@ -15675,7 +15693,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 	// GR 29.01.2015 if nValueUpper and zoom not sufficient, remove VALUES from flag 
 	if (szFlag.match(/VALUES/)) {
-		this.fHideValues = (this.szValueUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nValueUpper));
+		this.fHideValues = false;
+		if (!szFlag.match(/ZOOM/)) {
+			this.fHideValues = (this.szValueUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nValueUpper));
+		}
 		// GR 29.01.2019 no VALUES on zoomed pie chart with more than 10 parts 
 		if (szFlag.match(/ZOOM/) && szFlag.match(/PIE/) && nPartsA.length > 10) {
 			szFlag = this.removeDefinition(szFlag, "VALUES");
@@ -16468,7 +16489,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			if (szFlag.match(/FIXSIZE/)) {
 				nRadius = nMaxRadius / 2 / (this.nNormalSizeValue || 1);
 			} else
-			if (szFlag.match(/ZOOM/)) {
+			if (0 && szFlag.match(/ZOOM/)) {
 				nRadius = (nMaxRadius * 3 / 3); // GR 15.11.2013  / (szFlag.match(/CATEGORICAL/)?1:(Math.log(nMaxValue) * Math.log(Math.abs(nSizeValue)))); 
 			} else
 			if (szFlag.match(/NORMSIZE/)) {
@@ -16747,7 +16768,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							szText = "+" + szText;
 						}
 					} else
-					if (this.szSizeField && nSizeValue) {
+					if (this.szValueField && (this.szValueField == this.szSizeField) && nSizeValue) {
 						// GR 25.05.2015 explizit size display field
 						szText = this.formatValue(__scanValue(nSizeValue), this.nValueDecimals || ((nSizeValue < 1) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
 						if ((nSizeValue === 0) && (this.szFlag.match(/DIFFERENCE/) || this.szFlag.match(/RELATIVE/) || this.szFlag.match(/\bSIGN\b/))) {
@@ -17211,7 +17232,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				tValue = isNaN(this.itemA[a].szValue)?this.itemA[a].szValue:__scanValue(this.itemA[a].szValue);
 			} else
 			if ( !szFlag.match(/SEQUENCE|CATEGORICAL/) && this.szSizeField && this.itemA[a] && this.itemA[a].nSize ) {
-				tValue = this.itemA[a].nSize;
+				tValue = this.itemA[a].nSize || tValue;
 			} 
 
 			if (this.szShowParts) {
@@ -17404,9 +17425,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								var szTextColor = this.szTextColor || cColor.textColor;
 								var szMaxTextLength = Math.max((tValue.length || 0) + 1, szMaxText.length);
 								if( szFlag.match(/INLINETEXT/) ){
+									var szText = this.formatValue(tValue, this.nValueDecimals || (((tValue < 1) || (nMaxValue <= 1)) ? 1 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
 									var nFontSize = String(Math.min(nMaxRadius * 1, nMaxRadius * (((szSymbol == "hexagon") ? 2.7 : 3.2) / szMaxTextLength)));
 									nFontSize *= nRadius / nMaxRadius * this.nValueScale;
-									var newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:"+(this.szTextFont||"arial")+";font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", tValue);
+									var newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.33, "font-family:"+(this.szTextFont||"arial")+";font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";stroke:none;pointer-events:none", szText);
 								}else{
 									var cColor = __maptheme_getChartColors(szColor);
 									szLineColor = cColor.textColor;
@@ -20309,7 +20331,7 @@ MapTheme.prototype.getNodeArea = function (a) {
  * turn the geo coordinate string (lat,lon) into a map position
  * @param a the (map) id of the item
  */
-var positionRegExp = /(-?[0-9\.]+) ?, ?(-?[0-9\.]+)/;
+var positionRegExp = /(-?[0-9\.]+) ?[, ] ?(-?[0-9\.]+)/;
 MapTheme.prototype.getMapPosition = function (a) {
 	if (a) {
 		var szM = a;
