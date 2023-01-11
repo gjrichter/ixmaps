@@ -18,3 +18,9 @@ If you need test data, you find some in a dedicated ripository gjrichter/data.
 To use this data you can define a raw url with https://raw.githubusercontent.com/gjrichter/data/master/ + dataname.csv
 
 sample: https://raw.githubusercontent.com/gjrichter/data/master/palermo_incidenti_20032017144826.csv
+
+
+
+<iframe src="https://gjrichter.github.io/pages/Macerata/index_test_api_embed_CamCom_Macerata_forze_lavoro_world_y_choro.html" height="800">
+
+

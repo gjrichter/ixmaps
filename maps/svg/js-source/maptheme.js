@@ -568,11 +568,14 @@ Map.Themes.prototype.newThemeByObj = function (themeObj) {
 
 	// make unique identifier to toggle themes
 	var szIdStr = JSON.stringify(themeObj);
-	if (!themeObj.style.type.match(/FORCE/) && this.isTheme(szIdStr)) {
-		_TRACE("identic theme -> remove it");
-		this.removeTheme(null, this.isTheme(szIdStr).szId);
-		//displayMessage("removing theme ...",2000);
-		return null;
+	
+	// if identique theme exists
+	if (this.isTheme(szIdStr)){
+		if (themeObj.style.type.match(/TOGGLE/)) {
+			_TRACE("identic theme -> remove it");
+			this.removeTheme(null, this.isTheme(szIdStr).szId);
+			return null;
+		}
 	}
 
 	var mapTheme = null;
