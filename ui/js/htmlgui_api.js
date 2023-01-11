@@ -2639,7 +2639,6 @@ $Log: htmlgui_api.js,v $
 		},
 		getThemes: function(){
 			return ixmaps.getThemes(this.szMap);
-		},
 		}
 	};
 
