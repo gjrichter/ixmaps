@@ -718,7 +718,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
                     var szMinMax = "";
                     var ix = themeObj.szFlag.match(/INVERT/) ? (nColors - i - 1) : i;
                     if (themeObj.partsA[ix] && themeObj.partsA[ix].min && themeObj.partsA[ix].max) {
-                        szMinMax = parseFloat(themeObj.partsA[ix].min).toFixed(0) + szUnit + " ... " + parseFloat(themeObj.partsA[ix].max).toFixed(0) + szUnit;
+                        szMinMax = ixmaps.__formatValue(themeObj.partsA[ix].min, nDecimals, "SPACE") + szUnit + " ... " + 					ixmaps.__formatValue(themeObj.partsA[ix].max, nDecimals, "SPACE") + szUnit;
                     }
                     var nCount = Math.min(50 / nColors, 8);
                     var nOpacity = (1 / (row + 1));
@@ -759,11 +759,12 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 
         szUnit = ((szUnit.substr(0, 1) == '.') ? "" : " ") + szUnit;
         var span = Math.floor(nColors * 0.5);
-		
-		var nMin = themeObj.nMinA[0]||themeObj.nMin;
-		var nMax = themeObj.nMaxA[0]||themeObj.nMax;
+		//var nMin = themeObj.nMinA[0]||themeObj.nMin;
+		//var nMax = themeObj.nMaxA[0]||themeObj.nMax;
+		var nMin = themeObj.nMin;
+		var nMax = themeObj.nMax;
         szHtml += "<tr class='legend-range-text' >";
-        szHtml += "<td colspan='" + (span) + "' >" + ixmaps.__formatValue(nMin, nDecimals, "SPACE") + szUnit + "</td>";
+        szHtml += "<td colspan='" + (span) + "' align='left'>" + ixmaps.__formatValue(nMin, nDecimals, "SPACE") + szUnit + "</td>";
         szHtml += "<td colspan='" + (nColors - span) + "' align='right'>" + ixmaps.__formatValue(nMax, nDecimals, "SPACE") + ((szUnit.length <= 3) ? szUnit : "") + "</td>";
         szHtml += "</tr>";
 

@@ -955,6 +955,15 @@ $Log: htmlgui_api.js,v $
 		this.dispatchToEmbeddedApi(szMap,"hideTheme",[szThemeName]);
 	};
 	/**
+	 * toggle a Theme on the map
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szThemeName a name for the theme [optional]; will be displayed if the theme has no title defined
+	 * @return void
+	 */
+	ixmaps.toggleTheme = function(szMap,szThemeName){
+		this.dispatchToEmbeddedApi(szMap,"toggleTheme",[szThemeName]);
+	};
+	/**
 	 * remove a Theme from the map
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
 	 * @param {String} szThemeName a name for the theme [optional]; will be displayed if the theme has no title defined
@@ -2351,6 +2360,7 @@ $Log: htmlgui_api.js,v $
 	ixmaps.themeApi = function(szMap,szTheme){
 		this.szMap = szMap||null;
 		this.szTheme = szTheme||null;
+		this.obj = ixmaps.getThemeObj(szMap,szTheme)||null;
 	};
 	ixmaps.themeApi.prototype = {
 
@@ -2398,6 +2408,14 @@ $Log: htmlgui_api.js,v $
 		 **/
 		hide: function(){
 			ixmaps.hideTheme(this.szMap,this.szTheme);
+		},
+		/**
+		 * toggle theme
+		 * @example ixmaps.map().theme().toggle();
+		 * @return void
+		 **/
+		toggle: function(){
+			ixmaps.toggleTheme(this.szMap,this.szTheme);
 		},
 		/**
 		 * remove theme
@@ -2498,6 +2516,10 @@ $Log: htmlgui_api.js,v $
 			return this;
 		},
 
+		title: function(szTitle){
+			ixmaps.embeddedApiA[this.szMap].setTitle(szTitle);
+			return this;
+		},
 
 		setExternalData: function(data,options){
 			ixmaps.setExternalData(this.szMap,data,options);
@@ -2611,6 +2633,13 @@ $Log: htmlgui_api.js,v $
 				console.log(new ixmaps.themeApi(this.szMap,szTheme));
 				return new ixmaps.themeApi(this.szMap,szTheme);
 			}
+		},
+		themes: function(){
+			return ixmaps.getThemes(this.szMap);
+		},
+		getThemes: function(){
+			return ixmaps.getThemes(this.szMap);
+		},
 		}
 	};
 
@@ -2714,6 +2743,13 @@ $Log: htmlgui_api.js,v $
 			this.def.binding = this.def.binding || {};
 			for (var i in bObj){
 				this.def.binding[i] = bObj[i];
+			}
+			return this;
+		},
+		encoding: function(bObj){
+			this.def.binding = this.def.binding || {};
+			for (var i in bObj){
+				this.def.binding[i] = bObj[i].field || bObj[i];
 			}
 			return this;
 		},
@@ -2944,7 +2980,7 @@ $Log: htmlgui_api.js,v $
 
 			var target = window.document.getElementById(szTargetDiv);
 
-			var szName = opt.mapName || opt.name || "map" + String(Math.random()).split(".")[1];
+			var szName = opt.mapName || opt.name || szTargetDiv || "map" + String(Math.random()).split(".")[1];
 			var szBasemap = opt.mapService || opt.basemap || "leaflet";
 			var szMapType = opt.mapType || opt.maptype || "CartoDB - Positron";
 
