@@ -2979,7 +2979,7 @@ $Log: htmlgui_api.js,v $
 
 			var target = window.document.getElementById(szTargetDiv);
 
-			var szName = opt.mapName || opt.name || szTargetDiv || "map" + String(Math.random()).split(".")[1];
+			var szName = opt.mapName || opt.name || "map" + String(Math.random()).split(".")[1];
 			var szBasemap = opt.mapService || opt.basemap || "leaflet";
 			var szMapType = opt.mapType || opt.maptype || "CartoDB - Positron";
 
