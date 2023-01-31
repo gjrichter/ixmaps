@@ -195,6 +195,7 @@ var themeStyleTranslateA = [
 	,{ style: "titleupper"		,obj: "szTitleUpper"  }
 	,{ style: "labelupper"		,obj: "szLabelUpper"  }
 	,{ style: "valueupper"		,obj: "szValueUpper"  }
+	,{ style: "valuelower"		,obj: "szValueLower"  }
 	,{ style: "glowupper"		,obj: "szGlowUpper"  }
 	,{ style: "glowlower"		,obj: "szGlowLower"  }
 	,{ style: "chartupper"		,obj: "szChartUpper"  }
@@ -1095,6 +1096,16 @@ Map.Themes.prototype.parseStyle = function (mapTheme, styleObj) {
 		if (__isdef(styleObj.valuesupper)) {
 			mapTheme.szValueUpper = styleObj.valuesupper;
 			mapTheme.nValueUpper = __scanScaleValue(mapTheme.szValueUpper);
+		}
+		// GR 12.01.2023 define scaledependency lower for value label 
+		if (__isdef(styleObj.valuelower)) {
+			mapTheme.szValueLower = styleObj.valuelower;
+			mapTheme.nValueLower = __scanScaleValue(mapTheme.szValueLower);
+		}
+		// GR 12.01.2023 accept also 'valueslower' 
+		if (__isdef(styleObj.valueslower)) {
+			mapTheme.szValueLower = styleObj.valueslower;
+			mapTheme.nValueLower = __scanScaleValue(mapTheme.szValueLower);
 		}
 		// GR 12.11.2016 define scaledependency for chart glowing 
 		if (__isdef(styleObj.glowupper)) {
@@ -3748,6 +3759,12 @@ Map.Themes.prototype.doChangeThemeStyle = function (szId, szStyle, szFlag) {
 				mapTheme.nValueUpper = __scanScaleValue(mapTheme.szValueUpper);
 				mapTheme.fRedraw = true;
 			}
+			// GR 12.01.2023 define scaledependency for value label 
+			if (__isdef(styleObj.valuelower)) {
+				mapTheme.szValueLower = styleObj.valuelower;
+				mapTheme.nValueLower = __scanScaleValue(mapTheme.szValueLower);
+				mapTheme.fRedraw = true;
+			}
 			// GR 02.03.2017 define scaledependency for box title 
 			if (__isdef(styleObj.titleupper)) {
 				mapTheme.szTitleUpper = styleObj.titleupper;
@@ -6224,6 +6241,7 @@ function MapTheme(szThemes, szFields, szField100, szFlag, colorScheme, szTitle, 
 		this.szFields = obj.field || obj.fields || this.szFields;
 		this.szField100 = obj.field100 || this.szField100;
 		this.szFieldsA = szFields.split('|');
+		this.style.setProperties(obj);
 	}
 	/** set theme.style properties  */
 	this.style.setProperties = function(styleObj){
@@ -8893,7 +8911,8 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 
 				if (!szTitle || (szTitle != this.itemA[szId].szTitle)) {
 					//this.itemA[szId].szTitle = (this.itemA[szId].nCount + " items aggregated");
-					this.itemA[szId].szTitle = "(" + this.itemA[szId].nCount + ")";
+					this.itemA[szId].szTitle = this.szAggregation+" (" + this.itemA[szId].nCount + ")";
+					this.itemA[szId].szTitle = this.szAggregation+" of " + this.itemA[szId].nCount + " items";
 				}
 
 			}
@@ -11516,7 +11535,7 @@ MapTheme.prototype.paintMap = function (startIndex) {
 				var paintShape = this.paintShape(tilesNodesA[j], this.szNoDataColor ? this.szNoDataColor : "white", -1, -1);
 				paintShape.setAttributeNS(szMapNs, "tooltip", "no value");
 				if (this.szFlag.match(/DOPACITY/)) {
-					paintShape.style.setProperty("fill-opacity", "0", "");
+					//paintShape.style.setProperty("fill-opacity", "0", "");
 				}
 				this.nNoData++;
 			}
@@ -11574,7 +11593,8 @@ MapTheme.prototype.paintMap = function (startIndex) {
 	// init creating label by a sleep and continue  
 	// this way we allow the rendering of the CHOROPLETH theme
 	if (this.szFlag.match(/VALUES/) &&
-		(!this.szValueUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nValueUpper))) {
+		(!this.szValueUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nValueUpper)) &&
+		(!this.szValueLower || (map.Scale.nTrueMapScale * map.Scale.nZoomScale >= this.nValueLower))) {
 
 		if (this.mapSleep) {
 			this.mapSleep.initCheckSleep(25);
@@ -13957,7 +13977,8 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		this.fDoRedraw = !this.fDone;
 	}
 
-	this.fHideValues = (this.szValueUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nValueUpper));
+	this.fHideValues = (this.szValueUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nValueUpper)) || 
+					   (this.szValueLower && (map.Scale.nTrueMapScale * map.Scale.nZoomScale < this.nValueLower));
 
 	// GR 19.94.2020 give user a chart draw init event
 	//
@@ -14004,50 +14025,54 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		this.chartGroup.style.setProperty("stroke-linecap", "butt");
 		this.chartGroup.style.setProperty("stroke-linejoin", "round");
 		
-		var szInfo = "";
-		for ( var i=0; i<this.objTheme.dbFields.length-1; i++ ){
-			szInfo += (i?"|":"")+this.objTheme.dbFields[i].id;
-		}
-		this.chartGroup.setAttributeNS(szMapNs,"info",szInfo);
-		
-			// GR 28.10.2021 make shadow for the FEATURES
-			if ((this.fShadow === true) && SVGDocument.getElementById(szShadowFilterShapeId)) {
-				this.chartGroup.style.setProperty("filter", "url(#" + szShadowFilterShapeId + ")", "");
-			} else
-			if ((this.fShadow === true)) {
-				_TRACE("create shadow filter for objects ! --------------------------------------");
-				var filterNode = map.Dom.newNode('filter', this.chartGroup.parentNode);
-
-				filterNode.setAttributeNS(null, "id", szShadowFilterShapeId);
-				filterNode.setAttributeNS(null, "x", "-1");
-				filterNode.setAttributeNS(null, "y", "-1");
-				filterNode.setAttributeNS(null, "width", "2000%");
-				filterNode.setAttributeNS(null, "height", "2000%");
-
-				var filter = map.Dom.newNode('feGaussianBlur', filterNode);
-				filter.setAttributeNS(null, "stdDeviation", "0.3");
-				filter.setAttributeNS(null, "result", "BlurAlpha");
-
-				filter = map.Dom.newNode('feOffset', filterNode);
-				filter.setAttributeNS(null, "in", "BlurAlpha");
-				filter.setAttributeNS(null, "dx", "0.2");
-				filter.setAttributeNS(null, "dy", "0.5");
-				filter.setAttributeNS(null, "result", "OffsetBlurAlpha");
-
-				filter = map.Dom.newNode('feColorMatrix', filterNode);
-				filter.setAttributeNS(null, "in", "OffsetBlurAlpha");
-				filter.setAttributeNS(null, "type", "matrix");
-				filter.setAttributeNS(null, "values", "0.1 0.1 0.1 0 0 0.1 0.1 0.1 0 0 0.1 0.1 0.1 0 0 0 0 0 1 0");
-				filter.setAttributeNS(null, "result", "matrixOut");
-
-				filter = map.Dom.newNode('feMerge', filterNode);
-				var merge = map.Dom.newNode('feMergeNode', filter);
-				merge.setAttributeNS(null, "in", "matrixOut");
-				merge = map.Dom.newNode('feMergeNode', filter);
-				merge.setAttributeNS(null, "in", "SourceGraphic");
-
-				this.chartGroup.style.setProperty("filter", "url(#" + szShadowFilterShapeId + ")", "");
+		if (this.szFlag.match(/SILENT/)) {
+			this.chartGroup.style.setProperty("pointer-events", "none", "");
+		}else{
+			var szInfo = "";
+			for ( var i=0; i<this.objTheme.dbFields.length-1; i++ ){
+				szInfo += (i?"|":"")+this.objTheme.dbFields[i].id;
 			}
+			this.chartGroup.setAttributeNS(szMapNs,"info",szInfo);
+		}
+		
+		// GR 28.10.2021 make shadow for the FEATURES
+		if ((this.fShadow === true) && SVGDocument.getElementById(szShadowFilterShapeId)) {
+			this.chartGroup.style.setProperty("filter", "url(#" + szShadowFilterShapeId + ")", "");
+		} else
+		if ((this.fShadow === true)) {
+			_TRACE("create shadow filter for objects ! --------------------------------------");
+			var filterNode = map.Dom.newNode('filter', this.chartGroup.parentNode);
+
+			filterNode.setAttributeNS(null, "id", szShadowFilterShapeId);
+			filterNode.setAttributeNS(null, "x", "-1");
+			filterNode.setAttributeNS(null, "y", "-1");
+			filterNode.setAttributeNS(null, "width", "2000%");
+			filterNode.setAttributeNS(null, "height", "2000%");
+
+			var filter = map.Dom.newNode('feGaussianBlur', filterNode);
+			filter.setAttributeNS(null, "stdDeviation", "0.3");
+			filter.setAttributeNS(null, "result", "BlurAlpha");
+
+			filter = map.Dom.newNode('feOffset', filterNode);
+			filter.setAttributeNS(null, "in", "BlurAlpha");
+			filter.setAttributeNS(null, "dx", "0.2");
+			filter.setAttributeNS(null, "dy", "0.5");
+			filter.setAttributeNS(null, "result", "OffsetBlurAlpha");
+
+			filter = map.Dom.newNode('feColorMatrix', filterNode);
+			filter.setAttributeNS(null, "in", "OffsetBlurAlpha");
+			filter.setAttributeNS(null, "type", "matrix");
+			filter.setAttributeNS(null, "values", "0.1 0.1 0.1 0 0 0.1 0.1 0.1 0 0 0.1 0.1 0.1 0 0 0 0 0 1 0");
+			filter.setAttributeNS(null, "result", "matrixOut");
+
+			filter = map.Dom.newNode('feMerge', filterNode);
+			var merge = map.Dom.newNode('feMergeNode', filter);
+			merge.setAttributeNS(null, "in", "matrixOut");
+			merge = map.Dom.newNode('feMergeNode', filter);
+			merge.setAttributeNS(null, "in", "SourceGraphic");
+
+			this.chartGroup.style.setProperty("filter", "url(#" + szShadowFilterShapeId + ")", "");
+		}
 	}
 	
 	// ---------------------------------
@@ -14178,14 +14203,17 @@ MapTheme.prototype.chartMap = function (startIndex) {
 			if (!json){
 				continue;
 			}
-			
-			var szInfo = "";
-			var data = this.objTheme.dbRecords[this.itemA[a].dbIndex];
-			for ( var i=0; i<data.length-1; i++ ){
-				szInfo += (i?"|":"")+data[i];
+			if (this.szFlag.match(/SILENT/)) {
+				shapeGroup.style.setProperty("pointer-events", "none", "");
+			}else{
+				var szInfo = "";
+				var data = this.objTheme.dbRecords[this.itemA[a].dbIndex];
+				for ( var i=0; i<data.length-1; i++ ){
+					szInfo += (i?"|":"")+data[i];
+				}
+				shapeGroup.setAttributeNS(szMapNs,"info",szInfo);
+				shapeGroup.setAttributeNS(szMapNs,"tooltip",a);
 			}
-			shapeGroup.setAttributeNS(szMapNs,"info",szInfo);
-			shapeGroup.setAttributeNS(szMapNs,"tooltip",a);
 			
 			// if part of a theme, set the color
 			// ----------------------------------
@@ -15698,7 +15726,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 	if (szFlag.match(/VALUES/)) {
 		this.fHideValues = false;
 		if (!szFlag.match(/ZOOM/)) {
-			this.fHideValues = (this.szValueUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nValueUpper));
+			this.fHideValues = (this.szValueUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nValueUpper)) ||
+							   (this.szValueLower && (map.Scale.nTrueMapScale * map.Scale.nZoomScale < this.nValueLower));
 		}
 		// GR 29.01.2019 no VALUES on zoomed pie chart with more than 10 parts 
 		if (szFlag.match(/ZOOM/) && szFlag.match(/PIE/) && nPartsA.length > 10) {
@@ -16211,7 +16240,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		}
 
 		if (szFlag.match(/VALUES/) &&
-			(szFlag.match(/ZOOM/) || !this.szValueUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nValueUpper))) {
+			(szFlag.match(/ZOOM/) || !this.fHideValues)) {
 			// GR check possible fontsize here, if to small, don't create inline text
 			var nFontSize = Math.min(nSize * 0.8, nSize * (3.4 / (donut.partsA[0] ? donut.partsA[0].szText.length : 1)));
 			if ((nPartsA.length > 1) || szFlag.match(/NOINLINETEXT/) ||
@@ -16755,9 +16784,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					}
 				}
 				newText = null;
-				if (szFlag.match(/VALUES/) &&
-					(!this.szValueUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nValueUpper))) {
-					var szText = null;
+				if (szFlag.match(/VALUES/) && !this.fHideValues ){
+						var szText = null;
 					if (this.szValueField && (this.szValueField == "$title$")) {
 						szText = this.itemA[a].szTitle;
 					} else
@@ -17820,7 +17848,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								var szFont = this.szTextFont || "arial";
 								newShapeBg = map.Dom.newText(shapeGroup, 0, 0, "font-family:" + szFont + ";font-size:" + nFontSize + "px;font-weight:bold;text-anchor:middle;fill:none;stroke:" + szColor + ";stroke-width:" + nFontSize / 7 + ";stroke-opacity:0.5;pointer-events:none;stroke-linejoin:bevel;", szText);
 								newShapeBg.setAttributeNS(null, "id", this.szId + ":" + a + ":text:bg");
-								newShape = map.Dom.newText(shapeGroup, 0, 0, "font-family:" + szFont + ";font-size:" + nFontSize + "px;font-weight:bold;text-anchor:middle;fill:" + "#000000" + ";opacity:" + nOpacity + ";stroke:none;", szText);
+								newShape = map.Dom.newText(shapeGroup, 0, 0, "font-family:" + szFont + ";font-size:" + nFontSize + "px;font-weight:bold;text-anchor:middle;fill:" + (this.szTextColor || "#000000") + ";opacity:" + nOpacity + ";stroke:none;", szText);
 								newShape.setAttributeNS(null, "id", this.szId + ":" + a + ":text");
 							} else {
 								var nFontSize = String(Math.max(1, Math.min(nRadius * 0.8, nRadius * (3.4 / szText.length))));
@@ -18513,15 +18541,18 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 									}
 									nPLastValue = nPValue;
 									
-									if ( szFlag.match(/\bINLINETEXT\b/) ){
-										newText.fu.setPosition(nAxis, (-nPValue) * nScale);
-									}else
-									if (szFlag.match(/LINES/) && ((this.nGridX == null) || (this.nGridX <= 1) || (szFlag.match(/STACKED/)))) {
-										newText.fu.setPosition(nAxis - map.Scale.normalX(nChartSize / 4), (-nPValue) * nScale + map.Scale.normalY(nChartSize / 4) / (this.nGridX || 1));
-										newText.fu.scale(1.5,1.5);
-									} else {
-										newText.fu.scale(1.5,1.5);
-										newText.fu.setPosition(nAxis, (-nPValue) * nScale);
+									if (newText && newText.parentNode) {
+										if ( szFlag.match(/\bINLINETEXT\b/) ){
+											newText.fu.setPosition(nAxis, (-nPValue) * nScale);
+										}else
+										if (szFlag.match(/LINES/) && ((this.nGridX == null) || (this.nGridX <= 1) || (szFlag.match(/STACKED/)))) {
+											newText.fu.setPosition(nAxis - map.Scale.normalX(nChartSize * this.nGridX||1), (-nPValue) * nScale  );
+											newText.fu.scale(2.5,2.5);
+											newText.parentNode.removeChild(newText);
+										} else {
+											newText.fu.scale(1.5,1.5);
+											newText.fu.setPosition(nAxis, (-nPValue) * nScale);
+										}
 									}
 								}
 
@@ -18604,6 +18635,14 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 											plotShape.setAttributeNS(szMapNs, "time", String(uTime));
 										}
 									}
+									if (szFlag.match(/LASTPOP/) && nValue && (i >= nMaxI-(this.nGridX||1)) ) {
+										plotShape = map.Dom.newShape('circle', plotGroup, nAxis, (-nPValue) * nScale, map.Scale.normalX(this.nLineWidth*1.5), "fill:" + szColor + ";stroke:" + szLineColor + ";stroke-width:" + nLineWidth + ";");
+										if (plotShape) {
+											plotShape.setAttributeNS(szMapNs, "value", String(nValue));
+											//plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
+											plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+										}
+									}
 									if (szFlag.match(/PLOTVAR/)) {
 										var nMean = szFlag.match(/MEDIAN/) ? this.nMedianA[nIndex] : this.nMeanA[nIndex];
 										nMean -= nMinValue;
@@ -18641,6 +18680,14 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 								} else
 								if (szFlag.match(/LOLLIPOP/) && nValue) {
+									plotShape = map.Dom.newShape('line', plotGroup, nAxis, 0, nAxis, (-nPValue) * nScale, "stroke:" + (szColor) + ";stroke-width:" + map.Scale.normalX(3) + ";stroke-linecap:round;");
+									if (plotShape) {
+										plotShape.setAttributeNS(szMapNs, "value", String(nValue));
+										plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
+										plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+									}
+								} else
+								if (szFlag.match(/LASTPOP/) && nValue ) {
 									plotShape = map.Dom.newShape('line', plotGroup, nAxis, 0, nAxis, (-nPValue) * nScale, "stroke:" + (szColor) + ";stroke-width:" + map.Scale.normalX(3) + ";stroke-linecap:round;");
 									if (plotShape) {
 										plotShape.setAttributeNS(szMapNs, "value", String(nValue));
@@ -19491,7 +19538,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								szStyle = "fill:" + nColor + ";stroke:" + cColor.lowColor + ";stroke-width:" + map.Scale.normalX(this.nLineWidth * 0.25 * nSizer || 0.25) + ";fill-opacity:" + (this.nFadeNegative || 0.1) + ";stroke-opacity:0.8";
 							} else {
 								var cColor = __maptheme_getChartColors(nColor);
-								szStyle = "fill:" + (1 ? nColor : "white") + ";stroke:" + cColor.highColor + ";stroke-width:" + map.Scale.normalX(this.nLineWidth * 0.5 * nSizer || 0.5) + ";fill-opacity:" + (this.nFadeNegative || 0.1) + ";stroke-opacity:1";
+								szStyle = "fill:" + (1 ? nColor : "white") + ";stroke:" + cColor.highColor + ";stroke-width:" + (map.Scale.normalX(this.nLineWidth) * Math.sqrt(nSizer || 1)) + ";fill-opacity:" + (this.nFadeNegative || 0.1) + ";stroke-opacity:1";
 							}
 						}
 						map.Dom.newShape('path', barShape, 'M' + (nPosX + nWidth / 7) + ',' + (-nValue * nStep / nCenter) + ' l ' +
@@ -19527,7 +19574,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			// ---------------
 			if ((szFlag.match(/VALUES/) || this.szXaxisA) &&
 				!((nPosY > 0) && szFlag.match(/NONEGATIVE/)) &&
-				(szFlag.match(/ZOOM/) || !this.szValueUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nValueUpper))) {
+				(szFlag.match(/ZOOM/) || !this.fHideValues)) {
 
 				if (!nValue) {
 					nValue = 0;
