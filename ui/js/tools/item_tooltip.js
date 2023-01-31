@@ -28,6 +28,15 @@ window.ixmaps = window.ixmaps || {};
 		var xPos = evt.clientX;
 		var yPos = evt.clientY;
 
+		if (evt.type == 'touchstart' || evt.type == 'touchmove' || evt.type == 'touchend' || evt.type == 'touchcancel') {
+			var touch = evt.touches[0] || evt.changedTouches[0];
+			xPos = touch.pageX;
+			yPos = touch.pageY;
+		} else if (evt.type == 'mousedown' || evt.type == 'mouseup' || evt.type == 'mousemove' || evt.type == 'mouseover' || evt.type == 'mouseout' || evt.type == 'mouseenter' || evt.type == 'mouseleave') {
+			xPos = evt.clientX;
+			yPos = evt.clientY;
+		}
+
 		var fontsize = 22 / 1200 * window.innerWidth;
 
 		szHtml += "<div id='tooltipDiv' style='position:absolute;left:" + xPos + "px;top:" + yPos + "px;font-family: arial narrow, system;font-size:" + fontsize + "px;color: #444;background: white;border: 0.5px solid black;border-radius: 5px'>";
@@ -190,6 +199,9 @@ window.ixmaps = window.ixmaps || {};
 	}
 
 	ixmaps.htmlgui_onItemClick = function (evt,szId) {
+		if (!evt){
+			return;
+		}
 		__fTooltipPinned = false;
 		__fTooltipPin = true;
 		ixmaps.fOnItemClicked = true;

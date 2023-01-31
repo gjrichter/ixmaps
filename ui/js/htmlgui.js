@@ -3046,6 +3046,11 @@ $Log: htmlgui.js,v $
 		ixmaps.legend.url = (typeof (legend) != "undefined") ? legend : ixmaps.legend.url;
 	};
 
+	ixmaps.showItemGrid = function(szTheme){
+		ixmaps.legend = ixmaps.legend || {};
+		ixmaps.legend.showItemGrid(szTheme);
+	};	
+	
 	/**
 	 * require
 	 * @param {String} szUrl the URL of the external script to add toi project * @return void

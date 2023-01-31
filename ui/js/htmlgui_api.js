@@ -2008,7 +2008,17 @@ $Log: htmlgui_api.js,v $
 		}
 	};
     
-    
+ 	/**
+	 * display a item grid of the theme
+	 * @param {String} szHTML the HTML code 
+	 * @return void
+	 */
+	ixmaps.showItemGrid = function(szTheme){
+		for ( a in ixmaps.embeddedApiA ){
+			ixmaps.embeddedApiA[a].showItemGrid(szTheme);
+		}
+	};
+   
 	// ---------------------------------------------------
 	//
 	// functions to synchronize two or more embedded maps
@@ -2607,6 +2617,10 @@ $Log: htmlgui_api.js,v $
 		setProject: function(szProject){
 			ixmaps.setProject(this.szMap,szProject);
 			return this;
+		},
+		
+		getProjectString: function(){
+			return ixmaps.getProjectString(this.szMap);
 		},
 
 

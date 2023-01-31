@@ -146,7 +146,7 @@ window.ixmaps = window.ixmaps || {};
 			window.document.getElementById("tooltipDiv").style.setProperty("background-color", "rgba(50,50,50,0.85)");
 			window.document.getElementById("tooltipDiv").style.setProperty("border-color", "#555");
 		} else {
-			window.document.getElementById("tooltipDiv").style.setProperty("background-color", "rgba(255,255,255,0.8)");
+			window.document.getElementById("tooltipDiv").style.setProperty("background-color", "rgba(255,255,255,0.9)");
 		}
 
 		// tooltip ready, return true!
