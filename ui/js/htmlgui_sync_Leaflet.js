@@ -367,6 +367,13 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			attribution: ".",
 			subdomains: ['otile1','otile2','otile3','otile4']
 		});
+		__addTileLayer("#", {
+			name: "transparent",
+			myname: "transparent",
+			minZoom: 0,
+			attribution: ".",
+			subdomains: ['otile1','otile2','otile3','otile4']
+		});
 
 		/** Stamen Design */
 
@@ -487,8 +494,12 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		// ----------------------
 		// set the active layer
 		// ----------------------
-
-		ixmaps.fMapType = ixmaps.fMapType || "Stamen - toner-lite";
+		
+		if ( !ixmaps.fMapType || !ixmaps.layers[ixmaps.fMapType] ){
+			ixmaps.message("leaflet map type \""+ixmaps.fMapType+"\" unknown! -> set to default: \"Stamen - toner-lite\"");
+			ixmaps.fMapType = "Stamen - toner-lite"; 
+		}
+		
 		LMap.addLayer(ixmaps.layers[ixmaps.fMapType]);
 
 		lastLeafletLayer = ixmaps.fMapType;
@@ -545,7 +556,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		return LMap.getZoom();
 	}
 	htmlMap_setZoom = function(nZoom){
-		return LMap.setZoom(nZoom,{animate:false});
+		return LMap.setZoom(nZoom,{animate:true});
 	}
 	htmlMap_getCenter = function(){
 		var center = LMap.getCenter();
@@ -622,6 +633,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		mapTypeTranslate ["grey"]		= "grey";
 		mapTypeTranslate ["white"]		= "white";
 		mapTypeTranslate ["dark"]		= "dark";
+		mapTypeTranslate ["transparent"]= "transparent";
 		mapTypeTranslate ["BW"]			= "Stamen - toner-lite";
 
 	htmlMap_setMapTypeId = function(szMapType){
@@ -637,7 +649,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			LMap.addLayer(ixmaps.layers[mapTypeTranslate[szMapType]||szMapType]);
 			lastLeafletLayer = mapTypeTranslate[szMapType]||szMapType;
 			// GR 05.03.2021 make sure something is visible while panning
-			if (lastLeafletLayer.match(/gray|white|black/)){
+			if (lastLeafletLayer.match(/gray|white|black|transparent/)){
 				ixmaps.panHidden = false;
 			}
 		} catch (e){return null;}

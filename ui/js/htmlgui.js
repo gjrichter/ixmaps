@@ -1757,7 +1757,7 @@ $Log: htmlgui.js,v $
 		// --------------------------
 		try {
 			$("#divloading").css("visibility", "hidden");
-			$("#ixmap").css("background", "#fff");
+			//$("#ixmap").css("background", "#fff");
 		} catch (e) {}
 
 		// call user defined method on map ready
@@ -2491,15 +2491,27 @@ $Log: htmlgui.js,v $
 	 * @return void
 	 */
 	ixmaps.setView = function (center, nZoom) {
-		// GR 15.08.2018 call 2 times needed (magick)
-		ixmaps.htmlgui_setCenterAndZoom({
-			lat: center[0],
-			lng: center[1]
-		}, nZoom);
-		ixmaps.htmlgui_setCenterAndZoom({
-			lat: center[0],
-			lng: center[1]
-		}, nZoom);
+		// GR 04.03.2023 view in object syntax
+		if ((typeof(center) != "array") && center.center && center.zoom ) {
+			ixmaps.htmlgui_setCenterAndZoom({
+				lat: center.center.lat,
+				lng: center.center.lng
+			}, center.normalizeoom);
+			ixmaps.htmlgui_setCenterAndZoom({
+				lat: center.center.lat,
+				lng: center.center.lng
+			}, center.zoom);
+		}else{
+			// GR 15.08.2018 call 2 times needed (magick)
+			ixmaps.htmlgui_setCenterAndZoom({
+				lat: center[0],
+				lng: center[1]
+			}, nZoom);
+			ixmaps.htmlgui_setCenterAndZoom({
+				lat: center[0],
+				lng: center[1]
+			}, nZoom);
+		}
 		ixmaps.htmlgui_synchronizeSVG(false);
 		return ixmaps;
 	};

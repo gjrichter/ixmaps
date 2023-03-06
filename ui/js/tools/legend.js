@@ -1123,6 +1123,9 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			var szFrameText = themeObj.szXaxisA[themeObj.nActualFrame];
 			$("#time-span").html(szFrameText);
 			$("#myRange").attr("value",actualFrame);
+			if ( (themeObj.nActualFrame >= (themeObj.nClipFrames-1)) && !themeObj.szFlag.match(/\bLOOP\b/)){
+				ixmaps.legend.toggleClipState(false);
+			}
 			return;
 		}
 
@@ -1246,6 +1249,9 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 			
 			ixmaps.legend.toggleClipState = function(state){
 				if (state){
+					if ( themeObj.nActualFrame >= themeObj.nClipFrames-1 ){
+						ixmaps.setThemeClipFrame(themeObj.szId,0);
+					}
 					ixmaps.startThemeClip(null);
 					$("#clipbutton").attr("href","javascript:ixmaps.legend.toggleClipState(false);");
 					$("#clipbuttonicon").removeClass("fa-play");

@@ -305,7 +305,7 @@ window.ixmaps = window.ixmaps || {};
 
 			// request chart from map 
 			// -----------------------
-			if (themeObj.szFlag.match(/BAR|STACKED/)){
+			if (themeObj.szFlag.match(/BAR/) && themeObj.szFlag.match(/STACKED/)){
 				themeObj.drawChart(window.document.getElementById("getchartmenutarget"), szItem, 60, "VALUES|XAXIS|NOSIZE|BOX|GRID");
 			} else
 			if (themeObj.szFlag.match(/CHART|COMPOSECOLOR|DOMINANT|SUBTHEME/)){
@@ -315,7 +315,7 @@ window.ixmaps = window.ixmaps || {};
 				for (var t = themesA.length-1; t >= 0; t--) {
 					var themeObj = themesA[t];
 					if (themeObj.szFlag.match(/CHART|COMPOSECOLOR/)){
-						themeObj.drawChart(window.document.getElementById("getchartmenutarget"), szItem, 30, "VALUES|XAXIS|ZOOM|BOX|GRID");
+						themeObj.drawChart(window.document.getElementById("getchartmenutarget"), szItem, 30, "VALUES|XAXIS|NORMSIZE|ZOOM|BOX|GRID");
 						break;
 					}
 				}
@@ -335,10 +335,12 @@ window.ixmaps = window.ixmaps || {};
 				
 				if (themeObj.szFlag.match(/(BAR)|PLOT|CHOROPLETH/)) {
 					width /= Math.max(1, (3 / themeObj.itemA[szItem].nValuesA.length));
+				} else
+				if (themeObj.szFlag.match(/(SYMBOL)|SEQUENCE/)) {
+					width = 100 + themeObj.itemA[szItem].nValuesA.length*30;	
 				} else {
 					width /= themeObj.szFlag.match(/PIE/) ? 2 : 3;
 				}
-				
 				height = width / SVGBox.width * SVGBox.height;
 				while (height > window.innerHeight / 3) {
 					width *= 0.9;

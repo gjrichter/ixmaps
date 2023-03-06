@@ -670,7 +670,7 @@ $Log: htmlgui_api.js,v $
      * @example ixmaps.setView("map1",[51.59898731096802,-0.33786544322673245],10);
 	 */
 	ixmaps.setView = function(szMap,center,nZoom){ 
-		__checkArguments(arguments,3,"setView()");
+		__checkArguments(arguments,2,"setView()");
 		this.dispatchToEmbeddedApi(szMap,"setView",[center,nZoom]);
 	};
 	/**

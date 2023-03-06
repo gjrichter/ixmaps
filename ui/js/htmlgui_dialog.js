@@ -639,9 +639,25 @@ $Log: htmlgui.js,v $
 			$( "#switchlegendbutton" ).css("border-color","#dddddd");
 
 			changeCss(".loading-text","background-color:rgba(255,255,255,0.5)");
+			
+		}else if ( szId.match(/transparent/i) ){
+			$("#ixmap").css({"background":"none"});
+			$("#gmap").css({"background":"none"});
+			$("#story_board").css({"background":"#ffffff"});
+
+			// GR 18.06.2019 change color of sidebar body, for legend left/right
+			try{
+				window.parent.window.parent.window.document.getElementById('sidebar').parentNode.parentNode.style.setProperty("background-color","#ffffff");
+			}
+			catch (e){}
+
+			$( "#switchlegendbutton" ).css("background-color","#D4DADC");
+			$( "#switchlegendbutton" ).css("border-color","#dddddd");
+
+			changeCss(".loading-text","background-color:rgba(255,255,255,0.5)");
 		}else{
-			$("#ixmap").css({"background":"white"});
-			$("#gmap").css({"background":"white"});
+			$("#ixmap").css({"background":"none"});
+			$("#gmap").css({"background":"none"});
 			$("#story_board").css({"background":"#ffffff"});
 			// GR 18.06.2019 change color of sidebar body, for legend left/right
 			try{
