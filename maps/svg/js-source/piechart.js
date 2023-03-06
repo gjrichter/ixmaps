@@ -357,7 +357,7 @@ DonutChart.prototype.realize = function(){
 	if ( this.szStyle.match(/STARBURST/) && this.szStyle.match(/POLAR/) ) {
 
 		var radius = Math.max(1,this.nRadInner + nMaxRadius/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
-		var c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:white;fill-opacity:0.85;stroke:#444444;stroke-width:1px;"); 
+		var c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:white;fill-opacity:0.25;stroke:#444444;stroke-width:1px;"); 
 		c.setAttributeNS(null,"tooltip","range "+String((this.nMaxValue||100)*0.75) +"-"+ String((this.nMaxValue||100)*1));
 		
 		var radius = Math.max(1,this.nRadInner + nMaxRadius75/100*this.partsA.length * (this.nRadOuter-this.nRadInner));

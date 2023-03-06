@@ -6396,19 +6396,21 @@ MapTheme.prototype.removeValues = function () {
  * get sorted value arrays for QUANTILE and calcolate mean and median
  * @return void
  */
-MapTheme.prototype.getMeanMedianQuantile = function () {
+MapTheme.prototype.getMeanMedianQuantile = function () { 
+															
 	// if already done, do nothing 
 	if (this.quantileA && this.quantileA.length) {
 		return;
 	}
-	for (var i = 0; i < this.szFieldsA.length; i++) {
+	// GR 09.02.2023 this.szFieldsA -> this.nMaxA (this.nMaxA must have been calculated by data loading)
+	for (var i = 0; i < this.nMaxA.length; i++) {
 		var quantileA = [];
 		var nSum = 0;
 		for (var a in this.itemA) {
 			quantileA.push(this.itemA[a].nValuesA[i]);
 			nSum += this.itemA[a].nValuesA[i];
 		}
-		if ((this.szFieldsA[i] != "$item$")) {
+		if (this.szFieldsA[i] && (this.szFieldsA[i] != "$item$")) {
 			quantileA.sort(this.sortUp);
 		}
 		var nMedianMember = Math.round(quantileA.length / 2);
@@ -6436,6 +6438,7 @@ MapTheme.prototype.realize = function () {
 			this.chartGroup = map.Dom.newGroup(map.Layer.layerNode, this.szThemesA[0]);
 			map.Layer.listA[this.szThemesA[0]] = new Map.Layer.Item(null);
 			map.Layer.listA[this.szThemesA[0]].szName = this.szThemesA[0];
+			this.fDone = true;
 			this.isChecked = true;
 		}
 		
@@ -6836,6 +6839,11 @@ MapTheme.prototype.realizeDone = function () {
 		if (this.szFlag.match(/\bPAUSE\b/)) {
 			this.removeDefinitionFromFlag("PAUSE");
 			this.fClipPause = true;
+		}
+		if (this.szFlag.match(/\bLAST\b/)) {
+			this.removeDefinitionFromFlag("LAST");
+			var last = (this.nClipFrames-1);
+			setTimeout(function(){map.Themes.setClipFrame(szId,last);},10);
 		}
 		if (this.clipTimeout) {
 			clearTimeout(this.clipTimeout);
@@ -9105,7 +9113,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 	// filter by min aggregation count
 	// -------------------------------------------------------
 	if (this.szMinAggregation) {
-
+		
 		// get media aggregation count
 		// used for minaggregation == 'auto'
 		var nCount = 0;
@@ -9115,7 +9123,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 			nCount++;
 		}
 		nMediaCount /= nCount;
-
+		
 		// filter by media aggregation count/2 or given minimum
 		for (a in this.itemA) {
 			if (this.itemA[a].nCount && (this.itemA[a].nCount < (this.nMinAggregation || Math.sqrt(nMediaCount)-1))) {
@@ -9230,7 +9238,7 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 	_TRACE("== done with js data loaded === ");
 
 	this.fAnalyze = true;
-	
+
 	return true;
 };
 
@@ -10868,8 +10876,7 @@ MapTheme.prototype.distributeValues = function () {
 
 		if (this.szFlag.match(/DOMINANT/) || this.szFlag.match(/OFFSETMEAN/) || this.szFlag.match(/OFFSETMEDIAN/) ||
 			this.szFlag.match(/DEVIATION/) || this.szFlag.match(/PLOTVAR/)) {
-
-			this.getMeanMedianQuantile();
+ 			this.getMeanMedianQuantile();
 			for (i = 0; i < this.szFieldsA.length; i++) {
 
 				var quantileA = [];
@@ -11513,7 +11520,6 @@ MapTheme.prototype.paintMap = function (startIndex) {
 									var dx = (map.Scale.nTrueMapScale*map.Scale.nZoomScale)/map.Scale.nNormalSizeScale;
 									nOpacity *= Math.max(0.3, (Math.min(1, 0.3 + 0.7 / Math.max(1, Math.log(map.Zoom.nZoom/dx)))));
 								}
-
 								paintShape.style.setProperty("fill-opacity", String(nOpacity), "");
 							}
 						}
@@ -15080,7 +15086,6 @@ MapTheme.prototype.chartMap = function (startIndex) {
 								nFontSize = Math.max(bBox.width / 10, map.Scale.normalX(6));
 							}
 							nFontSize *= this.nTextScale||this.nValueScale||1;
-							
 							var szTitle = this.itemA[a].szTitle;
 							try {
 								var szTitle = HTMLWindow.ixmaps.htmlgui_onInfoTitle(this.itemA[a].szTitle, this.itemA[a]);
@@ -15817,9 +15822,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 	}
 
 	// == PIE / DONUT  =======================================================================
-
+	
 	if (szFlag.match(/PIE/)) {
-
+		
 		if ((nMySum === 0) && !szFlag.match(/AUTOCOMPLETE/)) {
 			return null;
 		}
@@ -15960,165 +15965,176 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			nSize = Math.max(nSize, nChartSize / 2);
 		}
 
-		var donut = DonutCharts.newChart(SVGDocument, shapeGroup, 0, 0, map.Scale.normalX(nSize), 0);
-
-		ptNull.x = 0;
-		ptNull.y = map.Scale.normalY(nSize) + map.Scale.normalY(5);
-
-		donut.setStyle("flat");
-		donut.setLine("#555566");
-		donut.setLineWidth(map.Scale.normalX(this.nLineWidth || 0.1));
-		if (szFlag.match(/NOLINES/)) {
-			donut.setLine("none");
-		}
-		if (szFlag.match(/WHITELINES/)) {
-			donut.setLine("white");
-		}
-		if (this.szLineColor) {
-			donut.setLine(this.szLineColor);
-		}
-		if (szFlag.match(/3D/)) {
-			donut.setStyle("3D");
-
-			var nPow = 1 / 2;
-			if (szFlag.match(/P3/)) {
-				nPow = 1 / 3;
-			} else
-			if (szFlag.match(/P4/)) {
-				nPow = 1 / 4;
-			}
-			if (szFlag.match(/SIZE/) && !szFlag.match(/NORMSIZE/) && this.szSizeField && a && this.itemA[a]) {
-				nHeight = nHeight / Math.pow((this.nMaxSize), nPow) * Math.pow(this.itemA[a].nSize, nPow);
-			} else if (szFlag.match(/SIZE/) && !szFlag.match(/NORMSIZE/)) {
-				nHeight = nHeight / Math.pow((nRange), nPow) * Math.pow(nMySum, nPow);
-			}
-
-			if (szFlag.match(/ZOOM/)) {
-				nHeight *= map.Scale.nObjectScaling;
-				nHeight = nHeight / this.origSize * nSize;
-			}
-			ptNull.y *= 0.7;
-		}
-
-		if (szFlag.match(/VOLUME/)) {
-			donut.addStyle("VOLUME");
-		}
-
-		if (szFlag.match(/DONUT/)) {
-			if (szFlag.match(/3D/)) {
-				donut.setRadInner(map.Scale.normalX(nSize * 0.5));
-			} else
-			if (szFlag.match(/XTHIN/)) {
-				donut.setRadInner(map.Scale.normalX(nSize * 0.95));
-			} else
-			if (szFlag.match(/THIN/)) {
-				donut.setRadInner(map.Scale.normalX(nSize * 0.66));
-			} else
-			if (szFlag.match(/THICK/)) {
-				donut.setRadInner(map.Scale.normalX(nSize * 0.25));
-			} else {
-				donut.setRadInner(map.Scale.normalX(nSize * 0.42));
-			}
-		} else
-		if (szFlag.match(/CENTER/)) {
-			var radius = Math.sqrt(Math.pow(map.Scale.normalX(nSize), 2) / 100 * this.nCenterSize);
-			donut.setRadInner(radius);
-		}
-
-		if (szFlag.match(/STARBURST/)) {
-			donut.addStyle("STARBURST");
-			ptNull.y *= 0.8;
-		}
-		if (szFlag.match(/XLFLOWER/) || szFlag.match(/XLRAYS/)) {
-			donut.addStyle("XLRAYS");
-			ptNull.y *= 0.8;
-		} else
-		if (szFlag.match(/LFLOWER/) || szFlag.match(/LRAYS/)) {
-			donut.addStyle("LRAYS");
-			ptNull.y *= 0.8;
-		} else
-		if (szFlag.match(/XSFLOWER/) || szFlag.match(/XSRAYS/)) {
-			donut.addStyle("XSRAYS");
-			ptNull.y *= 0.8;
-		} else
-		if (szFlag.match(/SFLOWER/) || szFlag.match(/SRAYS/)) {
-			donut.addStyle("SRAYS");
-			ptNull.y *= 0.8;
-		} else
-		if (szFlag.match(/FLOWER/) || szFlag.match(/RAYS/)) {
-			donut.addStyle("RAYS");
-			ptNull.y *= 0.8;
-		}
-		if (szFlag.match(/SILENT/)) {
-			donut.addStyle("SILENT");
-		}
-		// GR 14.04.2011
-		if (szFlag.match(/AUTOCOMPLETE/)) {
-			donut.addStyle("AUTOCOMPLETE");
-			donut.szNoDataColor = this.szNoDataColor||"#eeeeee";
-		}
-		// GR 20.02.2014
-		if (szFlag.match(/BIGTOTOP/)) {
-			donut.addStyle("BIGTOTOP");
-		}
-		// GR 25.12.2014
-		if (szFlag.match(/NOROTATE/)) {
-			donut.addStyle("NOROTATE");
-		}
-		// GR 13.10.2018
-		if (szFlag.match(/ROTATE/)) {
-			donut.addStyle("ROTATE");
-		}
-		// GR 13.10.2018
-		if (szFlag.match(/SYMMETRIC/)) {
-			donut.addStyle("SYMMETRIC");
-		}
-		// GR 03.03.2018
-		if (szFlag.match(/HALF/)) {
-			donut.addStyle("HALF");
-			donut.addStyle("NOROTATE");
-		}
-		// GR 02.03.2019
-		if (szFlag.match(/DIRECTION/)) {
-			donut.addStyle("DIRECTION");
-		}
-		// GR 02.03.2019
-		if (szFlag.match(/POLAR/)) {
-			donut.addStyle("POLAR");
-		}
-
-		// for donuts, get max value and recalclate percentages
-		var nMaxI = 0;
-		var nMinI = 0;
-		var nMaxValue = 0;
-		if (szFlag.match(/DONUT/)) {
-			for (var i = 0; i < nPartsA.length; i++) {
-				if (nPartsA[i] > nPartsA[nMaxI]) {
-					nMaxI = i;
-				}
-				if (nPartsA[i] < nPartsA[nMinI]) {
-					nMinI = i;
-				}
-			}
-		}
-
-		if ( szFlag.match(/STARBURST/) ) {
-			for (var i = 0; i < nPartsA.length; i++) {
-				// gr 29.03.2020 make all STARBURST parts! negative -> 0
-				nPartsA[i] = Math.max(nPartsA[i],0);
-				nMaxValue = Math.max(nMaxValue,this.nMaxA[i]);
-			}
-			if ( szFlag.match(/\bSIZE\b/) ) {
-				donut.setMaxValue(this.nMaxValue||nMaxValue); 			
-			}else{
-				donut.setMaxValue(this.nNormalSizeValue||this.nMaxValue||nMaxValue); 			
-			}
+		var donutsA = [];
+		for ( var s=0; s<(this.nGridX||1); s++ ){
 			
+			var donut = DonutCharts.newChart(SVGDocument, shapeGroup, 0, 0, map.Scale.normalX(nSize), 0);
+			donut.ident = s;
+			
+			ptNull.x = 0;
+			ptNull.y = map.Scale.normalY(nSize) + map.Scale.normalY(5);
+
+			donut.setStyle("flat");
+			donut.setLine("#555566");
+			donut.setLineWidth(map.Scale.normalX(this.nLineWidth || 0.1));
+			if (szFlag.match(/NOLINES/)) {
+				donut.setLine("none");
+			}
+			if (szFlag.match(/WHITELINES/)) {
+				donut.setLine("white");
+			}
+			if (this.szLineColor) {
+				donut.setLine(this.szLineColor);
+			}
+			if (szFlag.match(/3D/)) {
+				donut.setStyle("3D");
+
+				var nPow = 1 / 2;
+				if (szFlag.match(/P3/)) {
+					nPow = 1 / 3;
+				} else
+				if (szFlag.match(/P4/)) {
+					nPow = 1 / 4;
+				}
+				if (szFlag.match(/SIZE/) && !szFlag.match(/NORMSIZE/) && this.szSizeField && a && this.itemA[a]) {
+					nHeight = nHeight / Math.pow((this.nMaxSize), nPow) * Math.pow(this.itemA[a].nSize, nPow);
+				} else if (szFlag.match(/SIZE/) && !szFlag.match(/NORMSIZE/)) {
+					nHeight = nHeight / Math.pow((nRange), nPow) * Math.pow(nMySum, nPow);
+				}
+
+				if (szFlag.match(/ZOOM/)) {
+					nHeight *= map.Scale.nObjectScaling;
+					nHeight = nHeight / this.origSize * nSize;
+				}
+				ptNull.y *= 0.7;
+			}
+
+			if (szFlag.match(/VOLUME/)) {
+				donut.addStyle("VOLUME");
+			}
+
+			if (szFlag.match(/DONUT/)) {
+				if (szFlag.match(/3D/)) {
+					donut.setRadInner(map.Scale.normalX(nSize * 0.5));
+				} else
+				if (szFlag.match(/XTHIN/)) {
+					donut.setRadInner(map.Scale.normalX(nSize * 0.95));
+				} else
+				if (szFlag.match(/THIN/)) {
+					donut.setRadInner(map.Scale.normalX(nSize * 0.66));
+				} else
+				if (szFlag.match(/THICK/)) {
+					donut.setRadInner(map.Scale.normalX(nSize * 0.25));
+				} else {
+					donut.setRadInner(map.Scale.normalX(nSize * 0.42));
+				}
+			} else
+			if (szFlag.match(/CENTER/)) {
+				var radius = Math.sqrt(Math.pow(map.Scale.normalX(nSize), 2) / 100 * this.nCenterSize);
+				donut.setRadInner(radius);
+			}
+
+			if (szFlag.match(/STARBURST/)) {
+				donut.addStyle("STARBURST");
+				ptNull.y *= 0.8;
+			}
+			if (szFlag.match(/XLFLOWER/) || szFlag.match(/XLRAYS/)) {
+				donut.addStyle("XLRAYS");
+				ptNull.y *= 0.8;
+			} else
+			if (szFlag.match(/LFLOWER/) || szFlag.match(/LRAYS/)) {
+				donut.addStyle("LRAYS");
+				ptNull.y *= 0.8;
+			} else
+			if (szFlag.match(/XSFLOWER/) || szFlag.match(/XSRAYS/)) {
+				donut.addStyle("XSRAYS");
+				ptNull.y *= 0.8;
+			} else
+			if (szFlag.match(/SFLOWER/) || szFlag.match(/SRAYS/)) {
+				donut.addStyle("SRAYS");
+				ptNull.y *= 0.8;
+			} else
+			if (szFlag.match(/FLOWER/) || szFlag.match(/RAYS/)) {
+				donut.addStyle("RAYS");
+				ptNull.y *= 0.8;
+			}
+			if (szFlag.match(/SILENT/)) {
+				donut.addStyle("SILENT");
+			}
+			// GR 14.04.2011
+			if (szFlag.match(/AUTOCOMPLETE/)) {
+				donut.addStyle("AUTOCOMPLETE");
+				donut.szNoDataColor = this.szNoDataColor||"#eeeeee";
+			}
+			// GR 20.02.2014
+			if (szFlag.match(/BIGTOTOP/)) {
+				donut.addStyle("BIGTOTOP");
+			}
+			// GR 25.12.2014
+			if (szFlag.match(/NOROTATE/)) {
+				donut.addStyle("NOROTATE");
+			}
+			// GR 13.10.2018
+			if (szFlag.match(/ROTATE/)) {
+				donut.addStyle("ROTATE");
+			}
+			// GR 13.10.2018
+			if (szFlag.match(/SYMMETRIC/)) {
+				donut.addStyle("SYMMETRIC");
+			}
+			// GR 03.03.2018
+			if (szFlag.match(/HALF/)) {
+				donut.addStyle("HALF");
+				donut.addStyle("NOROTATE");
+			}
+			// GR 02.03.2019
+			if (szFlag.match(/DIRECTION/)) {
+				donut.addStyle("DIRECTION");
+			}
+			// GR 02.03.2019
+			if (szFlag.match(/POLAR/) && (s == ((this.nGridX||1)-1)) ) {
+				donut.addStyle("POLAR");
+			}
+
+			// for donuts, get max value and recalclate percentages
+			var nMaxI = 0;
+			var nMinI = 0;
+			var nMaxValue = 0;
+			if (szFlag.match(/DONUT/)) {
+				for (var i = 0; i < nPartsA.length; i++) {
+					if (nPartsA[i] > nPartsA[nMaxI]) {
+						nMaxI = i;
+					}
+					if (nPartsA[i] < nPartsA[nMinI]) {
+						nMinI = i;
+					}
+				}
+			}
+
+			if ( szFlag.match(/STARBURST/) ) {
+				for (var i = 0; i < nPartsA.length; i++) {
+					// gr 29.03.2020 make all STARBURST parts! negative -> 0
+					nPartsA[i] = Math.max(nPartsA[i],0);
+					nMaxValue = Math.max(nMaxValue,this.nMaxA[i]);
+				}
+				if ( szFlag.match(/\bSIZE\b/) ) {
+					donut.setMaxValue(this.nMaxValue||nMaxValue); 			
+				}else{
+					donut.setMaxValue(this.nNormalSizeValue||this.nMaxValue||nMaxValue); 			
+				}
+
+			}
+			donutsA.push(donut);
 		}
 
 		var nSumPercent = 0;
+		var stacked = 0;
+		
 		for (var i = 0; i < (this.nClipParts ? Math.min(this.nClipParts, nPartsA.length) : nPartsA.length); i++) {
 
+			var nDonut = i%(this.nGridX||1);
+			var donut = donutsA[nDonut];
+						
 			var szLabel = "";
 			var nI = (i);
 			if (this.sortedIndex) {
@@ -16139,6 +16155,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			}
 
 			var szColor = a ? (this.itemA[a].szColor || this.colorScheme[nI]) : this.colorScheme[nI];
+			var szColor = a ? (this.itemA[a].szColor || this.colorScheme[nI%(this.nGridX||100000)]) : this.colorScheme[nI%(this.nGridX||1000000)];
 
 			// pie with 1 value but color classes
 			if (nPartsA.length == 1) {
@@ -16171,11 +16188,16 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 												  ,0
 												  ,this.formatValue(this.itemA[a].nCountA[nI], this.nValueDecimals || (this.itemA[a].nCountA[nI] < 1 ? 2 : 0), "ROUND") + szUnit, szLabel);
 				}else{
-					var donutPart = donut.addPart(nPartsA[nI]
+					if ( nDonut == 0 ){
+						nStacked = 0;
+					}
+					var donutPart = donut.addPart(nPartsA[nI]+(szFlag.match(/STACKED/)?nStacked:0)
 												  ,nHeight
 												  ,szColor
 												  ,0
 												  ,(this.szAggregation && this.szAggregation.match(/sum/)) ? this.formatValue(nPartsA[nI], this.nValueDecimals || (nPartsA[nI] < 1 ? 2 : 0), "ROUND") + szUnit : this.formatValue(nPartsA[nI], this.nValueDecimals || (nPartsA[nI] < 1 ? 2 : 0), "ROUND") + szUnit, szLabel);
+					
+					nStacked += nPartsA[nI];
 				}
 				donutPart.nClass = nI;
 
@@ -16198,15 +16220,19 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			}
 
 			nSumPercent += nPartsA[nI];
+			
+			// GR 09.11.2019 donut with count or size == 1 --> bubble
+			if (donut.partsA.length < 2 && (this.itemA[a].nCount == 1)) {
+				donut.nRadInner = 0;
+				//donut.nRadOuter *= 0.85;
+			}
 		}
 
-		// GR 09.11.2019 donut with count or size == 1 --> bubble
-		if (donut.partsA.length < 2 && (this.itemA[a].nCount == 1)) {
-			donut.nRadInner = 0;
-			//donut.nRadOuter *= 0.85;
-		}
 
-		donut.realize();
+		//donut.realize();
+		for ( var s=(this.nGridX||1)-1; s>=0; s-- ){
+			donutsA[s].realize();
+		}
 
 		if (szFlag.match(/CENTER/) && !szFlag.match(/DONUT/)) {
 			var nRadius = Math.sqrt(Math.pow(map.Scale.normalX(nSize), 2) / 100 * this.nCenterSize);
@@ -16239,7 +16265,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			var newText = map.Dom.newText(shapeGroup, 0, nFontSize * 0.35, "font-family:arial;font-size:" + nFontSize + "px;text-anchor:middle;fill:" + szTextColor + ";opacity:" + nOpacity + ";stroke:none;pointer-events:none", szText);
 		}
 
-		if (szFlag.match(/VALUES/) &&
+		if (szFlag.match(/VALUES/) && !szFlag.match(/STACKED/) &&
 			(szFlag.match(/ZOOM/) || !this.fHideValues)) {
 			// GR check possible fontsize here, if to small, don't create inline text
 			var nFontSize = Math.min(nSize * 0.8, nSize * (3.4 / (donut.partsA[0] ? donut.partsA[0].szText.length : 1)));
@@ -17539,7 +17565,6 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			// b) symbolsize equals value
 			// --------------------------
 			else {
-
 				var nMaxRadius = map.Scale.normalX(nChartSize / 2);
 				var nMaxValue = this.nNormalSizeValue || nAllMaxValue;
 
@@ -18453,8 +18478,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 													(left) + ',' + (-s + nScale * nYStep) + ' z', "fill:#d8d8dd;fill-opacity:" + nBgOpacity + ";stroke:none;");
 												nBgOpacity -= 0.3;
 											}
-                                            if (sy === 0){
-                                                map.Dom.newShape('line', gridGroup, left, -sy, right, -sy, "stroke:#888888;stroke-opacity:0.5;stroke-width:" + map.Scale.normalX(0.05*nPlotScale)+ ";");
+                                            if (sy === (-nMinValue*nScale)){
+                                                map.Dom.newShape('line', gridGroup, left, -sy, right, -sy, "stroke:#444444;stroke-opacity:1;stroke-width:" + map.Scale.normalX(0.05*nPlotScale)+ ";");
                                             }else{
                                                 map.Dom.newShape('line', gridGroup, left, -sy, right, -sy, "stroke:#888888;stroke-opacity:0.4;stroke-width:" + (map.Scale.normalX(0.05*nPlotScale)) + ";stroke-dasharray:"+(6*nPlotScale)+" "+(3*nPlotScale)+";");
                                             }
@@ -18568,9 +18593,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 										if (szFlag.match(/AREA/)) {
 											plotShape = map.Dom.newShape('path', plotGroup, 'M' + (this.plot_last_position[yi].x - 2) + ',' + (this.plot_last_position[yi].y) +
 												' L ' + (nAxis) + ',' + ((-nPValue) * nScale) + ' ' +
-												(nAxis) + ',' + ((-nPValue + nValue - nMinValue) * nScale) + ' ' +
+												(nAxis) + ',' + ((-nPValue + nValue) * nScale) + ' ' +
 												(this.plot_last_position[yi].x - 2) + ',' +
-												(this.plot_last_last_position[yi - 1] ? this.plot_last_last_position[yi - 1].y : 0) +
+												(this.plot_last_last_position[yi - 1] ? this.plot_last_last_position[yi - 1].y : (nMinValue * nScale)) +
 												' z',
 												"fill:" + szColor + ";fill-opacity:" + (this.fillOpacity || 1) + ";");
 											if (plotShape) {
@@ -18628,7 +18653,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 										}
 									}
 									if (szFlag.match(/LOLLIPOP/) && nValue) {
-										plotShape = map.Dom.newShape('line', plotGroup, nAxis, 0, nAxis, (-nPValue) * nScale, "stroke:" + (szColor) + ";stroke-width:" + map.Scale.normalX(3) + ";stroke-linecap:round;");
+										plotShape = map.Dom.newShape('line', plotGroup, nAxis, (nMinValue * nScale), nAxis, (-nPValue) * nScale, "stroke:" + (szColor) + ";stroke-width:" + map.Scale.normalX(3) + ";stroke-linecap:butt;");
 										if (plotShape) {
 											plotShape.setAttributeNS(szMapNs, "value", String(nValue));
 											plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
@@ -18636,13 +18661,38 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 										}
 									}
 									if (szFlag.match(/LASTPOP/) && nValue && (i >= nMaxI-(this.nGridX||1)) ) {
-										plotShape = map.Dom.newShape('circle', plotGroup, nAxis, (-nPValue) * nScale, map.Scale.normalX(this.nLineWidth*1.5), "fill:" + szColor + ";stroke:" + szLineColor + ";stroke-width:" + nLineWidth + ";");
+										plotShape = map.Dom.newShape('circle', plotGroup, nAxis, (-nPValue) * nScale, map.Scale.normalX((this.nLineWidth||5)*(this.nMarkerSize||1.5)), "fill:" + szColor + ";stroke:" + szLineColor + ";stroke-width:" + nLineWidth + ";");
 										if (plotShape) {
 											plotShape.setAttributeNS(szMapNs, "value", String(nValue));
 											//plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
 											plotShape.setAttributeNS(szMapNs, "time", String(uTime));
 										}
 									}
+									
+									if (plotShape && this.szFlag.match(/\bLASTARROW\b/) && nValue && (i >= nMaxI-(this.nGridX||1))) {
+										var arrowId = "ArrowMarker" + Math.random();
+										var tmpDefs = map.Dom.newNode('defs', plotGroup);
+										var nP = Math.min(5, 2.5 + (100 / (((this.nLineWidth||1) / this.nChartGroupScale)))) * (this.nMarkerSize || 3);
+										console.log(nP);
+										var myMarker = map.Dom.constructNode('marker', tmpDefs, {
+											"id": arrowId,
+											"markerWidth": nP,
+											"markerHeight": nP,
+											"refX": nP / 1.7,
+											"refY": nP / 2,
+											"orient": "auto",
+											"markerUnits": "strokeWidth"
+										});
+										var myMarkerShape = map.Dom.constructNode('path', myMarker, {
+											"d": "M0," + nP + " L" + nP + "," + nP / 2 + " L0,0 Z",
+											"style": "fill:" + szColor + ";opacity:" + (1) + ";stroke:none;stroke-width:0.03"
+										});
+										plotShape.setAttributeNS(null, "marker-end", "url(#" + arrowId + ")");
+									}
+									
+									
+									
+									
 									if (szFlag.match(/PLOTVAR/)) {
 										var nMean = szFlag.match(/MEDIAN/) ? this.nMedianA[nIndex] : this.nMeanA[nIndex];
 										nMean -= nMinValue;
@@ -18719,28 +18769,36 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 										if (this.plot_last_position[yi]) {
 											if (szFlag.match(/PLOTVAR/)) {
 												plotShape = map.Dom.newShape('line', shapeGroup, this.plot_last_position[yi].x, this.plot_last_position[yi].y, nAxis, (-nPValue) * nScale, "stroke:" + szColor + ";stroke-width:" + map.Scale.normalX(2) + ";");
-												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
-												plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
-												plotShape.setAttributeNS(szMapNs, "time", String(uTime));
-												plotShape.parentNode.insertBefore(plotShape, plotShape.parentNode.firstChild);
+												if (plotShape){
+													plotShape.setAttributeNS(szMapNs, "value", String(nValue));
+													plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
+													plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+													plotShape.parentNode.insertBefore(plotShape, plotShape.parentNode.firstChild);
+												}
 
 												plotShape = map.Dom.newShape('line', shapeGroup, this.plot_last_position[yi].x - 40, this.plot_last_position[yi].y, this.plot_last_position[yi].x + 40, this.plot_last_position[yi].y, "stroke:" + szColor + ";stroke-width:" + map.Scale.normalX(this.nLineWidth || 3) + ";");
-												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
-												plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
-												plotShape.setAttributeNS(szMapNs, "time", String(uTime));
-												plotShape.parentNode.insertBefore(plotShape, plotShape.parentNode.firstChild);
+												if (plotShape){
+													plotShape.setAttributeNS(szMapNs, "value", String(nValue));
+													plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
+													plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+													plotShape.parentNode.insertBefore(plotShape, plotShape.parentNode.firstChild);
+												}
 
 												plotShape = map.Dom.newShape('line', shapeGroup, nAxis, 0, nAxis, -this.nPlotHeight, "stroke:#dddddd;stroke-width:" + map.Scale.normalX(0.25) + ";");
-												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
-												plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
-												plotShape.setAttributeNS(szMapNs, "time", String(uTime));
-												plotShape.parentNode.insertBefore(plotShape, plotShape.parentNode.firstChild);
+												if (plotShape){
+													plotShape.setAttributeNS(szMapNs, "value", String(nValue));
+													plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
+													plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+													plotShape.parentNode.insertBefore(plotShape, plotShape.parentNode.firstChild);
+												}
 											} else {
 												plotShape = map.Dom.newShape('line', shapeGroup, this.plot_last_position[yi].x, this.plot_last_position[yi].y, nAxis, (-nPValue) * nScale, "stroke:" + szColor + ";stroke-width:" + map.Scale.normalX(this.nLineWidth || 3) + ";");
-												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
-												plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
-												plotShape.setAttributeNS(szMapNs, "time", String(uTime));
-												shapeGroup.insertBefore(plotShape, this.plot_last_shape[yi]);
+												if (plotShape){
+													plotShape.setAttributeNS(szMapNs, "value", String(nValue));
+													plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
+													plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+													shapeGroup.insertBefore(plotShape, this.plot_last_shape[yi]);
+												}
 											}
 										}
 										this.plot_last_last_position[yi] = this.plot_last_position[yi] || new point(0, 0);
@@ -18762,24 +18820,32 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 										var nMean = szFlag.match(/MEDIAN/) ? this.nMedianA[nIndex] : this.nMeanA[nIndex];
 										nMean -= nMinValue;
 
-										plotShape = map.Dom.newShape('line', gridGroup, nAxis, -(nMean - this.nDeviationA[nIndex]) * nScale, nAxis, -(nMean + this.nDeviationA[nIndex]) * nScale, "stroke:" + "#aaaaaa" + ";stroke-width:" + map.Scale.normalX(1) + ";");
-										plotShape.setAttributeNS(szMapNs, "value", String(nValue));
-										plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
-										plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+										plotShape = map.Dom.newShape('line', gridGroup, nAxis, -(nMean - this.nDeviationA[nIndex]) * nScale, nAxis, -(nMean + this.nDeviationA[nIndex]) * nScale, "stroke:" + "#444444" + ";stroke-width:" + map.Scale.normalX(1) + ";");
+										if (plotShape){
+											plotShape.setAttributeNS(szMapNs, "value", String(nValue));
+											plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
+											plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+										}
 
-										plotShape = map.Dom.newShape('line', gridGroup, nAxis - 40, -(nMean) * nScale, nAxis + 40, -(nMean) * nScale, "stroke:" + "#aaaaaa" + ";stroke-width:" + map.Scale.normalX(2) + ";");
-										plotShape.setAttributeNS(szMapNs, "value", String(nValue));
-										plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
-										plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+										plotShape = map.Dom.newShape('line', gridGroup, nAxis - 40, -(nMean) * nScale, nAxis + 40, -(nMean) * nScale, "stroke:" + "#444444" + ";stroke-width:" + map.Scale.normalX(2) + ";");
+										if (plotShape){
+											plotShape.setAttributeNS(szMapNs, "value", String(nValue));
+											plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
+											plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+										}
 										
-										plotShape = map.Dom.newShape('line', gridGroup, nAxis - 80, -(nMean - this.nDeviationA[nIndex]) * nScale, nAxis + 80, -(nMean - this.nDeviationA[nIndex]) * nScale, "stroke:" + "#aaaaaa" + ";stroke-width:" + map.Scale.normalX(1) + ";");
-										plotShape.setAttributeNS(szMapNs, "value", String(nValue));
-										plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
-										plotShape.setAttributeNS(szMapNs, "time", String(uTime));
-										plotShape = map.Dom.newShape('line', gridGroup, nAxis - 80, -(nMean + this.nDeviationA[nIndex]) * nScale, nAxis + 80, -(nMean + this.nDeviationA[nIndex]) * nScale, "stroke:" + "#aaaaaa" + ";stroke-width:" + map.Scale.normalX(1) + ";");
-										plotShape.setAttributeNS(szMapNs, "value", String(nValue));
-										plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
-										plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+										plotShape = map.Dom.newShape('line', gridGroup, nAxis - 80, -(nMean - this.nDeviationA[nIndex]) * nScale, nAxis + 80, -(nMean - this.nDeviationA[nIndex]) * nScale, "stroke:" + "#444444" + ";stroke-width:" + map.Scale.normalX(1) + ";");
+										if (plotShape){
+											plotShape.setAttributeNS(szMapNs, "value", String(nValue));
+											plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
+											plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+										}
+										plotShape = map.Dom.newShape('line', gridGroup, nAxis - 80, -(nMean + this.nDeviationA[nIndex]) * nScale, nAxis + 80, -(nMean + this.nDeviationA[nIndex]) * nScale, "stroke:" + "#444444" + ";stroke-width:" + map.Scale.normalX(1) + ";");
+										if (plotShape){
+											plotShape.setAttributeNS(szMapNs, "value", String(nValue));
+											plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
+											plotShape.setAttributeNS(szMapNs, "time", String(uTime));
+										}
 
 										map.Dom.newShape('line', gridGroup, nAxis, 0, nAxis, -this.nPlotHeight, "stroke:#dddddd;stroke-width:" + map.Scale.normalX(0.25) + ";");
 										if (this.plot_last_position[yi]) {
@@ -18790,7 +18856,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 										this.plot_last_position[yi] = new point(nAxis, (-nMean) * nScale);
 
 									} else if (szFlag.match(/BOX/)) {
-										map.Dom.newShape('line', gridGroup, nAxis, 0, nAxis, -this.nPlotHeight, "stroke:#dddddd;stroke-width:" + map.Scale.normalX(0.25) + ";");
+										map.Dom.newShape('line', gridGroup, nAxis, 0, nAxis, -this.nPlotHeight, "stroke:#aaaaaa;stroke-width:" + map.Scale.normalX(0.25) + ";");
 									}
 								}
 
@@ -18822,18 +18888,18 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			}
 		}
 		// if we have values, move to top
-		if (shapeTextGroup) {
+		if (shapeTextGroup && shapeTextGroup.parentNode) {
 			shapeTextGroup.parentNode.appendChild(shapeTextGroup);
 		}
 		// if we have one shape of a sequence defined as top, move it there
-		if (topShape) {
+		if (topShape && topShape.parentNode) {
 			topShape.parentNode.appendChild(topShape);
 		}
 		// also the text !
-		if (topText) {
+		if (topText && topText.parentNode) {
 			topText.parentNode.appendChild(topText);
 		}
-		if (topText2) {
+		if (topText2 && topText2.parentNode) {
 			topText2.parentNode.appendChild(topText2);
 		}
 		// also lines on top of the chart !
@@ -19581,14 +19647,18 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				}
 				// GR 07.08.2008 new axis text
 				// ---------------------------
-				if (szFlag.match(/AXIS/) && !szFlag.match(/STACKED/) && (this.szLabelA || this.szXaxisA)) {
-					var xi = nIndex;
+				if (szFlag.match(/AXIS/) && !(szFlag.match(/STACKED/)&&nIndex%(this.nGridX||1)) && (this.szLabelA || this.szXaxisA)) {
+					var xi = nIndex/(this.nGridX||1);
+					console.log(nIndex+','+xi);
 					var szAxisText = (this.szXaxisA ? this.szXaxisA[xi] : (this.szLabelA ? this.szLabelA[xi] : " ")) || " ";
-					var nAxisTextSize = nTextSize * 0.8;
+					var nAxisTextSize = nWidth * 0.5;
 					if (szFlag.match(/\bUP\b/)) {
-						nAxisTextSize = nTextSize * 0.9;
+						nAxisTextSize = nWidth * 0.6;
 					}
-
+					if (szFlag.match(/\bHORZ\b/)) {
+						nAxisTextSize = nWidth * 0.9;
+					}
+					
 					var newText = map.Dom.newText(barShape, 0, 0, szTextStyle + ";fill:#666666;text-anchor:end;font-size:" + (nAxisTextSize) + "px", " " + szAxisText + " ");
 
 					var ptPos = new point(map.Scale.normalX(0.8), nWidth / 2 + nTextSize / 5 * 2);
