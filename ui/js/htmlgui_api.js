@@ -162,7 +162,7 @@ $Log: htmlgui_api.js,v $
 			}else
 			if ( e.data.match(/registerMap/) ){
 				var szMap = e.data.split(':')[1] || "map";
-				ixmaps.embeddedApiA[szMap] = {"crossdomain":true};
+				ixmaps.embeddedApiA[szMap].crossdomain = true;
 			}else
 			if ( e.data.match(/waitForMap/) ){
 				var szMap = e.data.split(':')[1] || "map"; 
