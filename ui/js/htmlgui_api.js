@@ -1335,8 +1335,8 @@ $Log: htmlgui_api.js,v $
 	 * @param {Array} position x,y screen position for the modal dialog
 	 * @void
 	 */
-	ixmaps.popupThemeFacets = function(szMap,position){
-		this.dispatchToEmbeddedApi(szMap,"popupThemeFacets",[position]);
+	ixmaps.popupThemeFacets = function(szMap,position,columns){
+		this.dispatchToEmbeddedApi(szMap,"popupThemeFacets",[position,columns]);
 	};
 	/**
 	 * show actual map in viewer
@@ -1609,6 +1609,25 @@ $Log: htmlgui_api.js,v $
 	 */
 	ixmaps.setMapTypeId = function(szMap,szId){
 		this.dispatchToEmbeddedApi(szMap,"setMapTypeId",[szId]);
+	};
+	/**
+	 * set (base)map type by name; change the (HTML) basemap into type defined for the basemap provider (leaflet,google...) 
+	 * @param {String} szMap the map name [optional] 
+	 * @param {String} szId the map type id to be set (e.g. 'satellite');
+	 * @return void
+	 */
+	ixmaps.setBasemap = function(szMap,szId){
+		this.dispatchToEmbeddedApi(szMap,"setMapTypeId",[szId]);
+	};
+	/**
+	 * set (base)map opacity; "relative" or "absolute"
+	 * @param {String} szMap the map name [optional] 
+	 * @param {Number} nOpacity the absolute bor relative opacity value (0...1)
+	 * @param {String} szMethod "relative" or "absolute"
+	 * @return void
+	 */
+	ixmaps.setBasemapOpacity = function(szMap,nOpacity,szMethod){
+		this.dispatchToEmbeddedApi(szMap,"setBasemapOpacity",[nOpacity,szMethod]);
 	};
 	/**
 	 * @deprecated old function call
@@ -2835,7 +2854,12 @@ $Log: htmlgui_api.js,v $
 	 * @param {String} [szLayer] the name of a layer to define or to refer
 	 * @return A new ixmaps.themeConstruct instance
 	 */
-	ixmaps.layer = function(szLayer){
+	ixmaps.layer = function(szLayer,callback){
+		if ( callback ){
+			var layer = new ixmaps.themeConstruct(this.szMap,szLayer);
+			callback(layer);
+			return layer.json();
+		}
 		return new ixmaps.themeConstruct(this.szMap,szLayer);
 	}
 

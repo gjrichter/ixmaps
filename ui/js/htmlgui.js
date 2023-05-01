@@ -927,9 +927,14 @@ $Log: htmlgui.js,v $
 			ixmaps.embeddedSVG.window.map.toggleOpacity();
 		} catch (e) {}
 	};
-	ixmaps.setHTMLMapOpacity = function (nValue, szMode) {
-		var nOpacity = Number($(this.gmapDiv).css("opacity") || 1);
-		nOpacity += nValue;
+	ixmaps.setBasemapOpacity = function (nOpacity, szMode) {
+		ixmaps.setHTMLMapOpacity(nOpacity, szMode);
+	}
+	ixmaps.setHTMLMapOpacity = function (nOpacity, szMode) {
+		if (szMode == "relative"){
+			nOpacity = Number($(this.gmapDiv).css("opacity") || 1);
+			nOpacity += nValue;
+		}
 		$(this.gmapDiv).css("opacity", String(nOpacity));
 	};
 

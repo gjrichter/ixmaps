@@ -311,7 +311,8 @@ $Log: htmlgui.js,v $
 		window.idialog = this.openDialog(null,'configurator','./tools/theme_configurator.html','Theme Configuator',position||'10,10',450,660);
 	};
 
-	ixmaps.popupThemeFacets = function(position){
+	ixmaps.popupThemeFacets = function(position,columns){
+		ixmaps.themeFacetColumns = columns;
 		window.idialog = this.openDialog(null,'facets','./tools/theme_facets.html','Theme Facets',position||'10,10',450,660);
 	};
 
