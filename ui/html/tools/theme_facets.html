@@ -89,6 +89,10 @@
 			<button id="btn-only-active" type="button" class="btn btn-default" onclick="$('.facet').hide();">active</button>
 			<button id="btn-all"         type="button" class="btn btn-default" onclick="$('.facet').show();">all</button>
 		</div>
+		<div id="facets-counts-values" class="btn-group" style="margin-top:0.8em;margin-bottom:0em;display:none">
+			<button id="btn-count" type="button" class="btn btn-default" onclick="ixmaps.data.fShowFacetValues = false;ixmaps.htmlgui_onZoomAndPan()">by counts</button>
+			<button id="btn-values" type="button" class="btn btn-default" onclick="ixmaps.data.fShowFacetValues = true;ixmaps.htmlgui_onZoomAndPan()">by values</button>
+		</div>
 
 		<div id="facetDiv" style="margin-bottom:1em;width:100%">
 			<h2 style="padding:0.2em 0.5em;background:#dddddd;border-radius:5px;color:white">generating facets ...<img src='../../resources/images/loading_blue.gif' style='display:block;margin:0.2em auto;height:64px'></h2>
@@ -125,6 +129,9 @@
 		}
 
 		ixmaps.initialized = true;
+		
+		ixmaps.data = ixmaps.data || {};
+		ixmaps.data.fShowFacetValues = true;
 
 		// -----------------------------------------------
 		// refresh theme on zoom and pan ! 
@@ -154,6 +161,7 @@
 				$("#facets").html("<h3>...nessun tema da filtrare!</h3>");
 				return;
 			}
+			
 			// theme data
 			// ------------------------------------
 			var szFilter = objThemeDefinition.style.filter;
@@ -234,6 +242,13 @@
 		else{
 			nValue = Math.round(nValue*nClipDecimal)/nClipDecimal;
 		}
+		
+		// GR 28.04.2023 test again !
+		if (!isFinite(nValue)){
+			return String(nValue);
+		}
+		
+		
 		// format numbers > 1000
 		if ( 0 && (nValue < 1000) ){
 			return String(nValue);

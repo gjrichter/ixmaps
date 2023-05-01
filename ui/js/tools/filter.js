@@ -570,10 +570,10 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 							// how often is the value in the column
 							var nCount = facetsA[i].valuesCount ? facetsA[i].valuesCount[facetsA[i].values[ii]] : null;
-                            var nMaxCount = facetsA[i].nCount;
+                            var nMaxCount = facetsA[i].nValuesSum || facetsA[i].nCount;
                             
 							var bgColor = "#eeeeee";
-							var szCount = String(nCount || "");
+							var szCount = ixmaps.__formatValue(nCount, 0, "BLANK") + " " + (ixmaps.data.fShowFacetValues?(objTheme.szUnits||""):""); //String(nCount || "");
 
 							if ((objThemeDefinition.field == facetsA[i].id)) {
 								bgColor = objTheme.colorScheme[objTheme.nStringToValueA[facetsA[i].values[ii]] - 1];
@@ -675,7 +675,7 @@ window.ixmaps.data = window.ixmaps.data || {};
             var themesA = ixmaps.getThemes();
             if (themesA.length > 1){
                 for ( i in themesA ){
-                    if ( !themesA[i].szFlag.match(/POSITION|FEATURE/) ){
+                    if ( themesA[i].fDone && themesA[i].fVisible && !themesA[i].szFlag.match(/POSITION|FEATURE/) ){
                         szThemeId = themesA[i].szId;
                         break;
                     }
@@ -749,8 +749,38 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 		var a, u;
 		var fields = mydata.columnNames();
+		
+		// GR 30.04.2023 new make values instead of counts id sizefield is defined
+		var v = null;
+		if (objThemeDefinition.style.sizefield) {
+			if (ixmaps.data.fShowFacetValues) {
+				v = mydata.column(objThemeDefinition.style.sizefield).values();
+			}
+			$("#facets-counts-values").show();
+		}
 
 		for (var i = 0; i < fields.length; i++) {
+			
+			// GR 30/03/2023 new columns filter
+			//
+			if ( ixmaps.themeFacetColumns ){
+				var doFacet = false;
+				if (typeof(ixmaps.themeFacetColumns) === 'string') {
+					if (fields[i] == ixmaps.themeFacetColumns) {
+						doFacet = true;
+					}
+				}else
+				if (typeof(ixmaps.themeFacetColumns) === 'object') {
+					for (var c in ixmaps.themeFacetColumns){
+						if (fields[i] == ixmaps.themeFacetColumns[c]) {
+							doFacet = true;
+						}
+					}
+				}
+				if (!doFacet) {
+					continue;
+				}
+			} 
 
 			a = mydata.column(fields[i]).values();
 
@@ -862,16 +892,17 @@ window.ixmaps.data = window.ixmaps.data || {};
 			// if less than 50 unique values, make text or number facet
 			// --------------------------------------------------------
 
-			if (u.length < 50 && !__rangesA[fields[i]] && !fNumeric) {
+			if (u.length < 500 && !__rangesA[fields[i]] && !fNumeric) {
 
 				console.log("less than 50 values");
-
 
 				// count values
 				var valuesCount = {};
 				var nCount = 0;
+				var nValuesSum = 0;
 				a.forEach(function (x) {
-					valuesCount[x] = (valuesCount[x] || 0) + 1;
+					valuesCount[x] = (valuesCount[x] || 0) + (v?Number(v[nCount]):1);
+					nValuesSum += (v?Number(v[nCount]):1);
                     nCount++;
 				});
 
@@ -893,6 +924,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 				facet.id = fields[i];
 				facet.values = u;
 				facet.nCount = nCount;
+				facet.nValuesSum = nValuesSum;
 				facet.valuesCount = valuesCount;
 				facet.uniqueValues = u.length;
 
@@ -946,14 +978,17 @@ window.ixmaps.data = window.ixmaps.data || {};
 						facet.values = u;
 						var valuesCount = {};
 						var nCount = 0;
+						var nValuesSum = 0;
 						a.forEach(function (x) {
-							valuesCount[x] = (valuesCount[x] || 0) + 1;
-                            nCount++;
+							valuesCount[x] = (valuesCount[x] || 0) + (v?Number(v[nCount]):1);
+  							nValuesSum += (v?Number(v[nCount]):1);
+                          nCount++;
 						});
 						u.sort(function (a, b) {
 							return ((valuesCount[a] < valuesCount[b]) ? 1 : -1);
 						});
 						facet.nCount = nCount;
+						facet.nValuesSum = nValuesSum;
 						facet.valuesCount = valuesCount;
 						facet.uniqueValues = u.length;
 					}
