@@ -791,6 +791,10 @@ Map.Zoom.prototype.doZoomMapToArea = function(rectArea){
 	// 		map.Dom.newShape('line',objectGroup,rectArea.x,rectArea.y,rectArea.x+rectArea.width,rectArea.y+rectArea.height,"stroke:black;stroke-width:20;fill:none")
 	// 		map.Dom.newShape('line',objectGroup,rectArea.x,rectArea.y+rectArea.height,rectArea.x+rectArea.width,rectArea.y,"stroke:black;stroke-width:20;fill:none")
 	// 	}catch (e){	}
+	
+	if (!rectArea.width || !rectArea.height){
+		return;
+	}
 
 	this.fAreaSet = true;
 

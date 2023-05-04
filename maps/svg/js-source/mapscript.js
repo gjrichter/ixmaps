@@ -918,7 +918,7 @@ Map.prototype.loadMap = function(szUrl){
 };
 
 // create instance here 
-var thisversion = "0.91";
+var thisversion = "0.92";
 map = new Map();
 map.version = thisversion;
 
@@ -941,6 +941,12 @@ function initAll(evt,embedName){
 }
 var init=0;
 function delayedInitAll(evt,embedName){
+	
+	if ( (window.innerWidth <= 0) || (window.innerHeight <= 0) ){
+		console.log("window dimension is zero -> no map");
+		setTimeout("delayedInitAll(null,'"+embedName+"')",1000);
+		return;
+	}
 
 	if ( map.fInitializing ){
 		return;
@@ -2093,9 +2099,16 @@ Map.Scale.prototype.reset = function(){
 Map.Scale.prototype.setCanvasSize = function(x,y,width,height,szMethod){
 
 	_TRACE("--- setCanvasSize("+x+","+y+","+width+","+height+","+szMethod+")");
+	
+	if ( !width || !height ){
+		return false;
+	}
+	
+	this.nScaleX = 20;
+	this.nScaleY = 20;
 
 	var SVGViewBoxString = ""+ String(x) +" "+ String(y) +" "+ String(this.normalX(width)) +" "+ String(this.normalX(height)) +"";
-
+	
 	// new map width in svg coordinates - legend offset tolted
 	var newWidth  = (this.normalX(width)  - this.mapPosition.x);
 	var newHeight = (this.normalX(height) - this.mapPosition.y);
@@ -2188,6 +2201,7 @@ Map.Scale.prototype.resizeCanvas = function(x,y,width,height,szMethod){
 	try	{
 		map.Viewport.reformat();	
 		map.Themes.reformat();
+		map.Themes.redraw();
 		// GR 18.01.2013 do also this
 		map.Themes.actualizeActiveTheme(true);
 
