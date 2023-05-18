@@ -6118,6 +6118,8 @@ function MapTheme(szThemes, szFields, szField100, szFlag, colorScheme, szTitle, 
 	/** the items of the theme */
 	this.itemA = [];
 
+	/** flag: to indicate the if layer is switched on/off (may be by scale)*/
+	this.fVisible = true;
 	/** flag: if true, reload data always */
 	this.fDataCache = true;
 	/** flag: if true, don't load data */
@@ -6588,6 +6590,11 @@ MapTheme.prototype.realize_analyze = function () {
 	_TRACE("distributeValues ---->");
 	this.fDraw = this.distributeValues();
 	_TRACE("---> done");
+	
+	// if we have an error on this.distributeValues(), we must end the realizing
+	if (!this.fDraw){
+		this.realizeDone();
+	}
 
 	this.timeAggregating = new Date() - x;
 	//this.fDraw = true;
@@ -13499,9 +13506,10 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		// no values, no charts		
 		// --------------------				
 		if (!this.partsA) {
+			this.realizeDone();
 			return;
 		}
-		
+	
 		var a = 0;
 		startIndex = 0;
 		this.indexA = [];
@@ -15898,6 +15906,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		// GR 15.10.2014 new, last value == center part
 		// --> Donut with center (inner radius) == last value 
 		// GR 26.07.2016 center part variabile
+		this.nCenterValue = 0;
 		// --------------------------------------------------
 		if (szFlag.match(/CENTER/)) {
 			this.nCenter = 0;
@@ -16279,11 +16288,25 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		if (szFlag.match(/CENTER/) && !szFlag.match(/DONUT/)) {
 			var nRadius = Math.sqrt(Math.pow(map.Scale.normalX(nSize), 2) / 100 * this.nCenterSize);
 			var szColor = this.colorScheme[this.nCenter];
-			var circle = map.Dom.newShape('circle', shapeGroup, 0, 0, nRadius * 0.95, "fill:" + szColor + ";");
+			var circle = map.Dom.newShape('circle', shapeGroup, 0, 0, nRadius * 0.9, "fill:" + szColor + ";");
 			if (circle) {
 				circle.setAttributeNS(szMapNs, "class", String(this.nCenter));
 				circle.setAttributeNS(szMapNs, "tooltip", this.szLabelA ? (this.szLabelA[this.nCenter] + ": " + nPartsA[this.nCenter] + this.szUnit + "") : (nPartsA[this.nCenter] + this.szUnit));
 			}
+			// GR 29.12.2016 new
+			if ((szFlag.match(/GLOW/) && !szFlag.match(/ZOOM/)) &&
+				(!this.szGlowUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nGlowUpper)) &&
+				(!this.szGlowLower || (map.Scale.nTrueMapScale * map.Scale.nZoomScale >= this.nGlowLower))
+			) {
+				var newShapeBg1 = map.Dom.newShape('circle', shapeGroup, 0, 0, nRadius * 6, "fill:" + szColor + ";stroke:none;fill-opacity:0.05;pointer-events:none;");
+				if (newShapeBg1) {
+					newShapeBg1.setAttributeNS(szMapNs, "class", String(nCenter));
+				}
+				var newShapeBg2 = map.Dom.newShape('circle', shapeGroup, 0, 0, nRadius * 2, "fill:" + szColor + ";stroke:none;fill-opacity:0.1;pointer-events:none;");
+				if (newShapeBg2) {
+					newShapeBg2.setAttributeNS(szMapNs, "class", String(nCenter));
+				}
+			} 
 			if (szFlag.match(/CENTERVALUE/) || szFlag.match(/ZOOM/) || (szFlag.match(/VALUES/) && !this.fHideValues)) {
 				var szText = this.formatValue(this.nCenterValue, this.nValueDecimals || (((this.nCenterSize < 1) || (nMaxValue < 10)) ? 0 : 0), "ROUND") + (this.szUnit.length <= 5 ? this.szUnit : "");
 				var cColor = __maptheme_getChartColors(szColor);
@@ -17444,6 +17467,12 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 						// GR 10.05.2015 explicit size field
 						if (this.szSizeField && a && this.itemA[a]) {
+							if (szFlag.match(/FIXSIZE/)) {
+								nRadius = map.Scale.normalX(nChartSize / 2) / (this.nNormalSizeValue || 1);
+							} else
+							if (szFlag.match(/NOSIZE/)) {
+								nRadius = map.Scale.normalX(nChartSize / 2);
+							} else
 							if (szFlag.match(/SIZELOG/)) {
 								nRadius = Math.max(1, nRadius / Math.log(this.nNormalSizeValue || this.nMaxSize) * Math.log(this.itemA[a].nSize));
 							} else
@@ -17860,8 +17889,10 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							if ((!this.fShadow) && this.fOrigShadow) {
 								newShapeBg = map.Dom.newShape('circle', shapeGroup, map.Scale.normalX(0.5) + nRadius * 0.02, map.Scale.normalX(0.5) + nRadius * 0.02, nRadius * 1.02, "fill:#000000;stroke:none;opacity:" + 0.6 * (this.fillOpacity ? this.fillOpacity : 1));
 							}
+							newShapeBg1 = null;
+							newShapeBg2 = null;
 							// GR 29.12.2016 new
-							if ((szFlag.match(/GLOW/) && !szFlag.match(/ZOOM/)) &&
+							if ((szFlag.match(/GLOW/) && (i == nStartI) && !szFlag.match(/ZOOM/)) &&
 								(!this.szGlowUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nGlowUpper)) &&
 								(!this.szGlowLower || (map.Scale.nTrueMapScale * map.Scale.nZoomScale >= this.nGlowLower))
 							) {
@@ -17876,7 +17907,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 									newShapeBg2.setAttributeNS(szMapNs, "time", String(uTime));
 								}
 							} else
-							if ((szFlag.match(/AURA/) && !szFlag.match(/ZOOM/)) &&
+							if ((szFlag.match(/AURA/) && (i == nStartI) && !szFlag.match(/ZOOM/)) &&
 								(!this.szGlowUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nGlowUpper)) &
 								(!this.szGlowLower || (map.Scale.nTrueMapScale * map.Scale.nZoomScale >= this.nGlowLower))
 							) {

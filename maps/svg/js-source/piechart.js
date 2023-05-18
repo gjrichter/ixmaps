@@ -279,27 +279,27 @@ DonutChart.prototype.realize = function(){
 		if ( this.szStyle.match(/XLRAYS/) ){
 			nAngle = Math.min(nMaxAngle/4,nMaxAngle/this.partsA.length);
 			nGapAngle = nAngle*0.10*(this.szStyle.match(/HALF/)?0.5:1);
-			this.nRadInner = Math.max(35,this.nRadInner);
+			this.nRadInner = Math.max(5,this.nRadInner);
 		}else
 		if ( this.szStyle.match(/LRAYS/) ){
 			nAngle = Math.min(nMaxAngle/4,nMaxAngle/this.partsA.length);
 			nGapAngle = nAngle*0.20*(this.szStyle.match(/HALF/)?0.5:1);
-			this.nRadInner = Math.max(35,this.nRadInner);
+			this.nRadInner = Math.max(5,this.nRadInner);
 		}else
 		if ( this.szStyle.match(/XSRAYS/) ){
 			nAngle = Math.min(nMaxAngle/12,nMaxAngle/this.partsA.length);
 			nGapAngle = nAngle*0.40*(this.szStyle.match(/HALF/)?0.5:1);
-			this.nRadInner = Math.max(35,this.nRadInner);
+			this.nRadInner = Math.max(5,this.nRadInner);
 		}else
 		if ( this.szStyle.match(/SRAYS/) ){
 			nAngle = Math.min(nMaxAngle/10,nMaxAngle/this.partsA.length);
 			nGapAngle = nAngle*0.33*(this.szStyle.match(/HALF/)?0.5:1);
-			this.nRadInner = Math.max(35,this.nRadInner);
+			this.nRadInner = Math.max(5,this.nRadInner);
 		}else
 		if ( this.szStyle.match(/RAYS/) ){
 			nAngle = nMaxAngle/this.partsA.length; // Math.min(nMaxAngle/8,nMaxAngle/this.partsA.length);
 			nGapAngle = nAngle*0.35*(this.szStyle.match(/HALF/)?0.5:1);
-			this.nRadInner = Math.max(35,this.nRadInner);
+			this.nRadInner = Math.max(5,this.nRadInner);
 		}
 	}
 
@@ -337,7 +337,7 @@ DonutChart.prototype.realize = function(){
 			this.donutPartsA[i].nHeight = 0;
 		}
 		if ( this.szStyle.match(/STARBURST/) ){
-			this.donutPartsA[i].nRadOuter = Math.max(1,this.nRadInner + this.partsA[i].nPercent/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
+			this.donutPartsA[i].nRadOuter = Math.max(1,this.nRadInner + (Math.sqrt(this.partsA[i].nPercent*this.partsA.length)/10) * (this.nRadOuter-Math.sqrt(this.nRadInner)));
 		}
 		if (nStartAngle<=180 && nEndAngle >= 180 ){
 			nLastPart = i;
