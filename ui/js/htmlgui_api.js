@@ -1977,9 +1977,9 @@ $Log: htmlgui_api.js,v $
 	 * show the an about dialog 
 	 * @return void
 	 */
-	ixmaps.showAbout = function(){ 
+	ixmaps.showAbout = function(szUrl){ 
 		for ( a in ixmaps.embeddedApiA ){
-			ixmaps.embeddedApiA[a].showAbout();
+			ixmaps.embeddedApiA[a].showAbout(szUrl);
 		}
 	};
 

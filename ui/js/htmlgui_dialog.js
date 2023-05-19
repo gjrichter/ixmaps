@@ -327,7 +327,10 @@ $Log: htmlgui.js,v $
 		//ixmaps.openDialog(null, "tools", './tools/popuptools_line_v2.html', 'Tools', '10,10', "95%", 150);
 	};
 
-	ixmaps.showAbout= function(position){
+	ixmaps.showAbout= function(szUrl,position){
+		if ( szUrl ){
+			ixmaps.openDialog(null, "tools", szUrl, 'about', position||'100,100',"50%","500");
+		}
 		if ( ixmaps.loadedProject.metadata.about && ixmaps.loadedProject.metadata.about.length ) {
 			ixmaps.openDialog(null, "tools", ixmaps.loadedProject.metadata.about, 'about', position||'100,100',"50%","500");
 		}
