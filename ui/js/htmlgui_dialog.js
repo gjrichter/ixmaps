@@ -329,7 +329,7 @@ $Log: htmlgui.js,v $
 
 	ixmaps.showAbout= function(szUrl,position){
 		if ( szUrl ){
-			ixmaps.openDialog(null, "tools", szUrl, 'about', position||'100,100',"50%","500");
+			ixmaps.openDialog(null, "tools", szUrl, '', position||'0,0',"350","500");
 		}
 		if ( ixmaps.loadedProject.metadata.about && ixmaps.loadedProject.metadata.about.length ) {
 			ixmaps.openDialog(null, "tools", ixmaps.loadedProject.metadata.about, 'about', position||'100,100',"50%","500");
