@@ -6259,6 +6259,10 @@ function MapTheme(szThemes, szFields, szField100, szFlag, colorScheme, szTitle, 
 	this.style.setProperties = function(styleObj){
 		map.Themes.parseStyle(this.theme,styleObj);
 	}
+	/** GR 29.05.2023 create group for theme charts here, this will secure the layer sequence */
+	if (!this.szFlag.match(/CHOROPLETH/)){
+		this.createChartGroup(map.Layer.objectGroup);
+	}
 }
 /**
  * check the theme; check presence of theme layers
@@ -7259,14 +7263,17 @@ MapTheme.prototype.addItemValues = function (szId, nValuesA, nValue100, nValueSi
 	}
 
 	// handle size value
-	if (nValueSize && this.szSizeField) {
+	if (this.szSizeField) {
 		if (!isNaN(nValueSize) && isFinite(nValueSize)) {
 			this.itemA[szId].nSize = nValueSize;
 			this.nMinSize = Math.min(this.nMinSize, nValueSize);
 			this.nMaxSize = Math.max(this.nMaxSize, nValueSize);
 			this.nSumSize += nValueSize;
+		}else{
+			this.itemA[szId].nSize = 0;
 		}
 	}
+	
 	// handle alpha value
 	if (this.szAlphaField && (nValueAlpha != null) && !isNaN(nValueAlpha) && isFinite(nValueAlpha) ) {
 		if (this.__fDensityAlpha) {
@@ -7907,11 +7914,23 @@ MapTheme.prototype.loadValuesOfTheme = function (szThemeLayer) {
 			}
 
 			// handle explizit size field 
+			// GR 27.05.2023 bugfix 'undefined'
 			// ----------------------
 			var nValueSize = null;
-			if (this.szSizeField) {
-				nValueSize = __scanValue((this.objTheme.dbRecords[j][this.objTheme.nSizeFieldIndex]));
+			if (this.szSizeField && (this.szSizeField != "$item$")) {
+				nValueSize = this.objTheme.dbRecords[j][this.objTheme.nSizeFieldIndex];
+				nValueSize = this.valueMap ? this.valueMap[String(nValueSize)] || __scanValue(nValueSize) : __scanValue(nValueSize);
+				nValueSize = (isFinite(nValueSize) && !isNaN(nValueSize)) ? nValueSize : 0;
+				if (nValueSize === 0) {
+					continue;
+				}
+				if (nValueSize < 0 ) {
+					continue;
+				}
+			} else {
+				nValueSize = 1;
 			}
+			
 			// GR 22.09.2013
 			// handle explizit alpha field 
 			// ----------------------
@@ -17488,6 +17507,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								nRadius = nRadius / Math.sqrt(this.nNormalSizeValue || this.nMaxSize) * Math.sqrt(this.itemA[a].nSize);
 							}
 						}
+
 						var nMaxRadius = map.Scale.normalX(nChartSize / 2);
 						var nLineWidth = (this.nLineWidth || 1) * map.Scale.normalX(Math.min(nRadius / nMaxRadius, 1));
 						switch (szSymbol) {
@@ -18761,7 +18781,6 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 										var arrowId = "ArrowMarker" + Math.random();
 										var tmpDefs = map.Dom.newNode('defs', plotGroup);
 										var nP = Math.min(5, 2.5 + (100 / (((this.nLineWidth||1) / this.nChartGroupScale)))) * (this.nMarkerSize || 3);
-										console.log(nP);
 										var myMarker = map.Dom.constructNode('marker', tmpDefs, {
 											"id": arrowId,
 											"markerWidth": nP,
@@ -19737,7 +19756,6 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				// ---------------------------
 				if (szFlag.match(/AXIS/) && !(szFlag.match(/STACKED/)&&nIndex%(this.nGridX||1)) && (this.szLabelA || this.szXaxisA)) {
 					var xi = nIndex/(this.nGridX||1);
-					console.log(nIndex+','+xi);
 					var szAxisText = (this.szXaxisA ? this.szXaxisA[xi] : (this.szLabelA ? this.szLabelA[xi] : " ")) || " ";
 					var nAxisTextSize = nWidth * 0.5;
 					if (szFlag.match(/\bUP\b/)) {
