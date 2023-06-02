@@ -636,7 +636,13 @@ Map.Themes.prototype.newThemeByObj = function (themeObj) {
 	mapTheme.parent = this;
 	this.addTheme(mapTheme);
 	mapTheme.fRealize = true;
-
+	
+	/** GR 29.05.2023 create group for theme charts here, this will secure the layer sequence */
+	// -----------------------------------------------------------------------
+	if (!mapTheme.szFlag.match(/CHOROPLETH/)){
+		mapTheme.createChartGroup(map.Layer.objectGroup);
+	}
+	
 	// if there is data to load, do this first, and draw the theme on callback
 	// -----------------------------------------------------------------------
 	if (1 || !fAllIncluded) {
@@ -6258,10 +6264,6 @@ function MapTheme(szThemes, szFields, szField100, szFlag, colorScheme, szTitle, 
 	/** set theme.style properties  */
 	this.style.setProperties = function(styleObj){
 		map.Themes.parseStyle(this.theme,styleObj);
-	}
-	/** GR 29.05.2023 create group for theme charts here, this will secure the layer sequence */
-	if (!this.szFlag.match(/CHOROPLETH/)){
-		this.createChartGroup(map.Layer.objectGroup);
 	}
 }
 /**
