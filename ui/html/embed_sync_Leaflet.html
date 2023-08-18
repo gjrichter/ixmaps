@@ -704,6 +704,14 @@
 				if ($(document).getUrlParam('ui') == "hidden"){
 					ixmaps.switchUi(false);
 					ixmaps.fMapControls = false;
+					$("#onmapbuttondivzoom").hide();
+				}
+			}
+			if ($(document).getUrlParam('layout')) {
+				if ($(document).getUrlParam('layout') == "minimal"){
+					ixmaps.switchUi(false);
+					ixmaps.fMapControls = false;
+					$("#onmapbuttondivzoom").hide();
 				}
 			}
 

@@ -306,16 +306,16 @@ window.ixmaps = window.ixmaps || {};
 			// request chart from map 
 			// -----------------------
 			if (themeObj.szFlag.match(/BAR/) && themeObj.szFlag.match(/STACKED/)){
-				themeObj.drawChart(window.document.getElementById("getchartmenutarget"), szItem, 60, "VALUES|XAXIS|NOSIZE|BOX|GRID");
+				themeObj.getChart(window.document.getElementById("getchartmenutarget"), szItem, 60, "VALUES|XAXIS|NOSIZE|BOX|GRID");
 			} else
 			if (themeObj.szFlag.match(/CHART|COMPOSECOLOR|DOMINANT|SUBTHEME/)){
-				themeObj.drawChart(window.document.getElementById("getchartmenutarget"), szItem, 30, "VALUES|XAXIS|ZOOM|BOX|GRID");
+				themeObj.getChart(window.document.getElementById("getchartmenutarget"), szItem, 30, "VALUES|XAXIS|ZOOM|BOX|GRID");
 			}else{
 				var themesA = ixmaps.getThemes();
 				for (var t = themesA.length-1; t >= 0; t--) {
 					var themeObj = themesA[t];
 					if (themeObj.szFlag.match(/CHART|COMPOSECOLOR/)){
-						themeObj.drawChart(window.document.getElementById("getchartmenutarget"), szItem, 30, "VALUES|XAXIS|NORMSIZE|ZOOM|BOX|GRID");
+						themeObj.getChart(window.document.getElementById("getchartmenutarget"), szItem, 30, "VALUES|XAXIS|NORMSIZE|ZOOM|BOX|GRID");
 						break;
 					}
 				}
@@ -334,7 +334,7 @@ window.ixmaps = window.ixmaps || {};
 				var height = window.innerHeight / 2;
 				
 				if (themeObj.szFlag.match(/(BAR)|PLOT|CHOROPLETH/)) {
-					width /= Math.max(1, (3 / themeObj.itemA[szItem].nValuesA.length));
+					width /= Math.max(1, (5 / themeObj.itemA[szItem].nValuesA.length));
 				} else
 				if (themeObj.szFlag.match(/(SYMBOL)|SEQUENCE/)) {
 					width = 100 + themeObj.itemA[szItem].nValuesA.length*30;	
@@ -385,7 +385,7 @@ window.ixmaps = window.ixmaps || {};
 			// item is not a chart -> item is a map shape
 			// then we have to get the id for tyhe data in another way
 			//
-			if (!szId.match(/chart/i)) {
+			if (0 && !szId.match(/chart/i)) {
 				var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szId);
 				var szChartId = szId.match(/::/) ? szId : obj.parentNode.getAttribute("id");
 				var szIdA = szChartId.split("#");
@@ -433,7 +433,7 @@ window.ixmaps = window.ixmaps || {};
 						var value = dataObject[i];
 						var szValue = (isNaN(value) || value < 10000) ? String(value) : String(value);
 						if (szValue.match(/http:/) || szValue.match(/https:/)) {
-							if (szValue.match(/.jpg/) || szValue.match(/.png/)) {
+							if (szValue.match(/.jpg/) || szValue.match(/.jpeg/) || szValue.match(/.png/)) {
 								szValue = "<img  src='" + szValue + "' style='max-width:100%'>";
 								szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
 							} else {
@@ -495,28 +495,54 @@ window.ixmaps = window.ixmaps || {};
 			// list data
 			// ----------
 			if ( data ) {
-				szHtml += "<div style='font-size:18px;color:" + normal + ";min-width:150px;max-width:400px;>";
-				szHtml += "<div style='margin-left:auto>";
-				szHtml += "<table style='font-size:0.7em;spacing:0.5em;min-width:200px'>"
-				for (i in data) {
-					if ( i != "NIX" ) {
-						var szValue = data[i];
-						if (szValue.match(/http:/) || szValue.match(/https:/)) {
-							if (szValue.match(/.jpg/) || szValue.match(/.png/)) {
-								szValue = "<img  src='" + szValue + "' style='max-width:100%'>";
-								szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
-							} else {
-								szValue = "<a  href='" + szValue + "' target='_blank' style='width:100px'>" + szValue + "</a>";
-								szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
+				szHtml += "<table style='font-size:0.85em;spacing:0.5em;min-width:300px'>"
+
+				var dataObject = data;
+				for (i in dataObject) {
+					if ((i == "geometry")) {
+						continue;
+					}
+					if (themeObj.szDataFieldsA) {
+						var fShow = false;
+						for (var f = 0; f < themeObj.szDataFieldsA.length; f++) {
+							if (themeObj.szDataFieldsA[f] == i) {
+								fShow = true;
 							}
-						}else{	
-							szHtml += "<tr><td></td><td class='label' style='text-align:right;color:#aaaaaa'>" + i + "</td><td class='value' style='text-align:left'><b>" + data[i] + "</b></td></tr>";
 						}
+						if (!fShow){
+							continue;
+						}
+					}
+
+					var value = dataObject[i];
+					var szValue = (isNaN(value) || value < 10000) ? String(value) : String(value);
+					if (szValue.match(/http:/) || szValue.match(/https:/)) {
+						if (szValue.match(/.jpg/) || szValue.match(/.jpeg/) || szValue.match(/.png/)) {
+							szValue = "<img  src='" + szValue + "' style='max-width:100%'>";
+							szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
+						} else {
+							szValue = "<a  href='" + szValue + "' target='_blank' style='width:100px'>" + szValue + "</a>";
+							szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
+						}
+					} else {
+						if (!i.match(/------/)) {
+							if (0 && (i == themeObj.szColorField ||
+									(themeObj.szFieldsA.indexOf(i) >= 0))) {
+								var color = themeObj.colorScheme[themeObj.nStringToValueA[szValue] - 1];
+								szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' style='text-align:right;color:#888888;' ><b>" + (i.replace(/\_/g, " ")) + "</b></td><td class='value' style='color:" + "#000000" + ";background:" + color + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
+							} else
+							if (i == themeObj.szSizeField ||
+								i == themeObj.szSymbolField ||
+								(themeObj.szFieldsA.indexOf(i) >= 0)
+							) {
+								szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' style='text-align:right;color:#000000;' ><b>" + (i.replace(/\_/g, " ")) + "</b></td><td class='value' style='color:" + highLight + ";background:" + highLightBg + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
+							} else {
+								szHtml += "<tr><td></td><td class='label' style='text-align:right;color:#cccccc';' >" + (i.replace(/\_/g, " ")) + "</td><td class='value' style='color:" + normal + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
+							}
+						} else {}
 					}
 				}
 				szHtml += "</table>";
-				szHtml += "</div>";
-				szHtml += "</div>";
 			}
 		}
 		
@@ -669,6 +695,8 @@ window.ixmaps = window.ixmaps || {};
 			oldTarget = oldOpacity = null;
 		}
 		hideTooltip();
+		event.stopPropagation();
+		event.preventDefault();
 	};
 
 	/**

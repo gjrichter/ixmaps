@@ -512,7 +512,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 								szHtml += "<span style='background:" + colorA[sortA[i].color] + ";border:solid " + themeObj.szLineColor + " 1px;opacity:0.7;font-size:0.5em'>";
 							}
 						} else {
-							szHtml += "<span style='background:" + colorA[sortA[i].color] + ";opacity:0.7;font-size:1em;border-radius:1em;margin-right:1em;width:1em;'>";
+							szHtml += "<span style='background:" + colorA[sortA[i].color] + ";opacity:0.7;font-size:1em;border-radius:0.6em;margin-right:1em;width:1em;'>";
 						}
 
 						szHtml += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp";
@@ -646,7 +646,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
             }
         }
 
-        szHtml += "</table>";
+        szHtml += "</div>";
 
         return szHtml;
     };
@@ -1542,8 +1542,10 @@ window.ixmaps.legend = window.ixmaps.legend || {};
         }
 
         $("#css-modifier-container").remove();
+		
+		var nBasemapOpacity = $(this.gmapDiv).css("opacity");
 
-        if (szId.match(/dark/i) || szId.match(/black/i) || szId.match(/satellite/i)) {
+        if (nBasemapOpacity > 0.5 && (szId.match(/dark/i) || szId.match(/black/i) || szId.match(/satellite/i))) {
 
             changeCss(".map-legend-body", "color:#fff");
 

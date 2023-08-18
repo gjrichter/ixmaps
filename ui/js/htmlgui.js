@@ -938,6 +938,22 @@ $Log: htmlgui.js,v $
 		$(this.gmapDiv).css("opacity", String(nOpacity));
 	};
 
+	/**
+	 * hide the user interface of the map(s) (the pan,info,search... buttons)
+	 * @return void
+	 */
+	ixmaps.hideUi = function(){
+		ixmaps.switchUi(false);
+	};
+
+	/**
+	 * show the user interface of the map(s) (the pan,info,search... buttons); complement to {@link ixmaps.hideUi}
+	 * @return void
+	 */
+	ixmaps.showUi = function(){
+		ixmaps.switchUi(true);
+	};
+	
 
 	/* ------------------------------------------------------------------ * 
 		helper
@@ -2975,6 +2991,9 @@ $Log: htmlgui.js,v $
 					});
 			}
 		} else {
+			if ( !data.table ){
+				alert("error at ixmaps.setExternalData: data not of format 'jsonDB'");
+			}
 			ixmaps.showLoadingArrayStop();
 			ixmaps.hideLoading();
 			ixmaps.embeddedSVG.window.map.Api.setThemeExternalData(null, data, opt.name);

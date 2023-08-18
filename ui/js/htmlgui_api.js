@@ -2283,7 +2283,6 @@ $Log: htmlgui_api.js,v $
 	};
 
 	ixmaps.htmlgui_onTooltipDisplay = function(evt,szText,args){
-		console.log(ixmaps.parentApi.htmlgui_onTooltipDisplay);
 		return ( ixmaps.parentApi != ixmaps ) ? ixmaps.parentApi.htmlgui_onTooltipDisplay(evt,szText,args) : szText
 	};
 
@@ -2942,6 +2941,9 @@ $Log: htmlgui_api.js,v $
 			if ( opt.align ){
 				szUrl += "&align="+opt.align;
 			}
+			if ( opt.ui ){
+				szUrl += "&ui="+opt.ui;
+			}
 			if ( opt.legend ){
 				szUrl += "&legend="+opt.legend;
 			}
@@ -3014,7 +3016,7 @@ $Log: htmlgui_api.js,v $
 		//return new Promise(function(resolve, reject){
 		
 			var iFrame = null;
-
+		
 			var target = window.document.getElementById(szTargetDiv);
 
 			var szName = opt.mapName || opt.name || "map" + String(Math.random()).split(".")[1];
@@ -3025,6 +3027,11 @@ $Log: htmlgui_api.js,v $
 			while ( ixmaps.embeddedApiA[szName] ){
 				szName += "1";
 			}
+		
+			// register map name to parent api
+			ixmaps.szMap = szName;
+			ixmaps.registerMe();
+		
 			// register map name
 			ixmaps.embeddedApiA[szName] = {};
 		
@@ -3063,6 +3070,9 @@ $Log: htmlgui_api.js,v $
 			}
 			if ( opt.align ){
 				szUrl += "&align="+opt.align;
+			}
+			if ( opt.layout ){
+				szUrl += "&layout="+opt.layout;
 			}
 			if ( opt.legend ){
 				szUrl += "&legend="+opt.legend;
@@ -3104,7 +3114,11 @@ $Log: htmlgui_api.js,v $
 			if ( opt.project ){
 				szUrl += "&project="+opt.project;
 			}
-
+		
+			if ( opt.about ){
+				szUrl += "&about="+opt.about;
+			}
+		
 			var szHeight = opt.height || "640px";
 			var szWidth  = opt.width  || "100%";
 		
@@ -3130,6 +3144,10 @@ $Log: htmlgui_api.js,v $
 				}
 				target.setAttributeNS(null,"id",szName+"_target");
                 // GR 08.09.2019 adapt the created frame on window resize 
+                window.onresize = function(event) {
+                    var newHeight = window.innerHeight;
+                    window.document.getElementById(szName).style.setProperty("height",String(newHeight-5)+"px");
+                };
 			}else{
 				target = document.createElement('div');
 				target.style = "width:"+szWidth+";height:"+szHeight+";";

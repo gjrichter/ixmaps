@@ -501,6 +501,12 @@ Map.Api.prototype.froozeMap = function(flag){
 	fFroozeDynamicContent = flag;
 };
 /**
+ * inhibit dynamic content and scaling  
+ */
+Map.Api.prototype.freezeMap = function(flag){
+	this.map.Event.fFreezeDynamicContent = flag;
+};
+/**
  * set a clipping width for the map
  * @param nWidth the new map width
  */

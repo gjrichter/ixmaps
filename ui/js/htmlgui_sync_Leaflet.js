@@ -51,6 +51,8 @@ $Log: htmlgui_sync_Leaflet.js,v $
 	}
 
 	ixmaps.htmlMap_Api = "Leaflet";
+	
+	ixmaps.tmp = ixmaps.tmp||{};
 
 	/* ------------------------------------------------------------------ * 
 		local variables
@@ -124,6 +126,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		// ---------------------
 
 		LMap = L.map(this.szGmapDiv,{zoomControl:false,
+									 zoomSnap: 0,
 									 gestureHandling:((ixmaps.scrollsafe|ixmaps.scrollsafesilent)?true:false),
 									 gestureHandlingOptions: {duration: ixmaps.scrollsafesilent?0:1000} 
 									});
@@ -132,10 +135,33 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		// define event handler
 		// ---------------------
 
-		LMap.on('zoomend', function(n, s, a) { ixmaps.hideAll();ixmaps.htmlgui_synchronizeSVG();});
-		LMap.on('movestart', function(n, s, a) { ixmaps.htmlgui_panSVGStart(); });
-		LMap.on('moveend', function(n, s, a) { ixmaps.htmlgui_panSVGEnd(); });
-		LMap.on('move',    function(n, s, a) { ixmaps.htmlgui_panSVG(); });
+		LMap.on('zoomstart', function(n, s, a) { 
+											ixmaps.tmp.inZoom = true;
+										    ixmaps.embeddedSVG.window.map.Api.freezeMap(true);
+										});
+		LMap.on('zoom', function(n, s, a) { 
+										   	ixmaps.htmlgui_synchronizeSVG();
+										});
+		LMap.on('zoomend', function(n, s, a) { 
+											ixmaps.tmp.inZoom = false;
+											ixmaps.embeddedSVG.window.map.Api.freezeMap(false);
+											ixmaps.htmlgui_synchronizeSVG();
+										});
+		
+		LMap.on('movestart', function(n, s, a) { 
+											ixmaps.htmlgui_panSVGStart();
+										});
+		LMap.on('move',    function(n, s, a) {
+											if(!ixmaps.tmp.inZoom){
+												ixmaps.htmlgui_panSVG();
+											}
+										});
+		LMap.on('moveend', function(n, s, a) { 
+											ixmaps.htmlgui_panSVGEnd();
+											ixmaps.embeddedSVG.window.map.Api.freezeMap(false);
+											ixmaps.htmlgui_synchronizeSVG();
+										});
+		
 
 		ixmaps.layers = []; 
 
@@ -400,7 +426,8 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			attribution: "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, under <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a>. Data by <a href='http://openstreetmap.org'>OpenStreetMap</a>, under <a href='http://creativecommons.org/licenses/by-sa/3.0'>CC BY SA</a>.",
 			subdomains: ['a','b','c','d']
 		});
-		__addTileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png", {
+		
+		__addTileLayer("https://tiles.stadiamaps.com/styles/stamen_watercolor/{z}/{x}/{y}.jpg", {
 			name: "Stamen - watercolor",
 			myname: "Stamen - watercolor",
 			minZoom: 2,
@@ -593,7 +620,8 @@ $Log: htmlgui_sync_Leaflet.js,v $
 	// to be verified later
 	htmlMap_setBounds = function(arrayPtLatLon,fZoomTo){
 
-		if (arrayPtLatLon && (arrayPtLatLon.length == 2) ){
+		if ( arrayPtLatLon && (arrayPtLatLon.length == 2) ){
+			console.log("here we go");
 
 			ixmaps.embeddedSVG.window._TRACE("<========= htmlgui: do adapt HTML map ! to sw:"+arrayPtLatLon[0].lat+","+arrayPtLatLon[0].lng+" ne:"+arrayPtLatLon[1].lat+","+arrayPtLatLon[1].lng);
 

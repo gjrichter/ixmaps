@@ -395,6 +395,12 @@ Map.Themes.prototype.getAllThemes = function () {
 	return this.themesA;
 };
 /**
+ * returns a list of all themes
+ */
+Map.Themes.prototype.getThemes = function () {
+	return this.themesA;
+};
+/**
  * returns true, if theme already exists
  */
 Map.Themes.prototype.isTheme = function (szIdStr) {
@@ -430,12 +436,29 @@ Map.Themes.prototype.isArray = function (obj) {
 	return Object.prototype.toString.call(obj) === '[object Array]';
 };
 /**
+ * test if object is a json object 
+ * @parameter obj the object to test
+ * @return true/false
+ * @type boolean
+ */
+Map.Themes.prototype.isObject = function (obj) {
+	return Object.prototype.toString.call(obj) === '[object Object]';
+};
+/**
  * make sure, object is type array 
  * @parameter obj the object to transform
  * @return array
  * @type array of string
  */
-Map.Themes.prototype.toArray = function (obj) {
+Map.Themes.prototype.toArray = function (obj) {	
+	if (this.isObject(obj)) {
+		var array = [];
+		for ( i in obj){
+			array.push(i);
+			array.push(obj[i]);
+		}	
+		return array;
+	} else	
 	if (this.isArray(obj)) {
 		return obj;
 	} else {
@@ -639,7 +662,7 @@ Map.Themes.prototype.newThemeByObj = function (themeObj) {
 	
 	/** GR 29.05.2023 create group for theme charts here, this will secure the layer sequence */
 	// -----------------------------------------------------------------------
-	if (!mapTheme.szFlag.match(/CHOROPLETH/)){
+	if (!mapTheme.szFlag.match(/CHOROPLETH||BUFFER/)){
 		mapTheme.createChartGroup(map.Layer.objectGroup);
 	}
 	
@@ -1274,7 +1297,11 @@ Map.Themes.prototype.parseStyle = function (mapTheme, styleObj) {
 		if (__isdef(styleObj.aggregationscale)) {
 			mapTheme.szAggregationFieldA = this.toArray(styleObj.aggregationscale);
 		}
-		// GR 211.10.2016 define ninimal aggregation count
+		// GR 12.07.2023 define aggregation mode (alias)
+		if (__isdef(styleObj.aggregation)) {
+			mapTheme.szAggregationFieldA = this.toArray(styleObj.aggregation);
+		}
+		// GR 21.10.2016 define ninimal aggregation count
 		if (__isdef(styleObj.minaggregation)) {
 			mapTheme.szMinAggregation = styleObj.minaggregation;
 			mapTheme.nMinAggregation = Number(styleObj.minaggregation) || 0;
@@ -3158,6 +3185,17 @@ Map.Themes.prototype.doSetTimeFrame = function (szId, nUMin, nUMax) {
  * @param szStyle the new style
  */
 Map.Themes.prototype.changeThemeStyle = function (evt, szId, szStyle, szFlag) {
+	
+	// GR 30.07.2023 null -> all themes
+	if ( szId == null){
+		themesA = this.getThemes();
+		for ( i in themesA ){
+			if (themesA[i].szFlag.match(/CHART/))
+			this.changeThemeStyle(evt, themesA[i].szId, szStyle, szFlag);
+		}
+		return;
+	}
+	
 	// GR 30.10.2017 style may contain "'" characters
 	_TRACE("changeThemeStyle" + ": '" + szId + "' , '" + szStyle.replace(/'/g, "\\\'") + "' , '" + szFlag + "'");
 	if (szFlag.match(/fast|silent|direct/)){
@@ -5328,10 +5366,25 @@ Map.Themes.prototype.showErrorInfo = function (evt, szId) {
 };
 
 /**
- * redraw actual theme ( may be necessary after zoom )
+ * keep old redraw function for compatibility reason 
+ * @parameter nZoomChangeFactor 1 if zoom not! changed
+ */
+Map.Themes.prototype.redraw = function (nZoomChangeFactor) {
+	return this.actualize(nZoomChangeFactor);
+}
+/**
+ * keep old actualize function for compatibility reason 
  * @parameter nZoomChangeFactor 1 if zoom not! changed
  */
 Map.Themes.prototype.actualizeActiveTheme = function (nZoomChangeFactor) {
+	return this.actualize(nZoomChangeFactor);
+}
+
+/**
+ * redraw themes ( may be necessary after zoom )
+ * @parameter nZoomChangeFactor 1 if zoom not! changed
+ */
+Map.Themes.prototype.actualize = function (nZoomChangeFactor) {
 	
 	_TRACE("A C T U A L I Z E");
 
@@ -5399,7 +5452,7 @@ Map.Themes.prototype.actualizeActiveTheme = function (nZoomChangeFactor) {
 						this.themesA[i].nGridWidth = maxDist / map.Scale.nZoomScale;
 						this.themesA[i].fRealize = true;
 						// important! to avoid rendering of intermediate scaled charts
-						this.themesA[i].unpaintMap();
+						//this.themesA[i].unpaintMap();
 						this.themesA[i].themeNodesPosA = [];
 					} else
 					if (this.themesA[i].nGridMatrix) {
@@ -5408,7 +5461,7 @@ Map.Themes.prototype.actualizeActiveTheme = function (nZoomChangeFactor) {
 						this.themesA[i].nGridWidth = maxDist / (this.themesA[i].nGridMatrix || 20) / map.Scale.nZoomScale;
 						this.themesA[i].fRealize = true;
 						// important! to avoid rendering of intermediate scaled charts
-						this.themesA[i].unpaintMap();
+						//this.themesA[i].unpaintMap();
 						this.themesA[i].themeNodesPosA = [];
 					} 
 				} 
@@ -6450,7 +6503,7 @@ MapTheme.prototype.realize = function () {
 	_TRACE(this.szFlag);
 	_TRACE(" ");
 	
-	_LOG("theme realize start");
+	_LOG("theme realize start - "+this.szId);
 	
 	if (this.szFlag.match(/WMS/)) {
 		
@@ -6644,7 +6697,7 @@ MapTheme.prototype.realize_draw = function () {
 	_TRACE("===========================> ");
 	_TRACE(this.szFlag);
 	
-	_LOG("theme draw start");
+	_LOG("theme draw start - "+this.szId);
 
 	this.timeStart = new Date();
 
@@ -6891,7 +6944,7 @@ MapTheme.prototype.realizeDone = function () {
 	_TRACE("<== realize done == ");
 	_TRACE(this.szFlag);
 	_TRACE(" ");
-	_LOG("theme done");
+	_LOG("theme done - "+this.szId);
 	
 	// GR 16.10.2022 theme type modifier flag to show theme extend now here
 	if (this.szFlag.match(/SHOW/)) {
@@ -8280,7 +8333,13 @@ MapTheme.prototype.loadAndAggregateValuesOfTheme = function (szThemeLayer, nCont
 		if (this.nGridWidth && !this.nGridWidthMap) {
 			this.nGridWidthMap = this.nGridWidth ? ((map.Scale.getDeltaXofDistanceInMeter(this.nGridWidth)) * map.Scale.nZoomScale) : 0;
 		}
-
+		
+		if (!this.nGridWidthPx) {
+			this.nGridWidthMap = this.nGridWidth ? ((map.Scale.getDeltaXofDistanceInMeter(this.nGridWidth)) * map.Scale.nZoomScale) : 0;
+			var nClip = (Math.pow(10,Math.floor(Math.log10(1/map.Scale.nZoomScale))));
+			this.nGridWidthMap = (Math.round(this.nGridWidthMap * nClip) / nClip);
+		}
+		
 		// offset to the grid
 		this.dX = 0;
 		this.dY = 0;
@@ -13431,7 +13490,7 @@ MapTheme.prototype.createChartGroup = function (objectGroup) {
 					szLineStyle = "stroke-width:" + map.Scale.normalX(1.0) + ";stroke-linecap:round;stroke-dasharray:1,50;";
 					break;
 				case "dashed":
-					szLineStyle = "stroke-width:" + map.Scale.normalX(1.0) + ";stroke-linecap:butt;stroke-dasharray:30,30;";
+					szLineStyle = "stroke-width:" + map.Scale.normalX(1.0) + ";stroke-linecap:butt;stroke-dasharray:300,300;";
 					break;
 				case "solid":
 					szLineStyle = "stroke-width:" + map.Scale.normalX(1.0) + ";";
@@ -13448,6 +13507,9 @@ MapTheme.prototype.createChartGroup = function (objectGroup) {
 					break;
 				case "thick":
 					szLineStyle += "stroke-width:" + map.Scale.normalX(1.5) + ";";
+					break;
+				default:
+					szLineStyle += "stroke-width:" + map.Scale.normalX(this.szBorderWidth) + ";";
 					break;
 			}
 		}
@@ -13837,7 +13899,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		// 
 		this.fSorted = false;
 		
-		if (this.fSortBeforeDraw && (this.nMin != this.nMax) &&
+		if (this.fSortBeforeDraw && ((this.nMin != this.nMax) || this.szSizeField) &&
 			(!this.szFlag.match(/NOSRT/) && !this.szFlag.match(/DOT/)) &&
 			(!this.szFlag.match(/NOSIZE/) || this.szFlag.match(/3D/) || this.szFlag.match(/\bSORT\b/)) &&
 			(!this.szFlag.match(/CATEGORICAL/) || this.szFlag.match(/AGGREGATE/) || this.szSizeField || this.szFlag.match(/\bSORT\b/))) {
@@ -14081,7 +14143,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		this.chartGroup.style.setProperty("fill", this.chart.szColor||"white");
 		this.chartGroup.style.setProperty("fill-opacity",  (this.fillOpacity || 0.1));
 		this.chartGroup.style.setProperty("stroke", this.szLineColor||"red");
-		this.chartGroup.style.setProperty("stroke-width", map.Scale.normalX(this.nLineWidth||1)*this.nChartGroupScaleY);
+		this.chartGroup.style.setProperty("stroke-width", map.Scale.normalX(this.nLineWidth||1)*this.nChartGroupScaleY / (fFeatureScalingDynamic? 1:map.Layer.nDynamicObjectScale));
 		if (typeof (this.szBorderStyle) != 'undefined') {
 			switch (this.szBorderStyle) {
 				case "dotted":
@@ -15150,7 +15212,10 @@ MapTheme.prototype.chartMap = function (startIndex) {
 						// 
 						if (this.szFlag.match(/TITLE/) && this.szTitleField && (!this.nTitleUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nTitleUpper))) {
 
-							var nFontSize = Math.max(map.Scale.normalX(0.9), Math.min(bBox.width / 10, map.Scale.normalX(14 / this.nScale)));
+							var nFontSize = map.Scale.normalX(5);
+							if (this.szFlag.match(/DTEXT/)) {
+								nFontSize = Math.max(map.Scale.normalX(0.9), Math.min(bBox.width / 5, map.Scale.normalX(14 / this.nScale)));
+							}
 							if (this.szFlag.match(/GRIDSIZE/)) {
 								nFontSize = Math.max(bBox.width / 10, map.Scale.normalX(6));
 							}
@@ -15508,6 +15573,14 @@ MapTheme.prototype.checkChartSize = function (a, nChartSize, szFlag, nSum) {
 //.................................................................
 // create one chart 
 //.................................................................
+
+MapTheme.prototype.getChart = function (chartGroup, a, nChartSize, szFlag, nMark) {
+	if ( !this.fRealizeDone ){
+		this.realize();
+	}
+	return this.drawChart(chartGroup, a, nChartSize, szFlag, nMark);
+}
+
 
 /**
  * create one chart object (SVG grafic) for one item of a theme
@@ -17484,14 +17557,19 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					}
 					szLineColor = this.szLineColor || szLineColor;
 
-					// GR 10.05.2015 explicit size field
-					if (this.szSizeField && a && this.itemA[a]) {
-						if (szFlag.match(/FIXSIZE/)) {
-							nRadius = map.Scale.normalX(nChartSize / 2) / (this.nNormalSizeValue || 1);
-						} else
-						if (szFlag.match(/NOSIZE/)) {
-							nRadius = map.Scale.normalX(nChartSize / 2);
-						} else
+					var nRadius = map.Scale.normalX(nChartSize / 2);
+
+					// GR 01.07.2023 redesign size handling
+					if (szFlag.match(/FIXSIZE/)) {
+						nRadius = map.Scale.normalX(nChartSize / 2) / (this.nNormalSizeValue || 1);
+					} else
+					if (szFlag.match(/NOSIZE/)) {
+						nRadius = map.Scale.normalX(nChartSize / 2);
+					} else
+					if (a && this.itemA[a] && this.itemA[a].nSize) {
+						if (szFlag.match(/LINEAR/) || szFlag.match(/SIZEP1/)) {
+							nRadius = nRadius / (this.nNormalSizeValue || this.nMaxSize) * this.itemA[a].nSize;
+						} else 
 						if (szFlag.match(/SIZELOG/)) {
 							nRadius = Math.max(1, nRadius / Math.log(this.nNormalSizeValue || this.nMaxSize) * Math.log(this.itemA[a].nSize));
 						} else
@@ -17509,8 +17587,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 					}
 					
 					if (szSymbol == "circle" || szSymbol == "square" || szSymbol == "roundrect" || szSymbol == "label" || szSymbol == "carot" || szSymbol == "diamond" || szSymbol == "triangle" || szSymbol == "hexagon" || szSymbol == "cross" || szSymbol == "empty") {
-						var nRadius = map.Scale.normalX(nChartSize / 2);
-
+						
 						var nMaxRadius = map.Scale.normalX(nChartSize / 2);
 						var nLineWidth = (this.nLineWidth || 1) * map.Scale.normalX(Math.min(nRadius / nMaxRadius, 1));
 						switch (szSymbol) {
@@ -17740,6 +17817,9 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				} else {
 					if (szFlag.match(/SIZELOG/)) {
 						nRadius = Math.max(1,nMaxRadius / Math.log(nMaxValue) * Math.log(nValue));
+					} else
+					if (szFlag.match(/SIZEP10/)) {
+						nRadius = nMaxRadius / Math.pow(nMaxValue, 1 / 10) * Math.pow(nValue, 1 / 10);
 					} else
 					if (szFlag.match(/SIZEP4/)) {
 						nRadius = nMaxRadius / Math.pow(nMaxValue, 1 / 4) * Math.pow(nValue, 1 / 4);
@@ -19085,7 +19165,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				}
 			}
 		}
-		if (this.szShapeType.match(/point/)) {
+		if (this.szShapeType.match(/dummy||point/)) {
 			// circle buffer	
 			if (szColor) {
 				nChartSize = nRadius * 2 / map.Scale.normalX(1);
@@ -19100,8 +19180,8 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				// GR 20.09.2011 style is set in chart group g element
 				var newShape = map.Dom.newShape('circle', shapeGroup, 0, 0, nRadius, "");
 				if (this.szFlag.match(/VALUE/)) {
-					var szTextStyle = "font-family:arial;font-size:" + (map.Scale.normalX(5)) + "px;fill:#222222;stroke-dasharray:none;pointer-events:none;";
-					var newText = map.Dom.newText(shapeGroup, nRadius - map.Scale.normalX(5), 0, szTextStyle, Map.Scale.prototype.formatDistanceString(this.nBufferSize));
+					var szTextStyle = "font-family:arial;font-size:" + (map.Scale.normalX(30)) + "px;fill:#222222;fill-opacity:1;stroke:white;stroke-opacity:0.2;stroke-dasharray:none;pointer-events:none;";
+					var newText = map.Dom.newText(shapeGroup, nRadius - map.Scale.normalX(20), 0, szTextStyle, Map.Scale.prototype.formatDistanceString(this.nBufferSize));
 				}
 				this.nRealizedCount++;
 			} else {
@@ -20281,12 +20361,12 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			szLabel = this.szLabelField + "?";
 		} else {
 			if (!isNaN(__scanValue(szLabel))) {
-				szLabel = this.formatValue(__scanValue(szLabel), 2) + (this.szLabelUnits || "");
+				szLabel = this.formatValue(__scanValue(szLabel), this.nValueDecimals || 2) + (this.szLabelUnits || "");
 			} else {
 				szLabel += (this.szLabelUnits || "");
 			}
 		}
-		var nTextSize = map.Scale.normalX(6) * (this.nTextScale||1);
+		var nTextSize = map.Scale.normalX(5) * (this.nTextScale||1);
 		
 		var szTextStyle = "opacity:0.7;font-family:arial;font-size:" + (nTextSize) + "px;text-anchor:middle;fill:#000000;pointer-events:none";
 		var szBgStyle = "opacity:1;fill:white;fill-opacity:0.4;stroke:#000000;stroke-width:" + map.Scale.normalX(1) + "pointer-events:none;";
