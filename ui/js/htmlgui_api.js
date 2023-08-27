@@ -2687,7 +2687,7 @@ $Log: htmlgui_api.js,v $
 		this.def = {};
 		this.def.layer = szLayer || "generic";
 		this.def.data = {};	
-		this.def.style = {type:"CHART|DOT"};
+		this.def.style = {type:"CHART|DOT",lookupfield:"geometry"};
 		this.def.field = "$item$";
 	};
 	ixmaps.themeConstruct.prototype = {

@@ -269,7 +269,7 @@ window.ixmaps = window.ixmaps || {};
 				var dest = themeObj.itemA[szItem].szSelectionId2.split("::");
 				dest = dest[1]||dest[0];
 				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em;white-space:nowrap'>" + (themeObj.itemA[szItem] ? ((origin + " &rarr; " + dest) || themeObj.itemA[szItem].szTitle ) : "") + "</h4><h4 style='margin:0.5em'>" + szSign + szValue + themeObj.szUnit + "</h4>";
-			}else{
+			}else if (!themeObj.szFlag.match(/CATEGORICAL/)){
 				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || themeObj.itemA[szItem].szSelectionId2.split("::")[1] || "") : "") + "</br>" + szSign + szValue + themeObj.szUnit + "</h5>";
 			}
 			fThemeData = true;
@@ -385,7 +385,7 @@ window.ixmaps = window.ixmaps || {};
 			// item is not a chart -> item is a map shape
 			// then we have to get the id for tyhe data in another way
 			//
-			if (0 && !szId.match(/chart/i)) {
+			if (!szId.match(/chart/i)) {
 				var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szId);
 				var szChartId = szId.match(/::/) ? szId : obj.parentNode.getAttribute("id");
 				var szIdA = szChartId.split("#");
@@ -702,7 +702,7 @@ window.ixmaps = window.ixmaps || {};
 	/**
 	 * dummies for PIE CHARTS
 	 */
-	var DonutCharts = {};
+	DonutCharts = {};
 	DonutCharts.partOver = function () {};
 	DonutCharts.partOut = function () {};
 
