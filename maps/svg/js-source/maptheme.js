@@ -3169,6 +3169,16 @@ Map.Themes.prototype.setTimeFrame = function (evt, szId, nUMin, nUMax) {
  * @param nUMax the maximum time (utime ms)
  */
 Map.Themes.prototype.doSetTimeFrame = function (szId, nUMin, nUMax) {
+	
+	// GR 25/08/2023 if no specific theme id given, then loop over all themes
+	if (szId == null) {
+		var mapThemesA = this.getThemes();
+		for ( var i in mapThemesA ){
+			mapThemesA[i].setTimeFrame(nUMin, nUMax);
+		}
+		return;
+	}
+
 	var mapTheme = this.getTheme(szId);
 	if (mapTheme) {
 		mapTheme.setTimeFrame(nUMin, nUMax);
@@ -12567,8 +12577,13 @@ MapTheme.prototype.setTimeFrame = function (nUMin, nUMax) {
 	var j;
 	var tilesNodesA = null;
 	var nIsolateGrayStrokeWidth = ((this.fShadow ? 5 : 10) / this.nScale);
-	if (this.szFlag.match(/CHART/)) {
+	
+	// GR 24/08/2023 now for all themes !
+	if (1 || this.szFlag.match(/CHART/)) {
 		var chartsA = this.chartGroup.childNodes;
+		if (this.szFlag.match(/CHART/)) {
+			chartsA = this.chartGroup.parentNode.childNodes;
+		}
 		var toTopA = [];
 		for (var i = 0; i < chartsA.length; i++) {
 			var chartNode = chartsA.item(i);
@@ -12578,7 +12593,7 @@ MapTheme.prototype.setTimeFrame = function (nUMin, nUMax) {
 				// element has no time attribute, can't be switched 
 				// go through all child groups and look for attribute time
 				// switch on/off elements by time frame
-
+				
 				var childA = chartNode.getElementsByTagName('g');
 				for (var ii = 0; ii < childA.length; ii++) {
 
@@ -14351,6 +14366,11 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				shapeGroup.setAttributeNS(szMapNs,"tooltip",a);
 			}
 			
+			if ( this.szTimeField ){
+				var uTime = new Date(this.itemA[a].szTime).getTime() || this.itemA[a].szTime;
+				shapeGroup.setAttributeNS(szMapNs, "time", uTime);
+			 }
+		
 			// if part of a theme, set the color
 			// ----------------------------------
 			if (this.szFlag.match(/CATEGORICAL/)) {
@@ -15255,6 +15275,12 @@ MapTheme.prototype.chartMap = function (startIndex) {
 								bBox.y -= bBox.height - oldHeight;
 								map.Dom.setClipRect(newText, new box(bBox.x, bBox.y - nFontSize * 10, bBox.width - nFontSize / 3, nFontSize * 20));
 							}
+							
+							if ( this.szTimeField ){
+								var uTime = new Date(this.itemA[a].szTime).getTime() || this.itemA[a].szTime;
+								newText.setAttributeNS(szMapNs, "time", uTime);
+							 }
+
 						}
 
 						// PLOTX or PLOTY must be sized by the biggest value, to make equal large boxes
@@ -15308,6 +15334,17 @@ MapTheme.prototype.chartMap = function (startIndex) {
 						if (this.szFlag.match(/\bPLOT\b/) && chartGroup) {
 							chartGroup.style.setProperty("display", "inline");
 						}
+						
+						// make time stamp
+						// -----------------
+						if ( this.szTimeField ){
+							console.log("---------!");
+							console.log("timestamp!");
+							var uTime = new Date(this.itemA[a].szTime).getTime() || this.itemA[a].szTime;
+							boxGroup.setAttributeNS(szMapNs, "time", uTime);
+						 }
+						
+						
 					}
 				}
 			}
@@ -20404,6 +20441,11 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		}
 
 		this.itemA[a].labelGroup = labelGroup;
+		
+		if ( this.szTimeField ){
+			var uTime = new Date(this.itemA[a].szTime).getTime() || this.itemA[a].szTime;
+			labelGroup.setAttributeNS(szMapNs, "time", uTime);
+		 }
 	}
 
 	// position the generated chart object
