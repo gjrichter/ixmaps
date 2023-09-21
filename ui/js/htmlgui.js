@@ -981,6 +981,9 @@ $Log: htmlgui.js,v $
 		if (opt) {
 			var szFeatures = "";
 			for (var i in opt) {
+				if ((typeof (i) == "string") && (i.match(/silent/i))) {
+					this.fSilent = ((typeof (opt[i]) == "string") ? (opt[i] == "true") : opt[i]);
+				} else
 				if ((typeof (i) == "string") && (i.match(/syncMap/i))) {
 					this.fSyncMap = ((typeof (opt[i]) == "string") ? (opt[i] == "true") : opt[i]);
 				} else
@@ -2744,7 +2747,8 @@ $Log: htmlgui.js,v $
 			// set the complete ext path for further use
 			options.theme.coTableExt = options.ext;
 		}
-
+		
+		if (!ixmaps.fSilent)
 		ixmaps.showLoadingArray(["loading data ...", " ... "]);
 		
 		$.getScript("../../../data.min.js/data.js")
