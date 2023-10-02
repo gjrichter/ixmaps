@@ -3041,7 +3041,7 @@ $Log: htmlgui_api.js,v $
 			}else if ( opt.mapStory ) {
 				szUrl = "/ui/dispatch.htm?ui=story&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName+"&story="+opt.mapStory;
 			}else{
-				szUrl = "/ui/html/embed_sync_Leaflet.html?basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName;
+				szUrl = "/ui/dispatch.htm?ui=embed&basemap="+szBasemap+"&maptype="+szMapType+"&name="+szName;
 			}
 
 			var scripts = window.document.scripts;
