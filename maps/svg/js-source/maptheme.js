@@ -17334,7 +17334,44 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			}
 		}
 		// --------------------------- end sort
-
+		
+		
+		// smooth by rolling average
+		// ---------------------------
+		if (szFlag.match(/\bSMOOTH\b/)) {
+			var ra = 3;
+			for (i = nPartsA.length-1; i >= ra-1; i--) {
+				for ( r=1; r<ra; r++ ){
+					nPartsA[i] += nPartsA[i-r];
+				}
+				nPartsA[i] /= ra;
+			}
+		}
+		
+		// create linear regression
+		// ---------------------------
+		if (szFlag.match(/\bLINREG\b/)) {
+			var xsum = 0;
+			var ysum = 0;
+			for (i = 0; i<nPartsA.length; i++) {
+				xsum += i;
+				ysum += nPartsA[i];
+			}
+			var xmean = xsum / nPartsA.length;
+			var ymean = ysum / nPartsA.length;
+			
+			var num = 0;
+			var denom = 0;
+			for (var i = 0; i < nPartsA.length; i ++) {
+				var x =i;
+				var y = nPartsA[i];
+				num += (x - xmean) * (y - ymean);
+				denom += (x - xmean) * (x - xmean);
+			}
+			var linreg_m = num / denom;
+			var linreg_b = ymean - (linreg_m * xmean);
+		}
+		
 		var topShape = null;
 		var topText = null;
 		var topText2 = null;
@@ -18034,7 +18071,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							newShapeBg1 = null;
 							newShapeBg2 = null;
 							// GR 29.12.2016 new
-							if ((szFlag.match(/GLOW/) && (i == nStartI) && !szFlag.match(/ZOOM/)) &&
+							if ((szFlag.match(/GLOW/) && (!this.sortedIndex || (i == nStartI)) && !szFlag.match(/ZOOM/)) &&
 								(!this.szGlowUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nGlowUpper)) &&
 								(!this.szGlowLower || (map.Scale.nTrueMapScale * map.Scale.nZoomScale >= this.nGlowLower))
 							) {
@@ -19155,6 +19192,18 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				d += "z ";
 				this.plot_area_shapes[0].setAttributeNS(null, "d", d);
 			}
+		}
+		
+		// draw linear regression line 
+		if (szFlag.match(/\bLINREG\b/)) {
+			var x1 = 0;
+			var x2 = nPartsA.length-1;
+			var y1 = linreg_m * x1 + linreg_b;
+			var y2 = linreg_m * x2 + linreg_b;
+			var szLineColor = this.szLineColorA ? this.szLineColorA[0] : this.chart.szColor;
+
+			var linearRegressionShape = map.Dom.newShape('line', plotGroup, x1*nStep, -y1*nScale, x2*nStep, -y2*nScale, "stroke:"+szLineColor+";stroke-width:50;stroke-dasharray:50 50"); 
+			linearRegressionShape.setAttributeNS(szMapNs,"tooltip","linerar regression");
 		}
 
 		// set frame size
