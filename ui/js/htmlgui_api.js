@@ -933,6 +933,16 @@ $Log: htmlgui_api.js,v $
 	 * @param {String} szThemeName a name for the theme [optional]; will be displayed if the theme has no title defined
 	 * @return void
 	 */
+	ixmaps.redraw = function(szMap,szThemeName){
+		this.dispatchToEmbeddedApi(szMap,"refreshTheme",[szThemeName]);
+	};
+	/**
+	 * refresh a Theme already on the ma
+	 * reload data and redraw theme
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szThemeName a name for the theme [optional]; will be displayed if the theme has no title defined
+	 * @return void
+	 */
 	ixmaps.refreshTheme = function(szMap,szThemeName){
 		this.dispatchToEmbeddedApi(szMap,"refreshTheme",[szThemeName]);
 	};
