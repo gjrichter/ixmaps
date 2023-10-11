@@ -271,6 +271,9 @@ window.ixmaps = window.ixmaps || {};
 				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em;white-space:nowrap'>" + (themeObj.itemA[szItem] ? ((origin + " &rarr; " + dest) || themeObj.itemA[szItem].szTitle ) : "") + "</h4><h4 style='margin:0.5em'>" + szSign + szValue + themeObj.szUnit + "</h4>";
 			}else if (!themeObj.szFlag.match(/CATEGORICAL/)){
 				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || themeObj.itemA[szItem].szSelectionId2.split("::")[1] || "") : "") + "</br>" + szSign + szValue + themeObj.szUnit + "</h5>";
+			} else {
+				// if theme has more values, insert only item title
+				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || "") : "") + "</h5>";
 			}
 			fThemeData = true;
 		} else {
@@ -285,6 +288,8 @@ window.ixmaps = window.ixmaps || {};
 		// add chart 
 		//
 		// ------------------------------------------
+		
+		var origThemeObj = themeObj;
 
 		if (!themeObj.szFlag.match(/TOOLTIPNOCHART/)) {
 
@@ -334,10 +339,18 @@ window.ixmaps = window.ixmaps || {};
 				var height = window.innerHeight / 2;
 				
 				if (themeObj.szFlag.match(/(BAR)|PLOT|CHOROPLETH/)) {
-					width /= Math.max(1, (5 / themeObj.itemA[szItem].nValuesA.length));
+					var nSymbols = 0;
+					for ( i in themeObj.itemA[szItem].nValuesA ){
+						nSymbols += themeObj.itemA[szItem].nValuesA[i]?1:0;
+					}
+					width = 100 + nSymbols*50;	
 				} else
 				if (themeObj.szFlag.match(/(SYMBOL)|SEQUENCE/)) {
-					width = 100 + themeObj.itemA[szItem].nValuesA.length*30;	
+					var nSymbols = 0;
+					for ( i in themeObj.itemA[szItem].nValuesA ){
+						nSymbols += themeObj.itemA[szItem].nValuesA[i]?1:0;
+					}
+					width = 100 + nSymbols*30;	
 				} else {
 					width /= themeObj.szFlag.match(/PIE/) ? 2 : 3;
 				}
@@ -374,6 +387,9 @@ window.ixmaps = window.ixmaps || {};
 			szHtml += "<div id='tooltip_2' style='position:absolute;font-family: arial narrow, system;color:#444;background:white;border:0.5px solid black;border-radius:5px;padding:5px;max-width:80%;display:none'></div>";
 		}
 
+		themeObj = origThemeObj;
+		var	fThemeData = false;
+		
 		// ------------------------------------------
 		//
 		// add data table ? 
@@ -471,78 +487,81 @@ window.ixmaps = window.ixmaps || {};
 
 			var szId =  ixmaps.embeddedSVG.window.map.Api.getShapeId(obj);
 			var szChartId = szId.match(/::/) ? szId : obj.parentNode.getAttribute("id");
-
-			// get shape info
-			// --------------------------
-			var layerA = ixmaps.getLayer();
-
-			var szLayer = (szChartId.split("::")[0]);
-			var szLayerName = layerA[szLayer].szLegendName || szLayerName;
-
-			var szItemName = (szChartId.split("::")[1]);
-			if (!isNaN(szItemName)) {
-				szItemName = layerA[szLayer].szSelection + ": " + szItemName;
-			} else {
-				szItemName = szItemName;
-				szLayerName += ":";
-			}
-
-			// get map shape metadata or theme data
-			// ------------------------------------
-			var child = obj.childNodes.item(1);
-			var data = ixmaps.embeddedSVG.window.map.Api.getShapeMetadataArray(child || obj);
 			
-			// list data
-			// ----------
-			if ( data ) {
-				szHtml += "<table style='font-size:0.85em;spacing:0.5em;min-width:300px'>"
+			if (themeObj.fShowData){
 
-				var dataObject = data;
-				for (i in dataObject) {
-					if ((i == "geometry")) {
-						continue;
-					}
-					if (themeObj.szDataFieldsA) {
-						var fShow = false;
-						for (var f = 0; f < themeObj.szDataFieldsA.length; f++) {
-							if (themeObj.szDataFieldsA[f] == i) {
-								fShow = true;
-							}
-						}
-						if (!fShow){
+				// get shape info
+				// --------------------------
+				var layerA = ixmaps.getLayer();
+
+				var szLayer = (szChartId.split("::")[0]);
+				var szLayerName = layerA[szLayer].szLegendName || szLayerName;
+
+				var szItemName = (szChartId.split("::")[1]);
+				if (!isNaN(szItemName)) {
+					szItemName = layerA[szLayer].szSelection + ": " + szItemName;
+				} else {
+					szItemName = szItemName;
+					szLayerName += ":";
+				}
+
+				// get map shape metadata or theme data
+				// ------------------------------------
+				var child = obj.childNodes.item(1);
+				var data = ixmaps.embeddedSVG.window.map.Api.getShapeMetadataArray(child || obj);
+
+				// list data
+				// ----------
+				if ( data ) {
+					szHtml += "<table style='font-size:0.85em;spacing:0.5em;min-width:300px'>"
+
+					var dataObject = data;
+					for (i in dataObject) {
+						if ((i == "geometry")) {
 							continue;
 						}
-					}
-
-					var value = dataObject[i];
-					var szValue = (isNaN(value) || value < 10000) ? String(value) : String(value);
-					if (szValue.match(/http:/) || szValue.match(/https:/)) {
-						if (szValue.match(/.jpg/) || szValue.match(/.jpeg/) || szValue.match(/.png/)) {
-							szValue = "<img  src='" + szValue + "' style='max-width:100%'>";
-							szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
-						} else {
-							szValue = "<a  href='" + szValue + "' target='_blank' style='width:100px'>" + szValue + "</a>";
-							szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
-						}
-					} else {
-						if (!i.match(/------/)) {
-							if (0 && (i == themeObj.szColorField ||
-									(themeObj.szFieldsA.indexOf(i) >= 0))) {
-								var color = themeObj.colorScheme[themeObj.nStringToValueA[szValue] - 1];
-								szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' style='text-align:right;color:#888888;' ><b>" + (i.replace(/\_/g, " ")) + "</b></td><td class='value' style='color:" + "#000000" + ";background:" + color + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
-							} else
-							if (i == themeObj.szSizeField ||
-								i == themeObj.szSymbolField ||
-								(themeObj.szFieldsA.indexOf(i) >= 0)
-							) {
-								szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' style='text-align:right;color:#000000;' ><b>" + (i.replace(/\_/g, " ")) + "</b></td><td class='value' style='color:" + highLight + ";background:" + highLightBg + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
-							} else {
-								szHtml += "<tr><td></td><td class='label' style='text-align:right;color:#cccccc';' >" + (i.replace(/\_/g, " ")) + "</td><td class='value' style='color:" + normal + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
+						if (themeObj.szDataFieldsA) {
+							var fShow = false;
+							for (var f = 0; f < themeObj.szDataFieldsA.length; f++) {
+								if (themeObj.szDataFieldsA[f] == i) {
+									fShow = true;
+								}
 							}
-						} else {}
+							if (!fShow){
+								continue;
+							}
+						}
+
+						var value = dataObject[i];
+						var szValue = (isNaN(value) || value < 10000) ? String(value) : String(value);
+						if (szValue.match(/http:/) || szValue.match(/https:/)) {
+							if (szValue.match(/.jpg/) || szValue.match(/.jpeg/) || szValue.match(/.png/)) {
+								szValue = "<img  src='" + szValue + "' style='max-width:100%'>";
+								szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
+							} else {
+								szValue = "<a  href='" + szValue + "' target='_blank' style='width:100px'>" + szValue + "</a>";
+								szHtml += "<tr><td></td><td class='label'>" + i + "</td><td class='value clip'>" + szValue + "</td></tr>";
+							}
+						} else {
+							if (!i.match(/------/)) {
+								if (0 && (i == themeObj.szColorField ||
+										(themeObj.szFieldsA.indexOf(i) >= 0))) {
+									var color = themeObj.colorScheme[themeObj.nStringToValueA[szValue] - 1];
+									szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' style='text-align:right;color:#888888;' ><b>" + (i.replace(/\_/g, " ")) + "</b></td><td class='value' style='color:" + "#000000" + ";background:" + color + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
+								} else
+								if (i == themeObj.szSizeField ||
+									i == themeObj.szSymbolField ||
+									(themeObj.szFieldsA.indexOf(i) >= 0)
+								) {
+									szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' style='text-align:right;color:#000000;' ><b>" + (i.replace(/\_/g, " ")) + "</b></td><td class='value' style='color:" + highLight + ";background:" + highLightBg + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
+								} else {
+									szHtml += "<tr><td></td><td class='label' style='text-align:right;color:#cccccc';' >" + (i.replace(/\_/g, " ")) + "</td><td class='value' style='color:" + normal + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
+								}
+							} else {}
+						}
 					}
+					szHtml += "</table>";
 				}
-				szHtml += "</table>";
 			}
 		}
 		
