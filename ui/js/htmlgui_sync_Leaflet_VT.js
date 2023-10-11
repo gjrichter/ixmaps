@@ -200,6 +200,92 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			minZoom: 2
 		});
 
+		__addVectorTileLayer("TONER.LITE", {
+			name: "VT_TONER_LITE",
+			myname: "VT_TONER_LITE",
+			minZoom: 2
+		});
+
+		__addVectorTileLayer("DATAVIZ", {
+			name: "VT_DATAVIZ",
+			myname: "VT_DATAVIZ",
+			minZoom: 2
+		});
+		
+		__addVectorTileLayer("DATAVIZ.LIGHT", {
+			name: "VT_DATAVIZ_LIGHT",
+			myname: "VT_DATAVIZ_LIGHT",
+			minZoom: 2
+		});
+		
+		__addVectorTileLayer("BACKDROP", {
+			name: "VT_BACKDROP",
+			myname: "VT_BACKDROP",
+			minZoom: 2
+		});
+		
+		__addVectorTileLayer("BACKDROP.LIGHT", {
+			name: "VT_BACKDROP_LIGHT",
+			myname: "VT_BACKDROP_LIGHT",
+			minZoom: 2
+		});
+		
+		__addVectorTileLayer("BASIC", {
+			name: "VT_BASIC",
+			myname: "VT_BASIC",
+			minZoom: 2
+		});
+		
+		__addVectorTileLayer("BASIC.LIGHT", {
+			name: "VT_BASIC_LIGHT",
+			myname: "VT_BASIC_LIGHT",
+			minZoom: 2
+		});
+		
+		__addVectorTileLayer("BRIGHT", {
+			name: "VT_BRIGHT",
+			myname: "VT_BRIGHT",
+			minZoom: 2
+		});
+		
+		__addVectorTileLayer("BRIGHT.LIGHT", {
+			name: "VT_BRIGHT_LIGHT",
+			myname: "VT_BRIGHT_LIGHT",
+			minZoom: 2
+		});
+		
+		__addVectorTileLayer("VOYAGER", {
+			name: "VT_VOYAGER",
+			myname: "VT_VOYAGER",
+			minZoom: 2
+		});
+		
+		__addVectorTileLayer("VOYAGER.LIGHT", {
+			name: "VT_VOYAGER_LIGHT",
+			myname: "VT_VOYAGER_LIGHT",
+			minZoom: 2
+		});
+		
+		__addVectorTileLayer("TOPO", {
+			name: "VT_TOPO",
+			myname: "VT_TOPO",
+			minZoom: 2
+		});
+		
+		__addVectorTileLayer("TOPO.SHINY", {
+			name: "VT_TOPO_SHINY",
+			myname: "VT_TOPO_SHINY",
+			minZoom: 2
+		});
+		
+		__addVectorTileLayer("TOPO.TOPOGRAPHIQUE", {
+			name: "VT_TOPO_TOPOGRAPHIQUE",
+			myname: "VT_TOPO_TOPOGRAPHIQUE",
+			minZoom: 2
+		});
+		
+		
+		
 		// ---------------------
 		// define the tile layer
 		// ---------------------
