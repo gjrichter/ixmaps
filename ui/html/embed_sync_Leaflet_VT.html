@@ -32,8 +32,6 @@
 
 	<link rel="shortcut icon" href="../resources/images/ixmaps_logo.png" />
 	
-	<link rel="stylesheet" type="text/css" href="../../ui/libs/leaflet-1.3.4/leaflet.css" />
-
 	<link rel="stylesheet" type="text/css" href="../../ui/html/assets/css/icomoon.css" />
 	<link rel="stylesheet" type="text/css" href="../../ui/html/assets/css/font-awesome.min.css" >
 	<link rel="stylesheet" type="text/css" href="../../ui/libs/jquery/ui/css/smoothness/jquery-ui-1.8.16.custom.css" />
@@ -44,6 +42,7 @@
 	<link rel="stylesheet" type="text/css" href="../css/legend.css" />
 	<link rel="stylesheet" type="text/css" href="../css/main.css" />
 	<!--========================================================================= -->
+	<link rel="stylesheet" href="../../ui/libs/leaflet-gesture-handling/leaflet-gesture-handling.min.css" type="text/css">
 
 	<style>
 		.disable-select {
@@ -54,19 +53,85 @@
 		   -ms-user-select: none; /* Internet Explorer/Edge */
 		}
 	</style>
+	<style>
+		@-webkit-keyframes leaflet-gestures-fadein {
+			0% {
+				opacity: 0
+			}
+
+			100% {
+				opacity: 1
+			}
+		}
+
+		@keyframes leaflet-gestures-fadein {
+			0% {
+				opacity: 0
+			}
+
+			100% {
+				opacity: 1
+			}
+		}
+
+		.leaflet-container:after {
+			-webkit-animation: leaflet-gestures-fadein .1s backwards;
+			animation: leaflet-gestures-fadein .1s backwards;
+			color: #aaa;
+			font-family: Roboto, Arial, sans-serif;
+			font-size: 22px;
+			-webkit-box-pack: center;
+			-ms-flex-pack: center;
+			justify-content: center;
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-box-align: center;
+			-ms-flex-align: center;
+			align-items: center;
+			padding: 15px;
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(255, 255, 255, .2);
+			z-index: 99999;
+			pointer-events: none
+		}
+
+		.leaflet-gesture-handling-scroll-warning:after,
+		.leaflet-gesture-handling-touch-warning:after {
+			-webkit-animation: leaflet-gestures-fadein .1s forwards;
+			animation: leaflet-gestures-fadein .1s forwards
+		}
+
+		.leaflet-gesture-handling-touch-warning:after {
+			content: attr(data-gesture-handling-touch-content)
+		}
+
+		.leaflet-gesture-handling-scroll-warning:after {
+			content: attr(data-gesture-handling-scroll-content)
+		}
+	</style>
 
 	<!--========================================================================= -->
-	  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
-	  <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-	  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.35.1/mapbox-gl.css" rel='stylesheet' />
-	  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.35.1/mapbox-gl.js"></script>
-	  <script src="http://rawgit.com/mapbox/mapbox-gl-leaflet/master/leaflet-mapbox-gl.js"></script>
+	
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.1.1/maptiler-sdk.umd.js"></script>
+    <link href="https://cdn.maptiler.com/maptiler-sdk-js/v1.1.1/maptiler-sdk.css" rel="stylesheet" />
+    <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v1.0.0/leaflet-maptilersdk.js"></script>
 	
 	<!--========================================================================= -->
 
 </head>
 
 <body style="margin:0px;padding:0px;overflow:hidden;">
+
+	<!-- header -->
+	<div id="map-header" class="map-header" style="margin-left:2px;z-index:1000;display:none;">
+	</div>
 
 	<!--========================================================================= 
 		the map space
@@ -148,6 +213,17 @@
 			</button>
 
 		</div>
+		<div id="onmapbuttondivzoom" style="position:absolute;bottom:12px;left:10px;z-index:100000;display:inline;">
+			<a href="javascript:ixmaps.zoomIn()" style="text-decoration:none">
+				<div style="padding:1em 1.15em;background-color:rgba(255,255,255,1);border:solid black 0.1px;border-radius:0.5em;">
+				<i class="icon icon-context icon-plus" title="Layer" tabindex="-1" style="font-size:0.9em;color:#aaaaaa" ></i></div>
+			</a>
+			<div style="height:0.2em"></div>
+			<a href="javascript:ixmaps.zoomOut()" style="text-decoration:none">
+				<div style="padding:1em 1.15em;background-color:rgba(255,255,255,1);border:solid black 0.1px;border-radius:0.5em;">
+				<i class="icon icon-context icon-minus" title="Layer" tabindex="-1" style="font-size:0.9em;color:#aaaaaa" ></i></div>
+			</a>	
+		</div>
 
 		<!-- title -->
 		<div id="title" class="title-field" style="width:100%;z-index:1000;display:none;">
@@ -158,7 +234,7 @@
 		</div>
 
 		<!-- overlay -->
-		<div id="map-overlay" class="map-overlay" style="width:100%;z-index:1000;display:none;">
+		<div id="map-overlay" class="map-overlay" style="z-index:1000;display:none;">
 		</div>
         
 		<!-- popup -->
@@ -176,10 +252,10 @@
 	</div>
 
 	<!-- footer -->
-	<div id="map-footer" class="map-footer" style="margin-left:10px;z-index:1000;display:none;">
-		<a href="http://ixmaps.com" target="_blank" >powered by iXmaps </a> &bullet;
-		<a href="javascript:ixmaps.popupShare()" >share this map</a> &bullet;
-		<a href="javascript:ixmaps.popOutEmbed()" >view fullscreen</a> &bullet;
+	<div id="map-footer" class="map-footer" style="margin-left:2px;z-index:1000;display:none;">
+		<a href="http://ixmaps.com" target="_blank" >powered by iXmaps </a> |
+		<a href="javascript:ixmaps.popupShare()" >share this map</a> |
+		<a href="javascript:ixmaps.popOutEmbed()" >view fullscreen</a> 
 	</div>
 	
 	<!--========================================================================= 
@@ -204,6 +280,8 @@
 
 	<div id="attribution-div">
 		<span id="attribution"></span>
+		<span>|</span>
+		<span class="map-footer"><a href="javascript:ixmaps.popupTools()" >tools</a></span>
 	</div>
 
 	<div id="divstart" style="	visibility:hidden;
@@ -251,6 +329,8 @@
 	<div id="projects" style="visibility:hidden;">
 	</div>
 
+	<div id="tooltip" style="position:absolute;top:0;left:0;z-index:999999">
+	</div>
 	<!--========================================================================= 
 		context menu
 	<!--========================================================================= -->
@@ -342,6 +422,7 @@
 
 <!--========================================================================= -->
 
+<script src="../../ui/libs/leaflet-gesture-handling/leaflet-gesture-handling.min.js"></script>
 
 
 <!--========================================================================= -->
@@ -556,24 +637,50 @@
 				$("#map-popout-button").show();
 				ixmaps.footer = 20;
 			}
+			if ($(document).getUrlParam('item')) {
+				ixmaps.item = $(document).getUrlParam('item');
+			}
 
 			// ----------------------
 			// align user interface
 			// ----------------------
+			// needed for relative ui element positioning
+			$("#map-overlay").css("width", window.innerWidth + "px");
+			$("#map-overlay").css("height", window.innerHeight + "px");
+			$("#map-overlay").css("pointer-events", "none");
 
 			if ($(document).getUrlParam('align')) {
 				if ($(document).getUrlParam('align') == "left") {
 					ixmaps.legendAlign = "left";
-					$(".map-legend").attr("data-align","left")
+					$(".map-legend").attr("data-align","left");
 					$(".map-legend").css("left", "4%");
 					$(".map-legend").css("top", "12px");
 					$(".title-field").css("left", "100px");
-				}
+				}else
 				if ($(document).getUrlParam('align') == "right") {
 					ixmaps.legendAlign = "right";
+					$(".map-legend").attr("data-align","right");
+					//$("#onmapbuttondiv").css("left", "");
+					//$("#onmapbuttondiv").css("right", "60px");
+					$(".map-legend").css("right", "25px");
+					$(".title-field").css("right", "100px");
+				}else
+				if ($(document).getUrlParam('align') == "center") {
+					$("#map-legend").appendTo("#map-header");
+					$("#map-header").show();
+					$("#ixmap").css("top", "75px");
+					ixmaps.legendAlign = "center";
+					$(".map-legend").attr("data-align","right");
+					$(".map-legend").css("text-align","center");
+					$(".map-legend").css("font-size","0.7em");
+					$(".map-legend").css("margin-top","-15px");
+					$(".map-legend").css("width", "100%");
+					$(".map-legend").css("max-width", "100%");
+					$(".map-legend").css("left", "0px");
+					$(".map-legend").css("background", "rgba(255,255,255,0.5)");
+					
 					$("#onmapbuttondiv").css("left", "");
 					$("#onmapbuttondiv").css("right", "60px");
-					$(".map-legend").css("right", "25px");
 					$(".title-field").css("right", "100px");
 				}
 			} else {
@@ -587,6 +694,29 @@
 			if ($(document).getUrlParam('toolmarginleft')) {
 				$("#onmapbuttondiv").css("left", String(Number($(document).getUrlParam('toolmarginleft'))) + "px") ;
 			}
+			if ($(document).getUrlParam('scrollsafe')) {
+				ixmaps.scrollsafe = true;
+			}
+			
+			if ($(document).getUrlParam('scrollsafesilent')) {
+				ixmaps.scrollsafesilent = true;
+			}
+			
+			ixmaps.fMapControls = true;
+			if ($(document).getUrlParam('ui')) {
+				if ($(document).getUrlParam('ui') == "hidden"){
+					ixmaps.switchUi(false);
+					ixmaps.fMapControls = false;
+					$("#onmapbuttondivzoom").hide();
+				}
+			}
+			if ($(document).getUrlParam('layout')) {
+				if ($(document).getUrlParam('layout') == "minimal"){
+					ixmaps.switchUi(false);
+					ixmaps.fMapControls = false;
+					$("#onmapbuttondivzoom").hide();
+				}
+			}
 
 			// ====================
 			// create the map app
@@ -596,7 +726,7 @@
 				var szMap = decodeURIComponent($(document).getUrlParam('svggis'));
 				szMap = (szMap && (szMap != "null")) ? szMap : szDefaultMap;
 				map = new ixmaps.map("ixmap", {
-					mapService: decodeURIComponent($(document).getUrlParam('mapservice')),
+					mapService: "leaflet",
 					maptype: decodeURIComponent($(document).getUrlParam('maptype')),
 					svg: szMap,
 					mapsize: "fullscreen",
@@ -615,6 +745,15 @@
 					if ($(document).getUrlParam('project')) {
 						szProjectUrl = $(document).getUrlParam('project');
 						ixmaps.loadProject(szProjectUrl, false);
+						ixmaps.onMapReady = null;
+					}
+					if ($(document).getUrlParam('view')) {
+						szView = $(document).getUrlParam('view');
+						setTimeout("ixmaps.setView("+szView+")",1000);
+					}
+					if ($(document).getUrlParam('data')) {
+						szDataUrl = $(document).getUrlParam('data');
+						ixmaps.loadData(szDataUrl, false);
 						ixmaps.onMapReady = null;
 					}
 					if (ixmaps.parentApi.onMapReady){
@@ -646,6 +785,9 @@
 				var mode = $(document).getUrlParam('mode');
 				ixmaps.execBookmark("map.Api.setMapTool('" + mode + "')", false);
 				__setInputMode(mode);
+				if ( mode == "info" ){
+					$("#onmapbuttondivzoom").show();
+				}
 			}
 
 			// set sync mode ?
@@ -690,6 +832,9 @@
 				$("#legend").parent().css("left", (window.innerWidth - width - 20) + "px");
 				$("#legend").parent().css("top", (window.innerHeight - height - 40) + "px");
 			}
+			$("#map-overlay").css("width", window.innerWidth + "px");
+			$("#map-overlay").css("height", window.innerHeight + "px");
+			$("#map-overlay").css("pointer-events", "none");
 		});
 
 		// ----------------------
@@ -742,6 +887,7 @@
 					$("#switchmodebutton").css("background", "#ffffff url(../resources/images/info.png) no-repeat 95% 55%");
 					$("#switchmodebutton").css("background-size", "13px");
 					$("#switchinfobutton").hide();
+					//$("#onmapbuttondivzoom").hide();
 					break;
 				case 'pan':
 				default:
@@ -751,6 +897,7 @@
 					$("#switchmodebutton").css("background", "#ffffff url(../resources/images/mano.png) no-repeat 98% 55%");
 					$("#switchmodebutton").css("background-size", "13px");
 					$("#switchmodebuttonicon").css("opacity", "1");
+					$("#onmapbuttondivzoom").show();
 					break;
 			}
 		};
@@ -833,33 +980,61 @@
 				$("#onmapbuttondiv").show();
 				$("#onmapbuttondivbottom").show();
 				htmlMap_showMapControl();
+				ixmaps.fMapControls = true;
 			} else {
 				$("#onmapbuttondiv").hide();
 				$("#onmapbuttondivbottom").hide();
 				htmlMap_hideMapControl();
+				ixmaps.fMapControls = false;
 			}
 		};
 
 		var __olditemclick = ixmaps.htmlgui_onItemClick;
-		ixmaps.htmlgui_onItemClick = function(szId){
-			if ( __olditemclick(szId) ){
+		ixmaps.htmlgui_onItemClick = function(evt,szId){ 
+			
+			ixmaps.fOnItemClicked = true;
+			
+			// check __olditemclick when parent Api has no map; magick - tested 
+			if ( (ixmaps.parentApi.isMap == false) && __olditemclick(evt,szId) ){
 				return true;
 			}else{
                 if (szId.match(/mapbackground:eventrect/)){
                     $("#switchinfobutton").hide();
+					$("#item").dialog("destroy");
+					ixmaps.embeddedSVG.window.map.Api.clearHighlight();
+					ixmaps.embeddedSVG.window.map.Api.clearAllOverlays();
                 }else{
 					var szItemUrl = "./tools/item.html";
-					if ( ixmaps.loadedProject.map.item && (ixmaps.loadedProject.map.item != "html") )  {
+					if ( ixmaps.item && 
+						(ixmaps.item != "html") )  {
+						szItemUrl = ixmaps.item;
+						szItemUrl = szItemUrl.replace("../../../..","../..");
+					}
+					if ( ixmaps.loadedProject && 
+						 ixmaps.loadedProject.map.item && 
+						(ixmaps.loadedProject.map.item != "html") )  {
 						szItemUrl = ixmaps.loadedProject.map.item;
 						szItemUrl = szItemUrl.replace("../../../..","../..");
 					}
-					if (ixmaps.loadedProject.map.item){
-						ixmaps.szMapItemId = szId;
-						window.idialog = this.openDialog(null,'item',szItemUrl,'Item info','50,50',480,660);
+					if (ixmaps.item || ixmaps.loadedProject.map.item){
+						ixmaps.szMapItemId = ixmaps.parentApi.szMapItemId = szId;
+						if ($("#item")[0]){
+							$("#item")[0].innerHTML = "";
+						}
+						
+						window.idialog = this.openDialog(null,'item',szItemUrl,'','70,100');
 						ixmaps.onDialogClose = function(){
 							ixmaps.embeddedSVG.window.map.Api.clearHighlight();
 							ixmaps.embeddedSVG.window.map.Api.clearAllOverlays();
 						};
+						$("#item").css("height", "100%");
+						$("#item").css("width", "90%");
+						$("#item").css("position", "absolute");
+						$("#item").css("top", "10px");
+						$("#item").css("overflow", "hidden");
+						// avoid dialog size flashing
+						$("#item").parent().css("display", "none");
+						setTimeout('ixmaps._fadeInItem()',200);
 
 						//ixmaps.loadPopUp(ixmaps.loadedProject.map.item||'./item.html',{frame:true});
 						return true;
@@ -867,8 +1042,21 @@
                     $("#onmapbuttondiv").show();
                     $("#switchinfobutton").show();
                 }
+				if (__olditemclick && __olditemclick(szId,evt)){
+					return true;
+				}
 				return false;
 			}
+		}
+		ixmaps._fadeInItem = function(){
+			$("#item").parent().fadeIn("slow");
+		}
+		var __oldSelection = ixmaps.htmlgui_onSelection;
+		ixmaps.htmlgui_onSelection = function(szId){
+			if ( __oldSelection(szId) ){
+				return true;
+			}
+			return false;
 		}
 
 		// -------------------------------------------
@@ -968,15 +1156,17 @@
 		ixmaps.search.szSearchSuffix = "";
 		ixmaps.search.queryNominatim = function () {
 			ixmaps.search.lastSearch = $('.search-box').val();
-			var query = encodeURIComponent($('.search-box').val() + ((this.szSearchSuffix.length > 1) ? ("," + this.szSearchSuffix) :
-				""));
+			// GR 15.11.2022 nominatim URL changed, suffix not any longer possible
+			//var query = encodeURIComponent($('.search-box').val() + ((this.szSearchSuffix.length > 1) ? ("," + this.szSearchSuffix) :
+			//	""));
+			var query = encodeURIComponent($('.search-box').val());
 			$('.error').hide();
 			$('.result-list').empty().hide();
 
 			this.showQueryMessage();
 
 			$.ajax({
-				url: "http://open.mapquestapi.com/nominatim/v1/search.php?key=9VpTwb1ib382pomWexOxmr2J67UtDJKN&q=" + query +
+				url: "https://nominatim.openstreetmap.org/search?key=9VpTwb1ib382pomWexOxmr2J67UtDJKN&q=" + query +
 					"&format=json&addressdetails=1",
 				success: function (result) {
 					if (result.length) {
