@@ -930,10 +930,12 @@ $Log: htmlgui.js,v $
 	ixmaps.setBasemapOpacity = function (nOpacity, szMode) {
 		ixmaps.setHTMLMapOpacity(nOpacity, szMode);
 	}
-	ixmaps.setHTMLMapOpacity = function (nOpacity, szMode) {
+	ixmaps.setHTMLMapOpacity = function (nValue, szMode) {
 		if (szMode == "relative"){
 			nOpacity = Number($(this.gmapDiv).css("opacity") || 1);
 			nOpacity += nValue;
+		}else{
+			nOpacity = nValue;
 		}
 		$(this.gmapDiv).css("opacity", String(nOpacity));
 	};
