@@ -694,6 +694,13 @@ window.ixmaps = window.ixmaps || {};
 		}
 		szUnit = szUnit.replace("\[", "");
 		szUnit = szUnit.replace("\]", "");
+		
+		szValue.trim();
+		szTestA = szValue.split(" ");
+		if (szTestA.length > 2){
+			szTestA[szTestA.length-2] = "<span style='font-size:0.9em;color:#aaaaaa'>"+szTestA[szTestA.length-2]+"</span>";
+		}
+		szValue = szTestA.join(" ");
 
 		szTooltip = "<div style='font-size:0.9em;line-height:1.2em;color:#aaaaaa;max-width:300px'>" + szUnit + "</div><div style='font-size:1.5em;margin:-0em 0.5em -0.1em 0em;white-space:nowrap'>" + szValue + "</div>";
 
