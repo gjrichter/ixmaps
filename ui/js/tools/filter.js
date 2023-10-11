@@ -409,62 +409,73 @@ window.ixmaps.data = window.ixmaps.data || {};
 
 			var bgColor = fActiveFacet ? "#884444" : "#888888";
 
-			var szMin = ixmaps.__formatValue(facetsA[i].min, 2, "BLANK");
-			var szMax = ixmaps.__formatValue(facetsA[i].max, 2, "BLANK");
+			var szMin = ixmaps.formatValue(facetsA[i].min, 2, "BLANK");
+			var szMax = ixmaps.formatValue(facetsA[i].max, 2, "BLANK");
 
 			szHtml += fActiveFacet ? "<a href='javascript:__removeFacets(\"" + (facetsA[i].id) + "\");' style='color:white' >" : "";
 			szHtml += "<div style='font-family:arial;font-size:1.1em;text-align:left;padding:0.5em 0.5em 0.5em 0.5em;margin:1em 0 0.4em 0;background:" + bgColor + ";border-radius:5px;color:white'>";
 			szHtml += facetsA[i].id;
-            
-			if(facetsA[i].data &&
-               facetsA[i].data.length &&
-               !isNaN(facetsA[i].min) &&
-               !isNaN(facetsA[i].max) &&
-               (facetsA[i].min < facetsA[i].max) ){
- 				szHtml += (typeof (facetsA[i].min) != "undefined") ? ((facetsA[i].min != facetsA[i].max) ? (": " + szMin + " - " + szMax) : (": " + szMin)) : "";
+
+			if (facetsA[i].data &&
+				facetsA[i].data.length &&
+				!isNaN(facetsA[i].min) &&
+				!isNaN(facetsA[i].max) &&
+				(facetsA[i].min < facetsA[i].max)) {
+				szHtml += (typeof (facetsA[i].min) != "undefined") ? ((facetsA[i].min != facetsA[i].max) ? (": " + szMin + " - " + szMax) : (": " + szMin)) : "";
 			}
-            
-			szHtml += fActiveFacet ? "<span style='float:right;margin-right:0em'><i class='icon shareIcon share_bitly icon-cancel-circle' title='Share a short link' tabindex='-1'></i></span>" : "";
+
+			szHtml += fActiveFacet ? "<span style='float:right;margin-right:0em;padding-top:0em;'><i class='icon shareIcon share_bitly icon-cancel-circle' title='Share a short link' tabindex='-1'></i></span>" : "";
 			szHtml += "</div>";
 			szHtml += fActiveFacet ? "</a>" : "";
 
-			if (facetsA[i].type == "search") {
-				var placeholder = "Search for..." + ( (!facetsA[i].values)?(" (e.g. "+(facetsA[i].example||" ")+")"):"" );
+			if (facetsA[i].type == "textual") {
+				var placeholder = "Cerca ..." + ((!facetsA[i].values) ? (" (e.g. " + (facetsA[i].example || " ") + ")") : "");
 				var value = "";
 				if (fActiveFacet) {
 					value = placeholder = szActiveFilter.split("\"")[3];
 				}
-				szHtml += '<div class="input-group" style="margin-bottom:0.5em" >';
-				szHtml += '<input id="' + (szSafeId + "query") + '" type="text" class="form-control" value="' + value + '" placeholder="' + placeholder + '"';
-				szHtml += 'onKeyUp="if(event.which == 13){var value = $(\'#' + (szSafeId + "query") + '\').val();__setFilter(\'' + facetsA[i].id + '\',value);}">';
-				szHtml += '<span class="input-group-btn">';
-				szHtml += '<button class="btn btn-search" type="button" onclick="var value = $(\'#' + (szSafeId + "query") + '\').val();__setFilter(\'' + facetsA[i].id + '\',value);"><i class="fa fa-search fa-fw"></i> </button>';
-				szHtml += '</span></input>';
-				szHtml += '</div>'
+				if ( !facetsA[i] || !facetsA[i].values || facetsA[i].values.length > 10){
+					szHtml += '<div class="input-group" style="margin-bottom:0.5em;margin-left:0.1em;width:100%" >';
+					szHtml += '<input id="' + (szSafeId + "query") + '" type="text" class="form-control" style="background:transparent;border:none" value="' + value + '" placeholder="' + placeholder + '"';
+					szHtml += 'onKeyUp="if(event.which == 13){var value = $(\'#' + (szSafeId + "query") + '\').val();__setFilter(\'' + facetsA[i].id + '\',value);}">';
+					szHtml += '<span class="input-group-btn" style="float:right;margin-left:-0.5em;margin-right:0.2em;">';
+					szHtml += '<button class="btn btn-search" style="border:none" type="button" onclick="var value = $(\'#' + (szSafeId + "query") + '\').val();__setFilter(\'' + facetsA[i].id + '\',value);"><i class="icon shareIcon share_bitly icon-search" title="Search by text" tabindex="-1"></i> </button>';
+					szHtml += '</span></input>';
+					szHtml += '</div>'
+				}else{
+					szHtml += '<div class="input-group" style="margin-bottom:0.5em" >';
+					szHtml += '</div>'
+				}
 			}
 
 			// ---------------------------------
 			// facet content
 			// ---------------------------------
 
-			if (typeof (facetsA[i].min) != "undefined" && 
-				 !isNaN(facetsA[i].min)				   &&
-				 !isNaN(facetsA[i].max)				   &&
-				 (facetsA[i].min < facetsA[i].max)	   ){
+			if (typeof (facetsA[i].min) != "undefined" &&
+				!isNaN(facetsA[i].min) &&
+				!isNaN(facetsA[i].max) &&
+				(facetsA[i].min < facetsA[i].max)) {
 
 				// ---------------------------------
+				// type A
 				// continous value facet
 				// make min/max slider
 				// ---------------------------------
-
+				
 				if (!__rangesA[facetsA[i].id] || !fActiveFacet) {
-					__rangesA[facetsA[i].id] = { min: facetsA[i].min, max: facetsA[i].max, data: facetsA[i].data, id: facetsA[i].id };
+					__rangesA[facetsA[i].id] = {
+						min: facetsA[i].min,
+						max: facetsA[i].max,
+						data: facetsA[i].data,
+						id: facetsA[i].id
+					};
 				}
 
 				var min = __rangesA[facetsA[i].id].min;
 				var max = __rangesA[facetsA[i].id].max;
-				var szMin = ixmaps.__formatValue(__rangesA[facetsA[i].id].min, 2, "BLANK");
-				var szMax = ixmaps.__formatValue(__rangesA[facetsA[i].id].max, 2, "BLANK");
+				var szMin = ixmaps.formatValue(__rangesA[facetsA[i].id].min, 2, "BLANK");
+				var szMax = ixmaps.formatValue(__rangesA[facetsA[i].id].max, 2, "BLANK");
 
 				var href = "#";
 				var bgColor = "#eeeeee";
@@ -483,11 +494,11 @@ window.ixmaps.data = window.ixmaps.data || {};
 					var sliderId = szSafeId;
 					var nTicks = Math.min(40, (max - min + 1));
 					nTicks = (nTicks >= 5) ? nTicks : 40;
-                    
-                    var nStep = pop = (max - min) / nTicks;
-                    if ( nStep > 1 && nStep < 2 ) {
-                        nTicks = max - min;                     
-                    }
+
+					var nStep = pop = (max - min) / nTicks;
+					if (nStep > 1 && nStep < 2) {
+						nTicks = max - min;
+					}
 
 					var szScale = ((max - min) < 40) ? "" : "LOG";
 
@@ -496,7 +507,7 @@ window.ixmaps.data = window.ixmaps.data || {};
 					barA.count.forEach(function (height) {
 						maxHeight = Math.max(maxHeight, height);
 					});
-					var fDiscret = (nTicks == max-min+1);
+					var fDiscret = (nTicks == max - min + 1);
 					var scale = 75 / maxHeight;
 					var width = 210 / nTicks;
 					szHtml += '<div style="background:#eeeeee;margin-top:0.4em;border-radius:5px;">'
@@ -505,9 +516,9 @@ window.ixmaps.data = window.ixmaps.data || {};
 					for (b = 0; b < barA.count.length - 1; b++) {
 						var height = barA.count[b];
 						var bMin = barA.min[b];
-						var bMax = fDiscret?barA.min[b]:barA.min[b + 1];
-						var szbMin = ixmaps.__formatValue(bMin, bMin < 100 ? 2 : 0, "BLANK");
-						var szbMax = ixmaps.__formatValue(bMax, bMax < 100 ? 2 : 0, "BLANK");
+						var bMax = fDiscret ? barA.min[b] : barA.min[b + 1];
+						var szbMin = ixmaps.formatValue(bMin, bMin < 100 ? 2 : 0, "BLANK");
+						var szbMax = ixmaps.formatValue(bMax, bMax < 100 ? 2 : 0, "BLANK");
 						var fActive = ((bMax >= facetsA[i].min) && (bMin <= facetsA[i].max));
 						var color = fActive ? "#888" : "#ddd";
 						if (fOnMap) {
@@ -519,18 +530,18 @@ window.ixmaps.data = window.ixmaps.data || {};
 							});
 						}
 
-						var szTooltip = 
-                            fDiscret?String(bMin):ixmaps.__formatValue(bMin, 2, "BLANK") + ' - ' + ixmaps.__formatValue(bMax, 2, "BLANK");
-						var szFilter = "ixmaps.filterThemeItems(null, null, \"\", { field: \""+facetsA[i].id+"\", min: "+bMin+", max: "+bMax+" });";
-						var szHighlight = "__origBg=$(this).css(\"background\");$(this).css(\"background\",\"#880000\");";//+szFilter;
-						var szClearHighlight = "$(this).css(\"background\",__origBg);";//ixmaps.filterThemeItems(null,null,\"\",\"remove\");"
-						var szHighlight = "$(this).css(\"border\",\"solid #ffffff 0.5px\");";//+szFilter;
-						var szClearHighlight = "$(this).css(\"border\",\"\");";//ixmaps.filterThemeItems(null,null,\"\",\"remove\");"
-						var szRange = "__setRangeFilter(\""+facetsA[i].id+"\", \""+bMin+","+bMax+"\", 0, 0)";
+						var szTooltip =
+							fDiscret ? String(bMin) : ixmaps.formatValue(bMin, 2, "BLANK") + ' - ' + ixmaps.formatValue(bMax, 2, "BLANK");
+						var szFilter = "ixmaps.filterThemeItems(null, null, \"\", { field: \"" + facetsA[i].id + "\", min: " + bMin + ", max: " + bMax + " });";
+						var szHighlight = "__origBg=$(this).css(\"background\");$(this).css(\"background\",\"#880000\");"; //+szFilter;
+						var szClearHighlight = "$(this).css(\"background\",__origBg);"; //ixmaps.filterThemeItems(null,null,\"\",\"remove\");"
+						var szHighlight = "$(this).css(\"border\",\"solid #ffffff 0.5px\");"; //+szFilter;
+						var szClearHighlight = "$(this).css(\"border\",\"\");"; //ixmaps.filterThemeItems(null,null,\"\",\"remove\");"
+						var szRange = "__setRangeFilter(\"" + facetsA[i].id + "\", \"" + bMin + "," + bMax + "\", 0, 0)";
 
 						szHtml += "<div style='display:inline-block;width:" + width + "px;background-color:" + color + ";height:" + (1 + (height * scale)) + "px;' ";
-						szHtml += " data-toggle='tooltip' title='" + szTooltip + "' onClick='" + szRange + "'"; 
-						szHtml += fActive?(" onmouseover='" + szHighlight + "' onmouseout='" + szClearHighlight + "'>"):">";
+						szHtml += " data-toggle='tooltip' title='" + szTooltip + "' onClick='" + szRange + "'";
+						szHtml += fActive ? (" onmouseover='" + szHighlight + "' onmouseout='" + szClearHighlight + "'>") : ">";
 						szHtml += "</div>";
 						//szHtml += "<div style='display:inline-block;width:" + width + "px;background-color:" + color + ";height:" + (1 + (height * scale)) + "px;' data-toggle='tooltip' title='" + (szbMin + ' - ' + szbMax) + "'></div>";
 					}
@@ -539,94 +550,115 @@ window.ixmaps.data = window.ixmaps.data || {};
 					// make slider
 					// ---------------------------------
 
-					sliderA.push({ id: sliderId, field: facetsA[i].id, scale: szScale, min: min, max: max, ticks: nTicks });
+					sliderA.push({
+						id: sliderId,
+						field: facetsA[i].id,
+						scale: szScale,
+						min: min,
+						max: max,
+						ticks: nTicks
+					});
 					szHtml += '<div style="margin:0em 0em 0.5em 0em;background:#eee;border-radius:5px;height:2.5em;padding-top:0.5em"><span class="minvalue">' + szMin + '</span> <input id="' + sliderId + '" type="text" class="span2" value="" data-slider-min="' + min + '" data-slider-max="' + max + '" data-slider-step="5" data-slider-value="[' + facetsA[i].min + ',' + facetsA[i].max + ']"/> <span class="maxvalue">' + szMax + '</span></div>';
 
 					szHtml += '</div>'
 				}
 			} else
-				if (facetsA[i].values) {
+			if (facetsA[i].values) {
 
-					// ---------------------------------
-					// unique value facet
-					// ---------------------------------
+				// ---------------------------------
+				// type B
+				// unique value facet
+				// ---------------------------------
 
-					szHtml += '<div>'
+				szHtml += '<div>'
 
-					// if more than 20 items, clip list to 10
-					// --------------------------------------
-					var maxII = (facetsA[i].values.length<20)?facetsA[i].values.length:10;
+				// if more than 20 items, clip list to 10
+				// --------------------------------------
+				var maxII = (facetsA[i].values.length < 12) ? facetsA[i].values.length : 10;
 
-					for (var ii = 0; ii <facetsA[i].values.length; ii++) {
+				for (var ii = 0; ii < facetsA[i].values.length; ii++) {
+					
+					if (facetsA[i].values[ii].length && (facetsA[i].values[ii] != " ")) {
 
-						if (facetsA[i].values[ii] != " ") {
+						// make the facet filter 
+						var szQuery = "WHERE \"" + facetsA[i].id + "\" = \"" + facetsA[i].values[ii] + "\"";
 
-							// make the facet filter 
-							var szQuery = "WHERE \"" + facetsA[i].id + "\" = \"" + facetsA[i].values[ii] + "\"";
+						// make href, pass filter by filter array to avoid " or ' conflicts
+						__queryA.push(szQuery);
+						var href = "javascript:__setFacetFilter(__queryA[" + (__queryA.length - 1) + "]);";
 
-							// make href, pass filter by filter array to avoid " or ' conflicts
-							__queryA.push(szQuery);
-							var href = "javascript:__setFacetFilter(__queryA[" + (__queryA.length - 1) + "]);";
+						// how often is the value in the column
+						var nCount = facetsA[i].valuesCount ? facetsA[i].valuesCount[facetsA[i].values[ii]] : null;
+						var nMaxCount = facetsA[i].nValuesSum || facetsA[i].nCount;
 
-							// how often is the value in the column
-							var nCount = facetsA[i].valuesCount ? facetsA[i].valuesCount[facetsA[i].values[ii]] : null;
-                            var nMaxCount = facetsA[i].nValuesSum || facetsA[i].nCount;
-                            
-							var bgColor = "#eeeeee";
-							var szCount = ixmaps.__formatValue(nCount, 0, "BLANK") + " " + (ixmaps.data.fShowFacetValues?(objTheme.szUnits||""):""); //String(nCount || "");
-
-							if ((objThemeDefinition.field == facetsA[i].id)) {
-								bgColor = objTheme.colorScheme[objTheme.nStringToValueA[facetsA[i].values[ii]] - 1];
-								//href = "javascript:ixmaps.markThemeClass('" + objTheme.szId + "'," + (objTheme.nStringToValueA[facetsA[i].values[ii]] - 1) + ");";
+						var bgColor = "";
+						var szCount = ixmaps.formatValue(nCount, 0, "BLANK") + " " + (ixmaps.data.fShowFacetValues ? (objTheme.szUnits || "") : ""); //String(nCount || "");
+						
+						var szText = facetsA[i].values[ii];
+						
+						if ((objThemeDefinition.field == facetsA[i].id)) {
+								bgColor = objTheme.colorScheme[objTheme.nStringToValueA[facetsA[i].values[ii]] - 1]||"none";
+							if ( objTheme.szLabelA && objTheme.szValuesA ){
+								szText = objTheme.szLabelA[objTheme.nStringToValueA[facetsA[i].values[ii]] - 1];
 							}
-
-							// facet button with one unique value
-							// -----------------------------------
-							//szHtml += '<a href="'+href+'" onmouseover="'+szHighlight+'" onmouseout="'+szClearHighlight+'" >';
-							szHtml += '<a href="' + href + '">';
-							szHtml += '<div class="input-group" style="margin-bottom:0.5em;width:100%">';
-							if ((objThemeDefinition.field == facetsA[i].id)) {
-								szHtml += '<span class="input-group-addon" id="btnGroupAddon" style="background:' + bgColor + '"></span>';
-							}
-							var szText = facetsA[i].values[ii];
-							if (facetsA[i].type == "search") {
-								if (fActiveFacet) {
-									value = szActiveFilter.split("\"")[3].replace("\/","\\\/");
-									var szTextA = eval("szText.split(/"+value+"/i)");
-									szText = szTextA.join("<span style='background:#ffff00'>"+value+"</span>");
+						}
+						/**
+						if ( localTextA[szText] ){
+							szText = localTextA[szText];
+						}
+						**/
+						// facet button with one unique value
+						// -----------------------------------
+						szHtml += '<a href="' + href + '">';
+						szHtml += '<div class="input-group" style="margin-bottom:0.5em;width:100%">';
+						if ((objThemeDefinition.field == facetsA[i].id)) {
+							szHtml += '<span class="input-group-addon" id="btnGroupAddon" style="background:' + bgColor + ';"></span>';
+						}
+						
+						if (facetsA[i].type == "textual") {
+							if (fActiveFacet) {
+								value = szActiveFilter.split("\"")[3].replace("\/", "\\\/");
+								if ( value != "*" ){
+									var szTextA = eval("szText.split(/" + value + "/i)");
+									szText = szTextA.join("<span style='color:#000000;background:#ffff00;padding:0 0.2em;'>" + value + "</span>");
 								}
 							}
-							szHtml += '<button type="button" class="btn btn-block btn-secondary "><span style="margin-left:0.5em;float:left;white-space:normal;text-align:left">' + szText + '</span><span class="badge badge-primary badge-pill pull-right" style="top:0.1em;right:0.2em;" onmouseover=\'' + szHighlight + '\' onmouseout=\'' + szClearHighlight + '\'>' + szCount + '</span></button>';
-                            
-                            var nWidth = (100/nMaxCount*nCount);
-                            if ( !isNaN(nWidth) && (nWidth<100) && (facetsA[i].uniqueValues > 2) ) {
-                                szHtml += '<div style="position:relative;top:0.25em;left:0.1em;background:rgba(208,208,208,1);line-height:0.4em;width:'+nWidth+'%;border-radius:0 0.5em 0.5em 0">&nbsp;</div>';                               
-                                }
-                                
-							szHtml += '</div>';
-							szHtml += '</a>';
+						}
+						szHtml += '<button type="button" class="btn btn-block btn-primary " style="width:100%;border:none;border-bottom:solid #000000 0.1px;border-radius:0;"><span style="margin-left:-0.5em;float:left;white-space:normal;text-align:left;margin-top:0.2em">' + szText + '</span><span class="badge badge-primary badge-pill pull-right" style="top:0.1em;right:-0.25em;float:right;text-align:right;font-size:18px" onmouseover=\'' + szHighlight + '\' onmouseout=\'' + szClearHighlight + '\'>' + szCount + '</span></button>';
+
+						var nWidth = (100 / nMaxCount * nCount);
+						if (!isNaN(nWidth) && (nWidth < 100) && (facetsA[i].uniqueValues > 2)) {
+							szHtml += '<div style="position:relative;top:3px;left:0.1em;background:rgba(208,208,208,1);line-height:0.4em;width:' + nWidth + '%;border-radius:0 0.5em 0.5em 0">&nbsp;</div>';
 						}
 
-						// clip list to max itema
-						// --------------------------------------
-						if ( ii == maxII ){
-							szHtml += '</div>';
-							szHtml += '<div id="'+(facetsA[i].id+"plus")+'" style="display:none">';
-						}
-
+						szHtml += '</div>';
+						szHtml += '</a>';
 					}
 
-					szHtml += '</div>';
-					szHtml += '<div>';
-
-					// if list clipped, make butto to expand 
+					// clip list to max itema
 					// --------------------------------------
-					if ( facetsA[i].values.length > maxII ){
-						szHtml += '<a ><button type="button" class="btn btn-default " style="padding:0.2em 0.5em" onclick="$(this).hide();$(\'#'+(facetsA[i].id+"plus")+'\').toggle();">+ '+(facetsA[i].values.length-maxII)+'</button></a>';
+					if (ii == maxII) {
+						szHtml += '</div>';
+						szHtml += '<div id="' + (szSafeId + "plus") + '" style="display:none">';
 					}
 
-					szHtml += "</div>";
 				}
+
+				szHtml += '</div>';
+				szHtml += '<div>';
+
+				// if list clipped, make butto to expand 
+				// --------------------------------------
+				if (facetsA[i].values.length > maxII) {
+					szHtml += '<a ><button type="button" class="btn btn-default " style="padding:0.2em 0.5em" onclick="$(this).hide();$(\'#' + (szSafeId + "plus") + '\').toggle();">+ ' + (facetsA[i].values.length - maxII) + '</button></a>';
+				}
+
+			} else {
+				// facet has no property .values 
+				// may be there are 0 or to many unique values when creating the facet
+				//szHtml += '(too many values)';
+			}
+
 			szHtml += "</div>";
 		}
 		szHtml += "</div>";
