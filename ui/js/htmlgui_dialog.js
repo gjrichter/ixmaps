@@ -289,6 +289,9 @@ $Log: htmlgui.js,v $
 		this.openDialog(null,'table-dialog',"./tools/table_new.html",'data table',position||'auto',800,600);
 	};
 
+	ixmaps.selectBasemap = function(target,position){
+		this.openDialog(null,'basemap-dialog',"./tools/layer.html",'layer table',position||'auto',400,600);
+	};
 	ixmaps.popupBookmarks = function(position){
 		this.openDialog(null,'bookmarks','./tools/history.html','Bookmarks',position||'50%,103',250,450);
 	};

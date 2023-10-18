@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+<meta http-equiv="Content-Language" content="en-us" />
+<meta name="copyright" content="Guenter Richter"/>
+<meta name="author" content="service@medienobjekte.de"/>
+<meta name="description" content="Interactive &amp; estensible maps in SVG"/>
+<meta name="revisit-after" content="30 days"/>
+<meta name="distribution" content="Global"/>
+
+<link rel="stylesheet" href="help.css" type="text/css" />
+
+<style type="text/css">
+	h1,h2,h3,h4,h5,h6,p {
+		font-family: arial,helvetica;
+		color: #444;
+		font-weight: 300;
+	}
+	p {
+		font-family: arial,helvetica;
+		color: #444;
+		font-weight: 300;
+	}
+	a {
+		font-family: arial,helvetica;
+		font-weight: 100;
+		color: #444;
+		text-decoration:none;
+	}
+
+	a:hover {
+		color: #0044dd;
+		text-decoration:none;
+	}
+</style>
+
+</head>
+
+<body style="margin:0px;padding:0px;" onload="">
+
+	<!-- Container -->
+	<div id="container" style="padding:2em 1em;vertical-align:middle;background-color:rgba(255,255,255,0.9)" >
+
+		<h3>MAPPA DI FONDO</h3>
+					
+		<hr>
+		<ul class="maptypelist">
+
+			<li><a href="javascript:ixmaps.setMapTypeId('white');">white</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('gray');">gray</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('black');">black</a></li>
+
+			<li role="separator" class="divider"></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('OpenStreetMap - Osmarenderer');">OpenStreetMap - Osmarenderer</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('OpenStreetMap - FR');">OpenStreetMap - Humanitarian</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('OpenStreetMap - wikipedia');">OpenStreetMap - Wikipedia</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('OpenTopoMap');">Open Topo Map</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('OpenPtMap');">Open Public Transport Map</a></li>
+
+			<li role="separator" class="divider"></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('Stamen - toner-lite');">Stamen - toner-lite</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('Stamen - watercolor');">Stamen - watercolor</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('Stamen - terrain');">Stamen - terrain</a></li>
+
+			<li role="separator" class="divider"></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('CartoDB - Positron');">CartoDB - Positron</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('CartoDB - Dark matter');">CartoDB - Dark matter</a></li>
+
+            <li role="separator" class="divider"></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('MapTiler - Positron');">MapTiler - Positron</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('MapTiler - Dark Matter');">MapTiler - Dark Matter</a></li>
+
+			<li role="separator" class="divider"></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('ArcGIS - Topo');">ArcGIS - Topo</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('ArcGIS - Light Gray Base');">ArcGIS - Light Gray Base</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('ArcGIS - Ocean Basemap');">ArcGIS - Ocean Basemap</a></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('ArcGIS - Hillshade');">ArcGIS - Hillshade</a></li>
+
+			<li role="separator" class="divider"></li>
+			<li><a href="javascript:ixmaps.setMapTypeId('NOKIA - satellite');">Nokia - Satellite</a></li>
+		</ul>	
+
+
+</body>
+	
+	<script type="text/javascript">
+
+	var ixmaps = null;
+	var parentWindow = null;
+
+	/* ------------------------------------------------------------------ * 
+		Init functions
+	 * ------------------------------------------------------------------ */
+
+		try
+		{
+			if ( parent ){
+				parentWindow = parent.window;
+				ixmaps = parent.window.ixmaps;
+			}else
+			if ( window.opener ){
+				parentWindow = window.opener;
+				ixmaps = window.opener.ixmaps;
+			}
+			else{
+				alert("error: missing parent window for map queries !");
+			}
+		}
+		catch (e)
+		{
+		}
+		
+	</script>	
+	
+	
+</html>

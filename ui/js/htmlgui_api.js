@@ -1295,6 +1295,19 @@ $Log: htmlgui_api.js,v $
 	};
 
 	/**
+	 * show basemap select
+	 * @void
+	 */
+	ixmaps.popupBasemapSelect = function(){
+		try{
+			ixmaps.embeddedApi.selectBasemap('dialog','10,103');
+		}
+		catch (e){
+			ixmaps.embeddedApi.embeddedApi.selectBasemap('dialog','10,103');
+		}
+	};
+
+	/**
 	 * show Project dialog
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
 	 * @param {Array} position x,y screen position for the modal dialog
