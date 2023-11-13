@@ -1376,7 +1376,7 @@ Map.Zoom.prototype.checkZoomLimit = function (nNewZoom) {
 		}
 	}
 	if (nNewZoom >= nLimit) {
-		displayMessage("zoom limit !", 1000);
+		//displayMessage("zoom limit !", 1000);
 		return nLimit;
 	}
 	nNewZoom = Math.round(nNewZoom * 1000000) / 1000000;

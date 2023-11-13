@@ -3200,7 +3200,7 @@ Map.Themes.prototype.changeThemeStyle = function (evt, szId, szStyle, szFlag) {
 	if ( szId == null){
 		themesA = this.getThemes();
 		for ( i in themesA ){
-			if (themesA[i].szFlag.match(/CHART/))
+			if (!themesA[i].szFlag.match(/FEATURE/))
 			this.changeThemeStyle(evt, themesA[i].szId, szStyle, szFlag);
 		}
 		return;
@@ -11305,6 +11305,12 @@ MapTheme.prototype.paintMap = function (startIndex) {
 			this.indexA[this.indexA.length] = a;
 			this.itemA[a].todo = true;
 		}
+		
+		// GR 13/11/2023 !!!
+		for (i = 0; i < this.partsA.length; i++) {
+			this.partsA[i].nCount = 0;
+			this.partsA[i].nSum = 0;
+		}
 
 		this.nDoneCount = 0;
 		
@@ -16265,6 +16271,22 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				donut.addStyle("SYMMETRIC");
 			}
 			// GR 03.03.2018
+			if (szFlag.match(/HALFPLUS20/)) {
+				donut.addStyle("HALFPLUS20");
+				donut.addStyle("NOROTATE");
+			}
+			if (szFlag.match(/HALFMINUS20/)) {
+				donut.addStyle("HALFMINUS20");
+				donut.addStyle("NOROTATE");
+			}
+			if (szFlag.match(/HALFPLUS10/)) {
+				donut.addStyle("HALFPLUS10");
+				donut.addStyle("NOROTATE");
+			}
+			if (szFlag.match(/HALFMINUS10/)) {
+				donut.addStyle("HALFMINUS10");
+				donut.addStyle("NOROTATE");
+			}
 			if (szFlag.match(/HALF/)) {
 				donut.addStyle("HALF");
 				donut.addStyle("NOROTATE");
@@ -18518,28 +18540,36 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 								}
 							}
 
+							var nMinValue = 0;
 							var nMaxValue = (nAllMaxValue || this.nMax);
+							
 							// GR 25.02.2019 for menu charts
 							nMaxValue = Math.max(nChartMaxValue, nMaxValue);
 
 							// set or calculate min/max values
 							// if this.nMaxValue or this.nMinValue not defined in theme config, set it (once) from data
 							//
-							var nMaxValue = this.nMaxValuePlot = (typeof this.nMaxValue !== "undefined") ? this.nMaxValue : nMaxValue;
-							var nMinValue = this.nMinValuePlot = (typeof this.nMinValue !== "undefined") ? this.nMinValue : Math.min(this.nMin, nAllMinValue);
+							nMaxValue = this.nMaxValuePlot = (typeof this.nMaxValue !== "undefined") ? this.nMaxValue : nMaxValue;
+							nMinValue = this.nMinValuePlot = (typeof this.nMinValue !== "undefined") ? this.nMinValue : Math.min(this.nMin, nAllMinValue);
 
+							// if this.nMaxValue is "auto", every chart item has is own fitting scale 
+							//
+							if (this.nMaxValue == "auto") {
+								nMaxValue = this.nMaxValuePlot = nChartMaxValue;
+							}
+							
 							// GR 04.04.2019 if this.nMaxValue is "inherit" look in already present themes for nMaxValue 
 							// needed for 'superposed' PLOT (curve) charts
 							//
 							if (this.nMaxValue == "inherit") {
+								// !important
+								this.nMaxValuePlot = this.nMinValuePlot = null;
+								
 								for (var t = 0; t < this.parent.themesA.length; t++) {
 									if ((this.parent.themesA[t] != this) && this.parent.themesA[t].nMaxValuePlot) {
 										nMaxValue = this.parent.themesA[t].nMaxValuePlot;
 									}
 								}
-							}
-							if (this.nMaxValue == "auto") {
-								var nMaxValue = this.nMaxValuePlot = nChartMaxValue;
 							}
 							
 							// calculate PLOT scale
@@ -18837,13 +18867,15 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 										if ( szFlag.match(/\bINLINETEXT\b/) ){
 											newText.fu.setPosition(nAxis, (-nPValue) * nScale);
 										}else
-										if (szFlag.match(/LINES/) && ((this.nGridX == null) || (this.nGridX <= 1) || (szFlag.match(/STACKED/)))) {
+										if ( szFlag.match(/\bSTACKED\b/) ){
+											newText.parentNode.removeChild(newText);
+										}else
+										if ( szFlag.match(/LINES/) && ((this.nGridX == null) || (this.nGridX <= 1)) ) {
 											newText.fu.setPosition(nAxis - map.Scale.normalX(nChartSize * this.nGridX||1), (-nPValue) * nScale  );
 											newText.fu.scale(2.5,2.5);
-											newText.parentNode.removeChild(newText);
-										} else {
-											newText.fu.scale(1.5,1.5);
-											newText.fu.setPosition(nAxis, (-nPValue) * nScale);
+											} else {
+											newText.fu.scale(1.5*this.nValueScale,1.5*this.nValueScale);
+											newText.fu.setPosition(nAxis - map.Scale.normalX(nChartSize/7), (-nPValue) * nScale);
 										}
 									}
 								}
@@ -20360,8 +20392,13 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 		var ptNullOrig = new point(ptNull.x, ptNull.y);
 		
-		ptNull.x = map.Scale.normalX(this.nOffsetX || 0) * (this.nSymbolScale || 1);
-		ptNull.y = map.Scale.normalY(-this.nOffsetY || 0) * (this.nSymbolScale || 1);
+		if ( szFlag.match(/PLOT/)) {
+			ptNull.x = map.Scale.normalX(this.nOffsetX || 0);
+			ptNull.y = map.Scale.normalY(-this.nOffsetY || 0);
+		}else{
+			ptNull.x = map.Scale.normalX(this.nOffsetX || 0) * (this.nSymbolScale || 1);
+			ptNull.y = map.Scale.normalY(-this.nOffsetY || 0) * (this.nSymbolScale || 1);
+		}
 
 		if (this.szAlign) {
 			if (szFlag.match(/PLOT/) && !szFlag.match(/ZOOM/)) {
@@ -20380,7 +20417,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				if (this.szAlign.match(/10\%right/)) {
 					ptNull.x = map.Scale.normalX(nChartSize*0.90*nPartsA.length/(this.nGridX||1));
 				}
-				if (this.szAlign.match(/10\%eft/)) {
+				if (this.szAlign.match(/10\%left/)) {
 					ptNull.x = map.Scale.normalX(nChartSize*0.10*nPartsA.length/(this.nGridX||1));
 				}
 				if (this.szAlign.match(/23left/)) {

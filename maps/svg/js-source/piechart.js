@@ -262,10 +262,26 @@ DonutChart.prototype.realize = function(){
 	if ( this.szStyle.match(/HALF/) ){
 		nEndAngle = 270;
 	}
+	if ( this.szStyle.match(/HALFPLUS10/) ){
+		nEndAngle = 260;
+	}
+	if ( this.szStyle.match(/HALFMINUS10/) ){
+		nEndAngle = 280;
+	}
+	if ( this.szStyle.match(/HALFPLUS20/) ){
+		nEndAngle = 250;
+	}
+	if ( this.szStyle.match(/HALFMINUS20/) ){
+		nEndAngle = 290;
+	}
 
 	// here we go
 
 	var nMaxAngle = this.szStyle.match(/HALF/)?180:360;
+	    nMaxAngle = this.szStyle.match(/HALFPLUS10/)?200:nMaxAngle;
+	    nMaxAngle = this.szStyle.match(/HALFMINUS10/)?160:nMaxAngle;
+	    nMaxAngle = this.szStyle.match(/HALFPLUS20/)?220:nMaxAngle;
+	    nMaxAngle = this.szStyle.match(/HALFMINUS20/)?140:nMaxAngle;
 
 	var nAngle = 0;
 	var nGapAngle = 0;
@@ -391,7 +407,7 @@ DonutChart.prototype.realize = function(){
 	// GR 16.08.2008 -> infodisplay this.frameGroup = _crc_constructNode('g',this.targetDocument,this.targetGroup,{id:"donutframe"+String(Math.random())});
 	this.frameGroup = _crc_constructNode('g',this.targetDocument,this.targetGroup,{});
 	for ( i=0;i<nLastPart;i++ ){
-		donutPart = _crc_drawDonut(this.targetDocument,this.frameGroup,this.mX,this.mY,this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter,this.nRadInner,this.donutPartsA[i].nHeight,this.donutPartsA[i].nStartAngle,this.donutPartsA[i].nEndAngle,this.donutPartsA[i].color,null,null,this.szLine,this.nLineWidth,this.szStyle,this.donutPartsA[i].nOffset);
+		donutPart = _crc_drawDonut(this.targetDocument,this.frameGroup,this.mX,this.mY,this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter,this.nRadInner,this.donutPartsA[i].nHeight,this.donutPartsA[i].nStartAngle,this.donutPartsA[i].nEndAngle,this.donutPartsA[i].color,null,null,this.szLine,this.nLineWidth*(this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter)/300,this.szStyle,this.donutPartsA[i].nOffset);
 //		donutPart.setAttributeNS(szMapNs,"tooltip",Math.round(this.partsA[i].nPercent*10)/10+" % of members "+Math.round(this.partsA[i].nHeight/20*10)/10+" % of value");
 		if ( !this.szStyle.match(/SILENT/) ){
 			donutPart.setAttributeNS(szMapNs,"tooltip",this.partsA[i].szInfo?(this.partsA[i].szText+this.partsA[i].szInfo):Math.round(this.partsA[i].nInfoValue*10)/10+" % ");
@@ -409,7 +425,7 @@ DonutChart.prototype.realize = function(){
 		this.donutPartsA[i].objNode = donutPart;
 	}
 	for ( i=this.donutPartsA.length-1;i>=nLastPart;i-- ){
-		donutPart = _crc_drawDonut(this.targetDocument,this.frameGroup,this.mX,this.mY,this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter,this.nRadInner,this.donutPartsA[i].nHeight,this.donutPartsA[i].nStartAngle,this.donutPartsA[i].nEndAngle,this.donutPartsA[i].color,null,null,this.szLine,this.nLineWidth,this.szStyle,this.donutPartsA[i].nOffset);
+		donutPart = _crc_drawDonut(this.targetDocument,this.frameGroup,this.mX,this.mY,this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter,this.nRadInner,this.donutPartsA[i].nHeight,this.donutPartsA[i].nStartAngle,this.donutPartsA[i].nEndAngle,this.donutPartsA[i].color,null,null,this.szLine,this.nLineWidth*(this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter)/300,this.szStyle,this.donutPartsA[i].nOffset);
 //		donutPart.setAttributeNS(szMapNs,"tooltip",Math.round(this.partsA[i].nPercent*10)/10+" % of members "+Math.round(this.partsA[i].nHeight/20*10)/10+" % of value");
 		if ( !this.szStyle.match(/SILENT/) ){
 			donutPart.setAttributeNS(szMapNs,"tooltip",this.partsA[i].szInfo?(this.partsA[i].szText+this.partsA[i].szInfo):Math.round(this.partsA[i].nInfoValue*10)/10+" % ");
