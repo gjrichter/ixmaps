@@ -1168,7 +1168,11 @@ $Log: htmlgui.js,v $
 				} else
 				if ((i == "alpha") || 
 					(i == "alphafield")) {
-					theme.style["alphfield"] = theme.binding[i];
+					theme.style["alphafield"] = theme.binding[i];
+				} else
+				if ((i == "alpha100") || 
+					(i == "alphafield100")) {
+					theme.style["alphafield100"] = theme.binding[i];
 				} else
 				if ((i == "title") ||
 					(i == "titlefield")) {

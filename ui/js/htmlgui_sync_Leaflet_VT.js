@@ -92,8 +92,8 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		}
 		ixmaps.layers[layerName] = L.maptilerLayer({
 			apiKey: 'D7iiyfgsNSCVtHuGghVu',
-			style: eval("L.MaptilerStyle."+style), // optional
-			attribution: options.attribution 
+			style: eval("L.MaptilerStyle." + style), // optional
+			attribution: options.attribution
 		});
 	};
 
@@ -152,7 +152,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 				duration: ixmaps.scrollsafesilent ? 0 : 1000
 			}
 		});
-		
+
 		// ---------------------
 		// define event handler
 		// ---------------------
@@ -187,7 +187,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		// ----------------------------
 		// define the vector tile layer
 		// ----------------------------
-		
+
 		__addVectorTileLayer("OPENSTREETMAP", {
 			name: "VT_OPENSTREETMAP",
 			myname: "VT_OPENSTREETMAP",
@@ -211,81 +211,81 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			myname: "VT_DATAVIZ",
 			minZoom: 2
 		});
-		
+
 		__addVectorTileLayer("DATAVIZ.LIGHT", {
 			name: "VT_DATAVIZ_LIGHT",
 			myname: "VT_DATAVIZ_LIGHT",
 			minZoom: 2
 		});
-		
+
 		__addVectorTileLayer("BACKDROP", {
 			name: "VT_BACKDROP",
 			myname: "VT_BACKDROP",
 			minZoom: 2
 		});
-		
+
 		__addVectorTileLayer("BACKDROP.LIGHT", {
 			name: "VT_BACKDROP_LIGHT",
 			myname: "VT_BACKDROP_LIGHT",
 			minZoom: 2
 		});
-		
+
 		__addVectorTileLayer("BASIC", {
 			name: "VT_BASIC",
 			myname: "VT_BASIC",
 			minZoom: 2
 		});
-		
+
 		__addVectorTileLayer("BASIC.LIGHT", {
 			name: "VT_BASIC_LIGHT",
 			myname: "VT_BASIC_LIGHT",
 			minZoom: 2
 		});
-		
+
 		__addVectorTileLayer("BRIGHT", {
 			name: "VT_BRIGHT",
 			myname: "VT_BRIGHT",
 			minZoom: 2
 		});
-		
+
 		__addVectorTileLayer("BRIGHT.LIGHT", {
 			name: "VT_BRIGHT_LIGHT",
 			myname: "VT_BRIGHT_LIGHT",
 			minZoom: 2
 		});
-		
+
 		__addVectorTileLayer("VOYAGER", {
 			name: "VT_VOYAGER",
 			myname: "VT_VOYAGER",
 			minZoom: 2
 		});
-		
+
 		__addVectorTileLayer("VOYAGER.LIGHT", {
 			name: "VT_VOYAGER_LIGHT",
 			myname: "VT_VOYAGER_LIGHT",
 			minZoom: 2
 		});
-		
+
 		__addVectorTileLayer("TOPO", {
 			name: "VT_TOPO",
 			myname: "VT_TOPO",
 			minZoom: 2
 		});
-		
+
 		__addVectorTileLayer("TOPO.SHINY", {
 			name: "VT_TOPO_SHINY",
 			myname: "VT_TOPO_SHINY",
 			minZoom: 2
 		});
-		
+
 		__addVectorTileLayer("TOPO.TOPOGRAPHIQUE", {
 			name: "VT_TOPO_TOPOGRAPHIQUE",
 			myname: "VT_TOPO_TOPOGRAPHIQUE",
 			minZoom: 2
 		});
-		
-		
-		
+
+
+
 		// ---------------------
 		// define the tile layer
 		// ---------------------
@@ -523,19 +523,19 @@ $Log: htmlgui_sync_Leaflet.js,v $
 
 		/** Stamen Design */
 
-		__addTileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png", {
+		__addTileLayer("https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png", {
 			name: "Stamen - toner",
 			myname: "Stamen - toner",
 			minZoom: 2,
-			attribution: "Map tiles by <a href='http://stamen.com'>Stamen Design</a>",
+			attribution: "&copy; <a href='https://www.stadiamaps.com/' target='_blank'>Stadia Maps</a> &copy; <a href='https://www.stamen.com/' target='_blank'>Stamen Design</a> &copy; <a href='https://openmaptiles.org/' target='_blank'>OpenMapTiles</a> &copy; <a href='https://www.openstreetmap.org/about/' target='_blank'>OpenStreetMap contributors</a>",
 			subdomains: ['a', 'b', 'c', 'd']
 		});
 
-		__addTileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png", {
+		__addTileLayer("https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png", {
 			name: "Stamen - toner-lite",
 			myname: "Stamen - toner-lite",
 			minZoom: 2,
-			attribution: "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, under <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a>. Data by <a href='http://openstreetmap.org'>OpenStreetMap</a>, under <a href='http://creativecommons.org/licenses/by-sa/3.0'>CC BY SA</a> | powered by <a href='http://ixmaps.com'>iXMaps</a> .",
+			attribution: "&copy; <a href='https://www.stadiamaps.com/' target='_blank'>Stadia Maps</a> &copy; <a href='https://www.stamen.com/' target='_blank'>Stamen Design</a> &copy; <a href='https://openmaptiles.org/' target='_blank'>OpenMapTiles</a> &copy; <a href='https://www.openstreetmap.org/about/' target='_blank'>OpenStreetMap contributors</a>",
 			subdomains: ['a', 'b', 'c', 'd']
 		});
 
@@ -547,18 +547,18 @@ $Log: htmlgui_sync_Leaflet.js,v $
 			subdomains: ['a', 'b', 'c', 'd']
 		});
 
-		__addTileLayer("https://tiles.stadiamaps.com/styles/stamen_watercolor/{z}/{x}/{y}.jpg", {
+		__addTileLayer("https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg", {
 			name: "Stamen - watercolor",
 			myname: "Stamen - watercolor",
 			minZoom: 2,
-			attribution: "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, under <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a>. Data by <a href='http://openstreetmap.org'>OpenStreetMap</a>, under <a href='http://creativecommons.org/licenses/by-sa/3.0'>CC BY SA</a>.",
+			attribution: "&copy; <a href='https://www.stadiamaps.com/' target='_blank'>Stadia Maps</a> &copy; <a href='https://www.stamen.com/' target='_blank'>Stamen Design</a> &copy; <a href='https://openmaptiles.org/' target='_blank'>OpenMapTiles</a> &copy; <a href='https://www.openstreetmap.org/about/' target='_blank'>OpenStreetMap contributors</a>",
 			subdomains: ['a', 'b', 'c', 'd']
 		});
-		__addTileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png", {
+		__addTileLayer("https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.jpg", {
 			name: "Stamen - terrain",
 			myname: "Stamen - terrain",
 			minZoom: 2,
-			attribution: "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, under <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a>. Data by <a href='http://openstreetmap.org'>OpenStreetMap</a>, under <a href='http://creativecommons.org/licenses/by-sa/3.0'>CC BY SA</a>.",
+			attribution: "&copy; <a href='https://www.stadiamaps.com/' target='_blank'>Stadia Maps</a> &copy; <a href='https://www.stamen.com/' target='_blank'>Stamen Design</a> &copy; <a href='https://openmaptiles.org/' target='_blank'>OpenMapTiles</a> &copy; <a href='https://www.openstreetmap.org/about/' target='_blank'>OpenStreetMap contributors</a>",
 			subdomains: ['a', 'b', 'c', 'd']
 		});
 
