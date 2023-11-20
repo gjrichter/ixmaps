@@ -200,6 +200,8 @@ var themeStyleTranslateA = [
 	,{ style: "glowlower"		,obj: "szGlowLower"  }
 	,{ style: "chartupper"		,obj: "szChartUpper"  }
 	,{ style: "chartlower"		,obj: "szChartLower"  }
+	,{ style: "layerupper"		,obj: "szLayerUpper"  }
+	,{ style: "layerlower"		,obj: "szLayerLower"  }
 	,{ style: "featureupper"	,obj: "szFeatureUpper"  }
 	,{ style: "featurelower"	,obj: "szFeatureLower"  }
 	,{ style: "boxupper"		,obj: "szBoxUpper"  }
@@ -1155,6 +1157,16 @@ Map.Themes.prototype.parseStyle = function (mapTheme, styleObj) {
 		if (__isdef(styleObj.chartlower)) {
 			mapTheme.szChartLower = styleObj.chartlower;
 			mapTheme.nChartLower = __scanScaleValue(mapTheme.szChartLower);
+		}
+		// GR 20.11.2022 define scaledependency for layer visibility 
+		if (__isdef(styleObj.layerupper)) {
+			mapTheme.szLayerUpper = styleObj.layerupper;
+			mapTheme.nLayerUpper = __scanScaleValue(mapTheme.szLayerUpper);
+		}
+		// GR 20.11.2022 define scaledependency for layer visibility 
+		if (__isdef(styleObj.layerlower)) {
+			mapTheme.szLayerLower = styleObj.layerlower;
+			mapTheme.nLayerLower = __scanScaleValue(mapTheme.szLayerLower);
 		}
 		// GR 10.09.2021 define scaledependency for features (layer) 
 		if (__isdef(styleObj.featureupper)) {
@@ -6532,12 +6544,12 @@ MapTheme.prototype.realize = function () {
 		var imageWidth  = map.Scale.bBox.width/20;
 		var imageHeight = map.Scale.bBox.height/20;
 		
-		if (this.nChartLower && (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nChartLower)) {
-			map.Dom.clearGroup(this.chartGroup);
+		if (this.nLayerLower && (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nLayerLower)) {
+			this.clearWMS();
 			return;
 		}
-		if (this.nChartUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nChartUpper)) {
-			map.Dom.clearGroup(this.chartGroup);
+		if (this.nLayerUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nLayerUpper)) {
+			this.clearWMS();
 			return;
 		}
 		var newShape = map.Dom.constructNode('image', this.chartGroup, {

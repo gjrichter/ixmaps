@@ -1335,7 +1335,7 @@ Map.Zoom.prototype.doPanMap = function (nDeltaX, nDeltaY) {
 		this.doPanFixed(newX - ptOld.x, newY - ptOld.y);
 	}
 
-	if (map.Scale.szMapProjection == "WinkelTripel") {
+	if (map.Scale.szMapProjection != "Mercator") {
 		return;
 	}
 	// GR 17.06.2013 correct sync error 

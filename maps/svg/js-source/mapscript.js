@@ -2376,6 +2376,9 @@ Map.Scale.prototype.getMapCoordinateUTM = function (x, y) {
 	if (this.szMapProjection == "WinkelTripel") {
 		ptCoord = _LLtoWinkelTripel(ptCoord.y, ptCoord.x);
 	} else
+	if (this.szMapProjection == "EqualEarth") {
+		ptCoord = _LLtoEqualEarth(ptCoord.y, ptCoord.x);
+	} else
 	if (this.szMapUnits != "feet" && this.szMapUnits != "meter" && this.szMapUnits != "meters") {
 		ptCoord = _LLtoUTM("WGS84", ptCoord.y, ptCoord.x);
 	}
@@ -2433,6 +2436,9 @@ Map.Scale.prototype.getMapCoordinateOfLatLon = function (lat, lon) {
 	if (this.szMapProjection == "WinkelTripel") {
 		ptCoord = _LLtoWinkelTripel(lat, lon);
 	} else
+	if (this.szMapProjection == "EqualEarth") {
+		ptCoord = _LLtoEqualEarth(lat, lon);
+	} else
 	if (this.szMapUnits == "feet" || this.szMapUnits == "meter" || this.szMapUnits == "meters") {
 		if (!this.szDatum && !this.szUTMZone) {
 			return null;
@@ -2459,6 +2465,9 @@ Map.Scale.prototype.getGeoCoordinateOfPoint = function (x, y) {
 
 	if (this.szMapProjection == "Mercator") {
 		return _MercatortoLL(y, x);
+	}
+	if (this.szMapProjection == "EqualEarth") {
+		return _EqualEarthtoLL(y, x);
 	}
 	if (this.szMapUnits != "feet" && this.szMapUnits != "meter" && this.szMapUnits != "meters") {
 		return new point(x, y);
@@ -6839,6 +6848,54 @@ function _LLtoWinkelTripel(nLat, nLon) {
 
 	return new point(x, y);
 }
+
+
+/**
+ * converts lat/long to Equal Earth coords.
+ * East Longitudes are positive, West longitudes are negative. 
+ * North latitudes are positive, South latitudes are negative
+ * Lat and Long are in decimal degrees
+ * @param  nLat latitude in decimal degrees
+ * @param  nLon longitude in decimal degrees
+ * @type   point
+ */
+var A1 = 1.340264,
+    A2 = -0.081106,
+    A3 = 0.000893,
+    A4 = 0.003796,
+    M = Math.sqrt(3) / 2,
+    iterations = 12;
+
+function _LLtoEqualEarth(nLat, nLon) {
+	/* Convert lon/lat to Equal Earth x/y */
+	nLat *= _deg2rad;
+	nLon *= _deg2rad;
+	var l = Math.asin(M * Math.sin(nLat)), l2 = l * l, l6 = l2 * l2 * l2;
+	return new point(
+		WGS_84_EQ_RAD * nLon * Math.cos(l) / (M * (A1 + 3 * A2 * l2 + l6 * (7 * A3 + 9 * A4 * l2))),
+		WGS_84_EQ_RAD * l * (A1 + A2 * l2 + l6 * (A3 + A4 * l2))
+	);
+}
+
+function _EqualEarthtoLL(x,y) {
+	
+	x /= WGS_84_EQ_RAD;
+	y /= WGS_84_EQ_RAD;
+	
+	var l = y, l2 = l * l, l6 = l2 * l2 * l2;
+	var delta = 0;
+	for (var i = 0, delta, fy, fpy; i < iterations; ++i) {
+		var fy = l * (A1 + A2 * l2 + l6 * (A3 + A4 * l2)) - y;
+		var fpy = A1 + 3 * A2 * l2 + l6 * (7 * A3 + 9 * A4 * l2);
+		l -= delta = fy / fpy, l2 = l * l, l6 = l2 * l2 * l2;
+		//if (abs(delta) < 0.1) break;
+	}
+	return new point(
+		_rad2deg * M * x * (A1 + 3 * A2 * l2 + l6 * (7 * A3 + 9 * A4 * l2)) / Math.cos(l),
+		_rad2deg * Math.asin(Math.sin(l) / M)
+	);
+};
+
 
 
 // .............................................................................
