@@ -407,7 +407,7 @@ DonutChart.prototype.realize = function(){
 	// GR 16.08.2008 -> infodisplay this.frameGroup = _crc_constructNode('g',this.targetDocument,this.targetGroup,{id:"donutframe"+String(Math.random())});
 	this.frameGroup = _crc_constructNode('g',this.targetDocument,this.targetGroup,{});
 	for ( i=0;i<nLastPart;i++ ){
-		donutPart = _crc_drawDonut(this.targetDocument,this.frameGroup,this.mX,this.mY,this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter,this.nRadInner,this.donutPartsA[i].nHeight,this.donutPartsA[i].nStartAngle,this.donutPartsA[i].nEndAngle,this.donutPartsA[i].color,null,null,this.szLine,this.nLineWidth*(this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter)/300,this.szStyle,this.donutPartsA[i].nOffset);
+		donutPart = _crc_drawDonut(this.targetDocument,this.frameGroup,this.mX,this.mY,this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter,this.nRadInner,this.donutPartsA[i].nHeight,this.donutPartsA[i].nStartAngle,this.donutPartsA[i].nEndAngle,this.donutPartsA[i].color,null,null,this.szLine,this.nLineWidth*(this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter)/300,this.szStyle,this.donutPartsA[i].nOffset,this.nBow);
 //		donutPart.setAttributeNS(szMapNs,"tooltip",Math.round(this.partsA[i].nPercent*10)/10+" % of members "+Math.round(this.partsA[i].nHeight/20*10)/10+" % of value");
 		if ( !this.szStyle.match(/SILENT/) ){
 			donutPart.setAttributeNS(szMapNs,"tooltip",this.partsA[i].szInfo?(this.partsA[i].szText+this.partsA[i].szInfo):Math.round(this.partsA[i].nInfoValue*10)/10+" % ");
@@ -425,7 +425,7 @@ DonutChart.prototype.realize = function(){
 		this.donutPartsA[i].objNode = donutPart;
 	}
 	for ( i=this.donutPartsA.length-1;i>=nLastPart;i-- ){
-		donutPart = _crc_drawDonut(this.targetDocument,this.frameGroup,this.mX,this.mY,this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter,this.nRadInner,this.donutPartsA[i].nHeight,this.donutPartsA[i].nStartAngle,this.donutPartsA[i].nEndAngle,this.donutPartsA[i].color,null,null,this.szLine,this.nLineWidth*(this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter)/300,this.szStyle,this.donutPartsA[i].nOffset);
+		donutPart = _crc_drawDonut(this.targetDocument,this.frameGroup,this.mX,this.mY,this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter,this.nRadInner,this.donutPartsA[i].nHeight,this.donutPartsA[i].nStartAngle,this.donutPartsA[i].nEndAngle,this.donutPartsA[i].color,null,null,this.szLine,this.nLineWidth*(this.donutPartsA[i].nRadOuter?this.donutPartsA[i].nRadOuter:this.nRadOuter)/300,this.szStyle,this.donutPartsA[i].nOffset,this.nBow);
 //		donutPart.setAttributeNS(szMapNs,"tooltip",Math.round(this.partsA[i].nPercent*10)/10+" % of members "+Math.round(this.partsA[i].nHeight/20*10)/10+" % of value");
 		if ( !this.szStyle.match(/SILENT/) ){
 			donutPart.setAttributeNS(szMapNs,"tooltip",this.partsA[i].szInfo?(this.partsA[i].szText+this.partsA[i].szInfo):Math.round(this.partsA[i].nInfoValue*10)/10+" % ");
@@ -536,8 +536,9 @@ function _crc_newText(targetDocument,targetGroup,x,y,s,szText){
  * @param nWidthLine	outline width of the part 
  * @param szStyle		perspective style of the part ( "flat","3D" )
  * @param nOffset		>0 to draw the part away from the center
+ * @param nBow			bow out the arc -> flower like style
  */
-function _crc_drawDonut(targetDocument, targetGroup,mX, mY, nRadOuter, nRadInner, nHeight, nStartAngle, nEndAngle, szColor1, szColor2, szColor3, szColorLine, nWidthLine, szStyle, nOffset ){
+function _crc_drawDonut(targetDocument, targetGroup,mX, mY, nRadOuter, nRadInner, nHeight, nStartAngle, nEndAngle, szColor1, szColor2, szColor3, szColorLine, nWidthLine, szStyle, nOffset, nBow ){
 
 	if ( nOffset == null ){
 		nOffset = 0;
@@ -657,7 +658,7 @@ function _crc_drawDonut(targetDocument, targetGroup,mX, mY, nRadOuter, nRadInner
 		// surface of donat
 		szPathD = "";
 		szPathD += pathMoveToCirclePoint	(mX,mY-nHeight,nRadOuter,nStartAngle);
-		szPathD += pathDrawArc				(mX,mY-nHeight,nRadOuter,nStartAngle,nEndAngle);
+		szPathD += pathDrawArc				(mX,mY-nHeight,nRadOuter,nStartAngle,nEndAngle,nBow);
 		szPathD += pathMoveToCirclePoint	(mX,mY-nHeight,nRadInner,nEndAngle);
 		if ( nRadInner ){
 			szPathD += pathDrawArcCounterClock	(mX,mY-nHeight,nRadInner,nEndAngle,nStartAngle);
@@ -670,7 +671,7 @@ function _crc_drawDonut(targetDocument, targetGroup,mX, mY, nRadOuter, nRadInner
 		// surface of donat
 		szPathD = "";
 		szPathD += pathMoveToCirclePoint	(mX,mY-nHeight,nRadOuter,nStartAngle);
-		szPathD += pathDrawArc				(mX,mY-nHeight,nRadOuter,nStartAngle,nEndAngle);
+		szPathD += pathDrawArc				(mX,mY-nHeight,nRadOuter,nStartAngle,nEndAngle,nBow);
 		szPathD += pathLineToCirclePoint	(mX,mY-nHeight,nRadInner,nEndAngle);
 		if ( nRadInner ){
 			szPathD += pathDrawArcCounterClock	(mX,mY-nHeight,nRadInner,nEndAngle,nStartAngle);
@@ -847,7 +848,7 @@ function _crc_donutPartDrawIn(obj){
  * @param nStartAngle the angle (0-360) where the arc starts
  * @param nEndAngle the angle (0-360) where the arc ends
  */
-function pathDrawArc(nX, nY, nRadius, nStartAngle, nEndAngle){
+function pathDrawArc(nX, nY, nRadius, nStartAngle, nEndAngle, nBow){
 	var x1,x2,y1,y2,z1,z2,xa,ya;
 	var dx1,dx2,dy1,dy2,dxa,dya;
 	var angle1,angle2;
@@ -858,8 +859,8 @@ function pathDrawArc(nX, nY, nRadius, nStartAngle, nEndAngle){
 	nStartAngle = nStartAngle%360;
 
 	if ( nStartAngle > nEndAngle ){
-		szPath += pathDrawArc(nX, nY, nRadius, nStartAngle, 360);
-		szPath += pathDrawArc(nX, nY, nRadius, 0		    , nEndAngle);
+		szPath += pathDrawArc(nX, nY, nRadius, nStartAngle, 360, nBow);
+		szPath += pathDrawArc(nX, nY, nRadius, 0		    , nEndAngle, nBow);
 		return szPath;
 		}
 	
@@ -898,6 +899,9 @@ function pathDrawArc(nX, nY, nRadius, nStartAngle, nEndAngle){
 		// Schnittpunkt der Tangenten 
 		xa =  (z2-z1)/(Math.tan(rad2)-Math.tan(rad1));
 		ya =  -Math.tan(rad1)*xa+z1;
+		// GR 22.11.2023 flower like style
+		xa *=  nBow || 1;
+		ya *=  nBow || 1;
 
 		// je nach Oktant umrechnen (spiegeln) 
 		switch(oct){	

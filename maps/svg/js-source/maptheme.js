@@ -2127,6 +2127,9 @@ Map.Themes.prototype.execute = function () {
 		if (this.themesA[i].fRealize) {
 			if ( (this.themesA[i].nChartUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale >  this.themesA[i].nChartUpper)) ||
 	     		 (this.themesA[i].nChartLower && (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.themesA[i].nChartLower)) )  {
+				if (this.themesA[i].chartGroup) {
+					this.themesA[i].chartGroup.style.setProperty("display", "none", "");
+				}	
 				continue;
 			}
 			// GR must be set to false, if not possible conflict with realize()
@@ -16340,6 +16343,22 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				}
 
 			}
+			if ( szFlag.match(/BOW/) ) {
+				donut.nBow = 1.3;
+			}
+			if ( szFlag.match(/SBOW/) ) {
+				donut.nBow = 1.2;
+			}
+			if ( szFlag.match(/XSBOW/) ) {
+				donut.nBow = 1.1;
+			}
+			if ( szFlag.match(/LBOW/) ) {
+				donut.nBow = 1.5;
+			}
+			if ( szFlag.match(/XLBOW/) ) {
+				donut.nBow = 1.8;
+			}
+			
 			donutsA.push(donut);
 		}
 
@@ -16374,7 +16393,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			var szColor = a ? (this.itemA[a].szColor || this.colorScheme[nI%(this.nGridX||100000)]) : this.colorScheme[nI%(this.nGridX||1000000)];
 
 			// pie with 1 value but color classes
-			if (nPartsA.length == 1) {
+			if (szFlag.match(/CLASSES/) || nPartsA.length == 1) {
 				for (x = 0; x < this.partsA.length; x++) {
 					if ((szFlag.match(/CATEGORICAL/) && (nPartsA[nI] == this.partsA[x].min)) || (!szFlag.match(/CATEGORICAL/) && (nPartsA[nI] < this.partsA[x].max))) {
 						szColor = this.colorScheme[x];
@@ -18319,7 +18338,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 						textOnTopGroup = textOnTopGroup || map.Dom.newGroup(chartGroup, this.szId + ":" + a + ":textchartontop");
 						nFontSize = 4 + (0.5 * nPartsA.length / (this.nGridX ? (this.nGridX * 2) : 1));
 						var scalefont = Math.log(nPartsA.length)/3;
-						newText = this.createTextLabel(SVGDocument, textOnTopGroup, "", szText, nFontSize * scalefont, "", "rgba(255,255,255,0.3)", cColor.lowColor, "GLOW");
+						newText = this.createTextLabel(SVGDocument, textOnTopGroup, "", szText, nFontSize * scalefont * this.nValueScale, "", "rgba(255,255,255,0)", cColor.lowColor, "GLOW");
 						newText.setAttributeNS(null, "opacity", "0.9");
 						//textOnTopGroup.fu.setPosition(-map.Scale.normalX(nFontSize) * 1.7, - map.Scale.normalY(nFontSize) * 0.3 / (this.nGridX||1) );
 						textOnTopGroup.fu.setPosition(-map.Scale.normalX(nFontSize* scalefont) * 0.7, - map.Scale.normalY(5/(this.nGridX||1)) );
