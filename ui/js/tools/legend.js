@@ -1082,7 +1082,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
         } catch (e) {}
 
         // GR 18.12.2018
-        ixmaps.htmlgui_setMapTypeBG(ixmaps.getMapTypeId());
+        //ixmaps.htmlgui_setMapTypeBG(ixmaps.getMapTypeId());
 		
         if (ixmaps.legend.url && ( (ixmaps.legend.url.substr(0,4) == "http") || (ixmaps.legend.url.substr(0,6) == "../../") ) ) {
             if ( 1 || !ixmaps.legend.externalLegend) {
@@ -1585,6 +1585,13 @@ window.ixmaps.legend = window.ixmaps.legend || {};
             changeCss(".loading-text", "background-color:rgba(0,0,0,0.5)");
             changeCss(".loading-text", "color:#d8d8d8");
 
+        } else 
+		if (szId.match(/#/i)) {
+            changeCss(".map-legend-pane:before", "background:"+szId);
+            changeCss(".map-legend", "background:"+szId);
+            changeCss("#map-legend", "background:"+szId);
+            changeCss(".loading-text", "background-color:"+szId);
+            changeCss(".loading-text", "color:#666");
         } else {
             changeCss(".loading-text", "background-color:rgba(255,255,255,0.5)");
             changeCss(".loading-text", "color:#666");
