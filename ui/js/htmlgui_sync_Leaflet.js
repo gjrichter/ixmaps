@@ -526,20 +526,25 @@ $Log: htmlgui_sync_Leaflet.js,v $
 		// ----------------------
 		// set the active layer
 		// ----------------------
-
+		/**
 		if (!ixmaps.fMapType || !ixmaps.layers[ixmaps.fMapType]) {
 			ixmaps.message("leaflet map type \"" + ixmaps.fMapType + "\" unknown! -> set to default: \"Stamen - toner-lite\"");
 			ixmaps.fMapType = "Stamen - toner-lite";
 		}
+		**/
+		htmlMap_setMapTypeId(ixmaps.fMapType);
+		ixmaps.htmlgui_setMapTypeBG(ixmaps.fMapType);
 
+		/**
 		LMap.addLayer(ixmaps.layers[ixmaps.fMapType]);
 
 		lastLeafletLayer = ixmaps.fMapType;
 		try {
 			ixmaps.htmlgui_setMapTypeBG(lastLeafletLayer);
 		} catch (e) {}
+		**/
 		__cssControls(lastLeafletLayer);
-
+		
 		// --------------------
 		// map controls
 		// --------------------
@@ -697,6 +702,9 @@ $Log: htmlgui_sync_Leaflet.js,v $
 				try {
 					LMap.removeLayer(ixmaps.layers[lastLeafletLayer]);
 				} catch (e) {}
+			}
+			if (szMapType.match(/#/)){
+				szMapType = "transparent";
 			}
 			lastLeafletLayer = mapTypeTranslate[szMapType] || szMapType;
 			LMap.addLayer(ixmaps.layers[mapTypeTranslate[szMapType] || szMapType]);

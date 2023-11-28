@@ -3042,9 +3042,9 @@ $Log: htmlgui_api.js,v $
 		
 			var target = window.document.getElementById(szTargetDiv);
 
-			var szName = opt.mapName || opt.name || "map" + String(Math.random()).split(".")[1];
-			var szBasemap = opt.mapService || opt.basemap || "leaflet";
-			var szMapType = opt.mapType || opt.maptype || "CartoDB - Positron";
+			var szName = encodeURIComponent(opt.mapName || opt.name || "map" + String(Math.random()).split(".")[1]);
+			var szBasemap = encodeURIComponent(opt.mapService || opt.basemap || "leaflet");
+			var szMapType = encodeURIComponent(opt.mapType || opt.maptype || "CartoDB - Positron");
 
 			// make sure than a map name exists only once
 			while ( ixmaps.embeddedApiA[szName] ){

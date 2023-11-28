@@ -662,6 +662,23 @@ $Log: htmlgui.js,v $
 			$( "#switchlegendbutton" ).css("border-color","#dddddd");
 
 			changeCss(".loading-text","background-color:rgba(255,255,255,0.5)");
+			
+		}else if ( szId.match(/#/i) ){
+			$("#ixmap").css({"background":szId});
+			$("#gmap").css({"background":szId});
+			$("#story_board").css({"background":szId});
+
+			// GR 18.06.2019 change color of sidebar body, for legend left/right
+			try{
+				window.parent.window.parent.window.document.getElementById('sidebar').parentNode.parentNode.style.setProperty("background-color",szId);
+			}
+			catch (e){}
+
+			$( "#switchlegendbutton" ).css("background-color","#D4DADC");
+			$( "#switchlegendbutton" ).css("border-color","#dddddd");
+
+			changeCss(".loading-text","background-color:rgba(255,255,255,0.5)");
+			
 		}else{
 			$("#ixmap").css({"background":"none"});
 			$("#gmap").css({"background":"none"});
