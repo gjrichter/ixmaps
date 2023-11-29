@@ -15937,7 +15937,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 							   (this.szValueLower && (map.Scale.nTrueMapScale * map.Scale.nZoomScale < this.nValueLower));
 		}
 		// GR 29.01.2019 no VALUES on zoomed pie chart with more than 10 parts 
-		if (szFlag.match(/ZOOM/) && szFlag.match(/PIE/) && nPartsA.length > 10) {
+		if (szFlag.match(/ZOOM/) && szFlag.match(/PIE/) && nPartsA.length > 25) {
 			szFlag = this.removeDefinition(szFlag, "VALUES");
 		}
 	}
