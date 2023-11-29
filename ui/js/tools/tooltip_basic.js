@@ -82,7 +82,7 @@ window.ixmaps = window.ixmaps || {};
 		// -----------------------------------------------------
 
 		var width = Math.min(400, window.innerWidth / 2);
-		var height = window.innerHeight / 2;
+		var height = window.innerHeight / 1.5;
 
 		var xPos = evt.clientX;
 		var yPos = evt.clientY;
@@ -148,7 +148,9 @@ window.ixmaps = window.ixmaps || {};
 		} else {
 			window.document.getElementById("tooltipDiv").style.setProperty("background-color", "rgba(255,255,255,0.9)");
 		}
-
+		if (window.document.getElementById("tooltipChartContainer")){
+			window.document.getElementById("tooltipChartContainer").scrollLeft = 200;
+		}
 		// tooltip ready, return true!
 
 		return true;
@@ -187,7 +189,7 @@ window.ixmaps = window.ixmaps || {};
 	 */
 	
 	ixmaps.htmlgui_onItemOver = function (evt, szId) {
-
+		
 		if (__fTooltipPinned) {
 			return true;
 		}
@@ -232,11 +234,16 @@ window.ixmaps = window.ixmaps || {};
 			return;
 		}
 		if (!szId.match(/\:\:/)) {
-			if (evt.path[1].getAttribute("id") && evt.path[1].getAttribute("id").match(/\:\:/)){
-				szItem = evt.path[1].getAttribute("id");
+			var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szItem);
+			var szChartId = szItem.match(/::/) ? szId : obj.parentNode.getAttribute("id");
+			var szIdA = szChartId.split("#");
+			if (szIdA.length > 1) {
+				var szIdAA = szIdA[1].split(/\b::\b/);
+				szChartId = szIdA[0] + "::" + szIdAA[1];
 			}
+			szItem = szChartId;
 		}
-
+		
 		// adapt content to map style
 		//
 		var normal = "#000000";
@@ -254,7 +261,10 @@ window.ixmaps = window.ixmaps || {};
 		var szHtml = "<div style='font-size:18px;color:" + normal + ";min-width:150px;max-width:400px;text-align:center'>";
 
 		// insert theme title
-		szHtml += "<p style='font-size:12px;margin-top:0em;margin-bottom:0.5em'>" + themeObj.szTitle + "</p>";
+		szHtml += "<p style='font-size:14px;margin-top:0em;margin-bottom:0.5em'>" + themeObj.szTitle + "</p>";
+		if (themeObj.szSnippet){
+			szHtml += "<p style='font-size:12px;margin-top:-0.5em;margin-bottom:0.5em'>" + themeObj.szSnippet + "</p>";
+		}
 
 		// insert item title and value, if theme has only one value
 		if (themeObj.szFlag.match(/CHOROPLETH|VECTOR/) && themeObj.itemA[szItem] && (themeObj.itemA[szItem].nValuesA.length == 1)) {
@@ -270,7 +280,7 @@ window.ixmaps = window.ixmaps || {};
 				dest = dest[1]||dest[0];
 				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em;white-space:nowrap'>" + (themeObj.itemA[szItem] ? ((origin + " &rarr; " + dest) || themeObj.itemA[szItem].szTitle ) : "") + "</h4><h4 style='margin:0.5em'>" + szSign + szValue + themeObj.szUnit + "</h4>";
 			}else if (!themeObj.szFlag.match(/CATEGORICAL/)){
-				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || themeObj.itemA[szItem].szSelectionId2.split("::")[1] || "") : "") + "</br>" + szSign + szValue + themeObj.szUnit + "</h5>";
+				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || (themeObj.itemA[szItem].szSelectionId2?themeObj.itemA[szItem].szSelectionId2.split("::")[1]:"") || "") : "") + "</br>" + szSign + szValue + themeObj.szUnit + "</h5>";
 			} else {
 				// if theme has more values, insert only item title
 				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || "") : "") + "</h5>";
@@ -302,7 +312,7 @@ window.ixmaps = window.ixmaps || {};
 
 			// prepare chart hosting SVG div (is not the final host of the chart)
 			//
-			var szTarget = "</div><svg width='300' height='300' viewBox='0 0 6000 6000'><g id='getchartmenutarget' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();' style='pointer-events:all'></g></svg>";
+			var szTarget = "<svg width='300' height='300' viewBox='0 0 6000 6000'><g id='getchartmenutarget' onmousemove='javascript:ixmaps.onMouseOver();' onmouseout='javascript:ixmaps.onMouseOut();' style='pointer-events:all'></g></svg>";
 			try {
 				window.document.getElementById("getchartmenutarget").remove();
 			} catch (e) {}
@@ -338,12 +348,21 @@ window.ixmaps = window.ixmaps || {};
 				var width = Math.min(400, window.innerWidth / 2.5);
 				var height = window.innerHeight / 2;
 				
+				
+				if (themeObj.szFlag.match(/PLOT/)) {
+					width /= Math.max(1, (3 / themeObj.itemA[szItem].nValuesA.length));	
+				} else
 				if (themeObj.szFlag.match(/(BAR)|PLOT|CHOROPLETH/)) {
 					var nSymbols = 0;
 					for ( i in themeObj.itemA[szItem].nValuesA ){
-						nSymbols += themeObj.itemA[szItem].nValuesA[i]?1:0;
+						nSymbols += themeObj.itemA[szItem].nValuesA[i]?1:1;
 					}
-					width = 100 + nSymbols*50;	
+					if ( themeObj.szFlag.match(/CHOROPLETH/) ){
+						height = nSymbols*15;
+						width = height / SVGBox.height * SVGBox.width;
+					}else{
+						width = 100 + nSymbols*30;	
+					}
 				} else
 				if (themeObj.szFlag.match(/(SYMBOL)|SEQUENCE/)) {
 					var nSymbols = 0;
@@ -360,7 +379,11 @@ window.ixmaps = window.ixmaps || {};
 					height *= 0.9;
 				}
 				// create some space around the chart, some need it 
-				if (themeObj.szFlag.match(/BUBBLE|SYMBOL/) && !themeObj.szFlag.match(/PLOT/)) {
+				if (themeObj.szFlag.match(/PLOT/)) {
+					SVGBox.width += 200;
+					SVGBox.height += 200;
+				} else
+				if (themeObj.szFlag.match(/BUBBLE|SYMBOL|PIE/) && !themeObj.szFlag.match(/PLOT/)) {
 					var space = Math.min(SVGBox.width,SVGBox.height)/50;
 					SVGBox.x -= space;
 					SVGBox.y -= space;
@@ -375,7 +398,7 @@ window.ixmaps = window.ixmaps || {};
 				window.document.getElementById("getchartmenutarget").parentNode.setAttribute("viewBox", SVGBox.x + ' ' + SVGBox.y + ' ' + SVGBox.width + ' ' + SVGBox.height);
 
 				// then get the chart code (html,svg) and insert into the tooltip HTML code
-				szHtml += window.document.getElementById("chartDiv").innerHTML;
+				szHtml += "<div id='tooltipChartContainer' style='overflow:auto'>"+ window.document.getElementById("chartDiv").innerHTML +"</div>";
 				// and delete the temporary chart hosting div !!
 				window.document.getElementById("chartDiv").remove();
 			}else{
@@ -565,6 +588,9 @@ window.ixmaps = window.ixmaps || {};
 			}
 		}
 		
+		if (themeObj.szDescription){
+			szHtml += "<p style='font-size:12px;margin-top:-1em;margin-bottom:0.5em;text-align:center'>" + themeObj.szDescription + "</p>";
+		}
 		// ------------------------------------------------------------------------------
 		// tooltip content is ready 
 		// now show the tooltip using the tooltip hook ixmaps.htmlgui_onTooltipDisplay()
@@ -664,6 +690,7 @@ window.ixmaps = window.ixmaps || {};
 			source = source.parentNode;
 		}
 		// try to format tooltip
+		
 		var szTestA = szTooltip.split(" ");
 		var szValue = "";
 		var szUnit = "";
