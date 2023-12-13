@@ -673,7 +673,12 @@
 					$(".map-legend").css("width", "100%");
 					$(".map-legend").css("max-width", "100%");
 					$(".map-legend").css("left", "0px");
+					// GR 13/12/2023 HTML color maptype -> map background color 
 					//$(".map-legend").css("background", "rgba(255,255,255,0.5)");
+					var szBackgroundcolor = decodeURIComponent($(document).getUrlParam('maptype'));
+					if ( szBackgroundcolor && (szBackgroundcolor.charAt(0) == '#') ){
+						$("body").css("background", decodeURIComponent($(document).getUrlParam('maptype')));
+					}
 					
 					$("#onmapbuttondiv").css("left", "");
 					$("#onmapbuttondiv").css("right", "60px");

@@ -1185,6 +1185,24 @@ $Log: htmlgui.js,v $
 				if ((i == "time") ||
 					(i == "timefield")) {
 					theme.style["timefield"] = theme.binding[i];
+				} else
+				if ((i == "number") ||
+					(i == "tonumber") ||
+					(i == "lookuptonumber")) {
+					theme.style["lookuptonumber"] = theme.binding[i];
+				} else
+				if ((i == "upper") ||
+					(i == "toupper") ||
+					(i == "lookuptoupper")) {
+					theme.style["lookuptoupper"] = theme.binding[i];
+				} else
+				if ((i == "digits") ||
+					(i == "lookupdigits")) {
+					theme.style["lookupdigits"] = theme.binding[i];
+				} else
+				if ((i == "suffix") ||
+					(i == "lookupsuffix")) {
+					theme.style["lookupsuffix"] = theme.binding[i];
 				}
 			}
 		}
