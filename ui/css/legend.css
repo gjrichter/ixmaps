@@ -44,10 +44,10 @@
 		width: 100%;
 		height: 100%;
 		z-index: 0;
-		background: white;
+		background: rgba(250,250,245,1);
 		opacity: 0.8;
-		border: solid #cccccc 1px;
-		border-radius: 1em;
+		border: solid #dddddd 0.1px;
+		border-radius: 0.8em;
 	}
 	.map-legend-pane {
 		padding:0.5em 1em 1em 1.5em;
