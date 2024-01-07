@@ -249,6 +249,7 @@ var themeStyleTranslateA = [
 	,{ style: "snippet"			,obj: "szSnippet"  }
 	,{ style: "splash"			,obj: "szSplash"  }
 	,{ style: "description"		,obj: "szDescription"  }
+	,{ style: "tooltip"			,obj: "szTooltip"  }
 
 ];
 
@@ -923,6 +924,9 @@ Map.Themes.prototype.parseStyle = function (mapTheme, styleObj) {
 		}
 		if (__isdef(styleObj.description)) {
 			mapTheme.szDescription = unescape(styleObj.description);
+		}
+		if (__isdef(styleObj.tooltip)) {
+			mapTheme.szTooltip = unescape(styleObj.tooltip);
 		}
 		if (__isdef(styleObj.label)) {
 			mapTheme.szLabelA = mapTheme.szOrigLabelA = this.toArray(styleObj.label);
