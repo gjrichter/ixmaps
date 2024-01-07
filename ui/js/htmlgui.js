@@ -1052,7 +1052,10 @@ $Log: htmlgui.js,v $
 		if (fClear) {
 			if (fClear == "force") {
 				theme.style.type += "|FORCE";
-			}
+			} else
+			if (fClear == "replace") {
+				this.removeTheme(theme.style.name);
+			} else
 			if (fClear == "clearcharts") {
 				this.clearAllCharts();
 			} else {
@@ -1499,6 +1502,25 @@ $Log: htmlgui.js,v $
 				szItem.pop();
 				szItem = szItem.join(":");
 
+				var dataA = ixmaps.embeddedSVG.window.map.Api.getMapThemeDataRow(theme, szItem);
+				var result = [];
+				var data = {};
+				var nItems = dataA.length / 2;
+				for (i = 0; i < nItems; i++) {
+					if (data[dataA[i]]) {
+						result.push(data);
+						data = {};
+					}
+					data[dataA[i]] = dataA[i + nItems];
+				}
+				result.push(data);
+				return result;
+			}else{
+				// if is something like "theme:layername::itemname"
+				// remove first ":" qualifier from id
+				szItem = szItem.split(":");
+				szItem.shift();
+				szItem = szItem.join(":");
 				var dataA = ixmaps.embeddedSVG.window.map.Api.getMapThemeDataRow(theme, szItem);
 				var result = [];
 				var data = {};

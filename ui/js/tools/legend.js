@@ -1075,7 +1075,7 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		}
 	};
 
-    ixmaps.htmlgui_onDrawTheme = function (szId) {
+    ixmaps.htmlgui_onDrawTheme = function (szId) { 
 
         try {
             old_onDrawTheme(szId);
@@ -1537,7 +1537,11 @@ window.ixmaps.legend = window.ixmaps.legend || {};
     }
     var old_setMapTypeBG = ixmaps.htmlgui_setMapTypeBG;
     ixmaps.htmlgui_setMapTypeBG = function (szId) {
-
+		
+		if (!szId){
+			return;
+		}
+		
         if (old_setMapTypeBG) {
             old_setMapTypeBG(szId);
         }

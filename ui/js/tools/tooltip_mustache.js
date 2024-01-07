@@ -1,21 +1,21 @@
 /**********************************************************************
-tooltip_basic.js
+tooltip_moustache.js
 
 $Comment: provides custem HTML tooltip for iXMaps SVG maps
-$Source : tooltip_basic.js,v $
+$Source : tooltip_moustache.js,v $
 
 $InitialAuthor: guenter richter $
 $InitialDate: 2022/11/02 $
 $Author: guenter richter $
-$Id: tooltip_basic.js 1 2022-11-02 10:51:41Z Guenter Richter $map
+$Id: tooltip_moustache.js 1 2022-11-02 10:51:41Z Guenter Richter $map
 
 Copyright (c) Guenter Richter
-$Log: tooltip_basic.js,v $
+$Log: tooltip_moustache.js,v $
 **********************************************************************/
 
 /** 
  * @fileoverview 
- * This file provides custom HTML tooltip for iXMaps SVG Maps
+ * This file provides custom HTML tooltip for iXMaps SVG Maps with moustache syntax ({{}})
  *  
  * intercepts tooltip display from the iXMaps SVG map
  *
@@ -44,6 +44,18 @@ window.ixmaps = window.ixmaps || {};
 
 	// this creates the tooltip/info popup 
 	// may be only on mouseover or pinned (click) 
+
+	$.when(
+		$.getScript("../../ui/js/tools/format.js"),	
+		$.getScript("../../ui/js/tools/mustache.js",
+		$.Deferred(function (deferred) {
+			$(deferred.resolve);
+		})
+	).done(function () {
+		Mustache.escape = function(string){return string}
+		})
+	);
+
 
 	/**
 	 * intercept tooltip display of ythe SVG map
@@ -103,7 +115,7 @@ window.ixmaps = window.ixmaps || {};
 
 		var szHtml = "";
 
-		szHtml += "<div id='tooltipDiv' style='position:absolute;left:" + xPos + "px;top:" + yPos + "px;font-family: arial narrow, system;font-size:" + fontsize + "px;color: #444;background: white;border: 0.5px solid black;border-radius: 5px;margin-top:0.7em;margin-right:0.7em;'>";
+		szHtml += "<div id='tooltipDiv' style='position:absolute;left:" + xPos + "px;top:" + yPos + "px;font-family: arial narrow, system;font-size:" + fontsize + "px;color: #444;background: white;border: 0.5px solid black;border-radius: 5px;padding:0.5em;;box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);'>";
 
 		// insert tooltip content (szText) 
 		//
@@ -120,7 +132,7 @@ window.ixmaps = window.ixmaps || {};
 				window.document.getElementById("tooltip").innerHTML = "";
 				ixmaps.clearHighlight();
 			};
-			szHtml += "<div onclick='ixmaps.htmlgui_deleteItemPinned()' style='position:absolute;top:-0.5em;right:-0.5em;font-size:16px;color:white;background:#444444;padding:0 0.25em;border-radius:1em;cursor:pointer;'>&Cross;</div>"
+			szHtml += "<div onclick='ixmaps.htmlgui_deleteItemPinned()' style='position:absolute;top:-0.7em;right:-0.7em'><img src='../../ui/resources/images/delete.png' height='22px'></div>"
 			__fTooltipPinned = true;
 		}
 
@@ -136,7 +148,7 @@ window.ixmaps = window.ixmaps || {};
 		var height = window.document.getElementById("tooltipDiv").clientHeight;
 
 		xPos = xPos > window.innerWidth / 2 ? (xPos - width - 30) : xPos + 30;
-		yPos = yPos > window.innerHeight / 3 ? (yPos - height + 150) : (yPos + 20);
+		yPos = yPos > window.innerHeight / 2 ? (yPos - height) : (yPos + 20);
 		window.document.getElementById("tooltipDiv").style.left = xPos + "px";
 		window.document.getElementById("tooltipDiv").style.top = yPos + "px";
 
@@ -148,7 +160,7 @@ window.ixmaps = window.ixmaps || {};
 		} else {
 			window.document.getElementById("tooltipDiv").style.setProperty("background-color", "rgba(255,255,255,0.95)");
 		}
-		if (window.document.getElementById("tooltipChartContainer")){
+		if (window.document.getElementById("tooltipChartContainer")) {
 			window.document.getElementById("tooltipChartContainer").scrollLeft = 200;
 		}
 		// tooltip ready, return true!
@@ -187,26 +199,29 @@ window.ixmaps = window.ixmaps || {};
 	 * @return boolean
 	 * @public
 	 */
-	
+
 	ixmaps.htmlgui_onItemOver = function (evt, szId) {
-		
+
 		if (__fTooltipPinned) {
 			return true;
 		}
 
 		var fThemeChart = false;
 		var fThemeData = false;
-		
+
 		// ------------------------------------
 		// get the theme object from item id
 		// ------------------------------------
+		
+		console.log("=== item over ===");
+		console.log(szId);
+		
 
 		// 1.try
 		var themeObj = ixmaps.getThemeObj(szId.split(":")[0]);
 
 		// check and if not the right theme (possible if onOver on map shape)
 		if (!(themeObj.szId == szId.split(":")[0])) {
-
 			// look in all CHOROPLETH themes for the a corrisponding one
 			//
 			var themes = ixmaps.getThemes();
@@ -215,17 +230,29 @@ window.ixmaps = window.ixmaps || {};
 					themeObj = themes[i];
 				}
 			}
+			
+			szId = themeObj.szId+":"+szId;
 		}
+		
+		console.log("=== theme ===");
+		console.log(themeObj.szId);
+		console.log(themeObj.szFlag);
+		console.log(themeObj);
 
 		// ------------------------------------------
 		// start creating the tooltip content
 		// ------------------------------------------
 
 		// create a theme item list compatible item id
+		// to get the chart, see __add_chart(themeObj,szItem)
 		//
 		var szItem = szId;
 		if (szId.match(/chartgroup/)) {
 			szItem = szId.split(":chartgroup")[0].split(":");
+			szItem = szItem[1] + "::" + szItem[3];
+		}
+		if (szId.match(/text/)) {
+			szItem = szId.split(":text")[0].split(":");
 			szItem = szItem[1] + "::" + szItem[3];
 		}
 		if (!szItem || !szItem.length || szItem.match(/mapbackground/i)) {
@@ -243,55 +270,72 @@ window.ixmaps = window.ixmaps || {};
 			}
 			szItem = szChartId;
 		}
+		console.log("=== item ===");
+		console.log(szItem);
 		
-		// adapt content to map style
-		//
-		var normal = "#000000";
-		var highLight = "#000000";
-		var highLightBg = "#e8e8e8";
+		// get data and tooltip (mustache) template
+		
+		var szHtml = themeObj.szTooltip || "no template! ";
+		
+		var data = ixmaps.map().getData(szId);
+		
+		console.log("=== item data ===");
+		console.log(data);
+	
+		// make data object to feed mustache rendering
+		
+		var dataObj = {};
+		
+		dataObj.theme = dataObj.theme || {};
+		dataObj.theme.title = themeObj.szTitle;
+		dataObj.theme.snippet = themeObj.szSnippet;
+		dataObj.theme.description = themeObj.szDescription;
+		dataObj.theme.chart = __add_chart(themeObj,szItem);
+		dataObj.theme.item = dataObj.theme.item || {};
+		dataObj.theme.item.chart = dataObj.theme.chart;
+		dataObj.theme.item.data = __add_data(themeObj,szId);
 
-		if (ixmaps.getMapTypeId().match(/dark/i)) {
-			normal = "#bbbbbb";
-			highLight = "#ffffff";
-			highLightBg = "#808080";
-		}
-
-		// here we go
-		//
-		var szHtml = "<div style='font-size:18px;color:" + normal + ";min-width:150px;max-width:400px;text-align:center'>";
-
-		// insert theme title
-		szHtml += "<p style='font-size:14px;margin-top:0em;margin-bottom:0.5em'>" + themeObj.szTitle + "</p>";
-		if (themeObj.szSnippet){
-			szHtml += "<p style='font-size:12px;margin-top:-0.5em;margin-bottom:0.5em'>" + themeObj.szSnippet + "</p>";
-		}
-
-		// insert item title and value, if theme has only one value
-		if (themeObj.szFlag.match(/CHOROPLETH|VECTOR/) && themeObj.itemA[szItem] && (themeObj.itemA[szItem].nValuesA.length == 1)) {
-			
-			var nValue = themeObj.itemA[szItem] ? (Number(themeObj.itemA[szItem].szValue) || themeObj.itemA[szItem].nValue || themeObj.itemA[szItem].nValuesA[0]) : "";
-			var szSign = ((nValue > 0) && themeObj.szFlag.match(/SIGN/)) ? "+" : "";
-			var szValue = ixmaps.__formatValue?ixmaps.__formatValue(nValue,2,"BLANK"):nValue.toFixed(themeObj.nValueDecimals||2);
-			
-			if (themeObj.szFlag.match(/VECTOR/) ){
-				var origin = themeObj.itemA[szItem].szSelectionId.split("::");
-				origin = origin[1]||origin[0];
-				var dest = themeObj.itemA[szItem].szSelectionId2.split("::");
-				dest = dest[1]||dest[0];
-				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em;white-space:nowrap'>" + (themeObj.itemA[szItem] ? ((origin + " &rarr; " + dest) || themeObj.itemA[szItem].szTitle ) : "") + "</h4><h4 style='margin:0.5em'>" + szSign + szValue + themeObj.szUnit + "</h4>";
-			}else if (!themeObj.szFlag.match(/CATEGORICAL/)){
-				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em;line-height:1.2em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || (themeObj.itemA[szItem].szSelectionId2?themeObj.itemA[szItem].szSelectionId2.split("::")[1]:"") || "") : "") + "</br>" + szSign + szValue + themeObj.szUnit + "</h5>";
-			} else {
-				// if theme has more values, insert only item title
-				szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || "") : "") + "</h5>";
+		if (data){
+			dObj = data[0];
+			for (var i in dObj){
+				if (!isNaN(dObj[i])){
+					dataObj[i] = (ixmaps.formatValue(dObj[i],themeObj.nValueDecimals||2,"BLANK"));
+				}else{
+					dataObj[i] = (dObj[i]);
+				}
 			}
-			fThemeData = true;
-		} else {
-			// if theme has more values, insert only item title
-			szHtml += "<h4 style='margin-top:0em;margin-bottom:0.5em'>" + (themeObj.itemA[szItem] ? (themeObj.itemA[szItem].szTitle || "") : "") + "</h5>";
 		}
+			
+		// ------------------------------------------------------------------------------
+		// tooltip content is ready 
+		// now show the tooltip using the tooltip hook ixmaps.htmlgui_onTooltipDisplay()
+		// ------------------------------------------------------------------------------
 
+		if (typeof (Mustache) === "undefined") {
+			alert("mustache not loaded!");
+		} else {
+			szHtml = Mustache.render(szHtml, dataObj);
+			ixmaps.htmlgui_onTooltipDisplay(evt, szHtml, szId);
+		}
+		
+		return true;
+	};
+
+	/**
+	 * create item SVG CHART
+	 * get the items ZOOM chart from the theme into an SVG environment,
+	 * and scale it to the tooltip
+	 *
+	 * @param {object} themeObj the ixmaps theme object
+	 * @param {string} szItem the id of the mouseover opbject (item)
+	 * @return {string} the embeddeb and scaled SVG chart code
+	 * @public
+	 */
+	
+	var __add_chart = function(themeObj,szItem){
+		
 		var suffix = "";
+		var szHtml = "";
 
 		// ------------------------------------------
 		//
@@ -405,10 +449,44 @@ window.ixmaps = window.ixmaps || {};
 				window.document.getElementById("chartDiv").remove();
 			}
 
-			szHtml += "</div>";
+			//szHtml += "</div>";
 
 			szHtml += "<div id='tooltip_2' style='position:absolute;font-family: arial narrow, system;color:#444;background:white;border:0.5px solid black;border-radius:5px;padding:5px;max-width:80%;display:none'></div>";
 		}
+
+		return szHtml;
+	
+	};
+
+	/**
+	 * create item data Table
+	 * get the items data from the theme 
+	 * create a HTML table
+	 *
+	 * @param {object} themeObj the ixmaps theme object
+	 * @param {string} szItem the id of the mouseover opbject (item)
+	 * @return {string} the embeddeb and scaled SVG chart code
+	 * @public
+	 */
+	
+	var __add_data = function(themeObj,szItem){
+		
+		var suffix = "";
+		var szHtml = "";
+
+		// adapt content to map style
+		//
+		var normal = "#000000";
+		var highLight = "#000000";
+		var highLightBg = "#e8e8e8";
+
+		if (ixmaps.getMapTypeId().match(/dark/i)) {
+			normal = "#bbbbbb";
+			highLight = "#ffffff";
+			highLightBg = "#808080";
+		}
+		
+		var origThemeObj = themeObj;
 
 		themeObj = origThemeObj;
 		var	fThemeData = false;
@@ -420,27 +498,12 @@ window.ixmaps = window.ixmaps || {};
 		// ------------------------------------------
 
 		if (themeObj.fShowData) {
-
-			// item is not a chart -> item is a map shape
-			// then we have to get the id for tyhe data in another way
-			//
-			if (!szId.match(/chart/i)) {
-				var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szId);
-				var szChartId = szId.match(/::/) ? szId : obj.parentNode.getAttribute("id");
-				var szIdA = szChartId.split("#");
-				if (szIdA.length > 1) {
-					var szIdAA = szIdA[1].split(/\b::\b/);
-					szChartId = szIdA[0] + "::" + szIdAA[1];
-					szTitle = szIdAA[1];
-				}
-				szId = ixmaps.getThemes()[1].szId + ":" + szChartId + ":chartgroup";
-			}
-
+			
 			// get the data, and make tooltip content
 			// ---------------------------------------
 			//
-			var data = ixmaps.map().getData(szId);
-			
+			var data = ixmaps.map().getData(szItem);
+
 			if (data) {
 
 				szHtml += "<table style='font-size:0.85em;spacing:0.5em;min-width:300px'>"
@@ -468,9 +531,9 @@ window.ixmaps = window.ixmaps || {};
 								continue;
 							}
 						}
-
 						var value = dataObject[i];
 						var szValue = (isNaN(value) || value < 10000) ? String(value) : String(value);
+
 						if (szValue.match(/http:/) || szValue.match(/https:/)) {
 							if (szValue.match(/.jpg/) || szValue.match(/.jpeg/) || szValue.match(/.png/)) {
 								szValue = "<img  src='" + szValue + "' style='max-width:100%'>";
@@ -492,7 +555,7 @@ window.ixmaps = window.ixmaps || {};
 								) {
 									szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' style='text-align:right;color:#000000;' ><b>" + (i.replace(/\_/g, " ")) + "</b></td><td class='value' style='color:" + highLight + ";background:" + highLightBg + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
 								} else {
-									szHtml += "<tr><td></td><td class='label' style='text-align:right;color:#cccccc';' >" + (i.replace(/\_/g, " ")) + "</td><td class='value' style='color:" + normal + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
+								szHtml += "<tr><td></td><td class='label' style='text-align:right;color:#cccccc';' >" + (i.replace(/\_/g, " ")) + "</td><td class='value' style='color:" + normal + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
 								}
 							} else {}
 						}
@@ -506,7 +569,7 @@ window.ixmaps = window.ixmaps || {};
 		}
 		
 		var obj = ixmaps.embeddedSVG.window.SVGDocument.getElementById(szItem);
-		if ( obj && !fThemeChart && !fThemeData ){
+		if ( 0 && obj ){
 
 			var szId =  ixmaps.embeddedSVG.window.map.Api.getShapeId(obj);
 			var szChartId = szId.match(/::/) ? szId : obj.parentNode.getAttribute("id");
@@ -588,19 +651,12 @@ window.ixmaps = window.ixmaps || {};
 			}
 		}
 		
-		if (themeObj.szDescription){
-			szHtml += "<p style='font-size:12px;margin-top:-1em;margin-bottom:0.5em;text-align:center'>" + themeObj.szDescription + "</p>";
-		}
-		// ------------------------------------------------------------------------------
-		// tooltip content is ready 
-		// now show the tooltip using the tooltip hook ixmaps.htmlgui_onTooltipDisplay()
-		// ------------------------------------------------------------------------------
-
-		ixmaps.htmlgui_onTooltipDisplay(evt, szHtml, szId);
-
-		return true;
-	}
-
+		return szHtml;
+	
+	};
+	
+	
+	
 	// ==============================================================
 	//
 	// intercept mouse click on map item
@@ -690,7 +746,7 @@ window.ixmaps = window.ixmaps || {};
 			source = source.parentNode;
 		}
 		// try to format tooltip
-		
+
 		var szTestA = szTooltip.split(" ");
 		var szValue = "";
 		var szUnit = "";
@@ -702,7 +758,7 @@ window.ixmaps = window.ixmaps || {};
 				fValue = false;
 				szUnit += (value + " ");
 			}
-			if (value == "..."){
+			if (value == "...") {
 				szValue += (value + " ");
 				fValue = true;
 			}
@@ -721,11 +777,11 @@ window.ixmaps = window.ixmaps || {};
 		}
 		szUnit = szUnit.replace("\[", "");
 		szUnit = szUnit.replace("\]", "");
-		
+
 		szValue.trim();
 		szTestA = szValue.split(" ");
-		if (szTestA.length > 2){
-			szTestA[szTestA.length-2] = "<span style='font-size:0.9em;color:#aaaaaa'>"+szTestA[szTestA.length-2]+"</span>";
+		if (0 && szTestA.length > 2) {
+			szTestA[szTestA.length - 2] = "<span style='font-size:0.9em;color:#aaaaaa'>" + szTestA[szTestA.length - 2] + "</span>";
 		}
 		szValue = szTestA.join(" ");
 

@@ -2616,6 +2616,10 @@ $Log: htmlgui_api.js,v $
 			ixmaps.newTheme(this.szMap,"layer",theme,flag);
 			return this;
 		},
+		add: function(theme,flag){
+			ixmaps.newTheme(this.szMap,"layer",theme,flag);
+			return this;
+		},
 
 		
 		changeThemeStyle: function(szTheme,style,flag){
@@ -2625,6 +2629,16 @@ $Log: htmlgui_api.js,v $
 
 		removeTheme: function(szTheme){
 			ixmaps.removeTheme(this.szMap,szTheme);
+			return this;
+		},
+		remove: function(szTheme){
+			ixmaps.removeTheme(this.szMap,szTheme);
+			return this;
+		},
+		
+		replace: function(szTheme,theme,flag){
+			ixmaps.removeTheme(this.szMap,szTheme);
+			ixmaps.newTheme(this.szMap,"layer",theme,flag);
 			return this;
 		},
 
@@ -2969,6 +2983,9 @@ $Log: htmlgui_api.js,v $
 			}
 			if ( opt.legend ){
 				szUrl += "&legend="+opt.legend;
+				if (opt.legend.match(/top|bottom|left|right|center/) && !opt.align){
+					szUrl += "&align="+opt.legend;
+				}
 			}
 			if ( opt.themeLegend ){
 				szUrl += "&themelegend="+opt.themeLegend;
@@ -3099,6 +3116,9 @@ $Log: htmlgui_api.js,v $
 			}
 			if ( opt.legend ){
 				szUrl += "&legend="+opt.legend;
+				if (String(opt.legend).match(/top|bottom|left|right|center/) && !opt.align){
+					szUrl += "&align="+opt.legend;
+				}
 			}
 			if ( opt.themeLegend ){
 				szUrl += "&themelegend="+opt.themeLegend;
@@ -3180,6 +3200,15 @@ $Log: htmlgui_api.js,v $
 				iFrame.style = "border:0;width:100%;height:100%";
 				iFrame.src = szUrl; 
 				target.append(iFrame);
+			}
+		
+            // GR 08.09.2019 adapt the created frame on window resize 
+			if (!opt.height){
+				window.onresize = function(event) {
+					var newHeight = window.innerHeight;
+					window.document.getElementById(szName).style.setProperty("height",String(newHeight-15)+"px");
+				};
+				setTimeout("window.dispatchEvent(new Event('resize'))",100);
 			}
 
 		return target;
