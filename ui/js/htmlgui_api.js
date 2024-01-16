@@ -2983,7 +2983,7 @@ $Log: htmlgui_api.js,v $
 			}
 			if ( opt.legend ){
 				szUrl += "&legend="+opt.legend;
-				if (opt.legend.match(/top|bottom|left|right|center/) && !opt.align){
+				if (String(opt.legend).match(/top|bottom|left|right|center/) && !opt.align){
 					szUrl += "&align="+opt.legend;
 				}
 			}
