@@ -226,7 +226,7 @@ window.ixmaps = window.ixmaps || {};
 			//
 			var themes = ixmaps.getThemes();
 			for (i in themes) {
-				if (themes[i].szThemes == szId.split(":")[0] && themes[i].szFlag.match(/CHOROPLETH/)) {
+				if (themes[i].szThemes == szId.split(":")[0] && themes[i].szFlag.match(/CHOROPLETH|FEATURES/)) {
 					themeObj = themes[i];
 				}
 			}
@@ -250,11 +250,14 @@ window.ixmaps = window.ixmaps || {};
 		if (szId.match(/chartgroup/)) {
 			szItem = szId.split(":chartgroup")[0].split(":");
 			szItem = szItem[1] + "::" + szItem[3];
-		}
+		} else
 		if (szId.match(/text/)) {
 			szItem = szId.split(":text")[0].split(":");
 			szItem = szItem[1] + "::" + szItem[3];
+		} else {
+			szItem = szId.split(/\b\:\b/)[1];
 		}
+		
 		if (!szItem || !szItem.length || szItem.match(/mapbackground/i)) {
 			__fTooltipPin = false;
 			__fTooltipPinned = false;
@@ -281,6 +284,13 @@ window.ixmaps = window.ixmaps || {};
 		
 		console.log("=== item data ===");
 		console.log(data);
+		var nValue = themeObj.itemA[szItem].nValue;
+		var szLabel = "";
+		if (themeObj.szFlag.match(/CLIP/)){
+			nValue = themeObj.itemA[szItem].nValuesA[themeObj.nActualFrame];
+			szLabel = themeObj.szXaxisA[themeObj.nActualFrame];
+		}
+		var szTitle = themeObj.itemA[szItem].szTitle;
 	
 		// make data object to feed mustache rendering
 		
@@ -294,7 +304,10 @@ window.ixmaps = window.ixmaps || {};
 		dataObj.theme.item = dataObj.theme.item || {};
 		dataObj.theme.item.chart = dataObj.theme.chart;
 		dataObj.theme.item.data = __add_data(themeObj,szId);
-
+		dataObj.theme.item.value = ixmaps.formatValue(nValue,themeObj.nValueDecimals||2,"BLANK");
+		dataObj.theme.item.label = szLabel;
+		dataObj.theme.item.title = szTitle;
+		
 		if (data){
 			dObj = data[0];
 			for (var i in dObj){
@@ -547,15 +560,15 @@ window.ixmaps = window.ixmaps || {};
 								if (0 && (i == themeObj.szColorField ||
 										(themeObj.szFieldsA.indexOf(i) >= 0))) {
 									var color = themeObj.colorScheme[themeObj.nStringToValueA[szValue] - 1];
-									szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' style='text-align:right;color:#888888;' ><b>" + (i.replace(/\_/g, " ")) + "</b></td><td class='value' style='color:" + "#000000" + ";background:" + color + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
+									szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' style='text-align:right;color:#888888;' ><b>" + (i) + "</b></td><td class='value' style='color:" + "#000000" + ";background:" + color + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
 								} else
 								if (i == themeObj.szSizeField ||
 									i == themeObj.szSymbolField ||
 									(themeObj.szFieldsA.indexOf(i) >= 0)
 								) {
-									szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' style='text-align:right;color:#000000;' ><b>" + (i.replace(/\_/g, " ")) + "</b></td><td class='value' style='color:" + highLight + ";background:" + highLightBg + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
+									szHtml += "<tr><td><span style='color:black'>&larr;</span></td><td class='label' style='text-align:right;color:#000000;' ><b>" + (i) + "</b></td><td class='value' style='color:" + highLight + ";background:" + highLightBg + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
 								} else {
-								szHtml += "<tr><td></td><td class='label' style='text-align:right;color:#cccccc';' >" + (i.replace(/\_/g, " ")) + "</td><td class='value' style='color:" + normal + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
+								szHtml += "<tr><td></td><td class='label' style='text-align:right;color:#cccccc';' >" + (i) + "</td><td class='value' style='color:" + normal + ";text-align:left;'>" + szValue + suffix + "</td></tr>";
 								}
 							} else {}
 						}
