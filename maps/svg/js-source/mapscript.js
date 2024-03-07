@@ -6879,6 +6879,19 @@ function _LLtoEqualEarth(nLat, nLon) {
 
 function _EqualEarthtoLL(x,y) {
 	
+	while ( x > WGS_84_EQ_RAD ){
+		x -= WGS_84_EQ_RAD;
+	}
+	while ( y > WGS_84_EQ_RAD ){
+		y -= WGS_84_EQ_RAD;
+	}
+	while ( x < -WGS_84_EQ_RAD ){
+		x += WGS_84_EQ_RAD;
+	}
+	while ( y < -WGS_84_EQ_RAD ){
+		y += WGS_84_EQ_RAD;
+	}
+	
 	x /= WGS_84_EQ_RAD;
 	y /= WGS_84_EQ_RAD;
 	
@@ -6888,7 +6901,7 @@ function _EqualEarthtoLL(x,y) {
 		var fy = l * (A1 + A2 * l2 + l6 * (A3 + A4 * l2)) - y;
 		var fpy = A1 + 3 * A2 * l2 + l6 * (7 * A3 + 9 * A4 * l2);
 		l -= delta = fy / fpy, l2 = l * l, l6 = l2 * l2 * l2;
-		//if (abs(delta) < 0.1) break;
+		if (Math.abs(delta) < 0.1) break;
 	}
 	return new point(
 		_rad2deg * M * x * (A1 + 3 * A2 * l2 + l6 * (7 * A3 + 9 * A4 * l2)) / Math.cos(l),

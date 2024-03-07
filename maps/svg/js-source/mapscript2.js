@@ -9017,56 +9017,58 @@ HighLightItem.prototype.doHighLight = function () {
 		}
 		if (this.szMode && this.szMode == "scale") {
 			if (this.node.parentNode.fu && this.node.parentNode.fu.getPosition) {
-				var clonedNode = onoverShape.cloneNode(1000);
-				this.highlightGroup = this.highlightGroup || map.Dom.newGroup(map.Layer.objectGroup.parentNode, ":highlightgroup");
-				this.highlightGroup.style.setProperty("pointer-events", "none");
-				this.itemNode = this.highlightGroup.appendChild(clonedNode);
-				this.itemNode.setAttributeNS(null, "id", "");
-				this.itemNode.style.removeProperty("fill");
-				this.itemNode.style.removeProperty("fill-opacity");
-				if (0 && this.itemNode.hasChildNodes) {
-					var cNodes = this.itemNode.childNodes;
-					for (var i = 0; i < cNodes.length; i++) {
-						if (cNodes.item(i).nodeType == 1) {
-							cNodes.item(i).style.setProperty("stroke", "yellow", "");
+				if ( onoverShape.nodeName == "g" ){
+					var clonedNode = onoverShape.cloneNode(1000);
+					this.highlightGroup = this.highlightGroup || map.Dom.newGroup(map.Layer.objectGroup.parentNode, ":highlightgroup");
+					this.highlightGroup.style.setProperty("pointer-events", "none");
+					this.itemNode = this.highlightGroup.appendChild(clonedNode);
+					this.itemNode.setAttributeNS(null, "id", "");
+					this.itemNode.style.removeProperty("fill");
+					this.itemNode.style.removeProperty("fill-opacity");
+					if (0 && this.itemNode.hasChildNodes) {
+						var cNodes = this.itemNode.childNodes;
+						for (var i = 0; i < cNodes.length; i++) {
+							if (cNodes.item(i).nodeType == 1) {
+								cNodes.item(i).style.setProperty("stroke", "yellow", "");
+							}
 						}
 					}
+					var box = map.Dom.getBox(this.node);
+					var scale = this.node.parentNode.fu.getScale();
+					var dx = this.node.fu.getPosition().x * scale.x; // + box.width/2*scale.x;
+					var dy = this.node.fu.getPosition().y * scale.y; // - box.height/2*scale.y;
+					var posX = this.node.parentNode.fu.getPosition().x + dx;
+					var posY = this.node.parentNode.fu.getPosition().y + dy;
+					this.itemNode.fu = new Methods(this.itemNode);
+					this.itemNode.fu.setPosition(posX, posY);
+
+					var scale1 = this.node.fu.getScale();
+					var scale2 = this.node.parentNode.fu.getScale();
+					this.itemNode.fu.scale(scale1.x * scale2.x, scale1.y * scale2.y);
+
+					//this.objectGroupOpacity = map.Layer.objectGroup.style.getPropertyValue("opacity") || 1;
+					//map.Layer.objectGroup.style.setProperty("opacity","0.3");
+
+					// add circle
+
+					var itemNode = map.Dom.newGroup(this.itemNode);
+					var nRadius = map.Scale.normalX(10) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+					var nStrokeWidth = map.Scale.normalX(2) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+					var nDash = map.Scale.normalX(1) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+					var nRadiusX = nRadius;
+					var nRadiusY = nRadius;
+					map.Dom.newShape('circle', itemNode, 0, 0, nRadius, "fill:none;fill-opacity:0.1;stroke:black;stroke-dasharray:" + nDash + " " + nDash + ";stroke-width:" + (nStrokeWidth * 1.1) + "px;pointer-events:none");
+					map.Dom.newShape('circle', itemNode, 0, 0, nRadius, "fill:none;fill-opacity:0.1;stroke:white;stroke-dasharray:" + nDash + " " + nDash + ";stroke-width:" + nStrokeWidth + "px;pointer-events:none");
+					var box = map.Dom.getBox(this.node);
+					var scale = this.node.parentNode.fu.getScale();
+					var dx = this.node.fu.getPosition().x * scale.x; // + box.width/2*scale.x;
+					var dy = this.node.fu.getPosition().y * scale.y; // - box.height/2*scale.y;
+					var posX = this.node.parentNode.fu.getPosition().x + dx;
+					var posY = this.node.parentNode.fu.getPosition().y + dy;
+					//this.itemNode.fu.setPosition(posX,posY);
+					itemNode.fu.scale(1 / scale.x, 1 / scale.y);
+					itemNode.fu.scaleBy(1, 1 / map.Zoom.nZoomY * map.Zoom.nZoomX);
 				}
-				var box = map.Dom.getBox(this.node);
-				var scale = this.node.parentNode.fu.getScale();
-				var dx = this.node.fu.getPosition().x * scale.x; // + box.width/2*scale.x;
-				var dy = this.node.fu.getPosition().y * scale.y; // - box.height/2*scale.y;
-				var posX = this.node.parentNode.fu.getPosition().x + dx;
-				var posY = this.node.parentNode.fu.getPosition().y + dy;
-				this.itemNode.fu = new Methods(this.itemNode);
-				this.itemNode.fu.setPosition(posX, posY);
-
-				var scale1 = this.node.fu.getScale();
-				var scale2 = this.node.parentNode.fu.getScale();
-				this.itemNode.fu.scale(scale1.x * scale2.x, scale1.y * scale2.y);
-
-				//this.objectGroupOpacity = map.Layer.objectGroup.style.getPropertyValue("opacity") || 1;
-				//map.Layer.objectGroup.style.setProperty("opacity","0.3");
-
-				// add circle
-
-				var itemNode = map.Dom.newGroup(this.itemNode);
-				var nRadius = map.Scale.normalX(10) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
-				var nStrokeWidth = map.Scale.normalX(2) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
-				var nDash = map.Scale.normalX(1) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
-				var nRadiusX = nRadius;
-				var nRadiusY = nRadius;
-				map.Dom.newShape('circle', itemNode, 0, 0, nRadius, "fill:none;fill-opacity:0.1;stroke:black;stroke-dasharray:" + nDash + " " + nDash + ";stroke-width:" + (nStrokeWidth * 1.1) + "px;pointer-events:none");
-				map.Dom.newShape('circle', itemNode, 0, 0, nRadius, "fill:none;fill-opacity:0.1;stroke:white;stroke-dasharray:" + nDash + " " + nDash + ";stroke-width:" + nStrokeWidth + "px;pointer-events:none");
-				var box = map.Dom.getBox(this.node);
-				var scale = this.node.parentNode.fu.getScale();
-				var dx = this.node.fu.getPosition().x * scale.x; // + box.width/2*scale.x;
-				var dy = this.node.fu.getPosition().y * scale.y; // - box.height/2*scale.y;
-				var posX = this.node.parentNode.fu.getPosition().x + dx;
-				var posY = this.node.parentNode.fu.getPosition().y + dy;
-				//this.itemNode.fu.setPosition(posX,posY);
-				itemNode.fu.scale(1 / scale.x, 1 / scale.y);
-				itemNode.fu.scaleBy(1, 1 / map.Zoom.nZoomY * map.Zoom.nZoomX);
 
 				return true;
 			}

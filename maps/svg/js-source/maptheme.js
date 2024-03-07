@@ -1615,6 +1615,15 @@ Map.Themes.prototype.refreshTheme = function (szId) {
 	var mapTheme = this.getTheme(szId);
 
 	if (mapTheme) {
+		
+	/** all exact values (string allowed) defined or generated */
+	mapTheme.szValuesA = null;
+	/** all ranges generated */
+	if (!mapTheme.szFlag.match(/RANGES/)) {
+		mapTheme.szRangesA = null;
+	}
+	/** all ranges defined or generated */
+	mapTheme.szExactA = null;
 		// reload data
 		mapTheme.fRealize = true;
 		// but keep existing charts, don't make them twice !
@@ -10740,9 +10749,17 @@ MapTheme.prototype.distributeValues = function () {
 		}
 	}
 	// --------------------------------------------------------------------
-
-
-
+	
+	// GR 03/02/2024 user defined color function as string in theme ?
+	if ( (this.colorScheme[0]).match(/function||\=\>/) ){
+		try {
+			// in generated json linebreaks in strings are not allowed
+			// this.origColorScheme[0] = this.colorScheme[0].replace(/\s\s+/g, ' ');
+			eval("var __defineColorScheme = "+this.colorScheme);
+			__defineColorScheme(this);
+		} catch (e) {}
+	}
+	
 	// GR 13.11.2016 user defined color scheme ?
 	if (1 || this.colorScheme[0].match(/user/i)) {
 		try {
@@ -13525,6 +13542,9 @@ MapTheme.prototype.createChartGroup = function (objectGroup) {
 			map.Layer.depListA[this.szThemesA[0]].szFeature = this.szThemesA[0];
 			setTimeout("map.Layer.switchScaleDependentLayer(null)",10);
 			}
+		if (this.fVisible == false){
+			this.chartGroup.style.setProperty("display", "none", "");
+		}
 	}else{
 		this.chartGroup = map.Dom.newGroup(objectGroup, this.szId + ":chartgroup");
 	}
@@ -13626,7 +13646,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		return;
 	}
 	
-	this.fVisible = true;
+	//this.fVisible = true;
 
 	if (this.chartGroup) {
 		this.chartGroup.style.setProperty("display", (this.chartGroup.display || "inline"), "");
@@ -17451,7 +17471,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		
 		// smooth by rolling average
 		// ---------------------------
-		if (szFlag.match(/\bSMOOTH\b/)) {
+		if (szFlag.match(/\bSMOOTH\b/) && !szFlag.match(/\bZOOM\b/)) {
 			var ra = 3;
 			var nPartsRawA = nPartsA.slice();
 			for (i = nPartsA.length-2; i >= ra-2; i--) {
@@ -21234,7 +21254,7 @@ MapTheme.prototype.createTextLabel = function (SVGDocument, SVGTargetGroup, szId
 		fBackground = false;
 	}
 
-	if (!nFontSize) {
+	if (isNaN(nFontSize)) {
 		nFontSize = 14;
 	}
 	if (!szTextOrientation) {
