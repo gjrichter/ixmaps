@@ -786,7 +786,7 @@ $Log: htmlgui_api.js,v $
 	 * @return void
 	 */
 	ixmaps.switchLayer = function(szMap,szLayerName,fState){
-		__checkArguments(arguments,3,"setView()");
+		__checkArguments(arguments,3,"switchLayer()");
 		this.dispatchToEmbeddedApi(szMap,"switchLayer",[szLayerName,fState]);
 	};
 	/**

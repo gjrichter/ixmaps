@@ -258,7 +258,7 @@
 							this.formatObj(obj[a]);
 							this.tab--;
 						} else {
-							this.szPrettyString += (n ? ',\n' : '\n') + (this.getIndent()) + '"' + String(obj[a]).replace(/\"/g, "\\\"") + '"';
+							this.szPrettyString += (n ? ',\n' : '\n') + (this.getIndent()) + '"' + String(obj[a]).replace(/\"/g, "\\\"").replace(/\s\s+/g, ' ') + '"';
 						}
 						n++;
 					}
@@ -284,7 +284,7 @@
 						this.tab--;
 						n++;
 					} else {
-						this.szPrettyString += (n ? ',\n' : '\n') + (this.getIndent()) + '"' + a + '": "' + String(obj[a]).replace(/\"/g, "\\\"") + '"';
+						this.szPrettyString += (n ? ',\n' : '\n') + (this.getIndent()) + '"' + a + '": "' + String(obj[a]).replace(/\"/g, "\\\"").replace(/\s\s+/g, ' ') + '"';
 						n++;
 					}
 				}

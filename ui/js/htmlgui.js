@@ -1102,10 +1102,10 @@ $Log: htmlgui.js,v $
 					theme.style["dbtableExt"] = theme.data[i];
 				} else
 				if (i == "process") {
-					theme.style["dbtableProcess"] = theme.data[i].replace(/\s\s+/g, ' ');
+					theme.style["dbtableProcess"] = theme.data[i];
 				} else
 				if (i == "query") {
-					theme.style["dbtableQuery"] = theme.data[i].replace(/\s\s+/g, ' ');
+					theme.style["dbtableQuery"] = theme.data[i];
 				} else
 				if (i == "cache") {
 					theme.style["datacache"] = theme.data[i];
