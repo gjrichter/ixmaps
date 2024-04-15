@@ -334,10 +334,12 @@ window.ixmaps = window.ixmaps || {};
 
 		} else
 		if (layer.szType == type) {
+			
+			var szChecked = (layer.szDisplay == "none") ? "" : "checked=\"checked\"";
 
-			szLegend += "<li style='margin-top:0.5em;'>";
-			szLegend += '<input type="checkbox" class="check" checked="checked" onchange="javascript:ixmaps.__switchLayer($(this),\'' + name + '\');">';
-			szLegend += '<span>&nbsp;' + name + '</span>';
+			szLegend += "<li style='margin-top:-1em;margin-bottom:1em;'>";
+			szLegend += '<input type="checkbox" class="check" '+szChecked+' onchange="javascript:ixmaps.__switchLayer($(this),\'' + name + '\');">';
+			szLegend += '<span>&nbsp;' + name + ' (' + type + ') </span>';
 			szLegend += "</li>";
 		}
 		return szLegend;
@@ -529,8 +531,8 @@ window.ixmaps = window.ixmaps || {};
 
 			var szLegendPane = "<div id='map-legend-pane' class='map-legend-pane'>" +
 				"<a href='javascript:__toggleLegendPane(-1)'>" +
-				"<div id='legend-type-switch'>" +
-				"..." +
+				"<div id='legend-type-switch' style='border:none'>" +
+				"<span style='font-size:28px;'>&#8942;</span>" +
 				"</div>" +
 				"</a>" +
 				"<div>" +
@@ -566,7 +568,10 @@ window.ixmaps = window.ixmaps || {};
 	 */
 	__old__htmlgui_onZoomAndPan = ixmaps.htmlgui_onZoomAndPan;
 	ixmaps.htmlgui_onZoomAndPan = function (nZoom) {
-		if (ixmaps.loadedMap && !ixmaps.loadedProject.themes && !ixmaps.legend.externalLegend && (ixmaps.legendType != "theme") ) {
+		if (  ixmaps.loadedMap && 
+			!(ixmaps.loadedProject && ixmaps.loadedProject.themes) && 
+			!(ixmaps.legend && ixmaps.legend.externalLegend) &&
+			!(ixmaps.legendType == "theme") ) {
 			setTimeout("ixmaps.makeLayerLegend(" + window.innerHeight * 0.75 + ")", 100);
 		}
 		__old__htmlgui_onZoomAndPan(nZoom);
