@@ -278,7 +278,8 @@ window.ixmaps = window.ixmaps || {};
 		
 		// get data and tooltip (mustache) template
 		
-		var szHtml = themeObj.szTooltip || "no template! ";
+		//var szHtml = themeObj.szTooltip || "no template! ";
+		var szHtml = themeObj.szTooltip || "<span style='white-space:nowrap;font-size:1.5em'>{{theme.title}}</span><br>{{theme.item.title}}{{theme.item.chart}}";
 		
 		var data = ixmaps.map().getData(szId);
 		
@@ -286,7 +287,7 @@ window.ixmaps = window.ixmaps || {};
 		console.log(data);
 		var nValue = themeObj.itemA[szItem].nValue;
 		var szLabel = "";
-		if (themeObj.szFlag.match(/CLIP/)){
+		if (themeObj.szFlag.match(/\bCLIP\b/)){
 			nValue = themeObj.itemA[szItem].nValuesA[themeObj.nActualFrame];
 			szLabel = themeObj.szXaxisA[themeObj.nActualFrame];
 		}
@@ -307,12 +308,14 @@ window.ixmaps = window.ixmaps || {};
 		dataObj.theme.item.value = ixmaps.formatValue(nValue,themeObj.nValueDecimals||2,"BLANK");
 		dataObj.theme.item.label = szLabel;
 		dataObj.theme.item.title = szTitle;
+		dataObj.raw = {};
 		
 		if (data){
 			dObj = data[0];
 			for (var i in dObj){
 				if (!isNaN(dObj[i])){
 					dataObj[i] = (ixmaps.formatValue(dObj[i],themeObj.nValueDecimals||2,"BLANK"));
+					dataObj.raw[i] =  (dObj[i]);
 				}else{
 					dataObj[i] = (dObj[i]);
 				}
