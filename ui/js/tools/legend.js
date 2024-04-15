@@ -1272,11 +1272,13 @@ window.ixmaps.legend = window.ixmaps.legend || {};
 		szHtml += "<div id='map-legend-footer' >";
         szHtml += ixmaps.htmlgui_onLegendFooter ? ixmaps.htmlgui_onLegendFooter(szId, themeObj, ixmaps.getThemeDefinitionObj(szId)) : "";
 		szHtml += "</div>";
+		
+		szLegendPane = "";
 
-		szLegendPane = "<div id='map-legend-pane' class='map-legend-pane'>" +
-            "<a href='javascript:__toggleLegendPane()'>" +
-            "<div id='legend-type-switch'>" +
-            "..." +
+		szLegendPane += "<div id='map-legend-pane' class='map-legend-pane'>" +
+            "<a href='javascript:__toggleLegendPane()' title='unfold/fold the legend'>" +
+            "<div id='legend-type-switch' style='border:none' >" +
+            "<span style='font-size:28px;'>&#8942;</span>" +
             "</div>" +
             "</a>" +
             "<div>" +
@@ -1286,9 +1288,9 @@ window.ixmaps.legend = window.ixmaps.legend || {};
             "</div>" +
             "</div>" +
             "</div>";
-
+		
         szLegendPane += "<a href='javascript:__toggleLegendPane(0);'>" +
-            "<div id='legend-type-switch-bottom'>" +
+            "<div id='legend-type-switch-bottom' style='display:none'>" +
             "<i id='map-legend-pane-switch' class='icon shareIcon blackHover icon-arrow-down2' title='close' style='color:#888;pointer-events:none;' tabindex='-1'></i>" +
             "</div>" +
             "</a>";
@@ -1403,6 +1405,28 @@ window.ixmaps.legend = window.ixmaps.legend || {};
     };
 
     // ============================================
+    // show/hide legend 
+    // ============================================
+	
+	ixmaps.legend.show = function(){
+		$("#map-legend").show();
+		$("#map-legend-switch").hide();
+	};
+	
+	ixmaps.legend.hide = function(){
+		$("#map-legend").hide();
+		if ( !$("#map-legend-switch")[0] ){
+			var szButton = '<button type="button" id="map-legend-switch" title="info/pan" class="toolbutton shadow" style="height:40px;width:40px;" onclick="javascript:ixmaps.legend.show()"><label for="map-legend-switch" style="height:36px;"><i id="clipbuttonicon" class="fa fa-bars fa-fw" style="font-size:2em;font-size:1.3em;padding:0.5em 0;color:#888888;"></i></label></button>';
+			/**
+			$("#onmapbuttondiv").append("<button type='button' id='map-legend-switch' style='toolbutton shadow'><a href='javascript:ixmaps.legend.show()'><i id='clipbuttonicon' class='fa fa-bars fa-fw' style='font-size:2em;font-size:1.3em;padding:0.5em 0;color:#666666;'></i></a></button>");
+			**/
+			$("#onmapbuttondiv").append(szButton);
+			$("#onmapbuttondiv").show();
+		}
+		$("#map-legend-switch").show();
+	};
+	
+    // ============================================
     // show/hide legend parts
     // ============================================
 
@@ -1440,8 +1464,13 @@ window.ixmaps.legend = window.ixmaps.legend || {};
             $("#map-legend-footer").hide();
             $("#map-legend-pane-switch").parent().hide();
         }
-        $("#map-legend").slideDown();
-    }
+		if (window.innerWidth < 500){
+			ixmaps.legend.hide();
+		}else{
+			$("#map-legend").slideDown();
+			ixmaps.legend.show();
+		}
+   }
 
     /**
      * open/close the legend parts
