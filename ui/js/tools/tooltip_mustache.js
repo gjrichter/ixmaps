@@ -285,7 +285,7 @@ window.ixmaps = window.ixmaps || {};
 		
 		console.log("=== item data ===");
 		console.log(data);
-		var nValue = themeObj.itemA[szItem].nValue;
+		var nValue = themeObj.itemA[szItem].nValue || themeObj.itemA[szItem].nValuesA[0];
 		var szLabel = "";
 		if (themeObj.szFlag.match(/\bCLIP\b/)){
 			nValue = themeObj.itemA[szItem].nValuesA[themeObj.nActualFrame];
