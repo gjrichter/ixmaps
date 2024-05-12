@@ -5233,7 +5233,7 @@ Map.Event.prototype.defaultMouseOver = function (evt) {
 	) {
 
 		try {
-			if (HTMLWindow.ixmaps.htmlgui_onItemOver(evt, mapObject.szId)) {
+			if (HTMLWindow.ixmaps.htmlgui_onItemOver(evt, mapObject.szId, onoverShape)) {
 				SVGPopupGroup.fu.clear();
 				highLightList.unlock();
 				highLightList.removeAll();

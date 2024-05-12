@@ -141,6 +141,13 @@ DonutChart.prototype.setMaxValue = function(nMax){
 	this.nMaxValue = nMax; 
 };
 /**
+ * method to set a normalsize value for STARBURST charts
+ * @param nValue value assioziated to normal starburst size, if lower than max value, the chart gets bigger
+ */
+DonutChart.prototype.setNormalSizeValue = function(nValue){
+	this.nNormalSizeValue = nValue; 
+};
+/**
  * adds one part to the donut / pie object
  * @param nPercent size of the part in 1/100
  * @param nHeight  set individual part height, overrides global height
@@ -203,7 +210,7 @@ DonutChart.prototype.realize = function(){
 	var nMaxRadius75 = 0;
 	var nMax = 0; 
 	
-	if ( this.szStyle.match(/VOLUME/) || this.szStyle.match(/STARBURST/) ){
+	if ( this.szStyle.match(/VOLUME/) ){
 		for ( var i=0;i<this.partsA.length;i++ ){
 			nSum += this.partsA[i].nPercent;
 			nMax = Math.max(nMax,this.partsA[i].nPercent);
@@ -220,6 +227,19 @@ DonutChart.prototype.realize = function(){
 		nMaxRadius25 = (100/nSqrtSum*Math.sqrt(this.nMaxValue/4||50));
 		nMaxRadius50 = (100/nSqrtSum*Math.sqrt(this.nMaxValue/2||50));
 		nMaxRadius75 = (100/nSqrtSum*Math.sqrt(this.nMaxValue/4*3||50));
+	}
+	
+	if ( this.szStyle.match(/STARBURST/) ){
+		for ( var i=0;i<this.partsA.length;i++ ){
+			nSum += this.partsA[i].nPercent;
+			nMax = Math.max(nMax,this.partsA[i].nPercent);
+			nSqrtSum += Math.sqrt(this.partsA[i].nPercent);
+		}
+		nSqrtSum = Math.sqrt(this.nMaxValue*this.partsA.length);
+		nMaxRadius = ((this.nMaxValue||100));
+		nMaxRadius25 = ((this.nMaxValue/4||50));
+		nMaxRadius50 = ((this.nMaxValue/2||50));
+		nMaxRadius75 = ((this.nMaxValue/4*3||50));
 	}
 	
 	// recalculate percentages for pies
@@ -290,7 +310,7 @@ DonutChart.prototype.realize = function(){
 	//
 	if ( this.szStyle.match(/STARBURST/) ){
 		nAngle = nMaxAngle/this.partsA.length;
-		this.nRadOuter += this.nRadInner/this.partsA.length*3;
+		this.nRadOuter += this.nRadInner; ///this.partsA.length*3;
 
 		if ( this.szStyle.match(/XLRAYS/) ){
 			nAngle = Math.min(nMaxAngle/4,nMaxAngle/this.partsA.length);
@@ -346,6 +366,13 @@ DonutChart.prototype.realize = function(){
 			}else{
 				this.donutPartsA[i] = {};
 			}
+		}else
+		if ( this.szStyle.match(/DIRECTED/) ){
+			if (this.partsA[i].nAngle){
+				this.donutPartsA[i] = {nStartAngle:this.partsA[i].nAngle-10,nEndAngle:this.partsA[i].nAngle+10,color:this.partsA[i].color,nHeight:this.partsA[i].nHeight,nOffset:this.partsA[i].nOffset};
+			}else{
+				this.donutPartsA[i] = {};
+			}
 		}else{
 			this.donutPartsA[i] = {nStartAngle:nStartAngle+nGapAngle,nEndAngle:nEndAngle-nGapAngle,color:this.partsA[i].color,nHeight:this.partsA[i].nHeight,nOffset:this.partsA[i].nOffset};
 		}
@@ -353,7 +380,9 @@ DonutChart.prototype.realize = function(){
 			this.donutPartsA[i].nHeight = 0;
 		}
 		if ( this.szStyle.match(/STARBURST/) ){
-			this.donutPartsA[i].nRadOuter = Math.max(1,this.nRadInner + (Math.sqrt(this.partsA[i].nPercent*this.partsA.length)/10) * (this.nRadOuter-Math.sqrt(this.nRadInner)));
+			var scale = this.nMaxValue/(this.nNormalSizeValue||this.nMaxValue)*2.14;
+			this.donutPartsA[i].nRadOuter = Math.max(1,this.nRadInner + (this.nRadOuter-this.nRadInner) *	(Math.sqrt(this.partsA[i].nPercent)/Math.sqrt(this.nMaxValue))*scale); 
+			//(Math.sqrt(this.partsA[i].nPercent)/Math.sqrt(this.nMaxValue)) * (this.nRadOuter-this.nRadInner));
 		}
 		if (nStartAngle<=180 && nEndAngle >= 180 ){
 			nLastPart = i;
@@ -371,19 +400,19 @@ DonutChart.prototype.realize = function(){
 	// GR 14.02.2020 make background circle 
 	// 
 	if ( this.szStyle.match(/STARBURST/) && this.szStyle.match(/POLAR/) ) {
-
-		var radius = Math.max(1,this.nRadInner + nMaxRadius/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
+		var scale = this.nMaxValue/(this.nNormalSizeValue||this.nMaxValue)*2.14;
+		var radius = Math.max(1,this.nRadInner + (this.nRadOuter-this.nRadInner) * (Math.sqrt(nMaxRadius)/Math.sqrt(this.nMaxValue))*scale);
 		var c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:white;fill-opacity:0.25;stroke:#444444;stroke-width:1px;"); 
 		c.setAttributeNS(null,"tooltip","range "+String((this.nMaxValue||100)*0.75) +"-"+ String((this.nMaxValue||100)*1));
 		
-		var radius = Math.max(1,this.nRadInner + nMaxRadius75/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
+		var radius = Math.max(1,this.nRadInner + (this.nRadOuter-this.nRadInner) * (Math.sqrt(nMaxRadius75)/Math.sqrt(this.nMaxValue))*scale);
 		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#444444;stroke-width:3px;stroke-dasharray:50 50"); 	
 		c.setAttributeNS(null,"tooltip","range "+String((this.nMaxValue||100)*0.50) +"-"+ String((this.nMaxValue||100)*0.75));
 		
-		var radius = Math.max(1,this.nRadInner + nMaxRadius50/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
+		var radius = Math.max(1,this.nRadInner + (this.nRadOuter-this.nRadInner) * (Math.sqrt(nMaxRadius50)/Math.sqrt(this.nMaxValue))*scale);
 		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#444444;stroke-width:1px;"); 			c.setAttributeNS(null,"tooltip","range "+String((this.nMaxValue||100)*0.25) +"-"+ String((this.nMaxValue||100)*0.50));
 	
-		var radius = Math.max(1,this.nRadInner + nMaxRadius25/100*this.partsA.length * (this.nRadOuter-this.nRadInner));
+		var radius = Math.max(1,this.nRadInner + (this.nRadOuter-this.nRadInner) * (Math.sqrt(nMaxRadius25)/Math.sqrt(this.nMaxValue))*scale);
 		c = map.Dom.newShape('circle', this.targetGroup, this.mX,this.mY,radius, "fill:none;stroke:#444444;stroke-width:3px;stroke-dasharray:50 50"); 
 		c.setAttributeNS(null,"tooltip","range "+String((this.nMaxValue||100)*0) +"-"+ String((this.nMaxValue||100)*0.25));
 
