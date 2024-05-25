@@ -286,6 +286,12 @@ window.ixmaps = window.ixmaps || {};
 		console.log("=== item data ===");
 		console.log(data);
 		var nValue = themeObj.itemA[szItem].nValue || themeObj.itemA[szItem].nValuesA[0];
+		if (themeObj.itemA[szItem].nValuesA.length > 1){
+			nValue = 0;
+			for (i in themeObj.itemA[szItem].nValuesA){
+				nValue += themeObj.itemA[szItem].nValuesA[i];
+			}
+		}
 		var szLabel = "";
 		if (themeObj.szFlag.match(/\bCLIP\b/)){
 			nValue = themeObj.itemA[szItem].nValuesA[themeObj.nActualFrame];
