@@ -495,7 +495,7 @@ Map.Api.prototype.setPrintScaling = function(){
 	this.map.Event.doPrintZoom();
 };
 /**
- * inhibit dynamic content and scaling  
+ * inhibit dynamic content and scaling  (deprecated!)
  */
 Map.Api.prototype.froozeMap = function(flag){
 	fFroozeDynamicContent = flag;

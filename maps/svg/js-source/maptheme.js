@@ -1621,14 +1621,14 @@ Map.Themes.prototype.refreshTheme = function (szId) {
 
 	if (mapTheme) {
 		
-	/** all exact values (string allowed) defined or generated */
-	mapTheme.szValuesA = null;
-	/** all ranges generated */
-	if (!mapTheme.szFlag.match(/RANGES/)) {
-		mapTheme.szRangesA = null;
-	}
-	/** all ranges defined or generated */
-	mapTheme.szExactA = null;
+		/** all exact values (string allowed) defined or generated */
+		mapTheme.szValuesA = null;
+		/** all ranges generated */
+		if (!mapTheme.szFlag.match(/RANGES/)) {
+			mapTheme.szRangesA = null;
+		}
+		/** all ranges defined or generated */
+		mapTheme.szExactA = null;
 
 		// reload data
 		mapTheme.fRealize = true;
@@ -2982,7 +2982,7 @@ Map.Themes.prototype.markClass = function (evt, szId, szClass, szStep) {
 		if (this.unmarkTimeout) {
 			clearTimeout(this.unmarkTimeout);
 		}
-		displayMessage("...", 1000, true);
+		displayMessage("...", 500, true);
 		this.markTimeout = setTimeout(function(){map.Themes.doMarkClass(szId,szClass,szStep);}, 50);
 	}
 };
@@ -2996,7 +2996,7 @@ Map.Themes.prototype.unmarkClass = function (evt, szId, szClass) {
 	var mapTheme = this.getTheme(szId);
 	if (mapTheme && mapTheme.isVisible && !mapTheme.showInfoMore) {
 
-		displayMessage("...", 1000, true);
+		displayMessage("...", 500, true);
 		this.unmarkTimeout = setTimeout(function(){map.Themes.doUnmarkClass(szId,szClass);}, 50);
 		mapTheme.fUnmarkEnable = true;
 		mapTheme.fMarkEnable = false;
@@ -3065,7 +3065,7 @@ Map.Themes.prototype.doUnmarkClass = function (szId, szClass) {
 				}
 			}
 			if (mapTheme.markedClassesA.length) {
-				displayMessage("...", 1000, true);
+				displayMessage("...", 500, true);
 				mapTheme.fMarkEnable = true;
 				mapTheme.markClass(mapTheme.markedClassesA[0],1);
 				mapTheme.fMarkEnable = false;
@@ -5589,12 +5589,8 @@ Map.Themes.prototype.actualize = function (nZoomChangeFactor) {
 		lastExecutionTime += this.themesA[i].timeAggregating;
 	}
 	
-	
-	if (1 || (lastExecutionTime > 10)) {
-		executeWithMessage("map.Themes.execute()", "...", 100);
-	} else {
-		map.Themes.execute();
-	}
+	map.Themes.execute();
+
 	return null;
 };
 /**
@@ -7907,7 +7903,11 @@ MapTheme.prototype.getSelectionId = function (szTheme, j) {
  */
 MapTheme.prototype.loadValuesOfTheme = function (szThemeLayer) {
 
-	if (this.szFlag.match(/FAST/) || (this.szFlag.match(/AGGREGATE/) && !this.szFlag.match(/COMPATIBLE|PERCENTOFMEAN/))) {
+	if (this.szFlag.match(/FAST/) 	|| 
+		this.szFlag.match(/VECTOR/) ||
+		this.szFlag.match(/BEZIER/) ||
+		(typeof (this.szSelectionField2) != "undefined") ||
+		(this.szFlag.match(/AGGREGATE/) && !this.szFlag.match(/COMPATIBLE|PERCENTOFMEAN/))) {
 		this.__fAggregateOnLoad = true;
 		return this.loadAndAggregateValuesOfTheme(szThemeLayer);
 	}
@@ -14790,10 +14790,15 @@ MapTheme.prototype.chartMap = function (startIndex) {
 				}
 
 				var len = Math.sqrt((p2.y - p1.y) * (p2.y - p1.y) + (p2.x - p1.x) * (p2.x - p1.x));
+				
 				var x = (p2.x - p1.x);
 				var y = (p2.y - p1.y);
 				var len = Math.sqrt(x * x + y * y);
-                
+				
+ 				if(this.szFlag.match(/\bDYNAMICWIDTH\b/)){
+					nLineWidth *= Math.max(1,Math.log10(len));
+				}
+               
 				if ( len <= 0 ){
 					continue;
 				}
@@ -19046,13 +19051,13 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 									if ((szFlag.match(/ZEROISVALUE/) && !szFlag.match(/ZEROISNOTVALUE/) && this.plot_last_position[yi] && (nValue || this.plot_last_position[yi].y)) ||
 										(nValue && this.plot_last_position[yi] && this.plot_last_position[yi].y)) {
 										if (szFlag.match(/AREA/)) {
-
+											
 											plotShape = map.Dom.newShape('path', plotGroup, 
 												'M' + (this.plot_last_position[yi].x - 2) + ',' + (this.plot_last_position[yi].y) +
 												'L' + (nAxis) + ',' + ((-nPValue) * nScale) + ' ' +
-													  (nAxis) + ',' + ((-nPValue + nValue - nMinValue) * nScale) + ' ' +
+													  (nAxis) + ',' + ((-nPValue + nValue) * nScale) + ' ' +
 													  (this.plot_last_position[yi].x - 2) + ',' +
-													    (this.plot_last_last_position[yi - 1] ? this.plot_last_last_position[yi - 1].y : (0)) +
+													  ((this.plot_last_last_position[yi - 1] ? this.plot_last_last_position[yi - 1].y : (0))+nMinValue*nScale) +
 												' z', "fill:" + szColor + ";fill-opacity:" + (this.fillOpacity || 1) + ";");
 											if (plotShape) {
 												plotShape.setAttributeNS(szMapNs, "value", String(nValue));
@@ -19187,7 +19192,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 
 								} else
 								if (szFlag.match(/LOLLIPOP/) && nValue) {
-									plotShape = map.Dom.newShape('line', plotGroup, nAxis, 0, nAxis, (-nPValue) * nScale, "stroke:" + (szColor) + ";stroke-width:" + map.Scale.normalX(3) + ";stroke-linecap:round;");
+									plotShape = map.Dom.newShape('line', plotGroup, nAxis, (nMinValue * nScale), nAxis, (-nPValue) * nScale, "stroke:" + (szColor) + ";stroke-width:" + map.Scale.normalX(3) + ";stroke-linecap:butt;");
 									if (plotShape) {
 										plotShape.setAttributeNS(szMapNs, "value", String(nValue));
 										plotShape.setAttributeNS(szMapNs, "class", String(nClass % (this.nGridX || 1000000)));
