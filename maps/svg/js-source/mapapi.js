@@ -122,6 +122,14 @@ Map.Api.prototype.setLocalString = function(szOrig,szLocal){
 	this.map.Dictionary.replace(szOrig,szLocal);
 };
 /**
+ * get translation from dictionary 
+ * @param szOrig the string to transtale
+ * @return the translated string 
+ */
+Map.Api.prototype.getLocalString = function(szOrig){
+	this.map.Dictionary.getLocalText(szOrig);
+};
+/**
  * set layer state
  * @param layerSwitchObject defines the layer and sublayer to switch
  */

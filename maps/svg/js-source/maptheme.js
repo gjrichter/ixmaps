@@ -670,27 +670,14 @@ Map.Themes.prototype.newThemeByObj = function (themeObj) {
 		mapTheme.createChartGroup(map.Layer.objectGroup);
 	}
 	
-	// if there is data to load, do this first, and draw the theme on callback
-	// -----------------------------------------------------------------------
-	if (1 || !fAllIncluded) {
-		if (mapTheme.coTable) {
-			this.loadExternalData(mapTheme.coTable, mapTheme.nRefreshTimeout, mapTheme);
-			return mapTheme;
-		} else
-		if (fLoadExternalData) {
-			var szThemesA = themeObj.layer.split("|");
-			for (var i = 0; i < szThemesA.length; i++) {
-				this.loadExternalData(szThemesA[i], mapTheme.nRefreshTimeout, mapTheme);
-			}
-			return mapTheme;
-		}
-	}
-
-	// no data to load, so draw the theme
-	// ----------------------------------
-
 	// GR 05.06.2015 make sure, zoom factors are up to date	
 	map.Event.doDefaultZoom();
+	
+	if (mapTheme.fDataCache === false){
+		if (mapTheme.coTable) {
+			eval("delete "+mapTheme.coTable);
+		}
+	}
 
 	executeWithMessage("map.Themes.execute()", "... processing ...");
 
@@ -6653,6 +6640,27 @@ MapTheme.prototype.realize = function () {
 			}
 		}
 	}
+	
+	// check if external data defined but not loaded (javascript object name.table not defined)
+	// if yes, load data and wait
+	//
+	if (this.coTable) {
+		this.__test = null;
+		try {
+			eval("this.__test = " + this.coTable + ".table");
+		} catch (e) {
+			try {
+				eval("this.__test = " + this.coTable + "_table");
+			} catch (e) {}
+		}
+		if (!this.__test){
+			map.Themes.loadExternalData(this.coTable, this.nRefreshTimeout, this);
+			this.fRealize = true;
+			return;
+		}
+	}
+	
+	// ok, we have data, lets do the theme
 
 	var x = new Date();
 
@@ -7596,7 +7604,7 @@ MapTheme.prototype.loadValues = function () {
  * @type boolean
  * @return true if item passes the filter
  */
-MapTheme.prototype.filterValues = function (j) {
+MapTheme.prototype.filterValues = function (j) { 
 
 	if (this.szFilter.match(/WHERE/)) {
 
@@ -7656,6 +7664,9 @@ MapTheme.prototype.filterValues = function (j) {
 				if (nToken) {
 
 					// get data table column index for query field
+					if (filterObj.szFilterField == "*") {
+						filterObj.nFilterFieldIndex = -1
+					} else
 					for (var ii = 0; ii < this.objTheme.dbFields.length; ii++) {
 						if (this.objTheme.dbFields[ii].id == filterObj.szFilterField) {
 							filterObj.nFilterFieldIndex = ii;
@@ -7688,7 +7699,11 @@ MapTheme.prototype.filterValues = function (j) {
 		for (var i in this.objTheme.filterQueryA) {
 
 			// get the value to test
-			this.__szValue = String(this.objTheme.dbRecords[j][this.objTheme.filterQueryA[i].nFilterFieldIndex]);
+			if (this.objTheme.filterQueryA[i].nFilterFieldIndex == -1){
+				this.__szValue = this.objTheme.dbRecords[j].join('|');
+			}else{
+				this.__szValue = String(this.objTheme.dbRecords[j][this.objTheme.filterQueryA[i].nFilterFieldIndex]);
+			}
 			this.__szFilterOp = this.objTheme.filterQueryA[i].szFilterOp.toUpperCase();
 			this.__szFilterValue = this.objTheme.filterQueryA[i].szFilterValue;
 			this.__szFilterValue2 = this.objTheme.filterQueryA[i].szFilterValue2;
@@ -11191,7 +11206,9 @@ MapTheme.prototype.distributeValues = function () {
 	}
 
 	// GR 23.04.2015 we test for < max, so add something little for the last part 
-	this.partsA[this.partsA.length - 1].max += 0.001;
+	if (this.partsA[this.partsA.length - 1]){
+		this.partsA[this.partsA.length - 1].max += 0.001;
+	}
 
 
 	// GR 23.01.2019 we must undo the ranges set on this.szColorField defined
@@ -11908,7 +11925,9 @@ MapTheme.prototype.unpaintMap = function () {
 		}
 		return;
 	}
-
+	if (this.szFlag.match(/LOCKED/)){
+		return;
+	}
 	this.beginDraw();
 
 	_TRACE("begin ===> ");
@@ -12149,6 +12168,9 @@ MapTheme.prototype.markClass = function (nClass, nStep) {
 	if ((map.Themes.enableSubThemes) &&
 		//(this.szFields.match(/\|/)) &&
 		(this.szFlag.match(/DOMINANT|COMPOSE/) && !this.szFlag.match(/CHART/))) {
+		if (this.szFlag.match(/SUBTHEME/)){
+			return;
+		}
 		this.createSubTheme(nClass);
 		return;
 	}
@@ -12960,7 +12982,7 @@ MapTheme.prototype.createSubTheme = function (nClass) {
 			}
 			this.subTheme =
 				map.Themes.newTheme(this.szThemes, fields, this.szField100,
-					"type:" + this.szFlag + "|NOINFO" + ";colorscheme:" + colorScheme + ";label:" + label + ";" + szAttributes);
+					"type:" + this.szFlag + "|SUBTHEME|NOINFO" + ";colorscheme:" + colorScheme + ";label:" + label + ";" + szAttributes);
 
 		} else {
 
@@ -13765,28 +13787,27 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		}
 		
 		// define size slope (value->symbol size), from linear (1) to n-dimensional (2 for quadratic/surface, 3 for cubic/volume ... ) 
-		if (!this.nSizePow){
-			if (this.szFlag.match(/LINEAR/) || this.szFlag.match(/SIZEP1/)) {
-				this.nSizePow = 1;
-			} else
-			if (this.szFlag.match(/SIZEP1H/)) {
-				this.nSizePow = 1.5;
-			} else 
-			if (this.szFlag.match(/SIZELOG/)) {
-				this.nSizePow = 10;
-			} else
-			if (this.szFlag.match(/SIZEP10/)) {
-				this.nSizePow = 10;
-			} else
-			if (this.szFlag.match(/SIZEP4/)) {
-				this.nSizePow = 4;
-			} else
-			if (this.szFlag.match(/SIZEP3/) || this.szFlag.match(/SIZEVOLUME/)) {
-				this.nSizePow = 3;
-			} else {
-				this.nSizePow = 2;
-			}
+		if (this.szFlag.match(/LINEAR/) || this.szFlag.match(/SIZEP1/)) {
+			this.nSizePow = 1;
+		} else
+		if (this.szFlag.match(/SIZEP1H/)) {
+			this.nSizePow = 1.5;
+		} else 
+		if (this.szFlag.match(/SIZELOG/)) {
+			this.nSizePow = 10;
+		} else
+		if (this.szFlag.match(/SIZEP10/)) {
+			this.nSizePow = 10;
+		} else
+		if (this.szFlag.match(/SIZEP4/)) {
+			this.nSizePow = 4;
+		} else
+		if (this.szFlag.match(/3D/) || this.szFlag.match(/SIZEP3/) || this.szFlag.match(/SIZEVOLUME/)) {
+			this.nSizePow = 3;
+		} else {
+			this.nSizePow = this.nSizePow || 2;
 		}
+		
 		// now here; must always be = nChartsize; nNormalSizeValue is used to make symbols smaller, but the grid must be invariant
 		// if you want to make a smaller grid, use scale, or rangescale.
 		this.nCharSizeNormal = nChartSize; // Math.pow(this.nNormalSizeValue,1/this.nSizePow);
@@ -15714,6 +15735,12 @@ MapTheme.prototype.getChartSize = function (a, nChartSize, szFlag, nMySum) {
 	var nValue100 = this.itemA[a].nValue100;
 
 	if (szFlag.match(/SIZE/) && !szFlag.match(/NORMSIZE/) && this.szSizeField && a && this.itemA[a]) {
+		if (szFlag.match(/SIZELOG/)) {
+			nSize = Math.max(1,nSize / Math.log((this.nMaxSize)) * Math.log(this.itemA[a].nSize));
+		} else {
+			nSize = nSize / Math.pow((this.nMaxSize), 1 / this.nSizePow) * Math.pow(this.itemA[a].nSize, 1 / this.nSizePow);
+		}
+		/**
 		if (szFlag.match(/LINEAR/) || szFlag.match(/SIZEP1/)) {
 			nSize = nSize / this.nMaxSize * this.itemA[a].nSize;
 		} else
@@ -15728,7 +15755,14 @@ MapTheme.prototype.getChartSize = function (a, nChartSize, szFlag, nMySum) {
 		} else {
 			nSize = nSize / Math.sqrt((this.nMaxSize)) * Math.sqrt(this.itemA[a].nSize);
 		}
+		**/
 	} else if (szFlag.match(/SIZE/) && !szFlag.match(/NORMSIZE/)) {
+		if (szFlag.match(/SIZELOG/)) {
+			nSize = Math.max(1,nSize / Math.log((nRange)) * Math.log(nMySum));
+		}else{
+			nSize = nSize / Math.pow((nRange), 1 / this.nSizePow) * Math.pow(nMySum, 1 / this.nSizePow);
+		}
+		/**
 		if (szFlag.match(/LINEAR/) || szFlag.match(/SIZEP1/)) {
 			nSize = nSize / nRange * nMySum;
 		} else
@@ -15744,6 +15778,7 @@ MapTheme.prototype.getChartSize = function (a, nChartSize, szFlag, nMySum) {
 			nSize = nSize / Math.sqrt((nRange)) * Math.sqrt(nMySum);
 		}
 		// _TRACE("nMySum:"+nMySum+" -> nSize:"+nSize);
+		**/
 	}
 
 	nHeight = map.Scale.normalX(10);
@@ -16293,6 +16328,12 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		if (szFlag.match(/SIZE/) && !szFlag.match(/NORMSIZE/) && this.szSizeField && a && this.itemA[a]) {
 			if (szFlag.match(/SIZELOG/)) {
 				nSize = Math.max(1,nSize / Math.log((this.nMaxSize)) * Math.log(this.itemA[a].nSize));
+			} else {
+				nSize = nSize / Math.pow((this.nMaxSize), 1 / this.nSizePow) * Math.pow(this.itemA[a].nSize, 1 / this.nSizePow);
+			}
+			/**
+			if (szFlag.match(/SIZELOG/)) {
+				nSize = Math.max(1,nSize / Math.log((this.nMaxSize)) * Math.log(this.itemA[a].nSize));
 			} else
 			if (szFlag.match(/SIZEP4/)) {
 				nSize = nSize / Math.pow((this.nMaxSize), 1 / 4) * Math.pow(this.itemA[a].nSize, 1 / 4);
@@ -16302,7 +16343,14 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			} else {
 				nSize = nSize / Math.sqrt((this.nMaxSize)) * Math.sqrt(this.itemA[a].nSize);
 			}
+			**/
 		} else if (szFlag.match(/SIZE/) && !szFlag.match(/NORMSIZE/)) {
+			if (szFlag.match(/SIZELOG/)) {
+				nSize = Math.max(1,nSize / Math.log((nRange)) * Math.log(nMySum));
+			} else {
+				nSize = nSize / Math.pow((nRange), 1 / this.nSizePow) * Math.pow(nMySum, 1 / this.nSizePow);
+			}
+			/**
 			if (szFlag.match(/SIZELOG/)) {
 				nSize = Math.max(1,nSize / Math.log((nRange)) * Math.log(nMySum));
 			} else
@@ -16314,6 +16362,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			} else {
 				nSize = nSize / Math.sqrt((nRange)) * Math.sqrt(nMySum);
 			}
+			**/
 		}
 
 		nHeight = map.Scale.normalX(10);
@@ -19514,6 +19563,12 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 		if (szFlag.match(/SIZE/) && !szFlag.match(/NORMSIZE/) && this.szSizeField && a && this.itemA[a]) {
 			if (szFlag.match(/SIZELOG/)) {
 				nSizer = 1 / Math.max(1,Math.log((this.nMaxSize)) * Math.log(this.itemA[a].nSize));
+			} else {
+				nSizer = 1 / Math.pow((this.nMaxSize), 1 / this.nSizePow) * Math.pow(this.itemA[a].nSize, 1 / this.nSizePow);
+			}
+			/**
+			if (szFlag.match(/SIZELOG/)) {
+				nSizer = 1 / Math.max(1,Math.log((this.nMaxSize)) * Math.log(this.itemA[a].nSize));
 			} else
 			if (szFlag.match(/SIZEP4/)) {
 				nSizer = 1 / Math.pow((this.nMaxSize), 1 / 4) * Math.pow(this.itemA[a].nSize, 1 / 4);
@@ -19523,6 +19578,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			} else {
 				nSizer = 1 / Math.sqrt((this.nMaxSize)) * Math.sqrt(this.itemA[a].nSize);
 			}
+			**/
 		}
 		// by values
 		//
@@ -19534,7 +19590,12 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			if (szFlag.match(/POINTER/)) {
 				nValueSum /= nPartsA.length;
 			}
-
+			if (szFlag.match(/SIZELOG/)) {
+				nSizer = 1 / Math.max(1,Math.log((nRange)) * Math.log(Math.abs(nValueSum)));
+			} else {
+				nSizer = 1 / Math.pow((nRange), 1 / this.nSizePow) * Math.pow(Math.abs(nValueSum), 1 / this.nSizePow);
+			}
+			/**
 			if (szFlag.match(/SIZELOG/)) {
 				nSizer = 1 / Math.max(1,Math.log((nRange)) * Math.log(Math.abs(nValueSum)));
 			} else
@@ -19546,6 +19607,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 			} else {
 				nSizer = 1 / Math.pow((nRange), 1 / 2) * Math.pow(Math.abs(nValueSum), 1 / 2);
 			}
+			**/
 		}
 		// ------------------------------------------------------------
 

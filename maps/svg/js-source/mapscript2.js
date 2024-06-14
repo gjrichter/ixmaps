@@ -5386,7 +5386,8 @@ var __circleHighlight = function (evt, mapObject) {
 	if (highLightList && !highLightList.checkItem(mapObject.objNode)) {
 		highLightList.unlock();
 		highLightList.removeAll();
-		highLightList.addItem(mapObject.objNode, __isChart(null, mapObject.objNode) ? "isolate" : "");
+		//highLightList.addItem(mapObject.objNode, __isChart(null, mapObject.objNode) ? "isolate" : "");
+		highLightList.addItem(mapObject.objNode, "circle");
 		highLightList.lock();
 	}
 };
@@ -8942,9 +8943,9 @@ HighLightItem.prototype.doHighLight = function () {
 			if (this.node.parentNode.fu && this.node.parentNode.fu.getPosition) {
 				this.highlightGroup = this.highlightGroup || map.Dom.newGroup(map.Layer.objectGroup, ":highlightgroup");
 				this.itemNode = map.Dom.newGroup(this.highlightGroup);
-				var nRadius = map.Scale.normalX(50) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
-				var nStrokeWidth = map.Scale.normalX(10) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
-				var nDash = map.Scale.normalX(5) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+				var nRadius = map.Scale.normalX(10) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+				var nStrokeWidth = map.Scale.normalX(2) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
+				var nDash = map.Scale.normalX(1) * map.Layer.nObjectScale / map.Layer.nDynamicObjectScale;
 				var nRadiusX = nRadius;
 				var nRadiusY = nRadius;
 				map.Dom.newShape('circle', this.itemNode, 0, 0, nRadius, "fill:none;fill-opacity:0.1;stroke:black;stroke-dasharray:" + nDash + " " + nDash + ";stroke-width:" + (nStrokeWidth * 1.1) + "px;pointer-events:none");
