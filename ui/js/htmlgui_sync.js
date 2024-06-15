@@ -119,9 +119,13 @@ $Log: htmlgui_sync.js,v $
 	function setBoundsLatLonSilent(latSW, lonSW, latNE, lonNE) {
 		try {
 			__timer_reset();
-			ixmaps.embeddedSVG.window.map.Api.froozeMap(true);
+			if (ixmaps.panFreezed){
+				ixmaps.embeddedSVG.window.map.Api.freezeMap(true);
+			}
 			ixmaps.embeddedSVG.window.map.Api.doCenterMapToGeoBounds(latSW, lonSW, latNE, lonNE);
-			ixmaps.embeddedSVG.window.map.Api.froozeMap(false);
+			if (ixmaps.panFreezed){
+				ixmaps.embeddedSVG.window.map.Api.freezeMap(false);
+			}
 			return __timer_getMS();
 		} catch (e) {}
 	}
@@ -382,7 +386,7 @@ $Log: htmlgui_sync.js,v $
 					ixmaps.fInputModeSwitched = true;
 					ixmaps.fOnItemClicked = false;
 					fEnableAutoDisable = true;
-					setTimeout("ixmaps.htmlgui_onSVGPointerIdle()",500);
+					//setTimeout("ixmaps.htmlgui_onSVGPointerIdle()",2000);
 				}
 			}
 			ixmaps.mouseDownX = ixmaps.mouseMoveX = ixmaps.mouseDownY = ixmaps.mouseMoveY = null;
@@ -426,7 +430,7 @@ $Log: htmlgui_sync.js,v $
 	 **	keyboard handler
 	 **/
 
-	ixmaps.do_keydown = function (evt,source) {
+	ixmaps.do_keydown = function (evt) {
 
 		// evoke theme editor by key ctrl+alt+E
 		if (evt.keyCode == 69) {
@@ -469,7 +473,7 @@ $Log: htmlgui_sync.js,v $
 		
 		//ixmaps.mapTool("pan");
 	};
-	ixmaps.do_keyup = function (evt, source) {
+	ixmaps.do_keyup = function (evt) {
 
 		if (fShareEvents) {
 			// switch back event target on 'shift' key up
@@ -552,6 +556,9 @@ $Log: htmlgui_sync.js,v $
 
 	// hide SVG while panning the map
 	ixmaps.panHidden = true;
+	
+	// freeze SVG while panning the map
+	ixmaps.panFreezed = true;
 
 	// if set to true, all maps on one html page will be synchronized (zoom and pan)
 	// ! every map and containing iframe must have the same unique name 
@@ -605,6 +612,14 @@ $Log: htmlgui_sync.js,v $
 	 * @private
 	 */
 	ixmaps.htmlgui_synchronizeMap = function (callback, zoomto) {
+		
+		if (ixmaps.fSVGInitializing) {
+			return;
+		}
+
+		if (this.loadingMap){
+			return;
+		}
 
 		if (!window || !ixmaps.embeddedSVG || !this.htmlMap || ixmaps.embeddedSVG.window.map.Api.pendingNewGeoBounds()) {
 			return;
@@ -1021,13 +1036,13 @@ $Log: htmlgui_sync.js,v $
 	/** set HTML map bounds
 	 */
 	ixmaps.htmlgui_setCurrentEnvelopeByGeoBounds = function (ptSW, ptNE) {
-		ixmaps.svgmap_view = true;
 		if (ixmaps.htmlmap_view && ixmaps.htmlMap && !ixmaps.fInSVGSync) {
 			ixmaps.htmlgui_synchronizeSVG(false);
 			ixmaps.htmlmap_view = false;
 			return true;
 		}
 		if (ixmaps.htmlMap && !ixmaps.fInSVGSync) {
+			ixmaps.htmlmap_view = true;
 			htmlMap_setBounds(new Array({
 				lat: ptSW.y,
 				lng: ptSW.x
@@ -1041,13 +1056,12 @@ $Log: htmlgui_sync.js,v $
 			return false;
 		}
 	};
-	ixmaps.htmlgui_setCurrentCenterByGeoBounds = function (ptCenter) {
+	ixmaps.htmlgui_setCurrentCenterByGeoBounds = function (ptCenter) { 
 			htmlMap_setCenter({
 				lat: ptCenter.y,
 				lng: ptCenter.x
 			});
 		return;
-		ixmaps.svgmap_view = true;
 		if (ixmaps.htmlmap_view && ixmaps.htmlMap && !ixmaps.fInSVGSync) {
 			ixmaps.htmlgui_synchronizeSVG(false);
 			return true;

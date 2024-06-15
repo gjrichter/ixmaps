@@ -479,3 +479,13 @@ p.legend-description {
 	text-decoration: none;
 	font-size: 12px;
 }
+
+/* tooltip */
+
+.tooltip .label {
+	vertical-align: top;
+}
+.tooltip .value {
+	vertical-align: top;
+	border-top: dotted black 0.1px;
+}

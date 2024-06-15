@@ -159,15 +159,17 @@ $Log: htmlgui_sync_Leaflet.js,v $
 
 		LMap.on('zoomstart', function (n, s, a) {
 			ixmaps.tmp.inZoom = true;
-			ixmaps.embeddedSVG.window.map.Api.freezeMap(true);
+			//ixmaps.embeddedSVG.window.map.Api.freezeMap(true);
 		});
 		LMap.on('zoom', function (n, s, a) {
-			ixmaps.htmlgui_synchronizeSVG();
+			if (!ixmaps.panHidden){
+				ixmaps.htmlgui_synchronizeSVG();
+			}
 		});
 		LMap.on('zoomend', function (n, s, a) {
 			ixmaps.tmp.inZoom = false;
-			ixmaps.embeddedSVG.window.map.Api.freezeMap(false);
-			ixmaps.htmlgui_synchronizeSVG();
+			//ixmaps.embeddedSVG.window.map.Api.freezeMap(false);
+			//ixmaps.htmlgui_synchronizeSVG();
 		});
 
 		LMap.on('movestart', function (n, s, a) {
@@ -757,7 +759,7 @@ $Log: htmlgui_sync_Leaflet.js,v $
 	// in mapstraction setBounds() executes correct, while setCenter() fails position 
 	// to be verified later
 	htmlMap_setBounds = function (arrayPtLatLon, fZoomTo) {
-
+		
 		if (arrayPtLatLon && (arrayPtLatLon.length == 2)) {
 			console.log("here we go");
 

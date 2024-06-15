@@ -1462,6 +1462,21 @@ $Log: htmlgui_api.js,v $
 	};
 
 	/**
+	 * get the localized string from the map
+	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
+	 * @param {String} szOrig the original string
+	 * @return {String} the local string
+	 */
+	ixmaps.getLocalString = function(szMap,szOrig){
+		if (arguments.length == 1){szItem=szMap;szMap=null;}
+		if ( (ixmaps.embeddedApiA[szMap]||ixmaps.embeddedApi).api == true ){
+			return (ixmaps.embeddedApiA[szMap]||ixmaps.embeddedApi).getLocalString(szMap,szOrig);
+		}else{
+			return (ixmaps.embeddedApiA[szMap]||ixmaps.embeddedApi).getLocalString(szMap,szOrig);
+		}
+	};
+
+	/**
 	 * get the position of a theme object or map item
 	 * @param {String} szMap the name of the embedded map [optional] <em>null if there is only one map</em>
 	 * @param {String} szItem the id of the theme item or map item
@@ -2870,9 +2885,27 @@ $Log: htmlgui_api.js,v $
 	 * @return A new ixmaps.mapApi instance
 	 */
 	ixmaps.map = function(szMap){
-		return new ixmaps.mapApi(szMap);
+		if (ixmaps.embeddedApi){
+			szMap = szMap || ixmaps.embeddedApi.szMap;
+			return new ixmaps.mapApi(szMap);
+		}else{
+			return null;
+		}
 	};
 	
+	/**
+	 * ixmaps.maps 
+	 * get all ixmaps.embeddedApiA instances
+	 * @param {String} [szMap] a map name to get the handle from
+	 * @return {array} an array of all map api instances actually present
+	 */
+	ixmaps.maps = function(){
+		var mapsA = {};
+		for (var i in ixmaps.embeddedApiA){
+			mapsA[i] = ixmaps.map[i];
+		}
+		return mapsA;
+	};
 
 	/**
 	 * ixmaps.theme 

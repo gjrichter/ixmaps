@@ -449,7 +449,7 @@ $Log: htmlgui.js,v $
 	 * @type void
 	 */
 	ixmaps.HTML_loadSVGMap = function (szUrl) {
-
+		
 		if (!szUrl || (typeof (szUrl) != 'string')) {
 			ixmaps.loadMapError(szUrl);
 			return;
@@ -582,7 +582,7 @@ $Log: htmlgui.js,v $
 			ixmaps.SVGmapWidth = window.innerWidth - __mapLeft - __SVGmapPosX - __SVGmapOffX;
 			ixmaps.SVGmapHeight = window.innerHeight - __mapTop - __mapFooter - __SVGmapPosY - __SVGmapOffY;
 			
-			$("#attribution-div").css("bottom","18px");
+			$("#attribution-div").css("bottom","15px");
 		}
 
 		if ($(this.gmapDiv)) {
@@ -779,6 +779,7 @@ $Log: htmlgui.js,v $
 		__showLoadingArray = szMessageA;
 		__showLoadingArrayActive = true;
 		__showLoadingArrayIndex = 0;
+		clearTimeout(__showLoadingArrayTimeout);
 		ixmaps.showLoadingArrayNext();
 	};
 	/**
@@ -995,6 +996,12 @@ $Log: htmlgui.js,v $
 				if ((typeof (i) == "string") && (i.match(/panHidden/i))) {
 					this.panHidden = (typeof (opt[i]) == "string") ? (opt[i] == "true") : opt[i];
 				} else
+				if ((typeof (i) == "string") && (i.match(/hideOnPan/i))) {
+					this.panHidden = (typeof (opt[i]) == "string") ? (opt[i] == "true") : opt[i];
+				} else
+				if ((typeof (i) == "string") && (i.match(/freezeOnPan/i))) {
+					this.panFreezed = (typeof (opt[i]) == "string") ? (opt[i] == "true") : opt[i];
+				} else
 				if ((typeof (i) == "string") && (i.match(/normalSizeScale/i))) {
 					this.setScaleParam({
 						"normalSizeScale": opt[i]
@@ -1007,6 +1014,7 @@ $Log: htmlgui.js,v $
 				}
 			}
 			ixmaps.embeddedSVG.window.map.Api.setMapFeatures(szFeatures);
+			
 		}
 		return ixmaps;
 	};
@@ -1039,7 +1047,7 @@ $Log: htmlgui.js,v $
 	// -----------------------------
 
 	ixmaps.newTheme = function (szThemeName, theme, fClear) {
-
+		
 		if (!theme) {
 			alert("no theme defined");
 			return;
@@ -1781,6 +1789,13 @@ $Log: htmlgui.js,v $
 			alert('map api error!');
 		}
 	};
+	ixmaps.getLocalString = function (szOrig) {
+		try {
+			return ixmaps.embeddedSVG.window.map.Dictionary.getLocalText(szOrig);
+		} catch (e) {
+			alert('map api error!');
+		}
+	};
 
 	// ----------------------------------------------------------------------
 	// Interface between SVG and HTML for zoom, pan and scale synchronizing
@@ -2003,7 +2018,8 @@ $Log: htmlgui.js,v $
 				ixmaps.embeddedSVG.window.map.Api.resizeCanvas(0, 0, ixmaps.embeddedSVG.window.innerWidth, ixmaps.embeddedSVG.window.innerHeight, szMethod);
 			}
 		}
-		ixmaps.htmlgui_synchronizeMap(false, fZoomTo);
+		// GR 22.05.2024 -> map zoom error with loaded projects (project zoom was overrided by initial zoom: whole world view))
+		//ixmaps.htmlgui_synchronizeMap(false, fZoomTo);
 	};
 
 	/**
@@ -2126,15 +2142,15 @@ $Log: htmlgui.js,v $
 	// foreward these events to an hosting window, if present
 	// ---------------------------------------------------------
 
-	ixmaps.htmlgui_onItemOver = function (evt,szId) {
+	ixmaps.htmlgui_onItemOver = function (evt,szId,shape) {
 		if (ixmaps.parentApi != ixmaps) {
-			return ixmaps.parentApi.htmlgui_onItemOver(evt,szId);
+			return ixmaps.parentApi.htmlgui_onItemOver(evt,szId,shape);
 		}
 	};
 	
-	ixmaps.htmlgui_onItemClick = function (evt,szId) {
+	ixmaps.htmlgui_onItemClick = function (evt,szId,shape) {
 		if (ixmaps.parentApi != ixmaps) {
-			return ixmaps.parentApi.htmlgui_onItemClick(evt,szId);
+			return ixmaps.parentApi.htmlgui_onItemClick(evt,szId,shape);
 		}
 	};
 
@@ -2551,7 +2567,7 @@ $Log: htmlgui.js,v $
 			lat: bounds[2],
 			lng: bounds[3]
 		}]);
-		ixmaps.htmlgui_synchronizeSVG(false);
+		//ixmaps.htmlgui_synchronizeSVG(false);
 		return ixmaps;
 	};
 	/**
@@ -2566,10 +2582,6 @@ $Log: htmlgui.js,v $
 			ixmaps.htmlgui_setCenterAndZoom({
 				lat: center.center.lat,
 				lng: center.center.lng
-			}, center.normalizeoom);
-			ixmaps.htmlgui_setCenterAndZoom({
-				lat: center.center.lat,
-				lng: center.center.lng
 			}, center.zoom);
 		}else{
 			// GR 15.08.2018 call 2 times needed (magick)
@@ -2577,12 +2589,8 @@ $Log: htmlgui.js,v $
 				lat: center[0],
 				lng: center[1]
 			}, nZoom);
-			ixmaps.htmlgui_setCenterAndZoom({
-				lat: center[0],
-				lng: center[1]
-			}, nZoom);
 		}
-		ixmaps.htmlgui_synchronizeSVG(false);
+		//ixmaps.htmlgui_synchronizeSVG(false);
 		return ixmaps;
 	};
 	/**
@@ -2595,7 +2603,7 @@ $Log: htmlgui.js,v $
 			lat: center[0],
 			lng: center[1]
 		});
-		ixmaps.htmlgui_synchronizeSVG(true);
+		//ixmaps.htmlgui_synchronizeSVG(true);
 		return ixmaps;
 	};
 	/**
@@ -2605,7 +2613,7 @@ $Log: htmlgui.js,v $
 	 */
 	ixmaps.setZoom = function (nZoom) {
 		ixmaps.htmlgui_setZoom(nZoom);
-		ixmaps.htmlgui_synchronizeSVG(false);
+		//ixmaps.htmlgui_synchronizeSVG(false);
 		return ixmaps;
 	};
 	/**
@@ -2630,7 +2638,7 @@ $Log: htmlgui.js,v $
 	 */
 	ixmaps.minZoom = function (nZoom) {
 		ixmaps.htmlgui_minZoom(nZoom);
-		ixmaps.htmlgui_synchronizeSVG(false);
+		//ixmaps.htmlgui_synchronizeSVG(false);
 		return ixmaps;
 	};
 	/**
@@ -2897,7 +2905,8 @@ $Log: htmlgui.js,v $
 						ext: options.ext,
 						cache: options.theme.fDataCache
 					});
-
+					options.cache = options.theme.fDataCache;
+					
 					var broker = new Data.Broker(options);
 					broker.addSource(szUrl, options.type)
 						.error(function (e) {
