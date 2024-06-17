@@ -7430,7 +7430,8 @@ MapTheme.prototype.addItemValues = function (szId, nValuesA, nValue100, nValueSi
 		if (this.__fDensityAlpha) {
 			if (nArea) {
 				nValueAlpha = nValueAlpha / nArea;
-				nValueAlpha = Math.min(nValueAlpha, 50000);
+				// GR 17.06.2024 not working for area in km2
+				//nValueAlpha = Math.min(nValueAlpha, 50000);
 			} else {
 				nValueAlpha = 0;
 			}
