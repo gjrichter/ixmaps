@@ -14492,7 +14492,18 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		// GR 26.11.2020 added geojson features LineString, MultiLineString e Polygon 
 		// ------------------------------------------------------------------------------
 		if (this.szFlag.match(/FEATURE/)) {
-			shapeGroup = map.Dom.newGroup(this.chartGroup, a);
+			
+			// GR 18/06/2024
+			// check if layer shape group for the feature exists, if yes put the path in the same group
+			// if layer source has items with the same id, a will be id+*+random() for the second, third, ...
+			// so we check if shape group id.split("*")[0] exists
+			//
+			if (a.match(/\*/)){
+				shapeGroup = SVGDocument.getElementById(a.split("*")[0]);
+			}
+			if (!shapeGroup){
+				shapeGroup = map.Dom.newGroup(this.chartGroup, a);
+			}
 			
 			// -------------------------------
 			// only position to define feature
