@@ -2162,7 +2162,7 @@ Map.Themes.prototype.execute = function () {
 				continue;
 			}
 			this.themesA[i].fEnableProgressBar = true;
-			if ( !this.themesA[i].szFlag.match(/FEATURES/) ){
+			if ( !this.themesA[i].szFlag.match(/FEATURE/) ){
 				this.themesA[i].unpaintMap();
 			}
 			this.themesA[i].redraw(false);
@@ -2316,6 +2316,8 @@ Map.Themes.prototype.realizeDone = function (mapTheme) {
 	if (this.isIdle()) {
 		clearMessage();
 	}
+	
+	setTimeout("map.Themes.execute()",100);
 };
 /**
  * show progress bar while drawing 
@@ -5469,16 +5471,25 @@ Map.Themes.prototype.actualize = function (nZoomChangeFactor) {
 
 	var lastExecutionTime = 0;
 	for (var i = 0; i < this.themesA.length; i++) {
+		
+		if (nZoomChangeFactor && (nZoomChangeFactor != 1) ) {
+			if (this.themesA[i].szFlag.match(/FEATURE/)) {
+				if (this.themesA[i].nFeatureUpper ||
+					this.themesA[i].nFeatureLower ){
+					if (!this.themesA[i].fDone) {
+						this.themesA[i].fRealize = !this.themesA[i].fDone;
+					}
+					setTimeout("map.Themes.execute()",100);
+				}
+			}
+		}
+		
 		if (!this.themesA[i].fDone) {
 			continue;
 		}
 		if (this.themesA[i].szFlag.match(/WMS/)) {
 			this.themesA[i].fRealize = true;
 			executeWithMessage("map.Themes.execute()", "...", 100);
-			continue;
-		}
-		if (this.themesA[i].szFlag.match(/FEATURES/)) {
-			this.themesA[i].fActualize = true;
 			continue;
 		}
 		
@@ -6623,8 +6634,15 @@ MapTheme.prototype.realize = function () {
 		return;
 	}
 
+	if (this.szFlag.match(/FEATURE/)) {
+		if ( (this.nFeatureLower && (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nFeatureLower)) ||
+		     (this.nFeatureUpper && (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nFeatureUpper)) ){
+			return;
+		}
+	}
+	
 	// check if chart theme (visible) depends on FEATURE layer theme and control FEATURE theme done 
-	if (this.szFlag.match(/CHART/) ){
+	if (this.szFlag.match(/CHART|CHOROPLETH/) ){
 		if ( (!this.nChartLower || (map.Scale.nTrueMapScale * map.Scale.nZoomScale > this.nChartLower)) &&
 		     (!this.nChartUpper || (map.Scale.nTrueMapScale * map.Scale.nZoomScale <= this.nChartUpper)) ){
 			var themes = map.Themes.getAllThemes();
@@ -6774,7 +6792,7 @@ MapTheme.prototype.realize_draw = function () {
 			this.szShapeType += "+buffer";
 		}
 	}
-	if (this.szOrigFlag.match(/FEATURES/) && this.szOrigFlag.match(/LINES/)){
+	if (this.szOrigFlag.match(/FEATURE/) && this.szOrigFlag.match(/LINES/)){
 		this.szShapeType = "line";
 	}
 
@@ -10888,7 +10906,7 @@ MapTheme.prototype.distributeValues = function () {
 		this.getMeanMedianQuantile();
 	}
 
-	_TRACE("distrubute values ==> classes");
+	_TRACE("distribute values ==> classes");
 
 	// distribute values in ranges (classes)
 	// -------------------------------------
@@ -11506,7 +11524,7 @@ MapTheme.prototype.paintMap = function (startIndex) {
 						var nMyMaxVal = (isNaN(this.nMax) ? 0 : this.nMax);
 						nOpacity = (this.nDopacityScale || 1) * Math.pow(nMyValue, nPow) / Math.pow(nMyMaxVal, nPow);
 					}
-					paintShape.style.setProperty("fill-opacity", String(nOpacity), "");
+					paintShape.style.setProperty(this.szShapeType.match(/line/)?"stroke-opacity":"fill-opacity", String(nOpacity), "");
 				}
 			}
 			xFound = true;
@@ -11640,7 +11658,7 @@ MapTheme.prototype.paintMap = function (startIndex) {
 								nOpacity *= Math.max(0.3, (Math.min(1, 0.3 + 0.7 / Math.max(1, Math.log(map.Zoom.nZoom/dx)))));
 							}
 
-							paintShape.style.setProperty("fill-opacity", String(nOpacity), "");
+							paintShape.style.setProperty(this.szShapeType.match(/line/)?"stroke-opacity":"fill-opacity", String(nOpacity), "");
 
 							//_TRACE("dopacity: pfm:"+nPercentOfMean+" sum:"+nTotalSum+" this.sum:"+nMyValue);
 
@@ -11895,7 +11913,7 @@ MapTheme.prototype.unpaintMap = function () {
 	_TRACE("== MapTheme.unpaintMap() ===> ");
 	if (this.szFlag.match(/FEATURE/)) {
 		if (this.chartGroup) {
-			map.Dom.clearGroup(this.chartGroup);
+			//map.Dom.clearGroup(this.chartGroup);
 			//map.Layer.listA[this.szThemesA[0]] = null;
 		}
 		return;
@@ -14789,7 +14807,7 @@ MapTheme.prototype.chartMap = function (startIndex) {
 		// GR 03.03.2019 bezier curve
 		// ------------------------------------------------
 		if (this.szFlag.match(/\bBEZIER\b/)) {
-
+			
 			if (this.nMinValue && (this.itemA[a].nSize < this.nMinValue)) {
 				continue;
 			}
@@ -17100,7 +17118,7 @@ MapTheme.prototype.drawChart = function (chartGroup, a, nChartSize, szFlag, nMar
 				this.itemA[a].szColor = __maptheme_getComposedColor_additive(this.itemA[a].nValuesA, this.colorScheme, this.nMax, Math.floor(this.nBrightness * 255));
 			}
 		} else {
-			if (this.colorScheme.length > 2 || (this.szRanges && this.szRanges.length)) {
+			if (this.colorScheme.length > 2 || this.partsA.length > 1 || (this.szRanges && this.szRanges.length)) {
 
 				fDoDraw = false;
 
