@@ -2210,6 +2210,7 @@ $Log: htmlgui.js,v $
 		} catch (e) {}
 		if (ixmaps.parentApi != ixmaps) {
 			console.log("*** up to parentApi ***");
+			console.log(ixmaps.parentApi);
 			ixmaps.dispatchToParentApi("htmlgui_onDrawTheme",[szId]);
 			console.log(ixmaps.parentApi);
 			ixmaps.parentApi.htmlgui_onDrawTheme(szId);
