@@ -2178,6 +2178,7 @@ $Log: htmlgui.js,v $
 			ixmaps.updatePageHistory();
 		} catch (e) {}
 		if (ixmaps.parentApi != ixmaps) {
+			console.log("*** up to parentApi ***");
 			ixmaps.parentApi.htmlgui_onDrawTheme(szId);
 		}
 	};
