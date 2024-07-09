@@ -2279,6 +2279,7 @@ $Log: htmlgui_api.js,v $
 	};
 
 	ixmaps.htmlgui_onDrawTheme = function(szId){
+		console.log(szId);
 		if ( ixmaps.parentApi != ixmaps ){
 			ixmaps.parentApi.htmlgui_onDrawTheme(szId);
 		}
