@@ -2172,6 +2172,35 @@ $Log: htmlgui.js,v $
 		}
 	};
 
+	/**
+	 * dispatch a function call to an embedded map which can be:<br>
+	 * a) an embedded ixmaps api, if registered<br> 
+	 * b) a cross domain iframe<br> 
+	 * @param {String} szFunc the name of the function to dispatch
+	 * @param {Array} argA an array of argument to pass
+	 * @return void
+	 * @private
+	 */
+	ixmaps.dispatchToParentApi = function(szFunc,argA){
+
+		// create argument string
+		//
+		szArgs = "";
+		for ( i=0; i<argA.length; i++ ){
+			if ( (typeof(argA[i])!="undefined") ){
+				szArgs += (i>0?",":"") +  JSON.stringify(argA[i]) ;
+			}
+		}
+		// create function call
+		//
+		var szCall = "ixmaps." + szFunc +'(';
+		szCall += szArgs;
+		szCall += ')';
+
+		// dispatch call
+		//
+		parent.postMessage("executeThis:"+szCall,"*");
+	};
 	ixmaps.htmlgui_onDrawTheme = function (szId) {
 		console.log("*** onDrawTheme: "+szId+" ***");
 		try {
@@ -2180,6 +2209,7 @@ $Log: htmlgui.js,v $
 		if (ixmaps.parentApi != ixmaps) {
 			console.log("*** up to parentApi ***");
 			ixmaps.parentApi.htmlgui_onDrawTheme(szId);
+			ixmaps.dispatchToParentApi("ixmaps.htmlgui_onDrawTheme",[szId]);
 		}
 	};
 
