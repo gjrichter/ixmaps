@@ -2182,6 +2182,8 @@ $Log: htmlgui.js,v $
 	 * @private
 	 */
 	ixmaps.dispatchToParentApi = function(szFunc,argA){
+		
+		console.log("dispatch !!!");
 
 		// create argument string
 		//
