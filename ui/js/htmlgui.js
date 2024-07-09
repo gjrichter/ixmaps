@@ -2173,6 +2173,7 @@ $Log: htmlgui.js,v $
 	};
 
 	ixmaps.htmlgui_onDrawTheme = function (szId) {
+		console.log("*** onDrawTheme: "+szId+" ***");
 		try {
 			ixmaps.updatePageHistory();
 		} catch (e) {}
