@@ -2211,6 +2211,7 @@ $Log: htmlgui.js,v $
 		if (ixmaps.parentApi != ixmaps) {
 			console.log("*** up to parentApi ***");
 			ixmaps.dispatchToParentApi("htmlgui_onDrawTheme",[szId]);
+			console.log(ixmaps.parentApi);
 			ixmaps.parentApi.htmlgui_onDrawTheme(szId);
 		}
 	};
