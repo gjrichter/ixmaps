@@ -2426,7 +2426,9 @@ $Log: htmlgui_api.js,v $
 	ixmaps.themeApi = function(szMap,szTheme){
 		this.szMap = szMap||null;
 		this.szTheme = szTheme||null;
-		this.obj = ixmaps.getThemeObj(szMap,szTheme)||null;
+		try{
+			this.obj = ixmaps.getThemeObj(szMap,szTheme)||null;
+		}catch(e){}
 	};
 	ixmaps.themeApi.prototype = {
 
