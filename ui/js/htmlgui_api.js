@@ -3120,9 +3120,14 @@ $Log: htmlgui_api.js,v $
 			}
 
 			var scripts = window.document.scripts;
+            console.log("scripts --->:");
+            console.log(scripts);
 			for ( a in scripts ){
-				if ( scripts[a].src && scripts[a].src.match(/htmlgui_api/)){
+                console.log(scripts[a].src);
+ 				if ( scripts[a].src && scripts[a].src.match(/htmlgui_api/)){
+                    console.log("got it");
 					opt.mapCdn = scripts[a].src.split("/ui")[0];
+                    console.log(opt.mapCdn);
 				}
 			}
 			if ( opt.mapCdn ){
