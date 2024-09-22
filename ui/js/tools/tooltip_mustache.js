@@ -149,6 +149,9 @@ window.ixmaps = window.ixmaps || {};
 
 		xPos = xPos > window.innerWidth / 2 ? (xPos - width - 30) : xPos + 30;
 		yPos = yPos > window.innerHeight / 2 ? (yPos - height) : (yPos + 20);
+        
+        yPos = Math.min(Math.max(10,yPos),window.innerHeight-height);
+        
 		window.document.getElementById("tooltipDiv").style.left = xPos + "px";
 		window.document.getElementById("tooltipDiv").style.top = yPos + "px";
 
@@ -314,7 +317,9 @@ window.ixmaps = window.ixmaps || {};
 		dataObj.theme.item.value = ixmaps.formatValue(nValue,themeObj.nValueDecimals||2,"BLANK");
 		dataObj.theme.item.label = szLabel;
 		dataObj.theme.item.title = szTitle;
+		dataObj.theme.item.count = data.length;
 		dataObj.raw = {};
+		dataObj.local = {};
 		
 		if (data){
 			dObj = data[0];
@@ -324,6 +329,7 @@ window.ixmaps = window.ixmaps || {};
 					dataObj.raw[i] =  (dObj[i]);
 				}else{
 					dataObj[i] = (dObj[i]);
+					dataObj.local[i] = (ixmaps.getLocalString(dObj[i]));
 				}
 			}
 		}
@@ -528,7 +534,7 @@ window.ixmaps = window.ixmaps || {};
 
 			if (data) {
 
-				szHtml += "<table style='font-size:0.85em;spacing:0.5em;min-width:300px'>"
+				szHtml += "<table class='tooltip' style='font-size:0.85em;spacing:0.5em;min-width:300px'>"
 
 				for (d = 0; d < Math.min(50, data.length); d++) {
 
