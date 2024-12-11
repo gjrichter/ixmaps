@@ -774,7 +774,11 @@
             //$('#input-table-map-' + name).append(
             ixmaps.embed('input-table-map-' + name, mapConfig, map => {
                 ixmaps.embeddedApiA[map.szMap].embeddedSVG.window[name] = data;
+                
                 dataA[name].map = map;
+                $("#input-table-header-" + name + "-theme").show();
+                $("#input-table-header-" + name + "-theme-edit").show();
+
                 //map.data(data, {
                 //    type: "jsonDB",
                 //    name: name
@@ -996,18 +1000,8 @@
                 }
             }
 
-            dataA[dataName].map = ixmaps.map(dataName);
-            
-            console.log("++++++++++++++++++++++++")
-            console.log(dataName);
-            console.log(ixmaps.map);
-            console.log(ixmaps.map(dataName));
-            console.log("++++++++++++++++++++++++")
-            
-            $("#" + "input-table-table-" + dataName).css("height", "150px");
+             $("#" + "input-table-table-" + dataName).css("height", "150px");
             $("#input-table-table-" + dataName).html(makeDataTable(dataA[dataName].data, dataName, 150));
- 
-
 
             $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height());
             $("#facetDiv-" + dataName).height($("#input-table-workspace-" + dataName).height());
@@ -1024,19 +1018,10 @@
             console.log("=== on zoom and pan ===");
             console.log("=======================");
             
-            alert("on zoom and pan");
-            
-            console.log(dataA);
-            
             for (var dataName in dataA) {
                 
                 if ( dataA[dataName].map ){
                     
-                    alert(dataName);
-
-                    $("#input-table-header-" + dataName + "-theme").show();
-                    $("#input-table-header-" + dataName + "-theme-edit").show();
-
                     let themesA = dataA[dataName].map.getThemes();
                     let objTheme = themesA[0];
                     let dataObj = new Data.Table(dataA[dataName].data);
