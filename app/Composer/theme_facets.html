@@ -1,0 +1,281 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta name="copyright" content="Guenter Richter" />
+    <meta name="author" content="service@medienobjekte.de" />
+    <meta name="description" content="Interactive &amp; estensible maps in SVG" />
+    <meta name="revisit-after" content="30 days" />
+    <meta name="distribution" content="Global" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.9.0/css/bootstrap-slider.min.css" />
+
+    <!-- Custom styles for this template -->
+    <link href="./assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="./assets/css/icomoon.css" rel="stylesheet">
+    <link href="./assets/font/IcoMoon-Free.css" rel="stylesheet">
+
+    <style>
+        table.facet {
+            xxbackground: #F7F6EF;
+            xxborder-radius: 0.3em;
+            xxpadding: 0.4em 0.8em;
+        }
+
+        td.facet {
+            xxborder: dotted #888800 0.1px;
+        }
+
+        button.facet,
+        button.facet-active {
+            background: none;
+            border: #dddddd solid 1px;
+            border-radius: 0.3em;
+            padding: 0.4em 0.8em;
+        }
+
+        .facet .btn,
+        .facet-active .btn {
+            background: none;
+            border: #dddddd solid 1px;
+            border-radius: 0.3em;
+            padding: 0.4em 0.8em;
+            color: #444444;
+        }
+
+        .facet .btn:hover,
+        .facet-active .btn:hover {
+            background: #f8f8f8;
+            border: #dddddd solid 1px;
+            border-radius: 0.3em;
+            padding: 0.4em 0.8em;
+            color: #444444;
+        }
+
+        .facet .btn-block,
+        .facet-active .btn-block {
+            background: none;
+            border: #dddddd solid 1px;
+            border-radius: 0.3em;
+            padding: 0.4em 0.8em;
+        }
+
+        .facet .btn-primary,
+        .facet-active .btn-primary {
+            background: none;
+            border: #dddddd solid 1px;
+            border-radius: 0.3em;
+            padding: 0.4em 0.8em;
+        }
+
+        .facet .badge,
+        .facet-active .badge {
+            background: none;
+            color: #444444;
+            font-weight: normal;
+        }
+
+        .badge-primary {}
+
+        .badge-pill {}
+
+        .facet {
+            color: black;
+            background: "#F0F0F0";
+        }
+
+        .facet_active {
+            color: white;
+            background: "#884444";
+        }
+
+        badge badge-primary badge-pill pull-right button:hover {
+            cursor: pointer;
+        }
+
+        .left {
+            text-align: left;
+        }
+
+        a.facet {
+            text-decoration: none;
+        }
+
+        .facet-active a,
+        .facet a {
+            text-decoration: none;
+        }
+
+        .facet-active>a,
+        .facet>a {
+            text-decoration: none;
+        }
+
+    </style>
+    <style type="text/css">
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: arial, helvetica;
+            color: #888;
+            font-weight: 300;
+        }
+
+        p.facet {
+            font-family: arial, helvetica;
+            color: #444;
+            font-weight: 300;
+        }
+
+        a.facet {
+            font-family: arial, helvetica;
+            font-weight: 100;
+            color: black;
+            text-decoration: none;
+        }
+
+        a.facet:hover {
+            color: #000088;
+            text-decoration: none;
+        }
+
+        .filter-input {
+            width: 275px;
+            margin: 0;
+            float: left;
+            outline: none;
+            font-size: 1.2em;
+            border: 0;
+            margin-left: 0.2em;
+            font-family: Raleway, Arial;
+            font-weight: 300;
+            color: #444;
+        }
+
+        .minvalue,
+        .maxvalue {
+            margin-left: 1em;
+            margin-right: 1em;
+        }
+
+        .slider-handle {
+            position: absolute;
+            top: 0px;
+            width: 20px;
+            height: 20px;
+            background-color: #ddd;
+            background-image: none;
+            filter: none;
+            box-shadow: rgba(255, 255, 255, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.05) 0px 1px 2px;
+            background-repeat: repeat-x;
+            border-width: 0px;
+            border-style: solid;
+            border-color: transparent;
+            border-image: initial;
+        }
+
+    </style>
+
+    <style type="text/css">
+        
+        .facet {
+            margin-bottom: 1em;
+        }
+        
+        .facet-headerxx {
+            color: white;
+            background-color: #888888; 
+            border-radius: 0.3em;
+            font-size: 16px;
+            font-weight: normal;
+            padding: 0.5em 0.8em 0.5em 0.5em;
+        }
+        .facet-header {
+            color: black;
+            background-color: #eeeeee; 
+            border-radius: 0.3em;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 0.5em 0.8em 0.5em 0.5em;
+        }
+        
+        .facet-header.active {
+            color: white;
+            background-color: #880000; 
+        }
+        
+        .facet-value-count {
+            font-size: 18px;
+        }
+            
+    </style>
+
+</head>
+
+<body style="margin:0px;padding:0px;" onload="">
+
+    <!-- Container -->
+    <div id="container" style="padding:0em 0.2em 0em 0em;vertical-align:middle;background-color:rgba(255,255,255,1);">
+
+        <div id="facetDiv" style="margin-bottom:1em;width:100%;height:400px;overflow:auto">
+            <p style="padding:0.2em 0.5em;border:solid black 0.1px;border-radius:5px;color:black">generating facets ...<img src='./resources/images/loading_blue.gif' style='display:block;margin:0.2em auto;height:64px'></p>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="../assets/js/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="../assets/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.9.0/bootstrap-slider.min.js"></script>
+    <script type="text/javascript" src="./js/show_word_cloud.js"></script>
+    <script src="./d3/d3.js" charset="utf-8"></script>
+    <script src="./d3/d3.layout.cloud.js"></script>
+    <script src="./d3/d3.wordcloud.js"></script>
+
+    <script type="text/javascript">
+        // ===========================================
+        //
+        // !! get ixmaps api from story parent/opener
+        //
+        // ===========================================
+
+        ixmaps.initialized = true;
+
+        ixmaps.data = ixmaps.data || {};
+        ixmaps.data.fShowFacetValues = true;
+
+        // -----------------------------------------------
+        // refresh theme on zoom and pan ! 
+        // defined here to be exportable with map sharing
+        // -----------------------------------------------
+
+        //ixmaps.htmlgui_onZoomAndPan = function(nZoom){
+        //setTimeout("ixmaps.data.makeFacets(null,'facetDiv')",10);
+        //};
+
+        $.when(
+            $.getScript("./js/facets.js"),
+            $.getScript("./js/show_facets.js"),
+            $.getScript("./js/format.js"),
+            $.Deferred(function(deferred) {
+                $(deferred.resolve);
+            })
+        ).done(function() {
+            $("#facetDiv").css("height", $("#facetDiv").parent().parent().height());
+            $("#facetDiv").attr("id", "facetDiv-" + ixmaps.data.facetsDataName);
+
+            var facetsA = ixmaps.data.getFacets(ixmaps.data.facetsObj, ixmaps.data.facetsFilter);
+            ixmaps.data.showFacets(ixmaps.data.facetsfilter, "facetDiv-" + ixmaps.data.facetsDataName, facetsA, ixmaps.data.facetsObj, ixmaps.data.facetsDataName);
+
+        });
+
+    </script>
+</body>
+
+</html>

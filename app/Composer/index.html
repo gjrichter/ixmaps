@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>VIS-X Composer</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="https://gjrichter.github.io/ixmaps/ui/resources/images/ixmaps_logo.png" />
+
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+
+    <link href="css/messagebox.css" rel="stylesheet" />
+
+    <style>
+        th {
+            position: sticky;
+            background-color: white;
+            z-index: 2;
+            top: 0;
+            padding: 0.2em 0;
+        }
+
+    </style>
+    
+	<style>
+		#tooltip {
+			font-family: arial, system;
+			font-size: 14px;
+			background: white;
+			border: 0.5px solid black;
+			border-radius: 5px;
+			padding: 0.5em 1em 0.5em 1em;
+			max-width: 300px;
+			box-shadow: 1px 1px 9px rgba(0, 0, 0, .275);
+		}
+
+		#tooltip p {
+			font-size: 14px;
+		}
+
+		#tooltip table {
+			font-size: 14px;
+		}
+	</style>
+    
+    
+</head>
+
+<body>
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container px-4 px-lg-5">
+            <a class="navbar-brand" href="#!">VIS-X Composer</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#!">All Products</a></li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+                            <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="d-flex">
+                    <button class="btn btn-outline-dark" type="submit">
+                        <i class="bi-cart-fill me-1"></i>
+                        Cart
+                        <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Related items section-->
+    <section>
+        <div class="container px-4 px-lg-5 mt-5">
+            <div id="Input-table"></div>
+        </div>
+    </section>
+
+    <!-- Related items section-->
+    <section>
+        <div class="container px-4 px-lg-5 mt-5">
+            <div id="load-data-button" class="text-left" style="margin-top:3em">
+                <a class="btn btn-outline-dark mt-auto" href="javascript:__dataLoadDialog()">add data</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- footer section-->
+    <section>
+        <div class="container px-4 px-lg-5 mt-5">
+            <p>View data tables and config a visualization on a map</p>
+        </div>
+    </section>
+
+    <!-- div to host dialog overlays -->
+    <div id="dialog-pos" style="position:absolute;top:100px;left:300px;display:none;z-index:9999">
+        <div id="dialog" style="display:none;">
+        </div>
+    </div>
+    
+    <!-- div to host dialog overlays -->
+    <div id="tooltip" style="position: absolute; display: none;z-index:9999"></div>
+    <div id="tooltips" style="display: none;"></div>
+
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JQuery core JS-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+    <script src="js/dataprocess.js"></script>
+    <script src="js/format.js"></script>
+    <script src="js/facets.js"></script>
+
+    <script src="libs/messagebox.js"></script>
+
+    <script src="../../ui/js/htmlgui_api.js"></script>
+    <script src="../../../data.js/data.js"></script>
+    
+    <script type="text/javascript" charset="utf-8">
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <script src="./js/json_config.js"></script>
+
+    <script type="text/javascript" charset="utf-8">
+        
+        // ----------------------------------------------------------
+        // ----------------------------------------------------------
+        //
+        // d a t a   h a n d l i n g   
+        //
+        // ----------------------------------------------------------
+        // ----------------------------------------------------------
+        
+        // this is the one and only composer data base
+        // --------------------------------------------
+        
+        const dataA = {};
+        
+        // it will hold 1 object per every loaded data 
+        // with the data object, all generated composer elements related to tyhe data 
+        // 
+        // dataA[dataName] = composer data object
+        //
+        // composer data object has the following structure
+        //
+        //      {
+        //          data:           the data object (jsonDB),
+        //          url:            the data source URL,
+        //          type:           the data source type (css, json, geoJson)
+        //          facetsFilter:   null or the actual selection string generated by facet filtering
+        //          sortDir:        null or the actual sort direction
+        //          map:            null or the map created with the data
+        //      }
+        //  
+        
+        
+        // and here we add data to the composer 
+        // -------------------------------------
+        
+        const __addData = (data) => {
+
+            data = Data.import({
+                source: data,
+                type: "jsonDB"
+            });
+
+            // make unique data name (id)
+            let dataName = "data" + String(Math.random()).slice(2);
+
+            // and add data 
+            dataA[dataName] = { data: data,
+                                 url: ixmaps.editor.dbtableUrl,
+                                type: ixmaps.editor.dbtableType
+                              };
+
+            // ------------------------------------------------
+            // html to show and manipolate one data object
+            // ------------------------------------------------
+
+            let szData = '<div id="input-table-' + dataName + '" style="margin-bottom:3em;clear:both">';
+
+            // buttons above the data workspace
+
+            let szHeader = '';
+            szHeader += '<div id="input-table-header-' + dataName + '" style="margin-bottom:0.5em;">';
+            szHeader += '<a id="input-table-header-' + dataName + '-facets" class="btn btn-outline-dark mt-auto" ' +
+                'href="javascript:__dataFacets(\'' + dataName + '\')"><i class="bi-funnel  me-1"></i>facets</a> ';
+            szHeader += '<a id="input-table-header-' + dataName + '-analytics" class="btn btn-outline-dark mt-auto" ' +
+                'href="javascript:__dataAnalytics(\'' + dataName + '\')">analyze</a> ';
+            szHeader += '<a id="input-table-header-' + dataName + '-filter" class="btn btn-outline-dark mt-auto" ' +
+                'href="javascript:__dataFilter(\'' + dataName + '\')">filter</a> ';
+            
+            szHeader += '<a class="dropdown-toggle btn btn-outline-dark" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">process</a>' +
+                        '   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">' +
+                        '       <li><a class="dropdown-item" href="javascript:__dataProcessPivot(\'' + dataName + '\')">pivot</a></li>' +
+                        '       <li><a class="dropdown-item" href="#!">condense</a></li>' +
+                        '       <li><a class="dropdown-item" href="#!">join</a></li>' +
+                        '   </ul>' +    
+                        '</a>';
+            
+            
+            
+            szHeader += '<a id="input-table-header-' + dataName + '-map" class="btn btn-outline-dark mt-auto" ' +
+                'href="javascript:__dataToMap(\'' + dataName + '\')"><i class="bi-map  me-1"></i> map</a> ';
+            szHeader += '<a id="input-table-header-' + dataName + '-theme" class="btn btn-outline-dark mt-auto" ' +
+                'href="javascript:__dataTheme(\'' + dataName + '\')" style="display:none"><i class="bi-layout-text-sidebar  me-1"></i>config. map</a> ';
+            szHeader += '<a id="input-table-header-' + dataName + '-theme-edit" class="btn btn-outline-dark mt-auto" ' +
+                'href="javascript:__dataThemeEdit(\'' + dataName + '\')" style="display:none"><i class="bi-pencil  me-1"></i>edit theme</a> ';
+
+            szHeader += '<a id="input-table-header-' + dataName + '-remove" class="btn btn-outline-dark " ' +
+                'href="javascript:__removeData(\'' + dataName + '\')" style="float:right;margin-left:0.3em"><i class="bi-x-circle me-1"></i>remove</a>';
+
+            szHeader += '<a id="input-table-header-' + dataName + '-toggle-data" class="btn btn-outline-dark " ' +
+                'href="javascript:__hideMap(\'' + dataName + '\')" style="display:none;float:right;margin-left:0.3em"><i class="bi-eye  me-1"></i>toggle map</a>';
+
+            szHeader += '<a id="input-table-header-' + dataName + '-toggle-map" class="btn btn-outline-dark " ' +
+                'href="javascript:__hideData(\'' + dataName + '\')" style="display:none;float:right"><i class="bi-eye  me-1"></i>toggle data</a>';
+            
+            szHeader += '</div>';
+            
+            szData += szHeader;
+
+            // the data space: frame with sidebar and data workspace, workspace contains table view and map
+
+            let szTable = '';
+            szTable += '<div id="input-table-frame-' + dataName + '" style="width:100%;">';
+
+            szTable += '<div id="input-table-sidebar-' + dataName + '" style="width:0%;height:100%;overflow:hidden;display:inline-block;"></div>';
+
+            szTable += '<div id="input-table-workspace-' + dataName + '" style="width:100%;display:inline-block">';
+            szTable += '<div id="input-table-table-' + dataName + '" style="resize:vertical;min-height:0px;height:400px;overflow:auto">';
+            szTable += makeDataTable(data, dataName, 450);
+            szTable += '</div>';
+            
+            szTable += '<p id="input-table-info-' + dataName + '">records: '+dataA[dataName].data.table.records+'</p>';
+            
+            szTable += "<div id='input-table-map-" + dataName + "' style='width:100%'></div>";
+
+            szTable += '</div>';
+            szTable += '</div>';
+            szData += szTable;
+            
+            szData += "</div>";
+
+            // ------------------------------------------------
+            // 
+            // ------------------------------------------------
+
+            $('#Input-table').append(szData);
+
+        };
+
+        __removeData = function(dataName) {
+
+            __confirm("do you really want to remove this data?", () => {
+                $("#" + "input-table-" + dataName).remove();
+                $("#" + "input-table-footer-" + dataName).remove();
+                $("#" + "input-table-header-" + dataName).remove();
+
+                delete dataA[dataName].data;
+                dataA[dataName] = null;
+            });
+        };
+
+        __hideData = function(dataName) {
+
+            $("#" + "input-table-table-" + dataName).toggle();
+
+            let height = ($("#" + "input-table-table-" + dataName).css("display") == "none") ? "600px" : "450px";
+            $("#" + "input-table-map-" + dataName).height(height);
+        };
+
+         __hideMap = function(dataName) {
+
+            $("#" + "input-table-map-" + dataName).toggle();
+
+            let height = ($("#" + "input-table-map-" + dataName).css("display") == "none") ? "600" : "150";
+            $("#" + "input-table-table-" + dataName).height(height);
+            $("#input-table-table-" + dataName).html(makeDataTable(dataA[dataName].data, dataName, height));
+        };
+        
+        
+        // ----------------------------------------------------------
+        // ----------------------------------------------------------
+        // f a c e t s   
+        // ----------------------------------------------------------
+        // ----------------------------------------------------------
+
+        __dataFacets = function(dataName) {
+
+            if ($("#input-table-header-" + dataName + "-facets").hasClass("active")) {
+                $("#input-table-sidebar-" + dataName).html("");
+                $("#input-table-sidebar-" + dataName).css("width", "0%");
+                $("#input-table-workspace-" + dataName).css("width", "100%");
+                $("#input-table-header-" + dataName + "-facets").removeClass("active");
+                return;
+            }
+
+            $("#input-table-header-" + dataName + "-theme").removeClass("active");
+            $("#input-table-header-" + dataName + "-theme-edit").removeClass("active");
+            $("#input-table-header-" + dataName + "-facets").addClass("active");
+
+            $("#input-table-sidebar-" + dataName).css("width", "30%");
+            $("#input-table-workspace-" + dataName).css("width", "70%");
+
+            $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height()-20);
+
+            ixmaps.data = ixmaps.data || {};
+            ixmaps.data.fShowFacetValues = true;
+            ixmaps.data.facetsObj = dataA[dataName].data;
+            ixmaps.data.facetsDataName = dataName;
+            ixmaps.data.facetsFilter = dataA[dataName].facetsFilter;
+
+            $("#input-table-sidebar-" + dataName).css("overflow", "hidden");
+            __openSidebar(dataName, '../../app/Composer/theme_facets.html');
+
+        };
+
+        __dataFacetsSetFilter = function(dataName, sFilter) {
+
+            ixmaps.data.facetsObj = dataA[dataName].data;
+            if (sFilter && sFilter.length) {
+                ixmaps.data.facetsObj = dataA[dataName].data.select(sFilter);
+            }
+            let height = $("#input-table-table-" + ixmaps.data.facetsDataName).height();
+            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
+            $("#input-table-table-" + dataName).html(makeDataTable(ixmaps.data.facetsObj, dataName, height));
+            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+            $("#input-table-info-" + dataName).html("records: "+ixmaps.data.facetsObj.table.records+" ("+dataA[dataName].data.table.records+")");
+
+            dataA[dataName].facetsFilter = sFilter;
+            ixmaps.data.facetsFilter = sFilter;
+
+            var facetsA = ixmaps.data.getFacets(ixmaps.data.facetsObj, sFilter);
+            ixmaps.data.showFacets(sFilter, "facetDiv-" + dataName, facetsA, ixmaps.data.facetsObj, dataName);
+
+            if (dataA[dataName].map) {
+                if (sFilter && sFilter.length) {
+                    dataA[dataName].map.changeThemeStyle(dataName, "filter:" + sFilter, "set");
+                } else {
+                    dataA[dataName].map.changeThemeStyle(dataName, "filter", "remove");
+                }
+            }
+        }
+
+        __dataSort = function(dataName, szColumn, szDir) {
+            let data = dataA[dataName].data;
+            if (dataA[dataName].facetsFilter) {
+                data = data.select(dataA[dataName].facetsFilter);
+            }
+            szDir = szDir || dataA[dataName].sortDir ? ((dataA[dataName].sortDir.match(/DOWN/)) ? "UP" : "DOWN") : "UP";
+            data.sort(szColumn, szDir);
+            dataA[dataName].sortDir = szColumn + "-" + szDir;
+
+            let height = $("#input-table-table-" + dataName).height();
+            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
+            $("#input-table-table-" + dataName).html(makeDataTable(data, dataName, height));
+            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+        };
+
+         __dataFilter = function(dataName) {
+
+            if ($("#input-table-header-" + dataName + "-filter").hasClass("active")) {
+                $("#input-table-header-" + dataName + "-filter").removeClass("active");
+                dataA[dataName].fShowFilter = false;
+            }else{
+                $("#input-table-header-" + dataName + "-filter").addClass("active");
+                dataA[dataName].fShowFilter = true;
+                
+                let data = dataA[dataName].data;
+                
+                if ( dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length ){
+                    
+                    // get filter parts
+                    // ----------------
+                    let szPartsA = dataA[dataName].facetsFilter.split('WHERE ')[1].split('AND');
+                    // test if BETWEEN x AND y and join two parts around AND
+                    for ( i=0; i<szPartsA.length; i++ ){
+                        if ( szPartsA[i].match(/BETWEEN/) ){
+                            szPartsA[i] = szPartsA[i] + "AND" + szPartsA[i+1];
+                            szPartsA.splice(i+1,1);
+                        }
+                    }
+                    // set filter parts
+                    // ----------------
+                    dataA[dataName].filterA = {};
+                    szPartsA.forEach(function(x){
+                        let xA = x.split(" ");
+                        dataA[dataName].filterA[xA[0].replace(/\"/g,"")] = xA[2].replace(/\"/g,"");
+                    });
+                    
+                    data = data.select(dataA[dataName].facetsFilter);
+                }
+            }
+
+            let height = $("#input-table-table-" + dataName).height();
+            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
+            $("#input-table-table-" + dataName).html(makeDataTable(data, dataName, height));
+            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+        };
+        
+       __dataKeyupSelect = function(dataName, szColumn, szSelect) {
+           
+            let data = dataA[dataName].data;
+            if (!dataA[dataName].filterA) {
+                dataA[dataName].filterA = {};
+            }
+            delete dataA[dataName].filterA[szColumn];
+            if (szSelect && szSelect.length){
+                 dataA[dataName].filterA[szColumn] = szSelect;
+            }
+            let szFilter = "";
+            for ( c in dataA[dataName].filterA ){
+                if ( dataA[dataName].filterA[c][0].match(/\<|\>/) && dataA[dataName].filterA[c].length < 3 ){
+                    continue;
+                }
+                szFilter += szFilter.length?" AND ":" WHERE ";
+                if ( dataA[dataName].filterA[c][0].match(/\<|\>/) ){
+                    szFilter += "\"" + c + "\" " + dataA[dataName].filterA[c];
+                }else{                    
+                    szFilter += "\"" + c + "\" like \"" + dataA[dataName].filterA[c] +"\"";
+                }
+            }
+            if ( szFilter && szFilter.length ){
+                data = data.select(szFilter);
+            }
+            if (dataA[dataName].map) {
+                if (szFilter && szFilter.length) {
+                    dataA[dataName].map.changeThemeStyle(null, "filter:" + szFilter, "set");
+                } else {
+                    dataA[dataName].map.changeThemeStyle(null, "filter", "remove");
+                }
+            }
+            dataA[dataName].facetsFilter = szFilter;
+            
+            let height = $("#input-table-table-" + dataName).height();
+            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
+            $("#input-table-table-" + dataName).html(makeDataTable(data, dataName, height));
+            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+            $("#input-table-info-" + dataName).html("records: "+data.table.records+" ("+dataA[dataName].data.table.records+")");
+           
+            let __input = $("#input-table-table-" + dataName+ "-filter-" + szColumn);
+            __input.focus().val(__input.val()+"?").val(__input.val().slice(0,-1));
+          }
+
+       __dataTheme = function(dataName) {
+
+            if ($("#input-table-header-" + dataName + "-theme").hasClass("active")) {
+                $("#input-table-sidebar-" + dataName).html("");
+                $("#input-table-sidebar-" + dataName).css("width", "0%");
+                $("#input-table-workspace-" + dataName).css("width", "100%");
+                $("#input-table-header-" + dataName + "-theme").removeClass("active");
+                
+                // remove colpicker elements; 
+                // these have been created by 'theme_configurator.html -> colpick.js' the in the 'body' element
+                $(".colpick").remove();
+                
+                return;
+            }
+            $("#input-table-header-" + dataName + "-facets").removeClass("active");
+            $("#input-table-header-" + dataName + "-theme-edit").removeClass("active");
+            $("#input-table-header-" + dataName + "-theme").addClass("active");
+
+            $("#input-table-sidebar-" + dataName).css("width", "35%");
+            $("#input-table-workspace-" + dataName).css("width", "65%");
+
+            $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height());
+
+            $("#input-table-sidebar-" + dataName).css("overflow", "auto");
+            __openSidebar(dataName, '../../app/Composer/theme_configurator.html');
+
+        };
+
+
+        __dataThemeEdit = function(dataName) {
+
+            if ($("#input-table-header-" + dataName + "-theme-edit").hasClass("active")) {
+                $("#input-table-sidebar-" + dataName).html("");
+                $("#input-table-sidebar-" + dataName).css("width", "0%");
+                $("#input-table-workspace-" + dataName).css("width", "100%");
+                $("#input-table-header-" + dataName + "-theme-edit").removeClass("active");
+                return;
+            }
+            $("#input-table-header-" + dataName + "-facets").removeClass("active");
+            $("#input-table-header-" + dataName + "-theme").removeClass("active");
+            $("#input-table-header-" + dataName + "-theme-edit").addClass("active");
+
+            $("#input-table-sidebar-" + dataName).css("width", "35%");
+            $("#input-table-workspace-" + dataName).css("width", "65%");
+
+            $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height());
+
+            $("#input-table-sidebar-" + dataName).css("overflow", "auto");
+            __openSidebar(dataName, '../../app/Composer/theme_editor.html');
+
+        };
+
+         __dataAnalytics = function(dataName) {
+
+            if ($("#input-table-header-" + dataName + "-analytics").hasClass("active")) {
+                $("#input-table-header-" + dataName + "-analytics").removeClass("active");
+                dataA[dataName].fShowAnalytics = false;
+            }else{
+                $("#input-table-header-" + dataName + "-analytics").addClass("active");
+                dataA[dataName].fShowAnalytics = true;
+                
+                let data = dataA[dataName].data;
+                
+                if ( dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length ){
+                    data = data.select(dataA[dataName].facetsFilter);
+                }
+            }
+
+            let height = $("#input-table-table-" + dataName).height();
+            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
+            $("#input-table-table-" + dataName).html(makeDataTable(data, dataName, height));
+            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+        };
+
+         __dataProcess = function(dataName) {
+
+            if ($("#input-table-header-" + dataName + "-process").hasClass("active")) {
+                $("#input-table-header-" + dataName + "-process").removeClass("active");
+                dataA[dataName].fShowAnalytics = false;
+            }else{
+                $("#input-table-header-" + dataName + "-process").addClass("active");
+                dataA[dataName].fShowAnalytics = true;
+                
+                let data = dataA[dataName].data;
+                
+                if ( dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length ){
+                    data = data.select(dataA[dataName].facetsFilter);
+                }
+            }
+
+            let height = $("#input-table-table-" + dataName).height();
+            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
+            $("#input-table-table-" + dataName).html(makeDataTable(data, dataName, height));
+            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+        };
+
+         __dataProcessPivot = function(dataName) {
+
+            if ($("#input-table-header-" + dataName + "-process").hasClass("active")) {
+                $("#input-table-header-" + dataName + "-process").removeClass("active");
+                dataA[dataName].fShowPivot = false;
+            }else{
+                $("#input-table-header-" + dataName + "-process").addClass("active");
+                dataA[dataName].fShowPivot = true;
+                
+                let data = dataA[dataName].data;
+                
+                if ( dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length ){
+                    data = data.select(dataA[dataName].facetsFilter);
+                }
+            }
+
+            let height = $("#input-table-table-" + dataName).height();
+            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
+            $("#input-table-table-" + dataName).html(makeDataTable(data, dataName, height));
+            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+        };
+
+        // ---------------------------------------------------
+        // ---------------------------------------------------
+        //
+        // h e l p e r  
+        //
+        // ---------------------------------------------------
+        // ---------------------------------------------------
+
+        __confirm = function(szText, callOk, callCancel) {
+            try {
+                MessageBox.show(MESSAGE_TYPE.Confirmation, " ", szText.replace(/\n+/g, '<br>'), callOk, callCancel);
+            } catch (e) {
+                if (confirm(szText)) {
+                    callOk();
+                } else {
+                    callCancel();
+                }
+            }
+        };
+
+        
+    </script>
+
+    <script type="text/javascript" charset="utf-8">
+        
+        // ----------------------------------------------------------
+        // d i a l o g     
+        // ----------------------------------------------------------
+
+        /**
+         * open/close the data input dialog 
+         * @param flag 'show' or 'hide'
+         * @type void
+         */
+        const __openDialog = (url) => {
+
+            const $dialog = $("#dialog");
+            const $dialogPos = $("#dialog-pos");
+
+            if ($dialog.is(":visible")) {
+                $dialog.empty().hide();
+                $dialogPos.hide();
+            } else {
+                $dialog.html("------").show();
+                $dialogPos.show();
+
+                $dialog.load(url, (response, status, xhr) => {
+                    if (status === "error") {
+                        alert(`Sorry but there was an error: ${xhr.status}\n${xhr.statusText}`);
+                    }
+
+                    $dialog.css({
+                        width: "50%",
+                        height: "150%",
+                        position: "relative",
+                        left: "15%"
+                    });
+
+                    $dialog.append(`
+                        <div style="position:absolute;top:15px;left:87%;">
+                            <a href="javascript:void(0)" onclick="__killDialog()">close</a>
+                        </div>
+                    `);
+                });
+            }
+        };
+
+        /**
+         * close the data input dialog 
+         * @param flag 'show' or 'hide'
+         * @type void
+         */
+        __killDialog = function() {
+            $("#dialog").hide();
+            $("#dialog-pos").hide();
+        };
+
+        // ----------------------------------------------------------
+        // s i d e b a r     
+        // ----------------------------------------------------------
+
+        const __openSidebar = (name, url) => {
+
+            const $sidebar = $("#input-table-sidebar-" + name);
+
+            $sidebar.load(url, (response, status, xhr) => {
+                if (status === "error") {
+                    alert(`Sorry but there was an error: ${xhr.status}\n${xhr.statusText}`);
+                }
+            });
+        };
+
+        /**
+         * open/close the project load dialog 
+         * @param flag 'show' or 'hide'
+         * @type void
+         */
+        ixmaps.__projectLoadDialog = function(flag) {
+            __openDialog('dialog_project_load.html');
+        };
+        /**
+         * open/close the project save dialog 
+         * @param flag 'show' or 'hide'
+         * @type void
+         */
+        ixmaps.__projectSaveDialog = function(flag) {
+            __openDialog('dialog_project_save.html');
+        };
+
+        /**
+         * open/close the data load dialog 
+         * @param flag 'show' or 'hide'
+         * @type void
+         */
+        xx__dataLoadDialog = function(flag) {
+            $("#dialog-pos").css("top", ($(document).scrollTop() + 100) + "px");
+            $("#dialog-pos").css("left", "-50px");
+            $("#dialog-pos").css("margin", "auto");
+            __openDialog('../../app/Composer/dialog_data_load.html');
+        };
+
+        const __dataLoadDialog = () => {
+            const dialog = $("#dialog-pos");
+
+            // Set the top position 100 pixels below the current scroll position
+            dialog.css("top", ($(document).scrollTop() + 100) + "px");
+
+            // Align the dialog to the left
+            dialog.css("left", "-50px");
+
+            __openDialog('../../app/Composer/dialog_data_load.html');
+        };
+
+
+        // ---------------------------------------------------
+        // ---------------------------------------------------
+        //
+        // t h e   m a p 
+        //
+        // ---------------------------------------------------
+        // ---------------------------------------------------
+
+
+        // make shure that multiple maps are no synchronized
+        ixmaps.fSyncMaps = false;
+        
+        /**
+         ** strings used by the map 	
+         **/
+
+        const attribution =
+            "powered by <a href=\"http://ixmaps.com\" target=\"_blank\">iXMaps</a>";
+
+        // ---------------------------------------------------
+        // c r e a t e   a   m a p   w i t h   1   t h e m e
+        // ---------------------------------------------------
+
+        const __createMap = (theme, data, name) => {
+
+            const mapConfig = {
+                mapService: "leaflet_vt",
+                mapType: "VT_VOYAGER_LIGHT",
+                map: "../../maps/svg/maps/generic/mercator.svg",
+                name: name,
+                mode: "pan",
+                legend: "true",
+                tools: "true",
+                search: "true",
+                about: "test"
+            };
+
+            const mapOptions = {
+                featurescaling: "true",
+                objectscaling: "true",
+                normalSizeScale: "500000",
+                flushChartDraw: "1000000",
+                basemapopacity: "0.5",
+                worksilent: "true",
+                loadsilent: "true",
+                freezeOnPan: "false",
+                hideOnPan: "false"
+            };
+
+            //$('#input-table-map-' + name).append(
+            ixmaps.embed('input-table-map-' + name, mapConfig, map => {
+                ixmaps.embeddedApiA[map.szMap].embeddedSVG.window[name] = data;
+                //map.data(data, {
+                //    type: "jsonDB",
+                //    name: name
+                //});
+                 map.options(mapOptions)
+                    .local("aggregated", "")
+                    .local("loading data ...", "...")
+                    .local("working ...", "")
+                    .require("../../ui/js/tools/tooltip_mustache.js")
+                    .attribution(attribution);
+                 map.layer(theme);
+            })
+            //);
+
+            let szCodeDiv = "";
+            szCodeDiv += '<div class="text-left" style="margin:0.3em 0 0.5em 0">';
+            szCodeDiv += '<a id="map_code_div-' + name + '-showcode" class="btn btn-outline-dark mt-auto" href="javascript:showCode(\'' + name + '\')">show map project (JSON)</a> ';
+            szCodeDiv += '<a id="map_code_div-' + name + '-showhtml" class="btn btn-outline-dark mt-auto" href="javascript:showHTML(\'' + name + '\')">show embeding code (HTML)</a>';
+            szCodeDiv += '<a class="btn btn-outline-dark mt-auto" style="float:right" href="javascript:fullscreen(\'' + name + '\')">fullscreen</a> ';
+            szCodeDiv += '</div>';
+            szCodeDiv += '<div id="map_code_div-' + name + '"></div>';
+            szCodeDiv += '<div id="map_code_div-' + name + '_save" class="text-left" style="margin-top:0em;display:none">';
+            szCodeDiv += '<a class="btn btn-outline-dark mt-auto" href="javascript:__saveProjectFile(\'' + name + '\')">save code</a> ';
+            szCodeDiv += '</div>';
+            $('#input-table-' + name).append(szCodeDiv);
+
+        };
+
+        // ---------------------------------------------------
+        // c r e a t e   a   m a p   w i t h   2   t h e m e s
+        // ---------------------------------------------------
+
+        const __createMap2 = (theme, data, name) => {
+
+            const mapConfig = {
+                mapService: "leaflet_vt",
+                mapType: "VT_OPENSTREETMAP",
+                map: "../../maps/svg/maps/generic/mercator.svg",
+                name: name[0],
+                height: "500px",
+                mode: "pan",
+                legend: "true",
+                tools: "true",
+                search: "true",
+                about: "test"
+            };
+
+            const mapOptions = {
+                featurescaling: "true",
+                objectscaling: "dynamic",
+                normalSizeScale: "10000000",
+                flushChartDraw: "1000000",
+                basemapopacity: "0.5",
+                worksilent: "true",
+                loadsilent: "true",
+                freezeOnPan: "false",
+                hideOnPan: "false"
+            };
+
+            $('#input-table-map-' + name[1]).append(
+                ixmaps.embed(name[1], mapConfig, map => {
+                    for (var i in data) {
+                        map.data(data[i], {
+                            type: "jsonDB",
+                            name: name[i]
+                        });
+                    }
+                    map.options(mapOptions)
+                        .local("aggregated", "")
+                        .local("loading data ...", "...")
+                        .local("working ...", "")
+                        .require("../../ui/js/tools/tooltip_mustache.js")
+                        .attribution(attribution);
+                    for (var i in theme) {
+                        map.layer(theme[i]);
+                    }
+                })
+            );
+
+            let szCodeDiv = "";
+            szCodeDiv += '<div class="text-left" style="margin-top:0.3em">';
+            szCodeDiv += '<a class="btn btn-outline-dark mt-auto" href="javascript:showCode(\'' + name + '\')">show code</a> ';
+            szCodeDiv += '<a class="btn btn-outline-dark mt-auto" href="javascript:showHTML(\'' + name + '\')">show html</a>';
+            szCodeDiv += '<a class="btn btn-outline-dark mt-auto" style="float:right" href="javascript:fullscreen(\'' + name + '\')">fullscreen</a> ';
+            szCodeDiv += '</div>';
+            szCodeDiv += '<div id="map_code_div-' + name + '"></div>';
+            szCodeDiv += '<div id="map_code_div-' + name + '"_save" class="text-left" style="margin-top:0em;display:none">';
+            szCodeDiv += '<a class="btn btn-outline-dark mt-auto" href="javascript:__saveProjectFile(\'' + name + '\')">save code</a> ';
+            szCodeDiv += '</div>';
+            $('#input-table-' + name).append(szCodeDiv);
+
+        };
+
+        /**
+         **
+         ** window size handling
+         **
+         **/
+
+        $(window).resize(function() {
+            $("#" + ixmaps.szMap).css("height", (window.innerHeight - 5) + "px");
+        });
+
+        var fullscreenMapId = null;
+        var pageY = 0;
+        var fullscreenMapIdStyle = null;
+        fullscreen = function(szFrameId) {
+
+            if (fullscreenMapId) {
+                $("#input-table-map-" + szFrameId).attr("style", fullscreenMapIdStyle);
+
+                window.scrollTo({
+                    top: -pageY
+                });
+                fullscreenMapId = null;
+                fullscreenMapIdStyle = null;
+                return;
+            }
+
+            fullscreenMapId = szFrameId;
+            pageY = document.body.getBoundingClientRect().top;
+
+            scroll = $("#input-table-map-" + szFrameId).offsetTop;
+
+            fullscreenMapIdStyle = $("#input-table-map-" + szFrameId).attr("style");
+            $("#input-table-map-" + szFrameId).attr("style", "position:absolute;width:100% !important;left:0 !important;height:" + (window.innerHeight - 5) + "px;border:0");
+
+            window.scrollTo({
+                top: scroll
+            });
+        }
+        inline = function() {
+
+        }
+
+        
+        
+        ixmaps.editor = ixmaps.editor || {};
+
+        __dataToMap = function(dataName) {
+
+            ixmaps.editor.dbtable = dataA[dataName].data;
+            ixmaps.editor.dataObj = dataA[dataName].data;
+
+            let themeObj = ixmaps.editor.makeDefaultTheme(dataName);
+            themeObj.style.filter = dataA[dataName].facetsFilter;
+
+            if (themeObj.style.lookupfield) {
+                $("#" + "input-table-map-" + dataName).css("height", "450px");
+                $("#" + "input-table-map-" + dataName).css("width", "100%");
+                __createMap(themeObj, dataA[dataName].data, dataName);
+            } else {
+
+                alert("no geometry reference found in data");
+
+                for (var name2 in dataA) {
+                    if (ixmaps.editor.getDefaultLookup(themeObj, dataA[name2].data)) {
+                        alert("but geometry reference found in data: " + name2);
+
+                        const dialog = $("#dialog-pos");
+
+                        // Set the top position 100 pixels below the current scroll position
+                        dialog.css("top", ($(document).scrollTop() + 100) + "px");
+
+                        // Align the dialog to the left
+                        dialog.css("left", "-50px");
+
+                        ixmaps.data.connectA = [];
+                        ixmaps.data.connectA.push(dataName);
+                        ixmaps.data.connectA.push(name2);
+
+                        //__openDialog('../../app/Composer/dialog_connect_data_to_map.html');
+                        
+                        matchesA = ixmaps.editor.matchTwoDataByFields(dataA[dataName].data, dataA[name2].data);
+                        alert(matchesA);
+                        console.log(matchesA);
+                        let bestMatch = null;
+                        matchesA.forEach((match) => {
+                            console.log(match);
+                            if (!bestMatch || (match.matches > bestMatch.matches)) {
+                                bestMatch = match;
+                            }
+                        })
+                        if (bestMatch) {
+                            console.log(bestMatch);
+                            alert("best match found with '" + bestMatch.field1 + "' and '" + bestMatch.field2 + "'");
+                            ixmaps.editor.dbtableUrl = "file";
+                            ixmaps.editor.dbtableType = "csv";
+                            ixmaps.editor.dbtable = dataA[dataName].data;
+                            ixmaps.editor.dataObj = dataA[dataName].data;
+
+                            let themeObjMap = ixmaps.editor.makeDefaultTheme(name2);
+                            themeObjMap.style.itemfield = bestMatch.field2;
+                            themeObjMap.layer = "layer_1";
+
+                            themeObj.style.lookupfield = bestMatch.field1;
+                            themeObj.layer = "layer_1";
+
+                            $("#" + "input-table-map-" + dataName).css("height", "450px");
+                            $("#" + "input-table-map-" + dataName).css("width", "100%");
+                            
+                            __createMap2([themeObjMap, themeObj], [dataA[name2].data, dataA[dataName].data], [dataName, dataName]);
+                        }
+                     }
+                /**    
+                } else {
+                    const dialog = $("#dialog-pos");
+
+                    // Set the top position 100 pixels below the current scroll position
+                    dialog.css("top", ($(document).scrollTop() + 100) + "px");
+
+                    // Align the dialog to the left
+                    dialog.css("left", "-50px");
+
+                    __openDialog('../../app/Composer/dialog_data_load.html');
+                    return;
+                }
+                **/
+                }
+            }
+
+            dataA[dataName].map = ixmaps.map(dataName);
+            
+            $("#" + "input-table-table-" + dataName).css("height", "150px");
+            $("#input-table-table-" + dataName).html(makeDataTable(dataA[dataName].data, dataName, 150));
+ 
+
+
+            $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height());
+            $("#facetDiv-" + dataName).height($("#input-table-workspace-" + dataName).height());
+            
+            $("#input-table-header-" + dataName + "-map").hide();
+            $("#input-table-header-" + dataName + "-toggle-data").show();
+            $("#input-table-header-" + dataName + "-toggle-map").show();
+
+        };
+
+        ixmaps.htmlgui_onZoomAndPan = function() {
+            
+            for (var dataName in dataA) {
+                
+                if ( dataA[dataName].map ){
+
+                    $("#input-table-header-" + dataName + "-theme").show();
+                    $("#input-table-header-" + dataName + "-theme-edit").show();
+
+                    let themesA = dataA[dataName].map.getThemes();
+                    let objTheme = themesA[0];
+                    let dataObj = new Data.Table(dataA[dataName].data);
+                    //alert(dataA[dataName].data.table.records);
+
+                    // take only rows which are on the map
+                    // -------------------------------------------------
+                    let records = [];
+                    try {
+                        for (i in objTheme.indexA) {
+                            if (objTheme.itemA[objTheme.indexA[i]].dbIndex) {
+                                records.push(dataObj.records[objTheme.itemA[objTheme.indexA[i]].dbIndex]);
+                            }
+                            if (objTheme.itemA[objTheme.indexA[i]].dbIndexA) {
+                                for (a in objTheme.itemA[objTheme.indexA[i]].dbIndexA) {
+                                    records.push(dataObj.records[objTheme.itemA[objTheme.indexA[i]].dbIndexA[a]]);
+                                }
+                            }
+                        }
+                    } catch (e) {}
+                    dataObj.records = records.slice();
+                    dataObj.table.records = records.length;
+                    let height = $("#input-table-table-" + dataName).height();
+                    $("#input-table-table-" + dataName).html(makeDataTable(dataObj, dataName, height));
+                    
+                    $("#input-table-info-" + dataName).html("records: "+dataObj.table.records+" ("+dataA[dataName].data.table.records+") filtered by map view");
+ 
+                    /**
+                    ixmaps.data.facetsObj = dataObj;
+                    var facetsA = ixmaps.data.getFacets(ixmaps.data.facetsObj, ixmaps.data.facetsFilter);
+                    ixmaps.data.showFacets(ixmaps.data.facetsfilter, "facetDiv-" + ixmaps.data.facetsDataName, facetsA, ixmaps.data.facetsObj, m);
+                    **/
+                }
+            }
+        };
+
+
+        // ----------------------------------------------------------
+        // d a t a   - - >  t h e m e        
+        // ----------------------------------------------------------
+
+        ixmaps.editor.makeDefaultTheme = function(dataName) {
+
+            if (!ixmaps.editor.dbtable ||
+                !ixmaps.editor.dbtable.table ||
+                !ixmaps.editor.dbtable.table.records
+            ) {
+                return {};
+            }
+
+            objTheme = {
+                layer: "generic",
+                field: "$item$"
+            };
+            objTheme.style = {};
+            objTheme.style.dbtableUrl = dataA[dataName].url || "";
+            objTheme.style.dbtableType = dataA[dataName].type || "";
+            objTheme.style.dbtable = dataName;
+            objTheme.style.lookupfield = " ";
+            objTheme.style.title = "[title]";
+            objTheme.style.colorscheme = [1, "#eeeeff", "#0000dd"];
+            objTheme.style.showdata = true;
+            objTheme.style.tooltip = "{{theme.item.chart}}{{theme.item.data}}";
+            objTheme.style.editor = true;
+            objTheme.style.name = dataName;
+
+            var x = String(ixmaps.editor.dbtable.records[0][ixmaps.editor.dbtable.table.fields - 1]);
+            if (x.match(/Polygon/)) {
+                objTheme.layer = "FEATURE";
+                $('#map-layer-select').append($('<option>', {
+                    value: "FEATURE",
+                    text: 'FEATURE'
+                }));
+                $("#map-layer-select").val("FEATURE");
+                objTheme.style.type = "FEATURE|SHOW";
+                objTheme.style.colorscheme = "#eeeeee";
+                objTheme.style.fillopacity = "0.1";
+                objTheme.style.linecolor = "#0088dd";
+                objTheme.style.linewidth = "0.5";
+            } else
+            if (x.match(/Line/)) {
+                objTheme.layer = "FEATURE";
+                $('#map-layer-select').append($('<option>', {
+                    value: "FEATURE",
+                    text: 'FEATURE'
+                }));
+                $("#map-layer-select").val("FEATURE");
+                objTheme.style.type = "FEATURE|SHOW";
+                objTheme.style.colorscheme = "#0088dd";
+                objTheme.style.fillopacity = "1";
+                objTheme.style.linecolor = "#0088dd";
+                objTheme.style.linewidth = "1";
+            } else
+            if (ixmaps.editor.dbtable && ixmaps.editor.dbtable.table && (ixmaps.editor.dbtable.table.records > 250000)) {
+                objTheme.style.type = "CHART|SYMBOL|GRIDSIZE|DOPACITY|AGGREGATE|SUM|SHOW";
+                //objTheme.style.type = "CHART|SYMBOL|AUTOSIZE|AGGREGATE|SUM|SHOW";
+                objTheme.style.gridwidth = "10px";
+                objTheme.style.symbols = ["hexagon"];
+                objTheme.style.dopacitypow = 2;
+                objTheme.style.dopacityscale = 2;
+            } else
+            if (ixmaps.editor.dbtable && ixmaps.editor.dbtable.table && (ixmaps.editor.dbtable.table.records > 100000)) {
+                objTheme.style.type = "CHART|BUBBLE|AGGREGATE|SUM|SHOW";
+                objTheme.style.gridwidth = "2px";
+                objTheme.style.fillopacity = "0.3";
+            } else {
+                //objTheme.style.type = "CHART|DOT|RAW";
+                objTheme.style.type = "CHART|DOT|RAW|SHOW";
+                objTheme.style.fillopacity = "0.2";
+            }
+
+            objTheme.style.lookupfield = ixmaps.editor.getDefaultLookup(objTheme, dataA[dataName].data);
+
+            ixmaps.editor.themeObj = objTheme;
+
+            return objTheme;
+
+        };
+
+        ixmaps.editor.getDefaultLookup = function(objTheme, data) {
+
+            let szLookup = "";
+
+            // 1. look for fields that contain both, latitude and longitude
+
+            let fields = data.fields;
+
+            for (var i in fields) {
+
+                var x = String(data.records[0][i]);
+                // identify by content
+                if (x && x.match(/Polygon|Line/)) {
+                    szLookup = fields[i].id;
+                } else
+                    // identify by name
+                    if (fields[i].id.match(/latitud/i) && fields[i].id.match(/longitud/i)) {
+                        szLookup = fields[i].id;
+                    } else {
+                        // identify by value (like 13.3568,45.34567)
+                        valuesA = ixmaps.editor.getFieldValues(fields[i].id, 10);
+                        for (x in valuesA) {
+                            if (!String(valuesA[x]).match(/\'/)) {
+                                var matchA = String(valuesA[x]).match(/(-?[0-9\.]+) ?, ?(-?[0-9\.]+)/)
+                                if (matchA &&
+                                    (matchA.length == 3) &&
+                                    (Number(matchA[1]) < 80) && (Number(matchA[1]) > -80) &&
+                                    (Number(matchA[2]) < 180) && (Number(matchA[2]) > -180) &&
+                                    matchA[1] % 1 &&
+                                    matchA[2] % 1
+                                ) {
+                                    szLookup = fields[i].id;
+                                    break;
+                                }
+                                if (matchA &&
+                                    (matchA.length == 3) &&
+                                    (Number(matchA[1]) < 180) && (Number(matchA[1]) > -180) &&
+                                    (Number(matchA[2]) < 80) && (Number(matchA[2]) > -80) &&
+                                    matchA[1] % 1 &&
+                                    matchA[2] % 1
+                                ) {
+                                    szLookup = fields[i].id;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+            }
+
+            // 2. look for 2 fields that contain latitude or longitude
+
+            let szLat = "";
+            let szLon = "";
+            for (var i in fields) {
+                if (fields[i].id.match(/latitud/i) || (fields[i].id == "lat") || (fields[i].id == "LAT") || (fields[i].id == "Y")) {
+                    szLat = fields[i].id;
+                }
+                if (fields[i].id.match(/longitud/i) || (fields[i].id == "lon") || (fields[i].id == "long") || (fields[i].id == "lng") || (fields[i].id ==
+                        "LON") || (fields[i].id == "LNG") || (fields[i].id == "X")) {
+                    szLon = fields[i].id;
+                }
+            }
+            if (szLat.length && szLon.length) {
+                szLookup = szLat + "|" + szLon;
+            }
+
+            return szLookup;
+        };
+
+        ixmaps.editor.getFieldValues = function(szField, nMax) {
+
+            // szField may be string or array of strings
+            // if array, take first string !
+            if ($.isArray(szField)) {
+                szField = szField[0];
+            }
+
+            var data = ixmaps.editor.dataObj;
+
+            var valuesA = null;
+            if (data) {
+                var valuesA = new Array();
+                if (szField == "$item$") {
+                    for (i = 0; i < 20; i++) {
+                        valuesA.push(1);
+                    }
+                } else {
+                    var fields = data.fields;
+                    var index = 0;
+                    for (i = 0; i < fields.length; i++) {
+                        if (fields[i].id == szField) {
+                            index = i;
+                        }
+                    }
+                    var nCount = Math.min(nMax || data.records.length, data.records.length);
+                    for (i = 0; i < nCount; i++) {
+                        valuesA.push(data.records[i][index]);
+                    }
+                }
+            }
+            return valuesA;
+        };
+
+        ixmaps.editor.matchTwoDataByFields = function(data1, data2) {
+
+            let result = [];
+            for (var i in data1.fields) {
+                let values1A = data1.column(data1.fields[i].id).uniqueValues().sort();
+                for (var ii in data2.fields) {
+                    if (data2.fields[ii].id == 'geometry') {
+                        continue;
+                    }
+                    let nMatch = 0;
+                    let values2 = data2.column(data2.fields[ii].id).uniqueValues().sort().join(',');
+                    for (v in values1A) {
+                        if (values2.match(values1A[v])) {
+                            nMatch++;
+                        }
+                    }
+                    if (nMatch > 0) {
+                        console.log(data1.fields[i].id + '|' + data2.fields[ii].id)
+                        console.log(nMatch + " ");
+                        let item = {
+                            field1: data1.fields[i].id,
+                            field2: data2.fields[ii].id,
+                            matches: nMatch
+                        };
+                        result.push(item);
+                    }
+
+                }
+            }
+            return result;
+        };
+
+        
+        
+        showCode = function(dataName) {
+            $("#map_code_div-" + dataName).html("");
+            $("#map_code_div-" + dataName + "_save").hide();
+            $("#map_code_div-" + dataName + "-showhtml").removeClass("active");
+
+            if ($("#map_code_div-" + dataName + "-showcode").hasClass("active")) {
+                $("#map_code_div-" + dataName + "-showcode").removeClass("active");
+            } else {
+                $("#map_code_div-" + dataName + "-showcode").addClass("active");
+                __showProjectString(dataA[dataName].map.getProjectString(), 1, 1, dataName);
+            }
+        };
+
+        showHTML = function(dataName) {
+            $("#map_code_div-" + dataName).html("");
+            $("#map_code_div-" + dataName + "_save").hide();
+            $("#map_code_div-" + dataName + "-showcode").removeClass("active");
+
+            if ($("#map_code_div-" + dataName + "-showhtml").hasClass("active")) {
+                $("#map_code_div-" + dataName + "-showhtml").removeClass("active");
+            } else {
+                $("#map_code_div-" + dataName + "-showhtml").addClass("active");
+                __showProjectHTML(ixmaps.map(dataName).getProjectString(), 1, 1, dataName);
+            }
+        };
+
+        __showProjectString = function(szProject, n, all, dataName) {
+
+            // make object to handle project definition and get string or json from it
+            // 
+            var project = new Config(szProject);
+
+            // get JSON and formatted string
+            //
+            szProject = project.getPrettyString();
+            project = project.obj;
+
+            // make the HTML
+
+            var list = "";
+            var id = "source-" + dataName;
+
+            list += '<div class="source" >';
+            list += '<pre id="' + id + '" class="prettyprint language-JSON">';
+            list += '</pre>';
+            list += '</div>';
+
+            $("#map_code_div-" + dataName).append(list);
+
+            $("#" + id + "").text(String(szProject));
+            hljs.highlightBlock($("#" + id)[0]);
+
+            $(".hljs-attr").attr("onMouseOver", "showTooltip(event,$(this).text())");
+            $(".hljs-attr").attr("onMouseOut", "hideTooltip()");
+
+            $("#map_code_div-" + dataName + "_save").show();
+
+        };
+
+        __showProjectHTML = function(szProject, n, all, dataName) {
+
+            // make object to handle project definition and get string or json from it
+            // 
+            var project = new Config(szProject);
+
+            // get JSON and formatted string
+            //
+            szProject = project.getPrettyString();
+            project = project.obj;
+
+            let view = new Config({
+                center: project.map.center,
+                zoom: project.map.zoom
+            });
+            let szView = view.getPrettyString().replace(/\n/g, "\n\t\t");
+
+            //szView = "["+project.map.center.lat+","+project.map.center.lng+"],"+project.map.zoom;
+            
+            szProject = "";
+
+            //szProject += "data = "+JSON.stringify(dataA[project.themes[0].style.dbtable]) + "\n\n";
+
+            szProject +=
+                '<!DOCTYPE html>\n' +
+                '<html>\n' +
+                '  \n' +
+                '<head>\n' +
+                '\t<meta charset="UTF-8">\n' +
+                '\t<meta http-equiv="X-UA-Compatible" content="IE=edge">\n' +
+                '\t<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+                '\t<meta name="description" content="ixmaps embed example">\n' +
+                '\t<meta name="author" content="guenter richter">\n' +
+                '\t<link rel="shortcut icon" href="https://gjrichter.github.io/ixmaps/ui/resources/images/ixmaps_logo.png">\n' +
+                ' \n' +
+                '\t<title>iXMaps Composer</title>\n' +
+                '</head>\n' +
+                ' \n' +
+                '<body>\n' +
+                ' \n' +
+                '\t<!-- here goes the map -->\n' +
+                '\t<div id="map-div"></div>\n' +
+                ' \n' +
+                '\t<!-- include the ixmaps API -->\n' +
+                '\t<script src="https://gjrichter.github.io/ixmaps/ui/js/htmlgui_api.js"><\/script>\n' +
+                ' \n' +
+                '\t<script type="text/javascript" charset="utf-8">\n' +
+                ' \n';
+
+            szProject +=
+                '\t\t// create and embed the map\n' +
+                '\t\t// ! reference to "map-div", the hosting html div\n' +
+                '\n' +
+                '\t\tixmaps.embed("map-div", {\n' +
+                '\t\t\tmapService: "leaflet_vt",\n' +
+                '\t\t\tmapType: "'+ (project.map.basemap || "VT_OPENSTREETMAP") +'",\n' +
+                '\t\t\tmap: "../../maps/svg/maps/generic/mercator.svg",\n' +
+                '\t\t\tname: "map_1",\n' +
+                '\t\t\tmode: "pan",\n' +
+                '\t\t\tlegend: "true",\n' +
+                '\t\t\ttools: "true",\n' +
+                '\t\t\tsearch: "Europe",\n' +
+                '\t\t\tabout: "test"\n' +
+                '\t\t},\n';
+
+            szProject +=
+                '\t\tmap => map\n' +
+                '\t\t.options({\n' +
+                '\t\t\tfeaturescaling: "'+(project.map.options.featurescaling||"true")+'",\n' +
+                '\t\t\tobjectscaling: "'+(project.map.options.objectscaling||"true")+'",\n' +
+                '\t\t\tnormalSizeScale: "'+(project.map.scaleParam.normalSizeScale||10000000)+'",\n' +
+                '\t\t\tflushChartDraw: "'+(project.map.scaleParam.flushChartDraw||1000000)+'",\n' +
+                '\t\t\tbasemapopacity: "'+(project.map.scaleParam.basemapopacity||0.5)+'",\n' +
+                '\t\t\tworksilent: "'+((typeof(project.map.scaleParam.worksilent) !='undefined')?project.map.scaleParam.worksilent: false)+'",\n' +
+                '\t\t\tloadsilent: "'+((typeof(project.map.scaleParam.loadsilent) !='undefined')?project.map.scaleParam.loadsilent: false)+'",\n' +
+                '\t\t\thideOnPan:  "'+((typeof(project.map.scaleParam.hideOnPan)  !='undefined')?project.map.scaleParam.hideOnPan:  false)+'",\n' +
+                '\t\t\tfreezeOnPan:"'+((typeof(project.map.scaleParam.freezeOnPan)!='undefined')?project.map.scaleParam.freezeOnPan:false)+'",\n' +
+                '\t\t})\n' +
+                '\t\t.local("working ...", "")\n' +
+                '\t\t.require("../../ui/js/tools/tooltip_basic.js")\n' +
+                '\t\t.attribution("' + (project.map.attribution||"").replace(/\"/g, '\\\"') + '")\n' +
+                '\t\t.view(' + szView + ')\n';
+
+            let szThemes = "";
+            for (var i in project.themes) {
+                let themeObj = project.themes[i];
+                let newObj = {};
+
+                szThemes +=
+                    '\t\t.layer(ixmaps.layer("generic", layer => layer\n';
+
+                let data = {
+                    url: String(themeObj.style.dbtableUrl),
+                    type: String(themeObj.style.dbtableType),
+                    name: String(themeObj.style.dbtable)
+                };
+                let dataObj = new Config(data);
+                let szData = dataObj.getPrettyString().replace(/\n/g, "\n\t\t\t");;
+                szThemes +=
+                    '\t\t\t.data(' + szData + ')\n';
+
+                delete themeObj.style.dbtableUrl;
+                delete themeObj.style.dbtableType;
+                delete themeObj.style.dbtable;
+
+                let binding = {
+                    geo: String(themeObj.style.lookupfield)
+                };
+                if (themeObj.field){
+                    binding.value = String(themeObj.field);
+                }
+                if (themeObj.style.itemfield){
+                    binding.id = String(themeObj.style.itemfield);
+                }
+                let bindingObj = new Config(binding);
+                let szBinding = bindingObj.getPrettyString().replace(/\n/g, "\n\t\t\t");;
+                szThemes +=
+                    '\t\t\t.binding(' + szBinding + ')\n';
+
+                delete themeObj.style.lookupfield;
+                delete themeObj.field;
+
+                szThemes +=
+                    '\t\t\t.type("' + themeObj.style.type + '")\n';
+                delete themeObj.style.type;
+
+                let style = themeObj.style;
+                let styleObj = new Config(style);
+                let szStyle = styleObj.getPrettyString().replace(/\n/g, "\n\t\t\t");;
+                szThemes +=
+                    '\t\t\t.style(' + szStyle + ')\n';
+
+            }
+            szProject += szThemes;
+
+            szProject +=
+                '\t\t))\n' +
+                '\t);\n';
+
+            szProject +=
+                '\t<\/script>\n' +
+                '<\/body>\n' +
+                '<\/html>\n';
+
+
+            // make the HTML
+
+            var list = "";
+            var id = "source-" + dataName;
+
+            list += '<div class="source" style="padding:0.2em 0 0.2em 1em;background:#f3f3f3">';
+            list += '<pre id="' + id + '" class="prettyprint language-HTML">';
+            list += '</pre>';
+            list += '</div>';
+
+            $("#map_code_div-" + dataName).append(list);
+
+            $("#" + id + "").text(String(szProject));
+            hljs.highlightBlock($("#" + id)[0]);
+
+            $(".hljs-attr").attr("onMouseOver", "showTooltip(event,$(this).text())");
+            $(".hljs-attr").attr("onMouseOut", "hideTooltip()");
+
+            $("#map_code_div-" + dataName + "_save").show();
+        };
+
+        __saveProjectFile = function(dataName) {
+
+            if (isAPIAvailable()) {
+                szText = $("#source-" + dataName).text();
+                if (szText.match(/\<html\>/)) {
+                    saveTextAsFile(szText, "map.html");
+                } else {
+                    saveTextAsFile(szText, "map.json");
+                }
+            }
+        };
+
+        /**
+         * isAPIAvailable  
+         * checks the browser support for the HTML5 File API
+         * displays a warning if the browser doesn't support it
+         * @type boolean
+         * @return true,false
+         */
+        function isAPIAvailable() {
+            // Check for the various File API support.
+            if (window.File && window.FileReader && window.FileList && window.Blob) {
+                // Great success! All the File APIs are supported.
+                return true;
+            } else {
+                alert("The browser you're using does not currently support\nthe HTML5 File API. As a result the file loading demo\nwon't work properly.");
+                return false;
+            }
+        }
+
+        function saveTextAsFile(szText, szFilename) {
+            var textToWrite = szText;
+            var textFileAsBlob = new Blob([textToWrite], {
+                type: 'text/plain'
+            });
+            var fileNameToSaveAs = szFilename || "project.json";
+
+            var downloadLink = document.createElement("a");
+            downloadLink.download = fileNameToSaveAs;
+            downloadLink.innerHTML = "Download File";
+            if (window.URL != null) {
+                // Chrome allows the link to be clicked
+                // without actually adding it to the DOM.
+                downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+            } else {
+                // Firefox requires the link to be added to the DOM
+                // before it can be clicked.
+                downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+                downloadLink.onclick = destroyClickedElement;
+                downloadLink.style.display = "none";
+                document.body.appendChild(downloadLink);
+            }
+
+            downloadLink.click();
+        }
+
+
+       
+        
+        // ----------------------------------------------------------
+        // ----------------------------------------------------------
+        // i n i t   a l l 
+        // ----------------------------------------------------------
+        // ----------------------------------------------------------
+
+        ixmaps.data = ixmaps.data || {};
+        ixmaps.editor = ixmaps.editor || {};
+
+        __dataLoadDialog();
+
+    </script>
+
+
+
+</body>
+
+</html>

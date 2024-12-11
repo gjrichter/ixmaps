@@ -1,0 +1,464 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>iXmps - Editor - Dataimport</title>
+    <!-- Styles ------------------------ -->
+
+    <style>
+        body #importdiv {
+            overflow: auto;
+            padding: 1em;
+        }
+
+        textarea {
+            width: 90%;
+        }
+
+        legend {
+            xxborder: 0;
+        }
+
+        .filenameOrUrl {
+            width: 80%;
+            height: 34px;
+            font-size: 1.1em;
+        }
+
+        .fileContainer {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .fileContainer [type=file] {
+            cursor: inherit;
+            display: block;
+            font-size: 999px;
+            filter: alpha(opacity=0);
+            min-height: 100%;
+            min-width: 100%;
+            opacity: 0;
+            position: absolute;
+            right: 0;
+            text-align: right;
+            top: 0;
+        }
+
+        /* Example stylistic flourishes */
+
+        .fileContainer {
+            font-weight: normal;
+            color: black;
+            background: white;
+            border: #888 solid 0.5px;
+            border-radius: .25em;
+            float: left;
+            padding: .5em;
+        }
+
+        .fileContainer [type=file] {
+            cursor: pointer;
+        }
+
+        /* Track */
+
+        ::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+            -webkit-border-radius: 0px;
+            box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+            border-radius: 0px;
+        }
+
+        /* Handle */
+
+        ::-webkit-scrollbar-thumb {
+            -webkit-border-radius: 0px;
+            border-radius: 0px;
+            background: rgba(232, 232, 232, 0.6);
+            -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.1);
+            box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb:window-inactive {
+            background: rgba(222, 222, 222, 0.4);
+        }
+
+    </style>
+</head>
+
+<!-- End of Header ------------------------ -->
+
+<body>
+    <div id="importdiv" style="margin-bottom:5em;margin-top:-1em;background-color: #ffffff;border-radius:1em;border:solid #888888 1px">
+
+        <h3 style="margin-top:0em">add data ...</h3>
+        <div>
+            <center>
+                <img src="./resources/images/loading_blue.gif" id="load-file-spinner" style="height:64px;margin:-0.4em 0 0 -2em;display:none">
+            </center>
+        </div>
+
+        <div id="info"></div>
+
+        <br>
+        <div style="display:none">
+            <div>
+                <p>or simply paste your dataset into the text area and hit the 'Run' button.</p>
+                <textarea id=textInput style="height:150px;"></textarea>
+                <input id="run" type="button" value="Run" class="btn btn-md btn-default" />
+                <img src="./resources/images/loading_blue.gif" id="load-text-spinner" style="height:24px;vertical-align:top;display:none">
+            </div>
+        </div>
+        <div>
+            <form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
+                <fieldset>
+                    <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+                    <div id="loadProject">
+                        <input type="file" id="fileSelect" name="fileselect[]" multiple="multiple" style="display:none" />
+                        <div id="filedrag" style="clear:both;height:8em;width:100%;border:dashed #dddddd 2px;padding:0 0.25em">drop <b>cvs, json, geojson </b>or<b> topojson</b> file here </div>
+                        <label class="fileContainer" for="fileSelect" style="position:relative;top:-4em;left:33%;border:none;padding:0 0.8em 0.15em 0.8em;background:#eeeeee;border-radius:1em">or select file from disk</label>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+
+        <section style="background-color:#ffffff;padding:0.5em;margin:0.2em 0em">
+           <div id="localdiskinfo" style="clear:both;padding:0.5em 0.5em 1px 0em;margin:-2.5em 0em 0em 0em;">
+                <p style="font-size:0.95em;">Data you add from your <strong>local disk</strong> is <strong>not</strong> uploaded to any server or cloud service. If you want to <strong>publish</strong> your work later you need to specify a <strong>web based data source</strong>.</p>
+            </div>
+        </section>
+
+
+        <section id="section-special-files" style="background-color:#dddddd;padding:0.5em;margin:0.2em 0em">
+            <div>
+                <p>enter a data source URL
+                    <br>
+                    <span style="font-size:0.8em;">
+                        <span>
+                </p>
+                <input type="text" id="dataURL" class="filenameOrUrl" style="border:none;border-radius:0.5em"></input>&nbsp;
+                <a class="btn btn-outline-dark mt-auto" href="javascript:doDataUrl()">load</a>
+                <img src="./resources/images/loading_blue.gif" id="load-url-spinner" style="height:64px;vertical-align:top;display:none">
+            </div>
+
+            <!-- some public data URL's -->
+            <div style="margin:0.5em 0 0.5em 0"><a href="#" onclick="$('#dataSamples').show()">try some public data ...</a></div>
+            <div id="dataSamples" style="display:none;margin-top:1em;margin-left:0em">
+                <ul>
+                    <li>
+                        <a href="#" onclick="$('#dataURL').val('https://raw.githubusercontent.com/ondata/alberimonumentaliitalia/master/alberiMonumentali.csv');doDataUrl();">
+                            alberi monumentali d'italia</a><br>
+                        <span style="color:#888">(onData, Andrea Borruso, cc-by-4.0</span> -><a href="https://github.com/ondata/alberimonumentaliitalia" target="_blank"> GitHub</a>)
+                    </li>
+                    <li>
+                        <a href="#" onclick="$('#dataURL').val('https://raw.githubusercontent.com/washingtonpost/data-school-shootings/master/school-shootings-data.csv');doDataUrl();">
+                            school shootings USA</a><br>
+                        <span style="color:#888">(Washington Post, cc-by-sa-4.0 </span> -><a href="https://github.com/washingtonpost/data-school-shootings" target="_blank"> GitHub</a>)
+                    </li>
+                    <li>
+                        <a href="#" onclick="$('#dataURL').val('https://raw.githubusercontent.com/wri/global-power-plant-database/master/output_database/global_power_plant_database.csv');doDataUrl();">
+                            global power plant database</a><br>
+                        <span style="color:#888">(World Resource Institute, cc-by-4.0</span> -><a href="https://github.com/wri/global-power-plant-database" target="_blank"> GitHub</a>)
+                    </li>
+                    <li>
+                        <script>
+                            __INGV_ultima_settimana = function() {
+                                var date = new Date();
+                                var uTime = date.getTime();
+
+                                // 7 days to the past
+                                uTime -= 1000 * 60 * 60 * 24 * 7;
+
+                                date = new Date(uTime);
+
+                                var year = date.getFullYear();
+                                var month = date.getMonth() + 1;
+                                var day = date.getDate();
+
+                                var szStartdate = year + "-" + String("0" + month).slice(-2) + "-" + String("0" + day).slice(-2);
+
+                                $('#dataURL').val('http://webservices.ingv.it/fdsnws/event/1/query?starttime=' + szStartdate + 'T00%3A00%3A00&minmag=1&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000');
+                                doDataUrl();
+                            }
+
+                        </script>
+                        <a href="#" onclick="__INGV_ultima_settimana()">
+                            INGV terremoti ultima settimana - magnitudine > 1</a><br>
+                        <span style="color:#888">INGV Centro Nazionale Terremoti, cc-by-4.0</span> -><a href="http://cnt.rm.ingv.it/" target="_blank"> sito web</a>)
+                    </li>
+                    <li>
+                        <a href="#" onclick="$('#dataURL').val('http://webservices.ingv.it/fdsnws/event/1/query?starttime=2000-01-01T00%3A00%3A00&endtime=2018-11-22T23%3A59%3A59&minmag=3&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000');doDataUrl();">
+                            INGV terremoti da 2000 in poi - magnitudine > 3</a><br>
+                        <span style="color:#888">INGV Centro Nazionale Terremoti, cc-by-4.0</span> -><a href="http://cnt.rm.ingv.it/" target="_blank"> sito web</a>)
+                    </li>
+                    <li>
+                        <a href="#" onclick="$('#dataURL').val('https://docs.google.com/spreadsheets/d/e/2PACX-1vRNXJQI8bZQYG3DzeI5QOPnc7l89gCO-gtHVZQmb7oiLfeUGYSE1bNBobBeSyL3iEdVt6TEkynarfrF/pub?gid=1425152245&single=true&output=csv');doDataUrl();">
+                            Google Sheet sample - isaia</a><br>
+                        <span style="color:#888">Interventi di difesa idraulica, cc-by-4.0</span> -><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRNXJQI8bZQYG3DzeI5QOPnc7l89gCO-gtHVZQmb7oiLfeUGYSE1bNBobBeSyL3iEdVt6TEkynarfrF/pub?gid=1425152245" target="_blank"> goole sheet</a>)
+                    </li>
+
+                </ul>
+            </div>
+
+         </section>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
+    <script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            var fFTReady = false;
+
+            if (isAPIAvailable()) {
+                $('#fileSelect').bind('change', handleFileSelect);
+            }
+
+            $('#run').bind('click', doTextData);
+
+            $('#loadData').bind('click', doDataUrl);
+            $('#loadFile').bind('click', doLoadFile);
+
+            var options = {
+                packages: ['corechart'],
+                callback: FTReady
+            };
+            //google.load('visualization', '1', options);
+
+            _LOG = function(text) {
+                console.log(text);
+            };
+
+        });
+
+        function FTReady() {
+            fFTReady = true;
+        }
+
+        /**
+         * isAPIAvailable  
+         * checks the browser support for the HTML5 File API
+         * displays a warning if the browser doesn't support it
+         * @type boolean
+         * @return true,false
+         */
+        function isAPIAvailable() {
+            // Check for the various File API support.
+            if (window.File && window.FileReader && window.FileList && window.Blob) {
+                // Great success! All the File APIs are supported.
+                return true;
+            } else {
+                alert(
+                    "The browser you're using does not currently support\nthe HTML5 File API. As a result the file loading demo\nwon't work properly."
+                );
+                return false;
+            }
+        }
+        /**
+         * handleFileSelect  
+         * parses the textfield input into the map data source
+         * @param evt the evemt handle
+         * @type void
+         */
+        function handleFileSelect(evt) {
+            $("load-file-spinner").show();
+            $("load-file-spinner").show();
+            var files = evt.target.files; // FileList object
+            for (var i = 0, len = files.length; i < len; i++) {
+                doFile(files[i], i);
+            }
+        }
+        /**
+         * doFile  
+         * reads the file and
+         * parses the data into the map data source
+         * @param file filename
+         * @param i filenumber
+         * @type void
+         */
+        var actFile = null;
+
+        function doFile(file, i) {
+            $("#fileName").val(file.name);
+            actFile = file;
+            doLoadFile();
+        }
+        /**
+         * doFile  
+         * reads the file and
+         * parses the data into the map data source
+         * @param file filename
+         * @param i filenumber
+         * @type void
+         */
+        function doLoadFile() {
+            $("#load-file-spinner").show();
+            //$("#section-special-files").hide();
+            var reader = new FileReader();
+            reader.readAsText(actFile);
+            ixmaps.editor.dbtableUrl = actFile.name + " (local file - please complete path or give url!)";
+            reader.onload = function(event) {
+                var csv = event.target.result;
+                if (!processTextData(csv, actFile.name)) {
+                    $("#load-file-spinner").hide();
+                    alert('Unable to read ' + actFile.name);
+                }
+            };
+            reader.onerror = function() {
+                $("#load-file-spinner").hide();
+                alert('Unable to read ' + actFile.name);
+            };
+        }
+
+        /**
+         * doDataUrl 
+         * parses the textfield input into the map data source
+         * @type void
+         */
+        function doDataUrl() {
+            $("#dataSamples").hide();
+            $("#load-url-spinner").show();
+            var szUrl = String($('#dataURL').val());
+            if (!szUrl.match(/http:/) && !szUrl.match(/https:/)) {
+                szUrl = ixmaps.embeddedApi.editor.szExternalDataPath + "csv/" + szUrl;
+            }
+            ixmaps.editor.dbtableUrl = szUrl;
+            $.ajax({
+                type: "GET",
+                url: szUrl,
+                dataType: "text",
+                success: function(data) {
+                    processTextData(data, szUrl);
+                },
+                error: function() {
+                    $("#load-url-spinner").hide();
+                    alert("\"" + szUrl + "\" could not be loaded!");
+                }
+            });
+        }
+
+        /**
+         * doTextData  
+         * parses the textfield input into the map data source
+         * @type void
+         */
+        function doTextData() {
+            processTextData($('#textInput').val(), "text");
+        }
+
+        function processTextData(text, szSource) {
+            
+            let sType = "";
+
+            if (text.match(/\<xml/) && text.match(/feed/)) {
+                sType = "rss";
+            } else
+            if (text.match(/\<xml/) && text.match(/www.opengis.net\/kml/)) {
+                sType = "kml";
+            } else
+            if (text.match(/created by dbf2xml/)) {
+                sType = "jsonDB";
+            } else
+            if (text.match(/\"type\"/) && text.match(/\"FeatureCollection\"/)) {
+                sType = "geojson";
+            } else
+            if (text.match(/\"type\"/) && text.match(/\"Topology\"/)) {
+                sType = "topojson";
+            } else
+            if ((text[0] == "{") || (text[0] == "[")) {
+                sType = "json";
+             } else {
+                sType = "csv";
+            }
+
+            $("#load-text-spinner").show();
+            
+            data = Data.import({
+                source: text,
+                type: sType
+            });
+            
+            console.log(data);
+
+            __killDialog();
+
+            ixmaps.editor.dbtableType = sType;
+            
+            __addData(data);
+
+            return true;
+        };
+
+
+
+
+
+        /**
+         * createThemeDataObject  
+         * take the loaded data and create a json object with the iXmaps data structure
+         * @type void
+         */
+        function createThemeDataObject(dataA, szDataType, szDataSource) {
+
+            var zValues = 0;
+            var nValues = 0;
+
+            // cerate data object
+            // ------------
+            var themeDataObj = new Object();
+
+            // first row of data => object.fields
+            // ------------
+            themeDataObj.fields = new Array();
+            for (var a in dataA[0]) {
+                themeDataObj.fields.push({
+                    id: (dataA[0][a] || " "),
+                    typ: 0,
+                    width: 60,
+                    decimals: 0
+                });
+            }
+
+            // following rows => object.ecords
+            // records array
+            // --------------
+            themeDataObj.records = new Array();
+
+            // get all values we want 
+            // loop over countries
+            for (i = 1; i < dataA.length; i++) {
+                // add one record
+                var valuesA = new Array();
+                for (var a in dataA[i]) {
+                    valuesA.push(dataA[i][a]);
+                }
+                themeDataObj.records.push(valuesA);
+            }
+
+            // finish the data object by creating object.table
+            // -----------------------------------------------
+            themeDataObj.table = {
+                records: dataA.length - 1,
+                fields: dataA[0].length
+            };
+
+            console.log(themeDataObj);
+
+            ixmaps.editor.dbtableType = szDataType;
+
+            __killDialog();
+
+            __addData(themeDataObj);
+
+        }
+
+        // ------------------------
+        // end of code 
+        // ------------------------
+
+    </script>
+
+</body>
+
+</html>

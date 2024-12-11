@@ -1,0 +1,3925 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>iXmaps Theme Configurator</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+
+    <!-- Custom styles -->
+    <link href="./assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="./assets/css/icomoon.css" rel="stylesheet">
+
+    <link href="./css/site.min.css" rel="stylesheet">
+
+    <style type="text/css" media="screen">
+        .map-config {
+            background-color: #888;
+        }
+
+        hr.separator {
+            display: none;
+            color: black;
+            margin: -0.8em 0.9em 1em 0.9em;
+            height: 0px;
+        }
+
+        #xcolor-label>span {
+            padding: 6px 12px;
+        }
+
+        .exact-value {
+            margin: 0.2em 0em;
+            padding: 1em;
+            width: 100%;
+        }
+
+        option,
+        optgroup {
+            xxcolor: #666666;
+            font-size: 1.2em;
+        }
+
+        optgroup,
+        label {
+            color: #dddddd;
+            padding-left: 0.2em;
+        }
+
+        #chartValueOptions option,
+        optgroup {
+            color: #bbbbbb;
+        }
+
+        select.form-control {
+            padding: 5px;
+        }
+
+        input.form-control {
+            padding: 8px;
+        }
+
+        input::placeholder {
+            color: #dddddd;
+        }
+
+        .form-control::placeholder {
+            color: #dddddd;
+        }
+
+        input,
+        select,
+        .form-group {
+            margin-bottom: 1em;
+        }
+
+        h3 {
+            margin-top: 0.3em;
+            margin-bottom: 0.2em;
+            padding-bottom: 0.2em;
+            padding-left: 0em;
+            xxborder-bottom: solid #ddd 0px;
+            border: solid #ddd 0px;
+            border-radius: 0.1em;
+            xbackground-color: #fff;
+            font-size: 36px;
+        }
+
+        h5 {
+            color: #ddd;
+            margin-top: -1em;
+            margin-bottom: 0.2em;
+            padding-bottom: 0.2em;
+            padding-left: 0em;
+            font-size: 14px;
+        }
+
+        .colorlist {
+            padding: 0px;
+            margin: 0px;
+            margin-left: -5px;
+            border: 0;
+        }
+
+        .colorlistitem {
+            padding: 1px;
+            margin: 3px;
+            border: 0;
+            font-family: monospace;
+            font-size: 24px;
+            line-height: 1em;
+        }
+
+        .colorlistitem>a {
+            text-decoration: none;
+            padding: 3px;
+            margin: 3px;
+            border: 0;
+        }
+
+        .colorlistitem>a:hover {
+            text-decoration: none;
+            background: #fd8;
+            xborder: #aaa solid 1px;
+        }
+
+        .colpick {
+            z-index: 9999;
+        }
+
+        .colpick_submit {
+            top: 145px;
+        }
+
+        h3.disabled {
+            color: #dddddd;
+        }
+
+        h3.enabled {
+            color: #48A542;
+        }
+
+        .control-alert {
+            border-color: #ff8888;
+            border-width: 1px;
+        }
+
+        .help {
+            color: #444444;
+            margin-left: 0px;
+            padding-left: 0;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .calendar {
+            color: black;
+            background-color: transparent;
+            padding: 0;
+            border-radius: 0;
+            border: 0;
+            box-shadow: none;
+            margin-right: 10px;
+        }
+
+        .calendar .years .plus em,
+        .calendar .years .minus em {
+            font-size: 1.2em;
+            user-select: none;
+            position: relative;
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            margin-top: 2px;
+            padding-top: 0px;
+            cursor: pointer;
+            color: #888;
+            border: 1px solid #aaa;
+            border-radius: 50%;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+        }
+
+        .calendar .years .minus em {
+            font-size: 1.2em;
+            padding-top: 0px;
+        }
+
+        .calendar .years .plus em:active,
+        .calendar .years .plus em:hover,
+        .calendar .years .minus em:active,
+        .calendar .years .minus em:hover {
+            border-color: #e9573f
+        }
+
+        a:hover {
+            cursor: pointer;
+        }
+
+        .checkbox {
+            margin: 1em 0;
+
+        }
+
+        .btn-link {
+            --bs-btn-font-weight: 400;
+            --bs-btn-color: #3bafda;
+            text-decoration: none;
+        }
+
+
+        .rich-select {
+            height: 81px;
+            /* 75px + 6 */
+            position: relative;
+            border: none;
+            margin: 5px 0;
+            padding: 0;
+            background: none;
+        }
+
+        .rich-select-dropdown {
+            border: solid 1px #888;
+            border-radius: .25rem;
+        }
+
+        .rich-select-dropdown:focus-within {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        }
+
+        .rich-select-dropdown-button {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .rich-select-dropdown-button+label,
+        .rich-select-option>input[type=radio] {
+            position: absolute;
+            display: block;
+            right: .5rem;
+            width: 2rem;
+            height: 1rem;
+            outline: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .rich-select-dropdown-button+label {
+            top: .5rem;
+            padding: 25px 10px;
+        }
+
+        .rich-select-dropdown-button+label::before {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            width: 1rem;
+            height: 1rem;
+            content: "";
+            pointer-events: none;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 5L0 3h4z'/%3e%3c/svg%3e");
+        }
+
+        .rich-select-dropdown>.rich-select-option>.rich-select-option-body {
+            display: none;
+        }
+
+        .rich-select-dropdown>.rich-select-option input[type=radio]:checked+.rich-select-option-body {
+            display: inline-block;
+            width: 100%;
+        }
+
+        .rich-select-options {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            border: solid 1px #DDD;
+            border-top: none;
+            border-radius: .25rem;
+            width: 100%;
+            max-height: 75vh;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: rgba(0, 0, 0, 0.4) 5px 8px 15px;
+        }
+
+        .rich-select-option {
+            padding: 0 8px;
+        }
+
+        .rich-select-options>.rich-select-option:hover {
+            background-color: #f1f1f1;
+        }
+
+        .rich-select-option-body label {
+            width: 100%;
+            padding: 2px;
+            margin-bottom: 0;
+        }
+
+        .rich-select-option-body img {
+            height: 75px;
+            width: 75px;
+            min-height: 75px;
+            min-width: 75px;
+            object-fit: contain;
+            margin-right: .5rem;
+        }
+
+        .rich-select-option-body>button {
+            width: 100%;
+            text-align: left;
+            padding: 2px;
+            border: none;
+            outline: none;
+            background: none;
+        }
+
+        .rich-select-dropdown-button:checked~.rich-select-options {
+            display: inline-block;
+        }
+
+        .rich-select-option-body div {
+            float: left;
+            margin-top: 1.5em;
+            width: 60px;
+            line-height: 0.9em;
+        }
+
+        .rich-select-option-body img {
+            float: left;
+        }
+
+    </style>
+</head>
+
+<body id="theme-editor">
+
+    <div id="editor-apply" style="position:absolute;top:50px;left:10px;background-color:white;border:solid #dddddd 1px;z-index:9999">
+        <a href='javascript:ixmaps.editor.applyChanges();'>
+            <button type="button" class="btn btn-link btn-md">
+                apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i>
+            </button>
+        </a>
+    </div>
+
+
+    <div id="workspace" style="overflow-x:hidden;height:100%;margin-right:5px;">
+
+        <div class="container map-config">
+
+            <!--  --------------------	-->
+            <!--  top				    -->
+            <!--  --------------------	-->
+
+            <p class="form-control" style="border:none;background:none;margin-top:0.5em;margin-bottom:-0.3em;margin-left:-0.7em">Theme:</p>
+
+            <div id="data-alert" style="margin-top:0.5em"></div>
+
+            <div id="map-data-sources" style="display:none">
+
+                <!--  --------------------	-->
+                <!--  map and data sources  -->
+                <!--  --------------------	-->
+
+                <h3 id="chartDefinitionMap_header" class="disabled">
+                    <span id="map-defined">map</span> and
+                    <span id="data-defined">data</span> sources
+                    <span><i class="icon icon-checkmark" title="check-map-defined"></i></span>
+                </h3>
+
+                <h5 class="subtitle">defines where to load maps and data</h5>
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <label id="define-map-title">map</label>
+                        <div class="input-group">
+                            <input id="define-map" type="text" class="form-control" placeholder="SVG map..." aria-label="SVG map...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-secondary" type="button">edit</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!--  map layer and embedded data  -->
+                <div id="map-info" style="display:inline">
+
+                    <div class="row" style="margin-top:0.4em">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <div class="form-group">
+                                <label id="map-layer-info-title" for="map-layer-info">map layer</label>
+                                <select class="form-control" id="map-layer-info" size='6' onchange="ixmaps.editor.getMapLookupValues()">
+                                    <option>-</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <div class="form-group">
+                                <label for="sel1">lookup values</label>
+                                <div id="mapLookupValueOptions">
+                                    <sub>
+                                        <br>
+                                        <span style="color:#888888;vertical-align:15px;">(no layer selected ...)&#160;&#160;</span>
+                                    </sub>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="data-define" style="display:none">
+
+                    <div class="row" style="margin-top:0.5em">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <label id="define-data-title">data</label>
+                            <div class="input-group">
+                                <input id="define-data" type="text" class="form-control" placeholder="define data source ..." aria-label="data...">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-secondary" type="button" onclick="ixmaps.loadStoryTool('../../../app/Editor/dialog_data_load.html')">edit</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="data-info" style="display:none">
+                        <div class="row" style="margin-top:0.4em">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div class="form-group">
+                                    <label id="info-datafields-title" for="info-data-fields-select">data field(s)</label>
+                                    <select class="form-control" id="info-data-fields-select" multiple="multiple" size='6' onchange="ixmaps.editor.getInfoValues()">
+                                        <option>-</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div class="form-group">
+                                    <label for="sel1">sample values</label>
+                                    <div id="infoValueOptions" class="form-control">
+                                        <sub>
+                                            <br>
+                                            <span style="color:#888888;vertical-align:15px;">(no field selected ...)&#160;&#160;</span>
+                                        </sub>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- --------------------	-->
+            <!-- layer and lookup       -->
+            <!-- --------------------	-->
+
+            <div id="config-lookup" style="margin-top:0em;display:none">
+
+                <h3 id="chartLookupFieldsHeader" class="disabled">
+                    <span id="chartLookupFields">map</span> /
+                    <span id="mapLookup">data</span> binding
+                    <span id="chartLookupFieldsCheck" style="display:none"><i class="icon icon-checkmark" title="check-map-defined"></i></span>
+                </h3>
+                <h5 class="subtitle">defines the charts position</h5>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label id="define-layer-title" for="sel1">layer</label>
+                            <select class="form-control" id="map-layer-select">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label id="define-lookup-title" for="theme-data-lookup-select">lookup field</label>
+                            <select class="form-control" id="theme-data-lookup-select">
+                                <option>-</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" id="define-latlon-div">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label id="define-latlon-title" for="theme-data-lat-select">lat/lon</label>
+                            <select class="form-control control-alert" id="theme-data-lat-select">
+                                <option>-</option>
+                            </select>
+                            <select class="form-control" id="theme-data-lon-select">
+                                <option>-</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="lookup-alert"></div>
+            </div>
+
+            <!-- --------------------	-->
+            <!-- data fields            -->
+            <!-- --------------------	-->
+
+            <div id="config-data" style="margin-top:2em;display:none">
+
+                <h3 id="chartDefinitionFieldsHeader" class="disabled">
+                    <span id="chartDefinitionFields">theme</span>
+                    <span>fields</span>
+                </h3>
+                <h5 class="subtitle">defines the data column(s) to visualize</h5>
+
+                <div id="data-field-alert"></div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label id="define-datafields-title" for="theme-data-fields-select">data field(s)</label>
+                            <select class="form-control" id="theme-data-fields-select" multiple="multiple" size='6' onchange="ixmaps.editor.getSampleValues()">
+                                <option>-</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="sel1">sample values</label>
+                            <div id="chartValueOptions">
+                                <sub>
+                                    <br>
+                                    <span style="color:#888888;vertical-align:15px;">(no field selected ...)&#160;&#160;</span>
+                                </sub>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="theme-data-field2-select">2. data field</label>
+                            <!-- help -->
+                            <a onclick="$(this).siblings('.help').toggle('fast');">
+                                <span style="font-size:14px;float:right;margin-right:0.2em;padding-top:0.2em">*)</span></a>
+                            <div class="help">
+                                <p>The second data field defines a data source to calculate the final value from two values, the data field(s) and this value.</p>
+                                <p>If not specified differently, iXMaps will perform a 'percent' calculation.</p>
+                                <p>Other calculations can be defined by 'theme type' modificators like PERMILLE, FACTOR, DIFFERENCE ...</p>
+                            </div>
+
+                            <select class="form-control" id="theme-data-field2-select">
+                                <option>-</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <label for="theme-data-field2-select">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                        <span class="">
+                            <a href='javascript:ixmaps.editor.applyChanges();'>
+                                <button type="button" class="btn btn-link btn-md" style="color:azure">
+                                    apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i>
+                                </button>
+                            </a>
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ====================	-->
+        <!-- theme definition       -->
+        <!-- ====================	-->
+
+        <div id="config-theme" style="display:none">
+
+            <div class="container" style="background-color:none;display:none">
+                <h3 class="disabled" style="margin:0.5em 0 0 0em;">theme definition</h3>
+            </div>
+
+            <div class="container">
+
+                <div id="xxtheme-alert" style="margin-top:0.5em"></div>
+
+                <!-- --------------------	-->
+                <!-- theme type             -->
+                <!-- --------------------	-->
+
+                <h3 id="chartThemeTitle" class="disabled">type
+                    <span class="pull-right">
+                        <a href='javascript:ixmaps.editor.applyChanges();'>
+                            <button type="button" class="btn btn-link btn-md">
+                                apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i>
+                            </button>
+                        </a>
+                    </span>
+                </h3>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="theme-type-select">you can either select a new basic type</label>
+                            <div class="rich-select custom-select">
+                                <div class="rich-select-dropdown">
+                                    <div class="rich-select-option">
+                                        <input type="radio" name="game" id="Dots" checked="">
+                                        <div class="rich-select-option-body">
+                                            <label tabindex="-1">
+                                                <img src="./resources/images/points.png" alt="">
+                                                <div>Dots</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="rich-select-option">
+                                        <input type="radio" name="game" id="sized-Bubbles">
+                                        <div class="rich-select-option-body">
+                                            <label tabindex="-1">
+                                                <img src="./resources/images/bubbles.png" alt="">
+                                                <div>sized Bubbles</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="rich-select-option">
+                                        <input type="radio" name="game" id="HexBin">
+                                        <div class="rich-select-option-body">
+                                            <label tabindex="-1">
+                                                <img src="./resources/images/hexbin.png" alt="">
+                                                <div>HexBin</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="rich-select-option">
+                                        <input type="radio" name="game" id="HexBinSized">
+                                        <div class="rich-select-option-body">
+                                            <label tabindex="-1">
+                                                <img src="./resources/images/hexbin_size.png" alt="">
+                                                <div>HexBin sized</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="rich-select-option">
+                                        <input type="radio" name="game" id="Waffle">
+                                        <div class="rich-select-option-body">
+                                            <label tabindex="-1">
+                                                <img src="./resources/images/waffle_grid.png" alt="">
+                                                <div>Waffle Grid</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" id="rich-select-dropdown-button" class="rich-select-dropdown-button">
+                                <label for="rich-select-dropdown-button" style="width:1000px;height:50px"></label>
+                                <div class="rich-select-options">
+                                    <div class="rich-select-option">
+                                        <div class="rich-select-option-body">
+                                            <label for="Dots" tabindex="-1" onclick="document.getElementById('rich-select-dropdown-button').click();ixmaps.editor.setChartStyle('CHART|DOT|RAW|FAST')">
+                                                <img src="./resources/images/points.png" alt="">
+                                                <div>Dots</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="rich-select-option">
+                                        <div class="rich-select-option-body">
+                                            <label for="sized-Bubbles" tabindex="-1" onclick="document.getElementById('rich-select-dropdown-button').click();ixmaps.editor.setChartStyle('CHART|BUBBLE|SIZE')">
+                                                <img src="./resources/images/bubbles.png" alt="">
+                                                <div>sized Bubbles</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="rich-select-option">
+                                        <div class="rich-select-option-body">
+                                            <label for="HexBin" tabindex="-1" onclick="document.getElementById('rich-select-dropdown-button').click();ixmaps.editor.setChartStyle('CHART|SYMBOL|GRIDSIZE|FAST|AGGREGATE|SUM|DOPACITY')">
+                                                <img src="./resources/images/hexbin.png" alt="">
+                                                <div>HexBin</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="rich-select-option">
+                                        <div class="rich-select-option-body">
+                                            <label for="HexBinSized" tabindex="-1" onclick="document.getElementById('rich-select-dropdown-button').click();ixmaps.editor.setChartStyle('CHART|BUBBLE|SIZE|FAST|AGGREGATE|RELOCATE|SUM')">
+                                                <img src="./resources/images/hexbin_size.png" alt="">
+                                                <div>HexBin sized</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="rich-select-option">
+                                        <div class="rich-select-option-body">
+                                            <label for="Waffle" tabindex="-1" onclick="document.getElementById('rich-select-dropdown-button').click();ixmaps.editor.setChartStyle('CHART|WAFFLE|GRIDSIZE|AGGREGATE|FAST|RECT|SUM')">
+                                                <img src="./resources/images/waffle_grid.png" alt="">
+                                                <div>Waffle Grid</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="theme-type-select">or modify the chart type</label>
+                            <div id="theme-type-menu-text"></div>
+                            <div class="btn btn-outline-dark" style="float:left;margin-top:0.4em;padding:1.8em 1em"  onclick="ixmaps.makeChartMenueHTML(null,'myMenuTarget');">
+                                <span>
+                                    <i class="icon shareIcon blackHover share_bitly icon-pie-chart" title="chart type menu" tabindex="-1" style="padding-top:0.2em"></i>
+                                    chart type menu </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="display:none">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <select class="form-control" id="theme-type-select" onchange="javascript:ixmaps.editor.setChartStyle()">
+                                <option>-</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row" style="display:none">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="form-group">
+                            <label id="actual-themetype-title" for="theme-type-select">the actual theme type is</label>
+                            <!-- help -->
+                            <a onclick="$(this).siblings('.help').toggle('fast');">
+                                <span style="font-size:14px;margin-right:0.2em;padding-top:0.2em">*)</span></a>
+                            <div class="help">
+                                <p>The theme 'type' is a string with one or more key words to define the theme type</p>
+                                <p>There are two basic theme types:
+                                <ul>
+                                    <li>CHOROPLETH</li>
+                                    <li>CHART</li>
+                                </ul>
+                                </p>
+                                <p>and different CHART types like PIE, BAR or SYMBOL and the class distributon mode like EQUIDISTANT, QUANTILE or LOGARITHMIC or CATEGORICAL for discrete value like 'type' or 'year'</p>
+                                </ul>
+                            </div>
+                            <!------ -->
+                            <div><textarea id="theme-type-text" class="form-control" style="width:100%;height:100px"></textarea></div>
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div id="myMenuTarget"></div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <!-- -----------------------	-->
+            <!-- colorscheme and classes    -->
+            <!-- -----------------------	-->
+
+            <hr class="separator">
+
+            <div class="container" style="padding-bottom:1.5em;">
+
+                <h3 id="chartColor-title" style="color:#dddddd">color
+                    <span class="pull-right" style="vertical-align:-100%">
+                        <a href='javascript:ixmaps.editor.applyChanges();'>
+                            <button type="button" class="btn btn-link btn-md">
+                                apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i>
+                            </button>
+                        </a>
+                    </span>
+                </h3>
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="form-group">
+                            <label id="xcolor-title" for="xcolor">colors</label>
+                            <div>
+                                <a id="xcolor" href="javascript:ixmaps.popupSelectColorScheme();" style="text-decoration: none">
+                                    <span id="xcolor-label" style="font-size:11px;line-height:15px;background-color:white;"></span>
+                                </a>
+                            </div>
+                            <div id="color-select-div" style="margin-top:1em;max-height:300px;overflow:auto;display:none"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="theme-distribution-select">distribution</label>
+                            <!-- help -->
+                            <a onclick="$(this).siblings('.help').toggle('fast');">
+                                <span style="font-size:14px;float:right;margin-right:0.2em;padding-top:0.2em">*)</span></a>
+                            <div class="help">
+                                <ul>
+                                    <li>for single fields it is either a class distributon mode like EQUIDISTANT, QUANTILE or LOGARITHMIC or CATEGORICAL for discrete value like 'type' or 'year'</li>
+                                    <li>for multiple field charts it can be 'by field' (for bar or pie charts) or 'dominant' or 'significant', if we have single value charts or shapes for the visualisation</li>
+                                    <p>('significant' is a value that is most above its own mean value; measured in standard deviation)</p>
+                                </ul>
+                            </div>
+                            <!------ -->
+                            <select class="form-control" id="theme-distribution-select" onchange="ixmaps.editor.setDistribution()">
+                                <optgroup label="distribution (numeric values only!)">
+                                    <option value="EQUIDISTANT">Equidistant</option>
+                                    <option value="LOGARITHMICAL">Logarithmical</option>
+                                    <option value="QUANTILE">Quantile</option>
+                                    <option value="RANGES">Ranges</option>
+                                </optgroup>
+                                <optgroup label="discret values (text values allowed)">
+                                    <option value="CATEGORICAL">Categorical</option>
+                                    <option value="CATEGORICAL">Categorical + ignore case</option>
+                                </optgroup>
+                                <optgroup label="dominant values (of multiple data)">
+                                    <option value="">by data source</option>
+                                    <option value="DOMINANT">by dominant value</option>
+                                    <option value="DOMINANT|DEVIATION">by significant value</option>
+                                </optgroup>
+                            </select>
+                            <select class="form-control" id="theme-classes-select" onchange="ixmaps.editor.setClasses()">
+                                <option value="1">1 class</option>
+                                <option value="2">2 classes</option>
+                                <option value="3">3 classes</option>
+                                <option value="4" selected>4 classes</option>
+                                <option value="5">5 classes</option>
+                                <option value="6">6 classes</option>
+                                <option value="7">7 classes</option>
+                                <option value="8">8 classes</option>
+                                <option value="9">9 classes</option>
+                                <option value="10">10 classes</option>
+                                <option value="11">11 classes</option>
+                                <option value="12">12 classes</option>
+                                <option value="13">13 classes</option>
+                                <option value="14">14 classes</option>
+                                <option value="15">15 classes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div id="theme-exact-label">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- --------------------------------- -->
+            <!-- chart style					   -->
+            <!-- --------------------------------- -->
+
+            <hr class="separator">
+
+            <div class="container" style="padding-bottom:1.5em;">
+
+                <h3 id="chartStyleTitle" class="disabled">style
+                    <span class="pull-right">
+                        <a href='javascript:ixmaps.editor.applyChanges();'>
+                            <button type="button" class="btn btn-link btn-md">
+                                apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i>
+                            </button>
+                        </a>
+                    </span>
+                </h3>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="theme-values-checkbox"></label>
+                            <div class="checkbox" style="margin-top:0px">
+                                <label class="toggle">
+                                    <span style="margin-left:4em;">show values</span>
+                                    <input type="checkbox" id="theme-values-checkbox" onchange="toggle_values()">
+                                    <span class="handle"></span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label class="toggle">
+                                    <span style="margin-left:4em;">shadow</span>
+                                    <input type="checkbox" id="theme-shadow-checkbox" onchange="toggle_shadow()">
+                                    <span class="handle"></span>
+                                </label>
+                            </div>
+                            <!--
+                            <div class="checkbox">
+                                <label class="toggle">
+                                    <span style="margin-left:4em;">show data</span>
+                                    <input type="checkbox" id="theme-showdata-checkbox" onchange="toggle_data()">
+                                    <span class="handle"></span>
+                                </label>
+                            </div>
+                            -->
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="theme-glow-checkbox"></label>
+                            <div class="checkbox" style="margin-top:0px">
+                                <label class="toggle">
+                                    <span style="margin-left:4em;">glow</span>
+                                    <input type="checkbox" id="theme-glow-checkbox" onchange="toggle_glow()">
+                                    <span class="handle"></span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label class="toggle">
+                                    <span style="margin-left:4em;">aura</span>
+                                    <input type="checkbox" id="theme-aura-checkbox" onchange="toggle_aura()">
+                                    <span class="handle"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top:0">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartPositionList">chart alignment</label>
+                            <select class="form-control" id="chartPositionList" name="chartThemeType" onchange="ixmaps.editor.setPosition()">
+                                <option value="">---</option>
+                                <option value="center">center</option>
+                                <option value="top">top</option>
+                                <option value="bottom">bottom</option>
+                                <option value="left">left</option>
+                                <option value="right">right</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartLabelFade">label fade</label>
+                            <input type="text" class="form-control" id="chartLabelFade" placeholder="0.1 ... 3">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartSortList">sorting</label>
+                            <select class="form-control" id="chartSortList" name="chartSortList">
+                                <option value="">---</option>
+                                <option value="SORT|DOWN|">sort down</option>
+                                <option value="SORT|UP|">sort up</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label id="chartOpacityLabel" for="chartOpacityValue">fill opacity</label>
+                            <div class="calendar">
+                                <div class="years clearfix">
+                                    <div class="unit minus" onclick="changeChartOpacity(-1)"><em>-</em></div>
+                                    <div class="monyear" style="padding:0em 0em 0em 1.2em"><input class="form-control" style="width:90%" type="text" id="chartOpacityValue" placeholder="1 ... " onkeypress="setChartOpacity()"></div>
+                                    <div class="unit plus" onclick="changeChartOpacity(1)"><em>+</em></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartLineColor">line color</label>
+                            <input type="text" class="form-control" id="chartLineColor" placeholder="none" onkeypress="setLineColor()">
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chart	">line width</label>
+                            <div class="calendar">
+                                <div class="years clearfix">
+                                    <div class="unit minus" onclick="changeLineWidth(-1)"><em>-</em></div>
+                                    <div class="monyear" style="padding:0em 0em 0em 1.2em"><input class="form-control" style="width:90%" type="text" id="chartLineWidth" placeholder="1 ... " onkeypress="setLineWidth()"></div>
+                                    <div class="unit plus" onclick="changeLineWidth(1)"><em>+</em></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartValueDecimalsList">value decimals</label>
+                            <select class="form-control" id="chartValueDecimalsList" name="chartSortList">
+                                <option value="0">#</option>
+                                <option value="1">#.#</option>
+                                <option value="2">#.##</option>
+                                <option value="3">#.###</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartValueScale">value text size</label>
+                            <div class="calendar">
+                                <div class="years clearfix">
+                                    <div class="unit minus" onclick="changeValueScale(-1)"><em>-</em></div>
+                                    <div class="monyear" style="padding:0em 0em 0em 1.2em"><input class="form-control" style="width:90%" type="text" id="chartValueScale" placeholder="1 ... " onkeypress="setValueScale()"></div>
+                                    <div class="unit plus" onclick="changeValueScale(1)"><em>+</em></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- --------------------------------- -->
+            <!-- size                              -->
+            <!-- --------------------------------- -->
+
+            <hr class="separator">
+
+            <div class="container" id="chartSize" style="padding-bottom:1.5em;display:none">
+
+                <h3 id="chartSizeTitle" class="disabled">size
+                    <span class="pull-right">
+                        <a href='javascript:ixmaps.editor.applyChanges();'>
+                            <button type="button" class="btn btn-link btn-md">
+                                apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i>
+                            </button>
+                        </a>
+                    </span>
+                </h3>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label id="chartSizeLabel" for="chartScaleValue">scale</label>
+                            <div class="calendar">
+                                <div class="years clearfix">
+                                    <div class="unit minus" onclick="changeChartScale(-1)"><em>-</em></div>
+                                    <div class="monyear" style="padding:0em 0em 0em 1.2em"><input class="form-control" style="width:90%" type="text" id="chartScaleValue" placeholder="1 ... " onkeypress="setChartScale()"></div>
+                                    <div class="unit plus" onclick="changeChartScale(1)"><em>+</em></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartSizeList">dynamic size</label>
+                            <select class="form-control" id="chartSizeList" name="chartSizeType" onchange="ixmaps.editor.applyChanges();">
+                                <option value="">---</option>
+                                <option value="SIZE">by value</option>
+                                <option value="LINEAR">by value - linear</option>
+                                <option value="SIZEP2">by value - square</option>
+                                <option value="SIZEP3">by value - cubic</option>
+                                <option value="SIZEP4">by value - power of 4</option>
+                                <option value="SIZELOG">by value - logarithmical</option>
+                                <option value="NOSIZE">don't size</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartSizeFieldList">chart size field</label>
+                            <select class="form-control" id="chartSizeFieldList" name="chartSizeFieldList" onchange="ixmaps.editor.applyChanges();">
+                                <option value="">none</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartExpandList">chart height</label>
+                            <select class="form-control" id="chartExpandList" name="chartExpandList">
+                                <option value="">---</option>
+                                <option value="HEIGHT">by value</option>
+                                <option value="EXPAND">expand</option>
+                                <option value="EXPANDMORE">expand more</option>
+                                <option value="EXPANDMAX">expand maximal</option>
+                                <option value="COMPRESS">compress</option>
+                                <option value="COMPRESSMORE">compress more</option>
+                                <option value="COMPRESSMAX">compress maximal</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartNormalSizeValue">normal size value</label>
+                            <!-- help -->
+                            <a onclick="$(this).siblings('.help').toggle();">
+                                <span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></a>
+                            <div class="help">
+                                <p>Method to define the size of the chart objects by giving the value that should be represented by a 'normal' size of 30 screen pixel.</p>
+                                <p>Higher values lead to smaller charts.</p>
+                            </div>
+                            <!------ -->
+                            <input class="form-control" type="text" id="chartNormalSizeValue" placeholder="1 ... " onkeypress="setNormalSizeValue()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartRangeScaleValue">range scale</label>
+                            <!-- help -->
+                            <a onclick="$(this).siblings('.help').toggle('fast');">
+                                <span style="font-size:14px;float:right;margin-right:0.2em;padding-top:0.2em">*)</span></a>
+                            <div class="help">
+                                <p>The range scale defines a factor to apply on yaxis compression or complex symbol radius.</p>
+                                <ul>
+                                    <li> a value > 1 expands the chart/plot</li>
+                                    <li> a value < 1 compresses the chart/plot </li>
+                                </ul>
+                            </div> <input class="form-control" type="text" id="chartRangeScaleValue" placeholder="1 ... " onkeypress="setChartRangeScale()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- --------------------------------- -->
+            <!-- dynamic alpha                     -->
+            <!-- --------------------------------- -->
+
+            <hr class="separator">
+
+            <div class="container" style="padding-bottom:1.5em;">
+
+                <h3 id="chartOpacityTitle" class="disabled">opacity
+                    <span class="pull-right">
+                        <a href='javascript:ixmaps.editor.applyChanges();'>
+                            <button type="button" class="btn btn-link btn-md">
+                                apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i>
+                            </button>
+                        </a>
+                    </span>
+                </h3>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartAlphaMode">dynamic alpha</label>
+                            <select id="chartAlphaMode" class="form-control" name="chartAlphaMode">
+                                <option value="">---</option>
+                                <option value="DOPACITY">dynamic</option>
+                                <option value="DOPACITYLOG">dynamic (log)</option>
+                                <option value="DOPACITYMAX">by value max</option>
+                                <option value="DOPACITYMIN">by value min</option>
+                                <option value="DOPACITYBIPOLAR">by value min/max</option>
+                                <option value="DOPACITYMEAN">by mean value</option>
+                                <option value="DOPACITYLOGMEAN">by mean value (log)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartAlphaSpread">smoothness</label>
+                            <input type="text" id="chartAlphaSpread" class="form-control" placeholder="0.1 ... 3">
+                            <label for="chartAlphaIntensity">intensity:</label>
+                            <input type="text" id="chartAlphaIntensity" class="form-control" placeholder="0.1 ... 100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartAlphaFieldList">dynamic alpha field</label>
+                            <select id="chartAlphaFieldList" class="form-control" name="chartAlphaFieldList">
+                                <option value="">---</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartAlphaField100">analysis</label>
+                            <select id="chartAlphaField100" class="form-control" name="chartAlphaField100">
+                                <option value="">---</option>
+                                <option value="$density$">density</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- --------------------------------- -->
+            <!-- aggregation                       -->
+            <!-- --------------------------------- -->
+
+            <hr class="separator">
+
+            <div class="container" style="padding-bottom:1.5em;">
+                <h3 id="chartAggregationTitle" class="disabled">aggregation
+                    <span class="pull-right">
+                        <a href='javascript:ixmaps.editor.applyChanges();'>
+                            <button type="button" class="btn btn-link btn-md">
+                                apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i>
+                            </button>
+                        </a>
+                    </span>
+                </h3>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartAggregationMode">aggregate by</label>
+                            <select id="chartAggregationMode" class="form-control" name="chartAggregationMode" onchange="ixmaps.editor.setAggregationMode()">
+                                <option value="">---</option>
+                                <option value="AGGREGATE">data field</option>
+                                <option value="AGGREGATE|RECT">rectangular grid</option>
+                                <option value="AGGREGATE|HEX">hexagonal grid</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="chartAggregationFieldList">aggregation field</label>
+                            <select id="chartAggregationFieldList" class="form-control" name="chartAggregationFieldList">
+                                <option value="">---</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartAggregationWidth">grid width</label>
+                            <input type="text" id="chartAggregationWidth" class="form-control" placeholder="0.1 ... 3">
+                            <label for="chartAggregationType">grid units</label>
+                            <select id="chartAggregationType" class="form-control" name="chartAggregationType">
+                                <option value="">---</option>
+                                <option value="pixel">screen pixel</option>
+                                <option value="meter">meter</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="chartAggregationCalc">aggregated value</label>
+                            <select id="chartAggregationCalc" class="form-control" name="chartAggregationMode">
+                                <option value="">---</option>
+                                <option value="SUM">sum</option>
+                                <option value="MEAN">mean</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="theme-values-checkbox">relocate</label>
+                            <div class="checkbox">
+                                <label class="toggle">
+                                    <input type="checkbox" id="theme-relocate-checkbox" onchange="toggle_relocate()">
+                                    <span class="handle"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label id="chartAggregationCenterX">grid offset X</label>
+                            <div class="calendar">
+                                <div class="years clearfix">
+                                    <div class="unit minus" onclick="changeGridOffsetX(-10)"><em>-</em></div>
+                                    <div class="monyear" style="padding:0em 0em 0em 1.2em"><input class="form-control" style="width:90%" type="text" id="chartAggregationCenterXValue" placeholder="1 ... " onkeypress="setGridOffsetX()"></div>
+                                    <div class="unit plus" onclick="changeGridOffsetX(10)"><em>+</em></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label id="chartAggregationCenterY">grid offset Y</label>
+                            <div class="calendar">
+                                <div class="years clearfix">
+                                    <div class="unit minus" onclick="changeGridOffsetY(-10)"><em>-</em></div>
+                                    <div class="monyear" style="padding:0em 0em 0em 1.2em"><input class="form-control" style="width:90%" type="text" id="chartAggregationCenterYValue" placeholder="1 ... " onkeypress="setGridOffsetY()"></div>
+                                    <div class="unit plus" onclick="changeGridOffsetY(10)"><em>+</em></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- -----------------------	-->
+            <!-- title and descriptions     -->
+            <!-- -----------------------	-->
+
+            <hr class="separator">
+
+            <div class="container" style="padding-bottom:1.5em;">
+
+                <h3 id="chartDefinitionTitle" class="disabled">description
+                    <span class="pull-right">
+                        <a href='javascript:ixmaps.editor.applyChanges();'>
+                            <button type="button" class="btn btn-link btn-md">
+                                apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i>
+                            </button>
+                        </a>
+                    </span>
+                </h3>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="theme-title-definition">title</label>
+                            <input type="text" class="form-control" id="theme-title-definition" placeholder="give it a nice title ...">
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="theme-snippet-definition">snippet</label>
+                            <textarea type="text" class="form-control" id="theme-snippet-definition" placeholder="some more words ..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- units and title field -->
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="theme-units-definition">units</label>
+                            <input type="text" class="form-control" id="theme-units-definition" placeholder="give it a nice title ...">
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            <label for="theme-title-field-select">title field</label>
+                            <select class="form-control" id="theme-title-field-select">
+                                <option>-</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- -----------------------	-->
+            <!-- EXTRA parameter            -->
+            <!-- -----------------------	-->
+
+            <hr class="separator">
+
+            <div class="container">
+                <h3 id="chartExtraTitle" class="disabled">extra</h3>
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="form-group">
+                            <label for="extraParamDef">extra parameter</label>
+                            <input class="form-control" type="text" style="width:98%" id="extraParamDef" placeholder='"p1":value,"p2":value, ...'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ----------------------- -->
+            <!-- MAP parameter           -->
+            <!-- ----------------------- -->
+
+            <div class="container map-config">
+                <h3 id="chartExtraTitle" class="disabled">behaviour</h3>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <!-- help -->
+                        <a onclick="$(this).siblings('.help').toggle();">
+                            <span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></a>
+                        <div class="help">
+                            <p>Objects are the charts on the map</p>
+                            <p>You can change the zoom behaviour of the charts here</p>
+                            <p>Zoom in/out to see the effect</p>
+                        </div>
+                        <!------ -->
+                        <div class="form-group">
+                            <label for="mapObjectScaling">object scaling</label>
+                            <select id="mapObjectScaling" class="form-control" name="mapObjectScaling" onchange="ixmaps.editor.setMapObjectScaling()">
+                                <option value="">false</option>
+                                <option value="true">normal</option>
+                                <option value="dynamic">dynamic</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <!-- help -->
+                        <a onclick="$(this).siblings('.help').toggle();">
+                            <span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></a>
+                        <div class="help">
+                            <p>Is the map scale where the chart objects have a 'normal' size when dynamic object scaling is selected</p>
+                            <p>Is set automatically to the actual map scale when you change the object scaling</p>
+                        </div>
+                        <!------ -->
+                        <div class="form-group">
+                            <label for="mapNormalsizeScale">normal size scale</label>
+                            <input type="text" id="mapNormalsizeScale" class="form-control" placeholder="1:1000000" onchange="ixmaps.editor.setMapNormalSizeScale()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <!-- help -->
+                        <a onclick="$(this).siblings('.help').toggle();">
+                            <span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></a>
+                        <div class="help">
+                            <p>Actualize display every n charts generated</p>
+                            <p>Changes user experience</p>
+                        </div>
+                        <!------ -->
+                        <div class="form-group">
+                            <label for="mapObjectScaling">render rate</label>
+                            <input type="text" id="mapRenderRate" class="form-control" placeholder="1:1000000" onchange="ixmaps.editor.setMapRenderRate()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div id="map-configuration">
+                        </div>
+                        <div class="form-group">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- end of parameter blocks    -->
+        </div>
+
+        <!-- --------------------------------- -->
+        <!-- f o o t e r                       -->
+        <!-- --------------------------------- -->
+
+        <div>
+
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="generating-on-bottom">
+                </div>
+            </div>
+
+            <!--
+			<div class="row" id="apply-on-bottom" style="display:none">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<a href='javascript:ixmaps.editor.applyChanges();'>
+						<button type="button" class="btn btn-warning btn-md">
+							apply changes
+						</button>
+					</a>
+				</div>
+			</div>
+			-->
+
+        </div>
+
+        <div id="editor-footer">
+        </div>
+        <div id="dialog">
+        </div>
+
+        <!-- ------------------------------------------------------------------ -->
+        <!--                                                                    -->
+        <!-- JavaScript                                                    -->
+        <!-- Placed at the end of the document so the pages load faster         -->
+        <!--                                                                    -->
+        <!-- ------------------------------------------------------------------ -->
+
+        <script src="../../ui/libs/colpick-jQuery-Color-Picker-master/js/colpick.js"></script>
+        <link href="../../ui/libs/colpick-jQuery-Color-Picker-master/css/colpick.css" rel="stylesheet" />
+
+        <script type="text/javascript">
+            /* get ixmaps api from parent window/frame */
+
+            ixmaps = ixmaps || null;
+            if (window.opener) {
+                parent = window.opener;
+                ixmaps = window.opener.ixmaps;
+            } else
+            if (parent) {
+                ixmaps = parent.window.ixmaps;
+            } else {
+                alert("error: missing parent window for themes !");
+            }
+
+        </script>
+
+        <script src="../../ui/js/htmlgui_query.js"></script>
+        <script src="../../ui/js/tools/colorscheme.js"></script>
+        <script src="../../ui/js/tools/colorselect.js"></script>
+
+        <script type="text/javascript">
+            /**
+             * set legend background on map type change
+             * @type void
+             */
+            function changeCss(className, classValue) {
+                var cssMainContainer = $('#css-modifier-container');
+
+                if (cssMainContainer.length == 0) {
+                    var cssMainContainer = $('<style id="css-modifier-container"></style>');
+                    cssMainContainer.appendTo($('head'));
+                }
+                cssMainContainer.append(className + " {" + classValue + "}\n");
+            }
+
+
+            // -----------------------------------------------------------
+            // global vars
+            // -----------------------------------------------------------
+
+            var szExternalDataTable = null;
+            var szExternalDataPath = null;
+            var fExternalData = true;
+            var fDisplayValues = false;
+            var szCallTheme = "";
+            var szThemeDef = "";
+            var szUserColorA = null;
+            var szUserLabelA = null;
+            var szValuesA = null;
+            var lastFieldCount = null;
+            var szFieldsLast = null;
+            var szShortURL = null;
+            var szChartTheme = null;
+            var fLookupToupper = false;
+            var themeDefObj = null;
+
+            var theme = null;
+
+            // -----------------------------------------------------------
+            // size
+            // -----------------------------------------------------------
+
+            var resize = function() {
+                var height = (window.parent.$("#editor").height() || ($(window.parent).height() + 60) || ($(window).height() + 60));
+                //$("#theme-editor").css("height", (height - 60) + "px");
+                //ixmaps.resizeStoryFrame();
+            };
+            window.onresize = function() {
+                resize();
+            };
+            window.onscroll = function() {
+                if ($(document).scrollTop() > 100) {
+                    $("#editor-apply").show();
+                    $("#editor-apply").css("top", ($(document).scrollTop() + 10) + "px");
+                } else {
+                    $("#editor-apply").hide();
+                }
+            };
+            //$("#editor-apply").hide();
+            $("#editor-apply-button").button();
+
+            $("#editor-div").show();
+
+            // -----------------------------------------------------------
+            // little helper
+            // -----------------------------------------------------------
+
+            __rgbStringToHex = function(szRGB) {
+                var szRGBA = szRGB.match(/\d+/g);
+                return __toHex(szRGBA[0]) + __toHex(szRGBA[1]) + __toHex(szRGBA[2]);
+            };
+            __rgbToHex = function(R, G, B) {
+                return __toHex(R) + __toHex(G) + __toHex(B);
+            };
+            __toHex = function(n) {
+                n = parseInt(n, 10);
+                if (isNaN(n)) {
+                    return "00";
+                }
+                n = Math.max(0, Math.min(n, 255));
+                return "0123456789ABCDEF".charAt((n - n % 16) / 16) +
+                    "0123456789ABCDEF".charAt(n % 16);
+            };
+
+            __removeTypeFlag = function(szFlags, szFlag) {
+                var styleA = szFlags.split("|");
+                var szTempStyle = "";
+                for (var i = 0; i < styleA.length; i++) {
+                    if (styleA[i] != szFlag) {
+                        szTempStyle += ((szTempStyle.length ? "|" : "") + styleA[i]);
+                    }
+                }
+                return szTempStyle;
+            }
+
+            ixmaps.popupSelectColorScheme = function() {
+                var szColors = ixmaps.getColors();
+                $("#color-select-div").html(szColors);
+                $("#color-select-div").toggle();
+           };
+
+            ixmaps.setColorScheme = function(szColorscheme) {
+
+                ixmaps.editorColorschemeType = "colorscheme";
+
+                ixmaps.editorColorscheme = szColorscheme;
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, "colorscheme:" + szColorscheme, "set");
+                ixmaps.setColors(szColorscheme);
+                //$("#color-select-div").hide();
+            };
+
+            ixmaps.getColorScheme = function(szColorScheme, nClasses) {
+
+                var csMonoBlue = new Array(5, "#eeeeff", "#0000dd");
+                var csMonoRed = new Array(5, "#ffeeee", "#dd0000");
+                var csMonoGreen = new Array(5, "#eeffee", "#00dd00");
+                var csMonoCyan = new Array("#888800", "#aaaa00", "#cccc00", "#eeee00", "#ffff00");
+                var csRedGreen = new Array(5, "#ff8888", "#88ff88");
+                var csGreenRed = new Array(5, "#88ff88", "#ff8888");
+                var csSpectrum = new Array(5, "spectrum", "");
+                var csOffice = new Array(5, "office", "");
+                var csMineral = new Array(5, "mineral", "");
+                var csHarvest = new Array(5, "harvest", "");
+                var colorSchemeA = {
+                    monored: csMonoRed,
+                    monogreen: csMonoGreen,
+                    monoblue: csMonoBlue,
+                    1: csMonoCyan,
+                    2: csRedGreen,
+                    3: csGreenRed,
+                    4: csSpectrum,
+                    5: csOffice,
+                    6: csMineral,
+                    7: csHarvest
+                };
+
+                // array given ?	
+                var colorA = szColorScheme.split(/,/);
+                if (colorA && colorA.length) {
+                    colorA.splice(0, 0, nClasses);
+                    return colorA;
+                }
+
+                if (szColorScheme.match(/Array/)) {
+                    var colorScheme = eval(szColorScheme);
+                } else {
+                    var colorScheme = colorSchemeA[szColorScheme];
+                }
+                if (nClasses) {
+                    if (typeof(colorScheme[0]) == "number") {
+                        colorScheme[0] = Number(nClasses);
+                    } else {
+                        colorScheme[1] = colorScheme[0];
+                        colorScheme[2] = colorScheme[colorScheme.length - 1];
+                        colorScheme[0] = Number(nClasses);
+                        colorScheme.length = 3;
+                    }
+                }
+                return colorScheme;
+            };
+
+            function toggle_dopacity() {
+                var szThemeStyle = ixmaps.getThemeStyleString();
+                if (szThemeStyle && szThemeStyle.match(/DOPACITYLOG/)) {
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOPACITYLOG;', 'remove');
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOPACITYMAX;dopacityscale:5;', 'toggle');
+                } else
+                if (szThemeStyle && szThemeStyle.match(/DOPACITYMAX/)) {
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOPACITYMAX;', 'remove');
+                } else
+                if (szThemeStyle && szThemeStyle.match(/DOPACITY/)) {
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOPACITY;', 'remove');
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOPACITYLOG;dopacityscale:5;', 'toggle');
+                } else {
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOPACITY;dopacityscale:5;', 'toggle');
+                }
+                setTimeout("init_theme_line()", 100);
+            }
+
+            function toggle_values() {
+                var szThemeStyle = ixmaps.getThemeStyleString();
+                if (szThemeStyle && szThemeStyle.match(/VALUES/)) {
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:VALUES;', 'remove');
+                } else {
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:VALUES;', 'add');
+                }
+            }
+
+            function toggle_glow() {
+                var szThemeStyle = ixmaps.getThemeStyleString();
+                if (szThemeStyle && szThemeStyle.match(/GLOW/)) {
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:GLOW;', 'remove');
+                } else {
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:GLOW;', 'add');
+                }
+            }
+
+            function toggle_aura() {
+                var szThemeStyle = ixmaps.getThemeStyleString();
+                if (szThemeStyle && szThemeStyle.match(/AURA/)) {
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:AURA;', 'remove');
+                } else {
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:AURA;', 'add');
+                }
+            }
+
+            function toggle_relocate() {
+                var szThemeStyle = ixmaps.getThemeStyleString();
+                if (szThemeStyle && szThemeStyle.match(/RELOCATE/)) {
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:RELOCATE;', 'remove');
+                } else {
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:RELOCATE;', 'add');
+                }
+            }
+
+            function toggle_shadow() {
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'shadow:toggle');
+            }
+
+            function toggle_data() {
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'showdata:toggle');
+            }
+
+            function setChartScale(nDelta) {
+                if (event.keyCode == 13) {
+                    var newScale = Number($("#chartScaleValue").val());
+                    if (!isNaN(newScale)) {
+                        ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'scale:' + String(newScale), 'set');
+                    } else {
+                        alert("Input type error: only numbers allowed!");
+                    }
+                }
+            }
+
+            function changeChartScale(nDelta) {
+                var nScale = Number($("#chartScaleValue").val());
+                if (nDelta < 0) {
+                    nScale = (nScale / 1.5).toPrecision(2);
+                } else {
+                    nScale = (nScale * 1.5).toPrecision(2);
+                }
+                $("#chartScaleValue").val(nScale)
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'scale:' + String(nScale), 'set');
+            }
+
+            function setLineColor() {
+                if (event.keyCode == 13) {
+                    var newColor = String($("#chartLineColor").val());
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'linecolor:' + newColor, 'set');
+                }
+            }
+
+            function setLineWidth(nDelta) {
+                if (event.keyCode == 13) {
+                    var newScale = Number($("#chartLineWidth").val());
+                    if (!isNaN(newScale)) {
+                        ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'linewidth:' + String(newScale), 'set');
+                    } else {
+                        alert("Input type error: only numbers allowed!");
+                    }
+                }
+            }
+
+            function changeLineWidth(nDelta) {
+                var nScale = Number($("#chartLineWidth").val());
+                if (nDelta < 0) {
+                    nScale = (nScale - 0.5).toPrecision(2);
+                } else {
+                    nScale = (nScale + 0.5).toPrecision(2);
+                }
+                $("#chartLineWidth").val(nScale)
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'linewidth:' + String(nScale), 'set');
+            }
+
+            function setValueScale(nDelta) {
+                if (event.keyCode == 13) {
+                    var newScale = Number($("#chartValueScale").val());
+                    if (!isNaN(newScale)) {
+                        ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'valuescale:' + String(newScale), 'set');
+                    } else {
+                        alert("Input type error: only numbers allowed!");
+                    }
+                }
+            }
+
+            function changeValueScale(nDelta) {
+                var nScale = Number($("#chartValueScale").val());
+                if (nDelta < 0) {
+                    nScale = (nScale / 1.5).toPrecision(2);
+                } else {
+                    nScale = (nScale * 1.5).toPrecision(2);
+                }
+                $("#chartValueScale").val(nScale)
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'valuescale:' + String(nScale), 'set');
+            }
+
+            function setChartOpacity() {
+                if (event.keyCode == 13) {
+                    var newOpacity = Number($("#chartOpacityValue").val());
+                    if (!isNaN(newOpacity)) {
+                        ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'fillopacity:' + String(newOpacity), 'set');
+                    } else {
+                        alert("Input type error: only numbers allowed!");
+                    }
+                }
+            }
+
+            function changeChartOpacity(nDelta) {
+                var nOpacity = Number($("#chartOpacityValue").val());
+                if (nDelta < 0) {
+                    nOpacity = (nOpacity / 1.5).toPrecision(2);
+                } else {
+                    nOpacity = (nOpacity * 1.5).toPrecision(2);
+                }
+                $("#chartOpacityValue").val(nOpacity)
+                ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'fillopacity:' + String(nOpacity), 'set');
+            }
+
+            function setNormalSizeValue() {
+                if (event.keyCode == 13) {
+                    var newValue = String($("#chartNormalSizeValue").val());
+                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'normalsizevalue:' + newValue, 'set');
+                }
+            }
+
+            function setChartRangeScale() {
+                if (event.keyCode == 13) {
+                    var newScale = Number($("#chartRangeScaleValue").val());
+                    if (!isNaN(newScale)) {
+                        ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'rangescale:' + String(newScale), 'set');
+                    } else {
+                        alert("Input type error: only numbers allowed!");
+                    }
+                }
+            }
+
+            function setGridOffsetX() {
+                if (event.keyCode == 13) {
+                    var newOffsetX = Number($("#chartAggregationCenterXValue").val());
+                    if (!isNaN(newOffsetX)) {
+                        ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'gridoffsetx:' + String(newOffsetX), 'set');
+                    } else {
+                        alert("Input type error: only numbers allowed!");
+                    }
+                }
+            }
+
+            function changeGridOffsetX(nDelta) {
+                var nOffset = Number($("#chartAggregationCenterXValue").val());
+                nOffset = nOffset + nDelta;
+                $('#chartAggregationCenterXValue').val(nOffset);
+                ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'gridoffsetx:' + String(nOffset), 'set');
+            }
+
+            function setGridOffsetY() {
+                if (event.keyCode == 13) {
+                    var newOffsetY = Number($("#chartAggregationCenterYValue").val());
+                    if (!isNaN(newOffsetY)) {
+                        ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'gridoffsety:' + String(newOffsetY), 'set');
+                    } else {
+                        alert("Input type error: only numbers allowed!");
+                    }
+                }
+            }
+
+            function changeGridOffsetY(nDelta) {
+                var nOffset = Number($("#chartAggregationCenterYValue").val());
+                nOffset = nOffset + nDelta;
+                $('#chartAggregationCenterYValue').val(nOffset);
+                ixmaps.changeThemeStyle(ixmaps.editor.themeId, 'gridoffsety:' + String(nOffset), 'set');
+            }
+
+
+            // -----------------------------------------------------------
+            // editor class and methods
+            // -----------------------------------------------------------
+
+            ixmaps.editor = ixmaps.editor || {};
+
+            ixmaps.editorColorscheme = "#ffeeee,#dd0000,dynamic,cold";
+
+            ixmaps.editor.setSelectColorScheme = function() {
+                var objTheme = ixmaps.getThemeObj();
+                if (objTheme) {
+                    var colorArgA = objTheme.origColorScheme.slice(0);
+
+                    if (isNaN(colorArgA[0])) {
+                        ixmaps.setColors(colorArgA.join('|'), "directly_defined_colors", 7);
+                        ixmaps.editorColorschemeType = "directly_defined_colors";
+                    } else {
+                        colorArgA.shift();
+                        ixmaps.setColors(colorArgA.join('|'), 7);
+                    }
+                    ixmaps.editorColorscheme = colorArgA.join('|');
+                }
+            };
+
+            ixmaps.editor.getFieldValues = function(szField, nMax) {
+
+                // szField may be string or array of strings
+                // if array, take first string !
+                if ($.isArray(szField)) {
+                    szField = szField[0];
+                }
+
+                var data = ixmaps.editor.dataObj;
+
+                var valuesA = null;
+                if (data) {
+                    var valuesA = new Array();
+                    if (szField == "$item$") {
+                        for (i = 0; i < 20; i++) {
+                            valuesA.push(1);
+                        }
+                    } else {
+                        var fields = data.fields;
+                        var index = 0;
+                        for (i = 0; i < fields.length; i++) {
+                            if (fields[i].id == szField) {
+                                index = i;
+                            }
+                        }
+                        var nCount = Math.min(nMax || data.records.length, data.records.length);
+                        for (i = 0; i < nCount; i++) {
+                            valuesA.push(data.records[i][index]);
+                        }
+                    }
+                } else
+                if (typeof(szSelectedTheme) != 'undefined') {
+                    if (szField == "$lookup$") {
+                        valuesA = ixmaps.doQuerySelectionValues(szSelectedTheme);
+                    } else {
+                        valuesA = ixmaps.doQueryValues(szSelectedTheme, szField);
+                    }
+                }
+                return valuesA;
+            };
+
+            ixmaps.editor.getSampleValues = function() {
+
+                var szField = $("#theme-data-fields-select").val();
+                var valuesA = ixmaps.editor.getFieldValues(szField, 20);
+
+                if (szField && valuesA) {
+                    var szHtml = "";
+                    var szValue = "";
+                    szHtml +=
+                        "<select id='chartValueList' name='chartValueList' size='6' class='form-control' style='background:none;border:0'>";
+                    for (var i = 0; i < valuesA.length; i++) {
+                        szValue = valuesA[i];
+                        szHtml += "<option value=\"" + valuesA[i] + "\">" + szValue + "<\/option>";
+                    }
+                    szHtml += "<option value=\"" + "---" + "\">" + "_______________" + "<\/option>";
+                    szHtml += "<\/select>";
+                    $("#chartValueOptions").html(szHtml);
+                }
+                // get 500 sample values and determine the values nature and space 
+                var valuesA = ixmaps.editor.getFieldValues(szField, 500);
+                ixmaps.editor.themeDataFieldType = ixmaps.editor.analyseValues(valuesA);
+            };
+
+            ixmaps.editor.getInfoValues = function() {
+
+                var szField = $("#info-data-fields-select").val();
+                var valuesA = ixmaps.editor.getFieldValues(szField, 20);
+
+                if (szField && valuesA) {
+                    var szHtml = "";
+                    var szValue = "";
+                    szHtml +=
+                        "<select id='infoValueList' name='infoValueList' size='6' class='form-control' style='background:none;border:0'>";
+                    for (var i = 0; i < valuesA.length; i++) {
+                        szValue = valuesA[i];
+                        szHtml += "<option value=\"" + valuesA[i] + "\">" + szValue + "<\/option>";
+                    }
+                    szHtml += "<option value=\"" + "---" + "\">" + "_______________" + "<\/option>";
+                    szHtml += "<\/select>";
+                    $("#infoValueOptions").html(szHtml);
+                }
+            };
+
+            ixmaps.editor.getMapFieldValues = function(szField, nMax) {
+
+                // szField may be string or array of strings
+                // if array, take first string !
+                if ($.isArray(szField)) {
+                    szField = szField[0];
+                }
+
+                var valuesA = null;
+                var szSelectedTheme = $("#map-layer-info").val();
+
+                if (typeof(szSelectedTheme) != 'undefined') {
+                    if (szField == "$lookup$") {
+                        valuesA = ixmaps.doQuerySelectionValues(szSelectedTheme);
+                    } else {
+                        valuesA = ixmaps.doQueryValues(szSelectedTheme, szField);
+                    }
+                }
+                return valuesA;
+            };
+
+            ixmaps.editor.getMapLookupValues = function() {
+
+                var valuesA = ixmaps.editor.getMapFieldValues("$lookup$", 20);
+
+                if (valuesA) {
+                    szHtml = "";
+                    var szValue = "";
+                    szHtml +=
+                        "<select id='mapLookupValueList' name='mapLookupValueList' size='6' class='form-control' style='background:none;border:0'>";
+                    for (var i = 0; i < valuesA.length; i++) {
+                        szValue = valuesA[i];
+                        szHtml += "<option value=\"" + valuesA[i] + "\">" + szValue + "<\/option>";
+                    }
+                    szHtml += "<option value=\"" + "---" + "\">" + "_______________" + "<\/option>";
+                    szHtml += "<\/select>";
+                    $("#mapLookupValueOptions").html(szHtml);
+                }
+            };
+            ixmaps.editor.getMapSampleValues = function() {
+
+                szField = $("#map-data-fields-select").val();
+                var valuesA = ixmaps.editor.getMapFieldValues(szField, 20);
+
+                if (szField && valuesA) {
+                    szHtml = "";
+                    var szValue = "";
+                    szHtml +=
+                        "<select id='mapDataValueList' name='mapDataValueList' size='6' class='form-control' style='background:none;border:0'>";
+                    for (var i = 0; i < valuesA.length; i++) {
+                        szValue = valuesA[i];
+                        szHtml += "<option value=\"" + valuesA[i] + "\">" + szValue + "<\/option>";
+                    }
+                    szHtml += "<option value=\"" + "---" + "\">" + "_______________" + "<\/option>";
+                    szHtml += "<\/select>";
+                    $("#mapDataValueOptions").html(szHtml);
+                }
+            };
+
+            ixmaps.editor.getUniqueValues_old = function() {
+
+                nClasses = 0;
+                var szLabelA = new Array();
+
+                szField = $("#theme-data-fields-select").val();
+                var szValuesA = ixmaps.editor.getFieldValues(szField);
+
+                if (szValuesA) {
+                    var szSLabelA = new Array();
+                    for (i = 0; i < szValuesA.length; i++) {
+                        /**
+                        if ( szMethod.match(/IGNORECASE/) ){
+                        	szValuesA[i] = String(szValuesA[i]).toUpperCase();
+                        }
+                        **/
+                        if (!szSLabelA[String(szValuesA[i])] && String(szValuesA[i]) && String(szValuesA[i]).length) {
+                            szSLabelA[String(szValuesA[i])] = szValuesA[i];
+                            nClasses++;
+                        }
+                    }
+                    for (a in szSLabelA) {
+                        szLabelA.push(a);
+                    }
+                    // GR 15.01.2014
+                    szLabelA.sort();
+                }
+
+                return (szLabelA);
+            };
+
+            // get unique values array
+            var __onlyUnique = function(value, index, self) {
+                return self.indexOf(value) === index;
+            };
+            ixmaps.editor.getUniqueValues = function() {
+
+                nClasses = 0;
+                var szLabelA = [];
+
+                szField = $("#theme-data-fields-select").val();
+
+                // create data object from theme data
+                // ------------------------------------
+                var mydata = new Data.Table(ixmaps.editor.dataObj);
+                a = mydata.column(szField).values();
+
+                a = a.map(function(value) {
+                    return value.trim()
+                });
+
+                // get unique values array
+                var u = a.filter(__onlyUnique);
+
+                // count values
+                var valuesCount = {};
+                a.forEach(function(x) {
+                    valuesCount[x] = (valuesCount[x] || 0) + 1;
+                });
+                return (u);
+            };
+
+            ixmaps.editor.setChartStyle = function(szValue) {
+
+                var szFlag = ixmaps.editor.themeObj.style.type || "";
+                var szCategorical = szFlag.match(/CATEGORICAL/) ? "|CATEGORICAL" : "";
+
+                szValue = szValue || $("#theme-type-select").val();
+                switch (szValue) {
+                    case "CHOROPLETH":
+                        ixmaps.editor.themeObj.style.type = szValue + szCategorical;
+                        ixmaps.embeddedSVG.window.map.Api.clearAll();
+                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
+                        break;
+                    case "CHART|DOT|RAW|FAST":
+                        ixmaps.editor.themeObj.style.type = szValue + szCategorical;
+                        ixmaps.editor.themeObj.style.fillopacity = "0.3";
+                        ixmaps.editor.themeObj.style.colorscheme[0] = "1";
+                        ixmaps.editor.themeObj.style.gridwidth = null;
+                        ixmaps.editor.themeObj.style.gridwidthpx = null;
+                        ixmaps.editor.themeObj.style.sizefield = null;
+                        ixmaps.embeddedSVG.window.map.Api.clearAll();
+                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
+                        break;
+                    case "CHART|BUBBLE|SIZE":
+                        ixmaps.editor.themeObj.style.type = szValue + szCategorical;
+                        ixmaps.editor.themeObj.style.fillopacity = "0.7";
+                        ixmaps.editor.themeObj.style.colorscheme[0] = "1";
+                        ixmaps.editor.themeObj.style.gridwidth = null;
+                        ixmaps.editor.themeObj.style.gridwidthpx = null;
+                        ixmaps.editor.themeObj.style.sizefield = null;
+                        ixmaps.embeddedSVG.window.map.Api.clearAll();
+                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
+                        break
+                    case "CHART|SYMBOL|GRIDSIZE|FAST|AGGREGATE|SUM|DOPACITY":
+                        ixmaps.editor.themeObj.style.type = szValue + szCategorical;
+                        ixmaps.editor.themeObj.style.symbols = ["hexagon"];
+                        ixmaps.editor.themeObj.style.gridwidth = "15px";
+                        ixmaps.editor.themeObj.style.fillopacity = "0.7";
+                        ixmaps.editor.themeObj.style.sizefield = null;
+                        ixmaps.editor.themeObj.style.dopacitypow = "2";
+                        ixmaps.editor.themeObj.style.dopacityscale = "2";
+                        if (!szFlag.match(/CATEGORICAL/)) {
+                            ixmaps.editor.themeObj.style.colorscheme[0] = "1";
+                        } else {
+                            ixmaps.editor.themeObj.style.type += "CENTER|DOMINANT";
+                        }
+                        ixmaps.embeddedSVG.window.map.Api.clearAll();
+                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
+                        break;
+                    case "CHART|SYMBOL|AUTOSIZE|FAST|AGGREGATE|SUM":
+                        ixmaps.editor.themeObj.style.type = szValue + szCategorical;
+                        ixmaps.editor.themeObj.style.symbols = ["hexagon"];
+                        ixmaps.editor.themeObj.style.gridwidth = "15px";
+                        ixmaps.editor.themeObj.style.fillopacity = "0.7";
+                        ixmaps.editor.themeObj.style.sizefield = null;
+                        if (!szFlag.match(/CATEGORICAL/)) {
+                            ixmaps.editor.themeObj.style.colorscheme[0] = "1";
+                        } else {
+                            ixmaps.editor.themeObj.style.type += "CENTER|DOMINANT";
+                        }
+                        ixmaps.embeddedSVG.window.map.Api.clearAll();
+                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
+                        break;
+                    case "CHART|BUBBLE|SIZE|FAST|AGGREGATE|RELOCATE|SUM":
+                        ixmaps.editor.themeObj.style.type = szValue + szCategorical;
+                        ixmaps.editor.themeObj.style.symbols = null;
+                        ixmaps.editor.themeObj.style.gridwidth = "15px";
+                        ixmaps.editor.themeObj.style.fillopacity = "0.7";
+                        ixmaps.editor.themeObj.style.sizefield = "$item$";
+                        if (!szFlag.match(/CATEGORICAL/)) {
+                            ixmaps.editor.themeObj.style.sizefield = null;
+                            ixmaps.editor.themeObj.style.colorscheme[0] = "1";
+                        } else {
+                            ixmaps.editor.themeObj.style.type += "";
+                        }
+                        ixmaps.embeddedSVG.window.map.Api.clearAll();
+                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
+                        break;
+                    case "CHART|BUBBLE|SIZE|FAST|AGGREGATE|HEX|AUTOSIZE|SUM":
+                        ixmaps.editor.themeObj.style.type = szValue + szCategorical;
+                        ixmaps.editor.themeObj.style.symbols = null;
+                        ixmaps.editor.themeObj.style.gridwidth = "15px";
+                        ixmaps.editor.themeObj.style.fillopacity = "0.7";
+                        ixmaps.editor.themeObj.style.sizefield = "";
+                        if (!szFlag.match(/CATEGORICAL/)) {
+                            ixmaps.editor.themeObj.style.colorscheme[0] = "1";
+                        } else {
+                            ixmaps.editor.themeObj.style.type += "";
+                        }
+                        ixmaps.embeddedSVG.window.map.Api.clearAll();
+                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
+                        break;
+                    case "CHART|WAFFLE|GRIDSIZE|AGGREGATE|FAST|RECT|SUM":
+                        ixmaps.editor.themeObj.style.type = szValue + szCategorical;
+                        ixmaps.editor.themeObj.style.symbols = null;
+                        ixmaps.editor.themeObj.style.gridwidth = "50px";
+                        ixmaps.editor.themeObj.style.fillopacity = "1";
+                        ixmaps.editor.themeObj.style.sizefield = "";
+                        ixmaps.editor.themeObj.style.bordercolor = "black";
+                        ixmaps.editor.themeObj.style.borderwidth = "1";
+                        ixmaps.editor.themeObj.style.boxcolor = "none";
+                        ixmaps.editor.themeObj.style.boxopacity = "0.01";
+                        if (!szFlag.match(/CATEGORICALAL/)) {
+                            ixmaps.editor.themeObj.style.colorscheme[0] = "1";
+                        } else {
+                            ixmaps.editor.themeObj.style.type += "";
+                        }
+                        ixmaps.embeddedSVG.window.map.Api.clearAll();
+                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
+                        break;
+
+                    default:
+                        break;
+                }
+                if (ixmaps.editor.themeObj.style.type.match(/CHART/)) {
+                    $("#chartSize").show();
+                } else {
+                    $("#chartSize").hide();
+                }
+            };
+
+            ixmaps.editor.setDistribution = function() {
+                var szDistribution = $("#theme-distribution-select").val();
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:EQUIDISTANT;', 'remove');
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:QUANTILE;', 'remove');
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:RANGE;', 'remove');
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:LOG;', 'remove');
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:LOGARITHMICAL;', 'remove');
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOMINANT;', 'remove');
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DEVIATION;', 'remove');
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:' + szDistribution + ';', 'add');
+            };
+
+            ixmaps.editor.setClasses = function() {
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'classes:"' + $("#theme-classes-select").val() + '"', 'set');
+            };
+
+            ixmaps.editor.setPosition = function() {
+                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'align:' + $("#chartPositionList").val() + '', 'set');
+            };
+
+            ixmaps.editor.setNewLabel = function(i) {
+                szUserLabelA[i] = $("#chartLabel" + i).val();
+            };
+
+            ixmaps.editor.setMapObjectScaling = function() {
+                var szScaling = $("#mapObjectScaling").val();
+                var szScale = ixmaps.getMapScale();
+                $("#mapNormalsizeScale").val("1:" + szScale);
+                ixmaps.setOptions(null,JSON.parse('{"objectscaling":"' + szScaling + '"}'));
+                ixmaps.setOptions(null,JSON.parse('{"normalsizescale":"' + szScale + '"}'));
+            };
+
+            ixmaps.editor.setAggregationMode = function() {
+                ixmaps.editor.applyChanges();
+            };
+
+            ixmaps.editor.setMapNormalSizeScale = function() {
+                var szScale = $("#mapNormalsizeScale").val();
+                if (szScale.match(/\:/)) {
+                    szScale = szScale.split(/\:/)[1];
+                }
+                ixmaps.setOptions(null,JSON.parse('{"normalsizescale":"' + szScale + '"}'));
+            };
+
+            ixmaps.editor.setMapRenderRate = function() {
+                var szRate = $("#mapRenderRate").val();
+                ixmaps.setOptions(null,JSON.parse('{"flushChartDraw":"' + szRate + '"}'));
+            };
+
+            ixmaps.editor.alert = function(szAlert, szDestination, szFlag) {
+
+                szHtml = '<div id="' + szDestination + '-alert" class="alert alert-' + szFlag + ' alert-dismissable">';
+                szHtml += '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'
+                szHtml += szAlert;
+                szHtml += '</div>';
+
+                var x = $("#" + szDestination);
+
+                $("#" + szDestination).html(szHtml);
+
+            };
+
+            ixmaps.editor.analyseValues = function(a) {
+
+                var themeObj = {
+                    "type": "",
+                    "style": {
+                        "type": ""
+                    }
+                };
+
+                if (!a || (typeof(a) != "object")) {
+                    return null;
+                }
+
+                // get unique valyes array
+                var onlyUnique = function(value, index, self) {
+                    return self.indexOf(value) === index;
+                };
+                var u = a.filter(onlyUnique);
+
+                // if less than 20 unique values, assume distinct values -> theme type CATEGORICAL
+                // 
+                nDistinct = u.length;
+
+                // if only one vale == 1
+                // 
+                if ((nDistinct == 1) && (u[0] == 1)) {
+                    themeObj.type = "item"
+                    themeObj.style.type += "|DOT";
+                    return themeObj;
+                }
+
+                // if less than 20 unique values, assume distinct values -> theme type CATEGORICAL
+                // 
+                if (0 && (nDistinct < 5)) {
+
+                    // sort the values to give the themes always the same value sequence
+                    u.sort();
+                    // correct known problem; ["dopo ...","entro ...","entro ...",...]
+                    if (String(u[0]).match(/dopo/)) {
+                        u.push(u.shift());
+                    }
+                    // set the values in the theme object !!! 
+                    themeObj.style.label = [];
+                    for (i = 0; i < u.length; i++) {
+                        themeObj.style.label.push(String(u[i]));
+                    }
+                    // set the theme distribution type 
+                    themeObj.type = "exact";
+                    themeObj.style.type += "|CATEGORICAL";
+                    themeObj.style.colorscheme = ["7", "fruit"];
+                } else {
+                    // if we have textual values, make always CATEGORICAL 
+                    if (isNaN(u[0])) {
+                        themeObj.type = "exact";
+                        themeObj.style.type += "|CATEGORICAL";
+                        themeObj.style.colorscheme = ["7", "fruit"];
+                    } else {
+                        themeObj.type = "numeric";
+                        themeObj.style.colorscheme = ["7", "#ffffff", "#ff0000"];
+                    }
+                }
+                return themeObj;
+            };
+
+            ixmaps.editor.makeDefaultTheme = function(color_selected) {
+
+                if (!ixmaps.editor.dbtable ||
+                    !ixmaps.editor.dbtable.table ||
+                    !ixmaps.editor.dbtable.table.records
+                ) {
+                    return {};
+                }
+
+                objTheme = {
+                    fields: "$item$"
+                };
+                objTheme.style = {};
+                objTheme.style.dbtableUrl = ixmaps.editor.dbtableUrl || "";
+                objTheme.style.dbtableType = ixmaps.editor.dbtableType || "";
+                objTheme.style.dbtable = "themeDataObj";
+                objTheme.style.lookupfield = " ";
+                objTheme.style.title = "[title]";
+                objTheme.style.colorscheme = [1, "#eeeeff", "#0000dd"];
+                objTheme.style.editor = true;
+
+                var x = (ixmaps.editor.dbtable.records[0][ixmaps.editor.dbtable.table.fields - 1]);
+                if (x.match(/Polygon|Line/)) {
+                    objTheme.layer = "FEATURE";
+                    $('#map-layer-select').append($('<option>', {
+                        value: "FEATURE",
+                        text: 'FEATURE'
+                    }));
+                    $("#map-layer-select").val("FEATURE");
+                    objTheme.style.type = "FEATURE";
+                    objTheme.style.colorscheme = "#eeeeee";
+                    objTheme.style.fillopacity = "0.1";
+                    objTheme.style.linecolor = "#0088dd";
+                    objTheme.style.linewidth = "0.5";
+                } else
+                if (ixmaps.editor.dbtable && ixmaps.editor.dbtable.table && (ixmaps.editor.dbtable.table.records > 250000)) {
+                    objTheme.style.type = "CHART|SYMBOL|GRIDSIZE|DOPACITY|AGGREGATE|FAST|SUM|ZOOMTO|SHOW";
+                    //objTheme.style.type = "CHART|SYMBOL|AUTOSIZE|AGGREGATE|SUM|ZOOMTO|SHOW";
+                    objTheme.style.gridwidth = "10px";
+                    objTheme.style.symbols = ["hexagon"];
+                    objTheme.style.dopacitypow = 2;
+                    objTheme.style.dopacityscale = 2;
+                } else
+                if (ixmaps.editor.dbtable && ixmaps.editor.dbtable.table && (ixmaps.editor.dbtable.table.records > 100000)) {
+                    objTheme.style.type = "CHART|BUBBLE|AGGREGATE|FAST|SUM|ZOOMTO|SHOW";
+                    objTheme.style.gridwidth = "2px";
+                    objTheme.style.fillopacity = "0.3";
+                } else {
+                    //objTheme.style.type = "CHART|DOT|RAW|FAST";
+                    objTheme.style.type = "CHART|DOT|RAW|FAST|ZOOMTO|SHOW";
+                    objTheme.style.fillopacity = "0.2";
+                }
+                ixmaps.editor.themeObj = objTheme;
+
+                return objTheme;
+
+            }
+
+            // =================================================================
+            // =================================================================
+            //
+            // h e r e   w e   g o  
+            //
+            // =================================================================
+            // =================================================================
+
+
+            // .................................................................
+            //
+            // t h e m e  -->  c o n f i g u r a t o r  
+            //
+            // .................................................................
+
+            /**
+             * loadTheme 
+             * load theme object and fill editor form fields
+             * @param szId the id of the theme
+             * @type object
+             * @return void
+             */
+
+            ixmaps.editor.loadTheme = function(szId) { 
+                
+                console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+                console.log("%%%%  loadTheme()            %%%%");
+                console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+
+
+                var typeId = ixmaps.htmlgui_getMapTypeId() || "";
+
+                var fDark = typeId.match(/dark/i) || typeId.match(/black/i) || typeId.match(/satellite/i);
+
+                if (fDark) {
+                    $("body").css("background-color", "#707070");
+                    changeCss(".form-control", "background-color:#777");
+                    changeCss(".form-control", "border-color:#888");
+                    changeCss(".form-control", "color:#ddd");
+                    changeCss(".toggle", "background-color:none");
+                    changeCss(".handle", "background-color:none");
+                    changeCss(".toggle", "color:#ddd");
+                    changeCss(".handle", "color:#ddd");
+                    changeCss(".container", "background-color:#666");
+                }
+                
+                ixmaps.editor.themeId = ixmaps.editor.themeId || szId || ixmaps.getThemes()[0].szId;
+
+                //var color_selected = "#48A542";
+                var color_selected = "#83bf80";
+                var color_unselected = "#dddddd";
+                var color_error = "#ff8888";
+
+                // remove all previous alerts
+                $(".alert").remove();
+
+                // ------------------------------------
+                // show loaded map
+                // ------------------------------------
+                var szMapUrl = ixmaps.getLoadedMapUrl() || ixmaps.getMapUrl();
+                $("#define-map").val(szMapUrl);
+                $("#define-map-title").css("color", color_selected);
+                $("#map-defined").css("color", color_selected);
+
+                // ------------------------------------
+                // show map layer (visible on demand)
+                // ------------------------------------
+
+                var themesA = ixmaps.doQueryThemesWithSelection();
+                var szHtml = "";
+                for (i in themesA) {
+                    szHtml += "<option value=\"" + themesA[i] + "\">" + themesA[i] + "<\/option>";
+                }
+                $("#map-layer-info").html(szHtml);
+                $("#map-layer-info").prev().css("color", color_selected);
+
+                $("#map-layer-select").html(szHtml);
+                $("#map-layer-select").prev().css("color", color_selected);
+
+                {
+                    var szDisplayFieldA = ixmaps.doQueryFields(themesA[0]);
+                    var fieldsA = szDisplayFieldA.slice(0, szDisplayFieldA.length);
+                    fieldsA.sort();
+                    fieldsA.push("$lookup$");
+                    var szHtml = "";
+                    szHtml += "<option value=\"none\" >---<\/option>";
+                    for (i in fieldsA) {
+                        szHtml += "<option value=\"" + fieldsA[i] + "\"" + (fieldsA[i].selected ? " selected='selected'" : "") + ">" +
+                            fieldsA[i] + "<\/option>";
+                    }
+                    $("#map-data-fields-select").html(szHtml);
+                }
+
+                // -----------------------------------------------------
+                // get actual theme
+                // if no theme given, preset with default theme values
+                // -----------------------------------------------------
+
+                var objTheme = ixmaps.editor.themeObj = ixmaps.getThemeDefinitionObj(szId);
+                var objThemeObj = ixmaps.getThemeObj(szId);
+
+                if (!objTheme || !objThemeObj) {
+
+                    // ------------------------------
+                    // no theme yet, lets preset one	
+                    // ------------------------------
+
+                    objTheme = ixmaps.editor.makeDefaultTheme(color_selected);
+
+                    if (!objTheme.fields) {
+                        var szHtml = "<p style='padding:1em'>no data defined or data not valid</p>";
+                        $("#editor-footer").html(szHtml);
+                    }
+
+                    objThemeObj = {
+                        szFieldsA: [objTheme.fields]
+                    };
+
+                    if (ixmaps.editor.dbtableType) {
+                        ixmaps.editor.applyChangesTimeout = setTimeout("ixmaps.editor.applyChanges()", 100);
+                        $("#data-defined").css("color", color_selected);
+                    }
+
+                    // ------------------------------
+                    // make user message	
+                    // ------------------------------
+
+                    if (ixmaps.isBookmark()) {
+                        ixmaps.editor.alert(
+                            '<h3 style="margin:0">iXMaps Theme Configurator</h3><h5>loading project ... <img src="../../../ui/resources/images/loading_blue.gif" id="load-file-spinner" style="height:72px;margin:-0.4em 0 0 -2em;"></h3>',
+                            'data-alert', 'success');
+                    } else {
+                        ixmaps.editor.alert(
+                            '<h3>Welcome to iXMaps!</h3><h4>please define a <strong><a onclick="ixmaps.loadStoryTool(\'../../../app/Editor/dialog_data_load.html\')"><button type="button" class="btn btn-info btn-md" style="border-radius:1.5em;padding:0.1em 0.7em 0.4em 0.7em">data source</button></a></strong>  or <strong><a onclick="ixmaps.loadStoryTool(\'../../../app/Editor/dialog_project_load.html\')""><button type="button" class="btn btn-info btn-md" style="border-radius:1.5em;padding:0.1em 0.8em 0.4em 0.8em">load a project</button></a></strong></h4>',
+                            'data-alert', 'success');
+                    }
+                } else {
+                    $("#no-data-alert").hide();
+                    $("#apply-on-bottom").show();
+                    $("#data-defined").css("color", color_selected);
+
+                    ixmaps.editor.alert(
+                        '<h3>theme properties</h3>',
+                        'theme-alert', 'success');
+                }
+
+                if (!objTheme || !objTheme.style) {
+                    return;
+                }
+
+                // ------------------------------
+                // show data source
+                // ------------------------------
+
+                if (objTheme.style && objTheme.style.dbtableUrl && objTheme.style.dbtableUrl.length) {
+                    //ixmaps.editor.alert(
+                    //	'<h3 style="margin:0">' + objTheme.style.title + '</h3><p>', 'data-alert', 'success');
+
+                    $("#define-data").val(objTheme.style.dbtableUrl || objTheme.style.dbtableExt);
+                    $("#define-data-title").css("color", color_selected);
+
+                    //$("#map-data-sources").show();
+                    $("#data-define").show();
+                    $("#config-lookup").show();
+                }
+
+                var szData = objTheme.style.dbtable;
+                ixmaps.editor.dataObj = eval("ixmaps.embeddedSVG.window." + (szData || "themeDataObj"));
+
+                // ------------------------------
+                // get data fields
+                // ------------------------------
+
+                if (ixmaps.editor.dataObj && ixmaps.editor.dataObj.fields) {
+                    var fields = ixmaps.editor.dataObj.fields.slice();
+                    fields.splice(0, 0, {
+                        id: "$item$"
+                    });
+                    var szFieldsA = objThemeObj.szFieldsA;
+                    for (i in fields) {
+                        delete fields[i].selected;
+                        for (ii in szFieldsA) {
+                            if (fields[i].id == szFieldsA[ii]) {
+                                fields[i].selected = true;
+                                $("#no-data-alert").hide();
+                            }
+                        }
+                    }
+                }
+
+                // ------------------------------------------------------
+                // make data field html: <options> for <select> elements
+                // ------------------------------------------------------
+
+                var szHtml = "";
+                szHtml += "<option value=\"\" >---<\/option>";
+                for (i in fields) {
+                    szHtml += "<option value=\"" + fields[i].id + "\"" + (fields[i].selected ? " selected='selected'" : "") + ">" +
+                        fields[i].id + "<\/option>";
+                }
+
+                $("#theme-data-fields-select").html(szHtml);
+
+                $("#info-data-fields-select").html(szHtml);
+
+                szHtml = "<option value=\"\" >---<\/option>";
+                for (i in fields) {
+                    szHtml += "<option value=\"" + fields[i].id + "\">" + fields[i].id + "<\/option>";
+                }
+
+                // --------------------------------------------------
+                // popolate all <selection> tha need the data fields
+                // --------------------------------------------------
+
+                $("#theme-data-field2-select").html(szHtml);
+                $("#theme-data-field2-select").val(objTheme.field100);
+
+                $("#theme-data-lookup-select").html(szHtml);
+                $("#theme-data-lat-select").html(szHtml);
+                $("#theme-data-lon-select").html(szHtml);
+
+                $("#theme-title-field-select").html(szHtml);
+                $("#chartSizeFieldList").html(szHtml);
+                $("#chartAlphaFieldList").html(szHtml);
+                $("#chartAggregationFieldList").html(szHtml);
+
+                // ------------------------------
+                // 1. set lookup section
+                // ------------------------------
+
+                $("#theme-data-lookup-select").removeClass("control-alert");
+                $("#theme-data-lat-select").removeClass("control-alert");
+                $("#theme-data-lon-select").removeClass("control-alert");
+
+                // if no lookup defined, try to find an appropriate data field(s)
+                // ---------------------------------------------------------------
+                if (objTheme.style.lookupfield == " ") {
+
+                    // 1. look for fields that contain both, latitude and longitude
+
+                    for (var i in fields) {
+                        // identify by name
+                        if (fields[i].id.match(/latitud/i) && fields[i].id.match(/longitud/i)) {
+                            $("#theme-data-lookup-select").val(fields[i].id);
+                        } else {
+                            // identify by value (like 13.3568,45.34567)
+                            valuesA = ixmaps.editor.getFieldValues(fields[i].id, 10);
+                            for (x in valuesA) {
+                                if (!String(valuesA[x]).match(/\'/)) {
+                                    var matchA = String(valuesA[x]).match(/(-?[0-9\.]+) ?, ?(-?[0-9\.]+)/)
+                                    if (matchA &&
+                                        (matchA.length == 3) &&
+                                        (Number(matchA[1]) < 80) && (Number(matchA[1]) > -80) &&
+                                        (Number(matchA[2]) < 180) && (Number(matchA[2]) > -180) &&
+                                        matchA[1] % 1 &&
+                                        matchA[2] % 1
+                                    ) {
+                                        $("#theme-data-lookup-select").val(fields[i].id);
+                                        break;
+                                    }
+                                    if (matchA &&
+                                        (matchA.length == 3) &&
+                                        (Number(matchA[1]) < 180) && (Number(matchA[1]) > -180) &&
+                                        (Number(matchA[2]) < 80) && (Number(matchA[2]) > -80) &&
+                                        matchA[1] % 1 &&
+                                        matchA[2] % 1
+                                    ) {
+                                        $("#theme-data-lookup-select").val(fields[i].id);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 2. look for 2 fields that contain latitude or longitude
+
+                    for (var i in fields) {
+                        if (fields[i].id.match(/latitud/i) || (fields[i].id == "lat") || (fields[i].id == "LAT") || (fields[i].id == "Y")) {
+                            $("#theme-data-lat-select").val(fields[i].id);
+                        }
+                        if (fields[i].id.match(/longitud/i) || (fields[i].id == "lon") || (fields[i].id == "long") || (fields[i].id == "lng") || (fields[i].id ==
+                                "LON") || (fields[i].id == "LNG") || (fields[i].id == "X")) {
+                            $("#theme-data-lon-select").val(fields[i].id);
+                        }
+                    }
+
+                    // success ?
+
+                    if (($("#theme-data-lookup-select").val() != "") ||
+                        (($("#theme-data-lon-select").val() != "") && ($("#theme-data-lon-select").val() != ""))) {
+
+                        // yes, lookup found
+                        ixmaps.editor.alert('<p><b>automatic</b> lookup field selection ! Please control !', "lookup-alert", "warning");
+                        $("#define-latlon-title").css("color", color_selected);
+                        $("#chartLookupFields").css("color", color_selected);
+                        $("#chartLookupFieldsCheck").show();
+
+
+                    } else {
+
+                        // no lookup found -> error
+                        clearTimeout(ixmaps.editor.applyChangesTimeout);
+
+                        ixmaps.editor.alert(
+                            '<p><b>automatic</b> coordinate field lookup <b>failed</b> !</p><p>Please select a <b>lookup</b> field or <b>lat/lon</b> fields and then click <a onclick="javascript:ixmaps.editor.applyChanges();">apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i></a></p>',
+                            "lookup-alert", "danger");
+
+                        $("#chartLookupFields").css("color", color_error);
+                        $("#chartLookupFieldsCheck").hide();
+
+                        $("#define-latlon-title").css("color", color_error);
+                        $("#define-lookup-title").css("color", color_error);
+
+                        $("#theme-data-lookup-select").addClass("control-alert");
+                        $("#theme-data-lat-select").addClass("control-alert");
+                        $("#theme-data-lon-select").addClass("control-alert");
+                    }
+
+                } else {
+
+                    // lookup defined in theme data
+                    // -----------------------------
+
+                    $("#chartLookupFields").css("color", color_unselected);
+                    $("#chartLookupFieldsCheck").hide();
+                    $("#define-lookup-title").css("color", color_unselected);
+                    $("#define-latlon-title").css("color", color_unselected);
+                    if (objTheme.style.lookupfield.match(/\|/)) {
+                        $("#theme-data-lat-select").val(objTheme.style.lookupfield.split("|")[0]);
+                        $("#theme-data-lon-select").val(objTheme.style.lookupfield.split("|")[1]);
+                        $("#define-latlon-title").css("color", color_selected);
+                        $("#chartLookupFields").css("color", color_selected);
+                        $("#chartLookupFieldsCheck").show();
+                    } else {
+                        $("#theme-data-lookup-select").val(objTheme.style.lookupfield);
+                        $("#define-lookup-title").css("color", color_selected);
+                        $("#define-latlon-div").hide();
+                        $("#chartLookupFields").css("color", color_selected);
+                        $("#chartLookupFieldsCheck").show();
+                    }
+                }
+
+                // if lookup defined show all of the configurator
+                // ----------------------------------------------
+
+                if (objTheme.style.lookupfield != " ") {
+                    $("#config-data").show();
+                    $("#config-theme").show();
+
+                    $("#map-info").hide();
+                    $("#data-info").hide();
+                } else {
+                    $("#map-info").show();
+                    $("#data-info").show();
+                }
+
+
+                // data info
+                // ----------------------------------------------
+                ixmaps.editor.getInfoValues();
+
+                // ------------------------------
+                // 2. set data fields section
+                // ------------------------------
+
+                $("#chartDefinitionFields").css("color", color_selected);
+                ixmaps.editor.getSampleValues();
+                $("#define-datafields-title").css("color", color_selected);
+
+                if (0 && $("#theme-data-fields-select").val() == "$item$") {
+                    ixmaps.editor.alert(
+                        "<p>data field set to <strong>generic</strong> data field <strong>'$item$'</strong></p><p>you can set <b>one </b>or<b> more</b> specific <b>data field(s)</b></p>",
+                        "data-field-alert", "success");
+                }
+                if ($("#theme-data-fields-select").val() == "") {
+                    ixmaps.editor.alert("no data selected", "data-field-alert", "danger");
+                }
+
+
+                // ------------------------------
+                // 3. theme type
+                // ------------------------------
+
+                $("#chartThemeTitle").css("color", color_selected);
+
+                szHtml = "";
+                szHtml += "<option value=\"\" >select basic chart type<\/option>";
+                szHtml += "<option value=\"CHOROPLETH\" >shapes<\/option>";
+                szHtml += "<option value=\"CHART|DOT|RAW|FAST\" >Dots<\/option>";
+                szHtml += "<option value=\"CHART|BUBBLE|SIZE\" >sized Bubbles<\/option>";
+                szHtml += "<option value=\"CHART|SYMBOL|GRIDSIZE|FAST|AGGREGATE|SUM|DOPACITY\" >Hexbin - dynamic opacity<\/option>";
+                szHtml += "<option value=\"CHART|SYMBOL|AUTOSIZE|FAST|AGGREGATE|SUM\" >Hexbin - dynamic size<\/option>";
+                szHtml += "<option value=\"CHART|BUBBLE|SIZE|FAST|AGGREGATE|RELOCATE|SUM\" >Bubble Grid - dynamic size<\/option>";
+                szHtml += "<option value=\"CHART|WAFFLE|GRIDSIZE|AGGREGATE|FAST|RECT|SUM\" >Waffle chart<\/option>";
+                $("#theme-type-select").html(szHtml);
+                $("#theme-type-select").val(__removeTypeFlag(objTheme.style.type, "ZOOMTO"));
+
+                $("#theme-type-text").html(__removeTypeFlag(objTheme.style.type, "ZOOMTO").replace(/\|/g, " | "));
+
+                $("#chartStyleTitle").css("color", color_unselected);
+
+                if (objTheme.style.type.match(/VALUES/)) {
+                    $("#chartStyleTitle").css("color", color_selected);
+                    $("#theme-values-checkbox").attr("checked", "checked");
+                }
+                if (objTheme.style.shadow) {
+                    $("#chartStyleTitle").css("color", color_selected);
+                    $("#theme-shadow-checkbox").attr("checked", "checked");
+                }
+                if (objTheme.style.showdata) {
+                    $("#chartStyleTitle").css("color", color_selected);
+                    $("#theme-showdata-checkbox").attr("checked", "checked");
+                }
+                if (objTheme.style.type.match(/GLOW/)) {
+                    $("#chartStyleTitle").css("color", color_selected);
+                    $("#theme-glow-checkbox").attr("checked", "checked");
+                }
+                if (objTheme.style.type.match(/AURA/)) {
+                    $("#chartStyleTitle").css("color", color_selected);
+                    $("#theme-aura-checkbox").attr("checked", "checked");
+                }
+                $("#define-themetype-title").css("color", color_selected);
+
+                if (objTheme.style.valuedecimals) {
+                    $("#chartValueDecimalsList").val(objTheme.style.valuedecimals);
+                    $("#chartValueDecimalsList").prev().css("color", color_selected);
+                }
+
+                if (objTheme.style.linecolor) {
+                    $("#chartLineColor").val(objTheme.style.linecolor);
+                    $("#chartLineColor").prev().css("color", color_selected);
+                }
+                if (objTheme.style.linewidth) {
+                    $("#chartLineWidth").val(objTheme.style.linewidth);
+                    $("#chartLineWidth").parent().prev().css("color", color_selected);
+                }
+                if (objTheme.style.valuescale) {
+                    $("#chartValueScale").val(objTheme.style.valuescale);
+                    $("#chartValueScale").parent().prev().css("color", color_selected);
+                }
+
+
+
+                // ------------------------------
+                // 4. theme colors and classes
+                // ------------------------------
+
+                ixmaps.editor.setSelectColorScheme();
+
+                $("#chartColor-title").css("color", color_selected);
+                $("#xcolor-title").css("color", color_selected);
+
+
+                if (objTheme.style.type.match(/RANGES/) || objTheme.style.ranges) {
+                    $("#theme-distribution-select").val("RANGES");
+                } else
+                if (objTheme.style.type.match(/QUANTILE/)) {
+                    $("#theme-distribution-select").val("QUANTILE");
+                } else
+                if (objTheme.style.type.match(/LOGARITHMICAL/)) {
+                    $("#theme-distribution-select").val("LOGARITHMICAL");
+                } else
+                if (objTheme.style.type.match(/CATEGORICAL/)) {
+                    $("#theme-distribution-select").val("CATEGORICAL");
+                } else
+                if (objTheme.style.type.match(/DEVIATION/)) {
+                    $("#theme-distribution-select").val("DOMINANT|DEVIATION");
+                } else {
+                    if (objTheme.style.type.match(/DOMINANT/)) {
+                        $("#theme-distribution-select").val("DOMINANT");
+                    } else
+                        $("#theme-distribution-select").val("EQUIDISTANT");
+                }
+                $("#theme-classes-select").val(Number(objTheme.style.colorscheme[0]) || objTheme.style.colorscheme.length);
+
+                $("#theme-distribution-select").prev().css("color", color_selected);
+
+                if (objTheme.style.type.match(/CATEGORICAL/) || objTheme.style.label) {
+
+                    $("#theme-classes-select").hide();
+
+                    var szLabelA = szUserLabelA = objTheme.style.values || ixmaps.editor.getUniqueValues();
+                    szValueA = objTheme.style.values || szLabelA.slice(0);
+
+                    nClasses = szLabelA.length;
+
+                    if (ixmaps.editorColorschemeType && (ixmaps.editorColorschemeType == "directly_defined_colors")) {
+                        var colorsA = ixmaps.editorColorscheme.split('|');
+                    } else {
+                        var colorA = ixmaps.getColorScheme(ixmaps.editorColorscheme, nClasses);
+                        var colorsA = szUserColorA || ixmaps.getColorsFromColorScheme(colorA.join('|'));
+                    }
+                    $("#chartLabelParam").show();
+
+                    var output = $("#theme-exact-label")[0];
+                    var szHTML = "<label style='color:#444'>colors and label:</label>";
+                    var c = 0;
+                    for (i in szLabelA) {
+
+                        szHTML += '<div class="input-group" style="margin-bottom:0.5em;width:100%">';
+                        szHTML += '<a class="input-group-addon color-box" id="btnGroupAddon" style="width:2.3em;background:' + colorsA[c] +
+                            '"></a>';
+                        szHTML += "<input class='form-control' type='text' id='chartLabel" + i + "' value=\"" + szLabelA[i] + "\" onchange=\"ixmaps.editor.setNewLabel(" + i + ")\">";
+                        szHTML += '</div>';
+
+                        c++;
+
+                        if (c >= 25) {
+                            szHTML += '<div class="input-group" style="margin-bottom:0.5em;width:100%">';
+                            szHTML += 'there are ' + (szLabelA.length - c) + ' more label ...';
+                            szHTML += '</div>';
+                            break;
+                        }
+                    }
+                    output.innerHTML = szHTML;
+
+                    $('.color-box').colpick({
+                        onBeforeShow: function(el) {
+                            $(this).colpickSetColor(__rgbStringToHex($(this).css("background-color")));
+                        },
+                        onSubmit: function(hsb, hex, rgb, el) {
+                            $(el).css('background-color', '#' + hex);
+                            $(el).colpickHide();
+
+                            szUserColorA = new Array();
+                            $(".color-box").each(function(index) {
+                                szUserColorA.push(_circ_getHexaColor($(this).css("background-color")));
+                            });
+                            //ixmaps.onChartChange();
+                        }
+                    });
+
+                }
+
+                // ------------------------------
+                // 5. title snippets
+                // ------------------------------
+
+                $("#chartDefinitionTitle").css("color", color_selected);
+                $("#theme-title-definition").val(objTheme.style.title);
+                $("#theme-title-definition").prev().css("color", color_selected);
+                $("#theme-snippet-definition").val(objTheme.style.snippet);
+                $("#theme-snippet-definition").prev().css("color", color_selected);
+                $("#theme-units-definition").val(objTheme.style.units);
+                $("#theme-units-definition").prev().css("color", objTheme.style.units?color_selected:color_unselected);
+
+                // ------------------------------
+                // 6. aggregation
+                // ------------------------------
+
+                if (objTheme.style.type.match(/AGGREGATE/)) {
+                    $("#chartAggregationTitle").css("color", color_selected);
+                    $("#chartAggregationMode").prev().css("color", color_selected);
+
+                    if (objTheme.style.type.match(/RECT/)) {
+                        $("#chartAggregationMode").val("AGGREGATE|RECT");
+                    } else {
+                        $("#chartAggregationMode").val("AGGREGATE|HEX");
+                    }
+                    if (objTheme.style.aggregationfield) {
+                        $("#chartAggregationMode").val("AGGREGATE");
+                        $("#chartAggregationFieldList").val(objTheme.style.aggregationfield);
+                    } else
+                    if (objTheme.style.gridwidth || objTheme.style.gridwidthpx) {
+                        if (objTheme.style.gridwidth) {
+                            if (String(objTheme.style.gridwidth).match(/px/)) {
+                                objTheme.style.gridwidthpx = parseInt(objTheme.style.gridwidth);
+                                objTheme.style.gridwidth = null;
+                            }
+                        }
+                        $("#chartAggregationWidth").val(objTheme.style.gridwidth || objTheme.style.gridwidthpx);
+                        $("#chartAggregationWidth").prev().css("color", color_selected);
+                        $("#chartAggregationType").val(objTheme.style.gridwidthpx ? "pixel" : "meter");
+                        $("#chartAggregationType").prev().css("color", color_selected);
+                    }
+                    if (objTheme.style.type.match(/RELOCATE/)) {
+                        $("#theme-relocate-checkbox").attr("checked", "checked");
+                    }
+                    if (objTheme.style.type.match(/SUM/)) {
+                        $("#chartAggregationCalc").val("SUM");
+                    } else
+                    if (objTheme.style.type.match(/MEAN/)) {
+                        $("#chartAggregationCalc").val("MEAN");
+                    } else {
+                        $("#chartAggregationCalc").val("SUM");
+                    }
+                    $("#chartAggregationCalc").prev().css("color", color_selected);
+
+                    if (objTheme.style.gridoffsetx) {
+                        $("#chartAggregationCenterXValue").val(objTheme.style.gridoffsetx);
+                        $("#chartAggregationCenterX").css("color", color_selected);
+                    } else {
+                        $("#chartAggregationCenterX").css("color", color_unselected);
+                    }
+
+                    if (objTheme.style.gridoffsety) {
+                        $("#chartAggregationCenterYValue").val(objTheme.style.gridoffsety);
+                        $("#chartAggregationCenterY").css("color", color_selected);
+                    } else {
+                        $("#chartAggregationCenterY").css("color", color_unselected);
+                    }
+
+                }
+
+                // ------------------------------
+                // 7. size
+                // ------------------------------
+
+                if (objTheme.style.type.match(/CHART/)) {
+                    $("#chartSize").show();
+                } else {
+                    $("#chartSize").hide();
+                }
+
+                $("#chartScaleValue").val(objTheme.style.scale);
+                $("#chartSizeTitle").css("color", color_selected);
+                $("#chartSizeLabel").css("color", color_selected);
+
+                if (objTheme.style.type.match(/SIZE/) || objTheme.style.sizefield || objTheme.style.normalsizevalue) {
+                    $("#chartSizeTitle").css("color", color_selected);
+                    if (objTheme.style.sizefield) {
+                        $("#chartSizeList").val("SIZE");
+                        $("#chartSizeList").prev().css("color", color_selected);
+                        $("#chartSizeFieldList").val(objTheme.style.sizefield);
+                        $("#chartSizeFieldList").prev().css("color", color_selected);
+                    }
+                    if (objTheme.style.normalsizevalue) {
+                        $("#chartNormalSizeValue").val(objTheme.style.normalsizevalue);
+                        $("#chartNormalSizeValue").prev().css("color", color_selected);
+                    }
+                }
+                if (objTheme.style.type.match(/LINEAR/)) {
+                    $("#chartSizeTitle").css("color", color_selected);
+                    $("#chartSizeList").prev().css("color", color_selected);
+                    $("#chartSizeList").val("LINEAR");
+                }
+                if (objTheme.style.type.match(/SIZEP1/)) {
+                    $("#chartSizeTitle").css("color", color_selected);
+                    $("#chartSizeList").prev().css("color", color_selected);
+                    $("#chartSizeList").val("LINEAR");
+                }
+                if (objTheme.style.type.match(/SIZEP2/)) {
+                    $("#chartSizeTitle").css("color", color_selected);
+                    $("#chartSizeList").prev().css("color", color_selected);
+                    $("#chartSizeList").val("SIZEP2");
+                }
+                if (objTheme.style.type.match(/SIZEP3/)) {
+                    $("#chartSizeTitle").css("color", color_selected);
+                    $("#chartSizeList").prev().css("color", color_selected);
+                    $("#chartSizeList").val("SIZEP3");
+                }
+                if (objTheme.style.type.match(/SIZEP4/)) {
+                    $("#chartSizeTitle").css("color", color_selected);
+                    $("#chartSizeList").prev().css("color", color_selected);
+                    $("#chartSizeList").val("SIZEP4");
+                }
+                if (objTheme.style.type.match(/SIZELOG/)) {
+                    $("#chartSizeTitle").css("color", color_selected);
+                    $("#chartSizeList").prev().css("color", color_selected);
+                    $("#chartSizeList").val("SIZELOG");
+                }
+                if (objTheme.style.type.match(/NOSIZE/)) {
+                    $("#chartSizeTitle").css("color", color_selected);
+                    $("#chartSizeList").prev().css("color", color_selected);
+                    $("#chartSizeList").val("NOSIZE");
+                }
+
+                $("#chartRangeScaleValue").val(objTheme.style.rangescale);
+
+                // ------------------------------
+                // 8. dynamic alpha
+                // ------------------------------
+
+                $("#chartOpacityValue").val(objTheme.style.opacity || objTheme.style.fillopacity);
+                $("#chartOpacityTitle").css("color", color_selected);
+                $("#chartOpacityLabel").css("color", color_selected);
+
+                if (objTheme.style.type.match(/DOPACITY/)) {
+                    $("#chartOpacityTitle").css("color", color_selected);
+                    if (objTheme.style.type.match(/DOPACITYBIPOLAR/)) {
+                        $("#chartAlphaMode").val("DOPACITYBIPOLAR");
+                    } else
+                    if (objTheme.style.type.match(/DOPACITYLOGMEAN/)) {
+                        $("#chartAlphaMode").val("DOPACITYLOGMEAN");
+                    } else
+                    if (objTheme.style.type.match(/DOPACITYMEAN/)) {
+                        $("#chartAlphaMode").val("DOPACITYMEAN");
+                    } else
+                    if (objTheme.style.type.match(/DOPACITYMIN/)) {
+                        $("#chartAlphaMode").val("DOPACITYMIN");
+                    } else
+                    if (objTheme.style.type.match(/DOPACITYMAX/)) {
+                        $("#chartAlphaMode").val("DOPACITYMAX");
+                    } else
+                    if (objTheme.style.type.match(/DOPACITYLOG/)) {
+                        $("#chartAlphaMode").val("DOPACITYLOG");
+                    } else {
+                        $("#chartAlphaMode").val("DOPACITY");
+                    }
+
+                    if (objTheme.style.dopacitypow) {
+                        $("#chartAlphaSpread").val(objTheme.style.dopacitypow);
+                        $("#chartAlphaSpread").prev().css("color", color_selected);
+                    }
+                    if (objTheme.style.dopacityscale) {
+                        $("#chartAlphaIntensity").val(objTheme.style.dopacityscale);
+                        $("#chartAlphaIntensity").prev().css("color", color_selected);
+                    }
+                }
+
+                if (objTheme.style.alphafield) {
+                    $("#chartAlphaFieldList").val(objTheme.style.alphafield);
+                }
+
+                var scaleParam = ixmaps.getScaleParam();
+                var options = ixmaps.getOptions();
+
+                if (0) {
+                    var szHtml = "";
+                    szHtml += "<table>";
+                    for (i in scaleParam) {
+                        szHtml += "<tr><td>" + i + "</td><td>" + scaleParam[i] + "</td></tr>";
+                    }
+                    for (i in options) {
+                        szHtml += "<tr><td>" + i + "</td><td>" + options[i] + "</td></tr>";
+                    }
+                    $("#map-configuration").html(szHtml);
+                }
+
+                if (scaleParam.normalSizeScale) {
+                    $("#mapNormalsizeScale").val("1:" + scaleParam.normalSizeScale);
+                }
+                if (options.objectscaling) {
+                    $("#mapObjectScaling").val(options.objectscaling);
+                }
+
+                if (options.flushChartDraw) {
+                    $("#mapRenderRate").val(options.flushChartDraw);
+                }
+
+                setTimeout("resize()", 100);
+                setTimeout("resize()", 500);
+                setTimeout("resize()", 1000);
+
+            };
+
+            // .................................................................
+            //
+            // c o n f i g u r a t o r  -->  t h e m e
+            //
+            // .................................................................
+
+            /**
+             * applay changes to the actual theme 
+             * @type void
+             */
+
+            ixmaps.editor.applyChanges = function() {
+
+                // theme
+                // ------------------------------------
+                var objTheme = ixmaps.getThemeDefinitionObj() || ixmaps.editor.themeObj;
+
+                objTheme.style.dbtableUrl = $("#define-data").val();
+                objTheme.layer = $("#map-layer-select").val();
+                objTheme.field = $("#theme-data-fields-select").val();
+
+                var lookup = $("#theme-data-lookup-select").val();
+                var lat = $("#theme-data-lat-select").val();
+                var lon = $("#theme-data-lon-select").val();
+
+                if (lookup.length) {
+                    objTheme.style.lookupfield = lookup;
+                    objTheme.style.itemfield = lookup;
+                } else
+                if (lat.length && lon.length) {
+                    objTheme.style.lookupfield = lat + "|" + lon;
+                    objTheme.style.itemfield = lat + "|" + lon;
+                } else {
+                    alert("lookup error");
+                    return;
+                }
+
+                if (szUserColorA) {
+                    objTheme.style.colorscheme = szUserColorA;
+                    objTheme.style.values = szValueA;
+                    objTheme.style.label = szUserLabelA;
+                }
+
+                var fValues = objTheme.style.type.match(/VALUES/);
+                
+                objTheme.style.title = $("#theme-title-definition").val();
+                objTheme.style.snippet = $("#theme-snippet-definition").val();
+                objTheme.style.units = $("#theme-units-definition").val();
+
+                objTheme.style.type = $("#theme-type-text").val().replace(/ \| /g, "|");
+
+                if (ixmaps.editor.themeDataFieldType) {
+                    if ((ixmaps.editor.themeDataFieldType.type == "exact") && !objTheme.style.type.match(/CATEGORICAL/)) {
+                        objTheme.style.type += "|CATEGORICAL";
+                        $("#chartAlphaMode").val("");
+                        objTheme.style.colorscheme = ixmaps.editor.themeDataFieldType.style.colorscheme;
+                    }
+                }
+
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "AGGREGATE");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "RECT");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "RELOCATE");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "VALUES");
+
+                if (fValues) {
+                    objTheme.style.type += "|VALUES";
+                }
+
+                if ($("#chartSizeFieldList").val() != "") {
+                    objTheme.style.sizefield = $("#chartSizeFieldList").val();
+                    objTheme.style.valuefield = $("#chartSizeFieldList").val();
+                }
+
+                if ($("#chartNormalSizeValue").val() != "") {
+                    objTheme.style.normalsizevalue = $("#chartNormalSizeValue").val();
+                }
+
+                if ($("#chartLineColor").val() != "") {
+                    objTheme.style.linecolor = $("#chartLineColor").val();
+                }
+
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "SIZE");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "LINEAR");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "SIZEP1");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "SIZEP2");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "SIZEP3");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "SIZEP4");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "SIZELOG");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "NOSIZE");
+
+                if ($("#chartSizeList").val() != "") {
+                    objTheme.style.type += "|" + $("#chartSizeList").val();
+                    objTheme.style.sizepow = null;
+                }
+
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "GLOW");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "AURA");
+
+                if ($("#theme-glow-checkbox").attr("checked") == "checked") {
+                    objTheme.style.type += "|GLOW";
+                }
+                if ($("#theme-aura-checkbox").attr("checked") == "checked") {
+                    objTheme.style.type += "|AURA";
+                }
+
+                objTheme.style.valuedecimals = $("#chartValueDecimalsList").val();
+
+                if ($("#chartAggregationMode").val().match(/AGGREGATE/)) {
+
+                    objTheme.style.type += "|" + $("#chartAggregationMode").val();
+
+                    if ($("#chartAggregationType").val() == "pixel") {
+                        objTheme.style.gridwidth = $("#chartAggregationWidth").val() + "px";
+                        objTheme.style.gridwidthpx = null;
+                    } else {
+                        objTheme.style.gridwidth = $("#chartAggregationWidth").val();
+                        objTheme.style.gridwidthpx = null;
+                    }
+
+
+                    objTheme.style.type = __removeTypeFlag(objTheme.style.type, "SUM");
+                    objTheme.style.type = __removeTypeFlag(objTheme.style.type, "MEAN");
+                    if ($("#chartAggregationCalc").val() == "SUM") {
+                        objTheme.style.type += "|SUM";
+                    } else
+                    if ($("#chartAggregationCalc").val() == "MEAN") {
+                        objTheme.style.type += "|MEAN";
+                    } else {}
+
+                    objTheme.style.type = __removeTypeFlag(objTheme.style.type, "RELOCATE");
+                    if ($("#theme-relocate-checkbox").attr("checked") == "checked") {
+                        objTheme.style.type += "|RELOCATE";
+                    }
+
+                    if ($("#chartAggregationMode").val().match(/RECT/)) {
+                        if (objTheme.style.symbols && (objTheme.style.symbols[0] == "hexagon")) {
+                            objTheme.style.symbols[0] = "square";
+                        }
+                    } else {
+                        if (objTheme.style.symbols && (objTheme.style.symbols[0] == "square")) {
+                            objTheme.style.symbols[0] = "hexagon";
+                        }
+                    }
+                }
+
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "DOPACITY");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "DOPACITYLOG");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "DOPACITYMAX");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "DOPACITYMIN");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "DOPACITYPIPOLAR");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "DOPACITYMEAN");
+                objTheme.style.type = __removeTypeFlag(objTheme.style.type, "DOPACITYLOGMEAN");
+
+                if ($("#chartAlphaMode").val().match(/DOPACITY/)) {
+                    objTheme.style.type += "|" + $("#chartAlphaMode").val();
+
+                    objTheme.style.dopacitypow = $("#chartAlphaSpread").val();
+                    objTheme.style.dopacityscale = $("#chartAlphaIntensity").val();
+                }
+
+                if ($("#chartAlphaFieldList").val() != "") {
+                    objTheme.style.alphafield = $("#chartAlphaFieldList").val();
+                }
+
+                objTheme.style.editor = true;
+                objTheme.style.datacache = null;
+
+                // make the new theme
+                // -----------------------------
+                var oldTheme = ixmaps.getThemeDefinitionObj();
+                ixmaps.embeddedSVG.window.map.Api.clearAll();
+                ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(objTheme);
+
+                if (!oldTheme) {
+                    setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()", 100);
+                    setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()", 200);
+                    setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()", 500);
+                    setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()", 1000);
+                }
+
+                ixmaps.editor.alert('<b>generating theme ...</b><img src="../../../ui/resources/images/loading_blue.gif" id="load-file-spinner" style="height:48px;margin:-0.4em 0 0 0;">', "generating-on-bottom", "default");
+            };
+
+
+            ixmaps.xxmakeChartMenueHTML = function(szId, szTarget) {
+
+                if ($("#" + szTarget).html().length) {
+                    $("#" + szTarget).html("");
+                    return;
+                };
+
+                ixmaps.themeObj = ixmaps.themeObj || ixmaps.getThemeObj(szId);
+
+                // make <div> + <svg> to receive the chart menu (in svg)
+                var szHtml = "";
+                szHtml += "<div style='font-size:0.6em;margin-bottom:0.5em'>select chart type:</div>";
+                szHtml += "<div id='menuDiv' style='height:300px;width:260px;overflow:auto'><div><svg width='240' height='2000' viewBox='0 0 4800 40000'><g id='getchartmenutarget'></g></svg></div></div>";
+
+                // create dialog
+                $("#" + szTarget).html(szHtml);
+
+                // call theme method to draw the charts
+                var szTypelistA = ixmaps.themeObj.getChartTypeMenu($("#getchartmenutarget")[0], null, 140);
+
+                // create click map to select the chart for the theme
+                szHtml = "<div style='position:relative;top:-2010px;'>";
+                for (i in szTypelistA) {
+                    if (i % 4 == 0) {
+                        szHtml += "<div style='clear:both'>";
+                    }
+                    szHtml += "<a href=\"javascript:ixmaps.changeThemeStyle(null,'" + ixmaps.themeObj.szId + "','type:" + szTypelistA[i] + "','set');\"><div style='float:left;height:60px;width:60px;'></div></a>";
+                }
+                szHtml += "</div>";
+
+                $("#menuDiv").append(szHtml);
+            };
+
+            szChartTypeList = [
+                "CHART|BAR", "CHART|BAR|3D", "CHART|BAR|3D|TRENDLINE", "CHART|BAR|3D|SORT", "CHART|BAR|HORZ|LEFT|UP", "CHART|BAR|HORZ|RIGHT|UP", "CHART|BAR|HORZ|LEFT|UP|COMPRESS", "CHART|BAR|HORZ|RIGHT|UP|COMPRESS", "CHART|BAR|HORZ|LEFT|UP|3D", "CHART|BAR|HORZ|RIGHT|UP|3D", "CHART|BAR|HORZ|RIGHT|3D", "CHART|BAR|HORZ|RIGHT|COMPRESS|3D", "CHART|BAR|HORZ|RIGHT|SORT|3D", "CHART|BAR|HORZ|RIGHT|SORT|COMPRESS|3D", "CHART|BAR|HORZ|RIGHT|SORT|UP|3D", "CHART|BAR|HORZ|LEFT|UP|COMPRESS|3D", "CHART|BAR|HORZ|RIGHT|UP|COMPRESS|3D", "CHART|BAR|HORZ|CENTER|UP", "CHART|BAR|STACKED", "CHART|BAR|STACKED|3D", "CHART|BAR|STACKED|3D", "CHART|BAR|COLUMNS|STACKED|3D", "CHART|BAR|COLUMNS|STACKED|3D|SIZE", "CHART|BAR|COLUMNS|STACKED|3D|SORT|SIZE", "CHART|BAR|HORZ|STACKED|SIZE", "CHART|BAR|HORZ|3D|STACKED|SIZE", "CHART|BAR|HORZ|COLUMNS|STACKED|SIZE", "CHART|PIE", "CHART|PIE|SIZE", "CHART|PIE|3D", "CHART|PIE|3D|SIZE", "CHART|PIE|3D|HEIGHT", "CHART|PIE|3D|VOLUME|SORT|SYMMETRIC", "CHART|PIE|3D|VOLUME|SORT|SYMMETRIC|SIZE", "CHART|PIE|3D|VOLUME|SORT|SYMMETRIC|SIZE|HEIGHT", "CHART|PIE|DONUT", "CHART|PIE|DONUT|SIZE", "CHART|PIE|DONUT|3D", "CHART|PIE|DONUT|3D|SIZE", "CHART|PIE|DONUT|3D|HEIGHT", "CHART|PIE|DONUT|3D|SIZE|HEIGHT", "CHART|PIE|DONUT|3D|VOLUME|SORT|SYMMETRIC", "CHART|PIE|STARBURST", "CHART|PIE|STARBURST|RAYS", "CHART|PIE|STARBURST|SRAYS", "CHART|PIE|STARBURST|SIZE", "CHART|PIE|STARBURST|RAYS|SIZE", "CHART|PIE|STARBURST|SRAYS|SIZE", "CHART|PIE|STARBURST|3D", "CHART|PIE|STARBURST|3D|SIZE", "CHART|PIE|STARBURST|3D|HEIGHT", "CHART|PIE|DONUT|STARBURST", "CHART|PIE|DONUT|STARBURST|SIZE", "CHART|PIE|DONUT|STARBURST|3D", "CHART|PIE|DONUT|STARBURST|3D|SIZE", "CHART|PIE|DONUT|STARBURST|3D|HEIGHT", "CHART|PIE|DONUT|STARBURST|3D|VOLUME", "CHART|PIE|DONUT|STARBURST|3D|VOLUME|SORT|SYMMETRIC", "CHART|PIE|CENTER|SIZE", "CHART|PIE|CENTERVALUE|SIZE", "CHART|PIE|CENTER|STARBURST|SIZE", "CHART|PIE|CENTERVALUE|STARBURST|SIZE", "CHART|PIE|CENTER|STARBURST|RAYS|SIZE", "CHART|PIE|CENTERVALUE|STARBURST|RAYS|SIZE", "CHART|PIE|HALF|CENTER|STARBURST|RAYS|SIZE", "CHART|PIE|HALF|CENTERVALUE|STARBURST|RAYS|SIZE", "CHART|PIE|DONUT|HALF|SIZE", "CHART|PIE|DONUT|HALF|STARBURST|SIZE", "CHART|PIE|DONUT|HALF|3D|SIZE", "CHART|PIE|DONUT|HALF|3D|HEIGHT|SIZE", "CHART|PIE|DONUT|HALF|3D|HEIGHT|VOLUME|SIZE", "CHART|WAFFLE|", "CHART|SYMBOL|SEQUENCE|CENTER", "CHART|SYMBOL|SEQUENCE|CENTER|SORT|UP", "CHART|SYMBOL|SEQUENCE|CENTER|SORT|DOWN", "CHART|SYMBOL|SEQUENCE|CENTER|RINGS", "CHART|SYMBOL|SEQUENCE|CENTER|SORT|UP|RINGS", "CHART|SYMBOL|SEQUENCE|CENTER|SORT|DOWN|RINGS", "CHART|SYMBOL|SEQUENCE|BOTTOM|SORT|DOWN", "CHART|SYMBOL|SEQUENCE|BOTTOM|SORT|UP|RINGS", "CHART|SYMBOL|SEQUENCE|TOP|SORT|UP|RINGS", "CHART|SYMBOL|SEQUENCE|BASE", "CHART|SYMBOL|SEQUENCE|BASE|SORT|DOWN", "CHART|SYMBOL|SEQUENCE|BASE|SORT|UP", "CHART|SYMBOL|SEQUENCE|STAR", "CHART|SYMBOL|SEQUENCE|STAR|SORT|UP|EXPAND", "CHART|SYMBOL|SEQUENCE|STAR|SORT|DOWN", "CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM", "CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM|DOPACITY"
+            ];
+            szChartTypeListSingleValue_old = [
+                "CHART|BAR", "CHART|BAR|VALUES", "CHART|BAR|3D", "CHART|BAR|3D|VALUES", "CHART|BAR|3D|VOLUME", "CHART|BAR|3D|VOLUME|VALUES", "CHART|BAR|HORZ|RIGHT|UP", "CHART|BAR|HORZ|RIGHT|UP|VALUES", "CHART|BAR|HORZ|RIGHT|UP|3D", "CHART|BAR|HORZ|RIGHT|UP|VALUES|3D", "CHART|BAR|POINTER", "CHART|BAR|POINTER|VALUES", "CHART|BUBBLE|SURFACE", "CHART|BUBBLE|SURFACE|VALUES", "CHART|SQUARE|SURFACE", "CHART|SQUARE|SURFACE|VALUES"
+            ];
+            szChartTypeListSingleValue = [
+                "CHOROPLETH", "CHART|BUBBLE", "CHART|SQUARE", "CHART|PIE|3D|SIZE", "CHART|PIE|3D|HEIGHT", "CHART|PIE|3D|SIZE|HEIGHT", "CHART|BAR|3D|VOLUME", "CHART|BAR", "CHART|BAR|3D", "CHART|BAR|3D|SIZE", "CHART|BAR|HORZ|RIGHT|UP", "CHART|BAR|HORZ|RIGHT|UP|3D", "CHART|BAR|POINTER", "CHART|BAR|POINTER|SIZE", "CHART|BAR|HORZ|RIGHT|UP|POINTER", "CHART|LABEL"
+            ];
+            szChartTypeListPLOT = [
+                "CHART|SYMBOL|FIXSIZE|PLOT", "CHART|SYMBOL|FIXSIZE|PLOT|LOLLIPOP", "CHART|SYMBOL|FIXSIZE|PLOT|LINES", "CHART|SYMBOL|FIXSIZE|PLOT|LINES|AREA", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT|LOLLIPOP", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT|LINES", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT|LINES|AREA", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT|LINES|AREA|STACKED", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOTVAR|LINES", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOTVAR|LINES|AREA"
+            ];
+
+            /**
+             * add definition to flag string
+             * @param szDef the definition to remove (e.g. "3D" )
+             * @type string
+             * @return the new flag string without szDef
+             */
+            _addDefinitionToFlag = function(szDef) {
+                return (this.szFlag = this.szFlag + "|" + szDef);
+            };
+
+            /**
+             * remove definition from flag string
+             * @param szDef the definition to remove (e.g. "3D" )
+             * @type string
+             * @return the new flag string without szDef
+             */
+            _removeDefinitionFromFlag = function(szDef) {
+                var szNewFlag = "";
+                var szFlagA = this.szFlag.split('|');
+                for (var i = 0; i < szFlagA.length; i++) {
+                    if (szFlagA[i] != szDef) {
+                        szNewFlag += (szNewFlag.length ? "|" : "") + szFlagA[i];
+                    }
+                }
+                return (this.szFlag = szNewFlag);
+            };
+
+            /**
+             * remove definition from string
+             * @param szFlag the definition string
+             * @param szDef the definition to remove (e.g. "3D" )
+             * @type string
+             * @return the new flag string without szDef
+             */
+            _removeDefinition = function(szFlag, szDef) {
+                var szNewFlag = "";
+                var szFlagA = szFlag.split('|');
+                for (var i = 0; i < szFlagA.length; i++) {
+                    if (szFlagA[i] != szDef) {
+                        szNewFlag += (szNewFlag.length ? "|" : "") + szFlagA[i];
+                    }
+                }
+                return szNewFlag;
+            };
+
+
+            ixmaps.chartOver = function() {
+                console.log("over");
+            };
+            ixmaps.chartOut = function() {
+                console.log("out");
+            };
+            ixmaps.chartClick = function(szFlag) {
+                ixmaps.changeThemeStyle(null, null, 'type:' + szFlag, 'set');
+            };
+
+
+
+            ixmaps.makeChartMenueHTML = function(szId, szTarget) {
+
+                if ($("#" + szTarget).html().length) {
+                    $("#" + szTarget).html("");
+                    return;
+                };
+
+                // make <div> + <svg> to receive the chart menu (in svg)
+                var szHtml = "";
+                szHtml += "<div style='font-size:0.6em;margin-bottom:0.5em'>select chart type:</div>";
+                szHtml += "<div id='chartmenu-div' style='height:500px;width:100%;background:white;overflow:auto'><div></div></div>";
+
+                // create dialog
+                $("#" + szTarget).html(szHtml);
+
+                var __themeObj = ixmaps.themeObj || ixmaps.getThemeObj(szId);
+
+                var szTypeList = szChartTypeListSingleValue;
+                if ((__themeObj.szFieldsA.length > 1) ||
+                    (__themeObj.szFlag.match(/CATEGORICAL/) && __themeObj.szFlag.match(/AGGREGATE/))) {
+                    szTypeList = szChartTypeList;
+                }
+                if (__themeObj.szFlag.match(/PLOT/)) {
+                    szTypeList = szChartTypeListPLOT;
+                }
+
+                for (i = 0; i < szTypeList.length; i++) {
+                    ixmaps.makeOneChartHTML(szId, szTypeList, i);
+                }
+
+
+            }
+
+            ixmaps.makeOneChartHTML = function(szId, szTypeList, index) {
+
+                console.log(i);
+
+                var szTargetDiv = "chartmenu-div";
+
+                var __themeObj = ixmaps.themeObj || ixmaps.getThemeObj(szId);
+
+                if (!__themeObj) {
+                    return;
+                }
+
+                var szMerkFlag = __themeObj.szFlag;
+
+                var szFlag = szTypeList[i] + "|NORMSIZE|SILENT|MENUSIZE";
+
+                if (szMerkFlag.match(/CATEGORICAL/)) {
+                    szFlag += "|CATEGORICAL";
+                }
+                if (szMerkFlag.match(/GROUP/)) {
+                    szFlag += "|GROUP";
+                }
+                if (szMerkFlag.match(/AGGREGATE/)) {
+                    szFlag += "|AGGREGATE";
+                }
+                if (szMerkFlag.match(/FAST/)) {
+                    szFlag += "|FAST";
+                }
+                if (szMerkFlag.match(/RELOCATE/)) {
+                    szFlag += "|RELOCATE";
+                }
+                if (szMerkFlag.match(/DIFFERENCE/)) {
+                    szFlag += "|DIFFERENCE";
+                }
+                if (szMerkFlag.match(/FRACTION/)) {
+                    szFlag += "|FRACTION";
+                }
+                if (szMerkFlag.match(/INVERT/)) {
+                    szFlag += "|INVERT";
+                }
+                if (szMerkFlag.match(/INVERTSIZE/)) {
+                    szFlag += "|INVERTSIZE";
+                }
+                if (szMerkFlag.match(/RELATIVE/)) {
+                    szFlag += "|RELATIVE";
+                }
+                if (szMerkFlag.match(/DENSITY/)) {
+                    szFlag += "|DENSITY";
+                }
+                if (szMerkFlag.match(/DOPACITYMAX/)) {
+                    szFlag += "|DOPACITYMAX";
+                } else
+                if (szMerkFlag.match(/DOPACITYLOGMAX/)) {
+                    szFlag += "|DOPACITYLOGMAX";
+                } else
+                if (szMerkFlag.match(/DOPACITYPOWMAX/)) {
+                    szFlag += "|DOPACITYPOWMAX";
+                } else
+                if (szMerkFlag.match(/DOPACITYMEAN/)) {
+                    szFlag += "|DOPACITYMEAN";
+                } else
+                if (szMerkFlag.match(/DOPACITYLOGMEAN/)) {
+                    szFlag += "|DOPACITYLOGMEAN";
+                } else
+                if (szMerkFlag.match(/DOPACITYPOWMEAN/)) {
+                    szFlag += "|DOPACITYPOWMEAN";
+                } else
+                if (szMerkFlag.match(/DOPACITYLOG/)) {
+                    szFlag += "|DOPACITYLOG";
+                } else
+                if (szMerkFlag.match(/DOPACITY/)) {
+                    szFlag += "|DOPACITY";
+                }
+                if (szMerkFlag.match(/AUTO100/)) {
+                    szFlag += "|AUTO100";
+                }
+                if (szMerkFlag.match(/AUTOCOMPLETE/)) {
+                    szFlag += "|AUTOCOMPLETE";
+                }
+
+                if (0 && szFlag.match(/PLOT/)) {
+                    if (szMerkFlag.match(/BOX/)) {
+                        szFlag += "|BOX";
+                    }
+                    if (szMerkFlag.match(/TITLE/)) {
+                        szFlag += "|TITLE";
+                    }
+                    if (szMerkFlag.match(/\bGRID\b/)) {
+                        szFlag += "|GRID";
+                    }
+                }
+
+                __themeObj.szFlag = szFlag;
+
+                var nTempClipParts = __themeObj.nClipParts;
+                if (!szFlag.match(/PLOT/)) {
+                    __themeObj.nClipParts = 10;
+                    if (szFlag.match(/STACKED/)) {
+                        __themeObj.szFlag += "|SORT|DOWN";
+                    }
+                    if (szFlag.match(/WAFFLE/)) {
+                        __themeObj.szFlag += "WAFFLE100";
+                    }
+                }
+
+                var szOrigFlagKeep = "";
+                if (szMerkFlag.match(/UNDEFINEDISVALUE/)) {
+                    szOrigFlagKeep += "|UNDEFINEDISVALUE";
+                }
+                if (szMerkFlag.match(/ZEROISVALUE/)) {
+                    szOrigFlagKeep += "|ZEROISVALUE";
+                }
+                if (szMerkFlag.match(/NEGATIVEISVALUE/)) {
+                    szOrigFlagKeep += "|NEGATIVEISVALUE";
+                }
+                if (szMerkFlag.match(/NONEGATIVE/)) {
+                    szOrigFlagKeep += "|NEGATIVEISVALUE";
+                }
+                if (szMerkFlag.match(/GROUP/)) {
+                    szOrigFlagKeep += "|GROUP";
+                }
+                if (szMerkFlag.match(/AGGREGATE/)) {
+                    szOrigFlagKeep += "|AGGREGATE";
+                }
+                if (szMerkFlag.match(/FAST/)) {
+                    szOrigFlagKeep += "|FAST";
+                }
+                if (szMerkFlag.match(/RECT/)) {
+                    szOrigFlagKeep += "|RECT";
+                }
+                if (szMerkFlag.match(/HEX/)) {
+                    szOrigFlagKeep += "|HEX";
+                }
+                if (szMerkFlag.match(/RELOCATE/)) {
+                    szOrigFlagKeep += "|RELOCATE";
+                }
+                if (szMerkFlag.match(/CATEGORICAL/)) {
+                    szOrigFlagKeep += "|CATEGORICAL";
+                }
+                if (szMerkFlag.match(/SUM/)) {
+                    szOrigFlagKeep += "|SUM";
+                }
+                if (szMerkFlag.match(/MEAN/)) {
+                    szOrigFlagKeep += "|MEAN";
+                }
+                if (szMerkFlag.match(/DIFFERENCE/)) {
+                    szOrigFlagKeep += "|DIFFERENCE";
+                }
+                if (szMerkFlag.match(/RELATIVE/)) {
+                    szOrigFlagKeep += "|RELATIVE";
+                }
+                if (szMerkFlag.match(/INVERT/)) {
+                    szOrigFlagKeep += "|INVERT";
+                }
+                if (szMerkFlag.match(/INVERTSIZE/)) {
+                    szOrigFlagKeep += "|INVERTSIZE";
+                }
+                if (szMerkFlag.match(/CALCMEAN/)) {
+                    szOrigFlagKeep += "|CALCMEAN";
+                }
+                if (szMerkFlag.match(/CALC100/)) {
+                    szOrigFlagKeep += "|CALC100";
+                }
+                if (szMerkFlag.match(/PRODUCT/)) {
+                    szOrigFlagKeep += "|PRODUCT";
+                }
+                if (szMerkFlag.match(/AUTOCOMPLETE/)) {
+                    szOrigFlagKeep += "|AUTOCOMPLETE";
+                }
+                if (szMerkFlag.match(/AUTO100/)) {
+                    szOrigFlagKeep += "|AUTO100";
+                }
+                if (szMerkFlag.match(/QUANTILE/)) {
+                    szOrigFlagKeep += "|QUANTILE";
+                }
+                if (szMerkFlag.match(/DENSITY/)) {
+                    szOrigFlagKeep += "|DENSITY";
+                }
+                if (szMerkFlag.match(/DOPACITY/)) {
+                    szOrigFlagKeep += "|DOPACITY";
+                }
+                if (szMerkFlag.match(/VALUES/)) {
+                    szOrigFlagKeep += "|VALUES";
+                }
+                if (szMerkFlag.match(/VALUEBACKGROUND/)) {
+                    szOrigFlagKeep += "|VALUEBACKGROUND";
+                }
+                // if new chart type has SIZE flag
+                // -------------------------------
+                if (szTypeList[i].match(/SIZE/)) {
+                    if (szMerkFlag.match(/SIZELOG/)) {
+                        szOrigFlagKeep += "|SIZELOG";
+                    } else
+                    if (szMerkFlag.match(/SIZEP4/)) {
+                        szOrigFlagKeep += "|SIZEP4";
+                    } else
+                    if (szMerkFlag.match(/SIZEP3/)) {
+                        szOrigFlagKeep += "|SIZEP3";
+                    } else
+                    if (szMerkFlag.match(/SIZE/)) {
+                        szOrigFlagKeep += "|SIZE";
+                    }
+                }
+                if (szMerkFlag.match(/SPACED/)) {
+                    szOrigFlagKeep += "|SPACED";
+                }
+                if (szMerkFlag.match(/BOX/)) {
+                    szOrigFlagKeep += "|BOX";
+                }
+                if (szMerkFlag.match(/TITLE/)) {
+                    szOrigFlagKeep += "|TITLE";
+                }
+                if (szMerkFlag.match(/\bGRID\b/)) {
+                    szOrigFlagKeep += "|GRID";
+                }
+                if (szMerkFlag.match(/\bGRIDSIZE\b/)) {
+                    szOrigFlagKeep += "|GRIDSIZE";
+                }
+
+                // make <div> + <svg> to receive the chart (svg)
+
+                var szHtml = "";
+                szHtml += "<div class='col-lg-4 col-md-4 col-sm-4 col-xs-4' style='min-height:100px;border:solid #ddd 1px'>";
+                //szHtml += "<div id='chart-title' style='font-size:0.5em;font-weight:300;padding:1em;margin-top:0.5em'>"+szTypeList[index];
+                //szHtml += "</div>";
+                szHtml += "<a href='#'>";
+                szHtml += "<div style='text-align:center;display:block;margin-top:10%;' title='" + szTypeList[index] + "' onclick='ixmaps.chartClick(\"" + (szTypeList[index] + szOrigFlagKeep) + "\");event.stopPropagation();event.preventDefault();' >";
+                szHtml += "<svg width='120' height='120' viewBox='-500 -3500 5000 5000' ><g id='getchartmenutarget" + index + "' ></g></svg>"
+                szHtml += "</div>";
+                szHtml += "</a>";
+                szHtml += "</div>";
+
+                $("#" + szTargetDiv).append(szHtml);
+
+                // ------------------------------------------------------------------------------------
+
+                __themeObj.drawChart($("#getchartmenutarget" + index)[0], null, 30);
+
+                if (!szFlag.match(/PLOT/)) {
+                    __themeObj.addChartTypeSign($("#getchartmenutarget" + index)[0], szTypeList[index]);
+                }
+                // ------------------------------------------------------------------------------------
+
+                __themeObj.szFlag = szMerkFlag;
+                __themeObj.nClipParts = nTempClipParts;
+
+                // size the chart to div extent
+
+                var SVGBox = $("#getchartmenutarget" + index)[0].getBBox();
+                var scale = Math.max(1, 200 / SVGBox.width);
+                SVGBox.width *= scale;
+                SVGBox.height *= scale;
+                SVGBox.x += 100;
+                SVGBox.y -= 10;
+                SVGBox.height += 20;
+
+                var size = __themeObj.szFlag.match(/PLOT/) ? 120 : 75;
+                var width = size;
+                var height = size / SVGBox.width * SVGBox.height;
+
+                while (height > width) {
+                    height *= 0.9;
+                }
+
+                $("#getchartmenutarget" + index)[0].parentNode.setAttribute("height", height);
+                $("#getchartmenutarget" + index)[0].parentNode.setAttribute("viewBox", SVGBox.x + ' ' + SVGBox.y + ' ' + SVGBox.width + ' ' + SVGBox.height);
+
+                resize();
+
+            };
+
+            // ---------------------------------------------------
+            // format number display 
+            // ---------------------------------------------------
+
+            /**
+             * convert a number into a formatted string; if the number > 1000 it will be formatted like 1 023 234 
+             * @param nValue the number to format
+             * @param nPrecision the wanted decimal points 
+             * @param szFlag "CEIL" or "FLOOR" (round either up or down)
+             */
+            ixmaps.__formatValue = function(nValue, nPrecision, szFlag) {
+
+                nValue = Number(nValue);
+
+                if (!isFinite(nValue) || !isFinite(nPrecision)) {
+                    return String(nValue);
+                }
+                if (nValue == 0) {
+                    return String(nValue);
+                }
+                if (nValue > 1000000000000) {
+                    return String(nValue);
+                }
+                if (nValue < -1000000000000) {
+                    return String(nValue);
+                }
+
+                if (!nPrecision) {
+                    nPrecision = 0;
+                }
+                nPrecision = Math.max(0, nPrecision);
+
+                // GR 02.12.2011 make that low values do not collapse to 0
+                if ((nValue > 0.0000001) && (nPrecision > 0)) {
+                    while (nValue.toFixed(nPrecision - 1) == 0) {
+                        nPrecision++;
+                    }
+                }
+
+                // GR 11.03.2009 fix precision before CEIL or FLOOR to avoid JS errors eg. 0.0000000000003
+                nValue = nValue.toFixed(nPrecision + 1);
+
+                nClipDecimal = Math.pow(10, nPrecision);
+                if (szFlag && szFlag.match(/CEIL/)) {
+                    nValue = Math.ceil(nValue * nClipDecimal) / nClipDecimal;
+                } else
+                if (szFlag && szFlag.match(/FLOOR/)) {
+                    nValue = Math.floor(nValue * nClipDecimal) / nClipDecimal;
+                } else {
+                    nValue = Math.round(nValue * nClipDecimal) / nClipDecimal;
+                }
+                // format numbers > 1000
+                if (0 && (nValue < 1000)) {
+                    return String(nValue);
+                } else {
+                    var szDecimals = String(nValue);
+                    if (szDecimals.match(/\./)) {
+                        szDecimals = szDecimals.split(".")[1];
+                        while (szDecimals.length < nPrecision) {
+                            szDecimals += '0';
+                        }
+                    } else {
+                        szDecimals = "";
+                    }
+                    var szReturn = nValue < 0 ? "-" : "";
+                    var szLeading = "";
+
+                    nValue = Math.floor(Math.abs(nValue));
+
+                    // GR new flag
+                    if (!szFlag || !szFlag.match(/NOBREAKS/)) {
+                        var nClip = 1000;
+                        while (nValue > nClip) {
+                            nClip *= 1000;
+                        }
+                        nClip /= 1000;
+
+                        var nPart = 0;
+                        var szBreak = " ";
+                        while (nClip >= 1000) {
+                            nPart = Math.floor(nValue / nClip);
+                            szReturn += __maptheme_formatpart(nPart, szLeading);
+                            nValue = nValue % nClip;
+                            nClip /= 1000;
+                            if (nPart) {
+                                szLeading = "0";
+                                if (szFlag && szFlag.match(/BLANK/)) {
+                                    szBreak = "&nbsp;";
+                                } else {
+                                    szBreak = ".";
+                                }
+                            }
+                            szReturn += szBreak;
+                        }
+                    }
+
+                    szReturn += __maptheme_formatpart(nValue, szLeading);
+
+                    if (!szReturn.length || (szReturn == "-")) {
+                        szReturn += "0";
+                    }
+
+                    if (szDecimals.length && szDecimals != "00") {
+                        szReturn += ((szFlag && szFlag.match(/BLANK/)) ? "." : ",") + szDecimals;
+                    }
+                }
+                return szReturn;
+            }
+            /**
+             * helper to format a number from 0 to 999 into a string with leading character (sample 32 -> "032" )
+             * @param nPart the number to format
+             * @param szLeading the leading character to insert if necessary 
+             */
+            function __maptheme_formatpart(nPart, szLeading) {
+                if (!szLeading) {
+                    szLeading = "";
+                }
+                var szPart = "";
+                if (nPart < 100) {
+                    szPart += szLeading;
+                }
+                if (nPart < 10) {
+                    szPart += szLeading;
+                }
+                if (nPart == 0) {
+                    szPart += szLeading;
+                } else {
+                    szPart += String(nPart);
+                }
+                return szPart;
+            }
+
+
+            $(document).ready(function() {
+
+                resize();
+                
+ 
+                // ===========================
+                // do this on every new theme  
+                // ===========================
+
+                __lastThemeId = null;
+                ixmaps.htmlgui_onDrawTheme = function(szId) {
+                    if (szId == __lastThemeId) {
+                        //return;
+                    }
+                    __lastThemeId = szId;
+                    setTimeout("ixmaps.editor.loadTheme(\"" + szId + "\")", 10);
+
+                    ixmaps.setLayout("right");
+                    resize();
+
+                };
+
+                /**
+               ixmaps.onMapReady = function() {
+                    setTimeout("ixmaps.editor.loadTheme()", 10);
+                };
+
+                // ===========================
+                // first time   
+                // ===========================
+                
+                **/
+
+                ixmaps.editor.loadTheme();
+
+            });
+
+        </script>
+
+</body>
+
+</html>

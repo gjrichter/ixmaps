@@ -1,0 +1,206 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>iXmaps Theme Editor</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+
+</head>
+
+<body id="theme-editor">
+
+    <div id="editor-div" style="height:100%;margin-right:5px">
+        <pre id="editor" style="height:100%;width:100%;border:#eee solid 1px;">loading ...</pre>
+    </div>
+
+    <div id="editor-apply-button" style="margin-top:0.2em;margin-left:0em">
+        <a href='javascript:ixmaps.applyEditorTheme();'>
+            <button type="button" class="btn btn-light btn-md">
+                apply changes
+            </button>
+        </a>
+    </div>
+
+    <div id="editor-footer" style="margin-top:-0.3em">
+        <span style="font-size:0.8em;color:#ddd">powered by ACE Code Editor, Copyright (c) 2010, Ajax.org B.V.</span>
+        <div>
+
+            <!-- Bootstrap core JavaScript
+    ================================================== -->
+            <!-- Placed at the end of the document so the pages load faster -->
+
+            <script src="../../ui/js/tools/json_config.js"></script>
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.9.6/ace.js" type="text/javascript" charset="utf-8"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.9.6/ext-language_tools.js"></script>
+
+            <script type="text/javascript">
+                
+                ixmaps = ixmaps || null;
+                
+                if (window.opener) {
+                    ixmaps = window.opener.ixmaps;
+                } else
+                if (parent) {
+                    ixmaps = parent.window.ixmaps;
+                } else {
+                    alert("error: missing parent window for themes !");
+                }
+
+                /**************************************************************** 
+                 *
+                 * apply new theme definition after editing
+                 *
+                 ****************************************************************/
+
+                ixmaps.applyEditorTheme = function() {
+
+                    console.log("applyEditorTheme");
+
+                    if (!ixmaps.editor) {
+                        ixmaps.parentApi.error("no theme defined!");
+                        return;
+                    }
+
+                    var szThemeDef = ixmaps.editor.getValue();
+
+                    var theme = new Config(szThemeDef);
+                    var themeDefObj = theme.obj;
+
+
+
+                    // remove previous theme representation from map
+                    ixmaps.embeddedSVG.window.map.Api.removeTheme(ixmaps.editorThemeId);
+
+                    // keep theme id
+                    theme.obj.style.id = ixmaps.editorThemeId;
+
+                    // make new theme representation
+                    ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(theme.obj);
+
+                    return;
+
+                }
+
+                /**************************************************************** 
+                 *
+                 * handle the ACE editor
+                 *
+                 ****************************************************************/
+
+                ixmaps.loadEditor = function() {
+
+                    ixmaps.editor = ace.edit("editor");
+
+                    // enable autocompletion and snippets
+                    ixmaps.editor.setOptions({
+                        enableBasicAutocompletion: true,
+                        enableSnippets: true,
+                        enableLiveAutocompletion: true,
+                        fontFamily: "Consolas",
+                        fontSize: "16px"
+                    });
+
+                    var ixmapsCompleter = {
+                        getCompletions: function(editor, session, pos, prefix, callback) {
+                            if (prefix.length === 0) {
+                                callback(null, []);
+                                return
+                            }
+                            $.getJSON(
+                                "../../js/tools/ixmaps.completer.js",
+                                function(wordList) {
+                                    // wordList like [{"word":"flow","freq":24,"score":300,"flags":"bc","syllables":"1"}]
+                                    callback(null, wordList.map(function(ea) {
+                                        return {
+                                            name: ea.word,
+                                            value: ea.word,
+                                            score: ea.score,
+                                            meta: (ea.help || "ixmaps")
+                                        }
+                                    }));
+                                })
+                        }
+                    }
+
+                    var langTools = ace.require("ace/ext/language_tools");
+                    langTools.addCompleter(ixmapsCompleter);
+
+                    ixmaps.editor.getSession().setMode("ace/mode/json");
+                    ixmaps.editor.setTheme("ace/theme/dawn");
+
+                    if (ixmaps.getThemeObj(ixmaps.editorThemeId)) {
+                        var themeObj = ixmaps.getThemeDefinitionObj(ixmaps.editorThemeId);
+                        ixmaps.editor.setValue(new Config(themeObj).getPrettyString());
+                        ixmaps.editor.clearSelection();
+                        ixmaps.editor.gotoLine(0, 0);
+                        try {
+                            ixmaps.editor.getSession().getSelection().selectionLead.setPosition(0, 0);
+                            ixmaps.editor.getSession().gotoLine(0);
+                        } catch (e) {}
+                    } else {
+                        ixmaps.editor.setValue("");
+                    }
+                };
+
+
+                /**************************************************************** 
+                 *
+                 * get theme definition string and open editor
+                 *
+                 ****************************************************************/
+
+                var themes = ixmaps.getThemes();
+                
+                for (i in themes) {
+                    if (!themes[i].szFlag.match(/FEATURE/)) {
+                        ixmaps.editorThemeId = themes[i].szId;
+                    }
+                }
+
+                // GR 17.10.2019 new: get active legend theme
+                var themeObj = ixmaps.getThemeObj(ixmaps.editor.szThemeId);
+
+                if (themeObj) {
+                    ixmaps.editorThemeId = themeObj.szId;
+                    
+                    $.when(
+                        $.getScript("https://cdnjs.cloudflare.com/ajax/libs/ace/1.9.6/ace.js"),
+                        $.getScript("https://cdnjs.cloudflare.com/ajax/libs/ace/1.9.6/ext-language_tools.js"),
+                        $.getScript("../../ui/js/tools/json_config.js"),
+                        $.Deferred(function (deferred) {
+                            $(deferred.resolve);
+                        })
+                    ).done(function () {
+                        ixmaps.loadEditor();
+                    });
+                }
+
+                var resize = function() {
+                    var height = (window.parent.$("#editor").height() || ($(window.parent).height() + 60) || ($(window).height()));
+                    $("#editor-div").css("height", (height - 60) + "px");
+                    // set dialog iframe height
+                    window.parent.window.document.getElementById('dialogframe').style.height = String((height - 50) + "px");
+                    if (ixmaps && ixmaps.editor && ixmaps.editor.resize) {
+                        ixmaps.editor.resize();
+                    }
+                };
+                window.onresize = function() {
+                    resize();
+                };
+
+                $("#editor-apply-button").button();
+                $("#editor-div").show();
+
+                resize();
+
+            </script>
+
+</body>
+
+</html>

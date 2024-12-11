@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="1"
+   name=""
+   committed-date="2006-10-11T18:27:20.998356Z"
+   url="file:///D:/SVN/Repositories/svggis/syntaxhighlighter"
+   last-author="T30"
+   kind="dir"
+   uuid="ae6058bf-968a-9a4b-ab60-e4af5f7ae11c"
+   repos="file:///D:/SVN/Repositories/svggis"
+   revision="2"/>
+<entry
+   committed-rev="1"
+   name="shBrushDelphi.js"
+   text-time="2006-10-11T18:51:19.593750Z"
+   committed-date="2006-10-11T18:27:20.998356Z"
+   checksum="d164c653f02c537cc39b3820d68d2172"
+   last-author="T30"
+   kind="file"
+   prop-time="2006-10-11T18:51:19.515625Z"/>
+<entry
+   committed-rev="1"
+   name="listxml.html"
+   text-time="2006-10-11T18:51:19.593750Z"
+   committed-date="2006-10-11T18:27:20.998356Z"
+   checksum="f74a2f3f1b20f13783bdce37872e8fc6"
+   last-author="T30"
+   kind="file"
+   prop-time="2006-10-11T18:51:19.515625Z"/>
+<entry
+   committed-rev="1"
+   name="shBrushVb.js"
+   text-time="2006-10-11T18:51:19.593750Z"
+   committed-date="2006-10-11T18:27:20.998356Z"
+   checksum="3a702553ace5db168be3691f63aff6b8"
+   last-author="T30"
+   kind="file"
+   prop-time="2006-10-11T18:51:19.515625Z"/>
+<entry
+   committed-rev="1"
+   name="shBrushPhp.js"
+   text-time="2006-10-11T18:51:19.609375Z"
+   committed-date="2006-10-11T18:27:20.998356Z"
+   checksum="4459c4f83639153819fb3036e133a3f6"
+   last-author="T30"
+   kind="file"
+   prop-time="2006-10-11T18:51:19.531250Z"/>
+<entry
+   committed-rev="1"
+   name="Tests.html"
+   text-time="2006-10-11T18:51:19.609375Z"
+   committed-date="2006-10-11T18:27:20.998356Z"
+   checksum="75887d7da6308a79ea5170bf7a060158"
+   last-author="T30"
+   kind="file"
+   prop-time="2006-10-11T18:51:19.531250Z"/>
+<entry
+   committed-rev="1"
+   name="shBrushJScript.js"
+   text-time="2006-10-11T18:51:19.609375Z"
+   committed-date="2006-10-11T18:27:20.998356Z"
+   checksum="de1c30e5b9e34cebbba8c522ba86d11a"
+   last-author="T30"
+   kind="file"
+   prop-time="2006-10-11T18:51:19.546875Z"/>
+<entry
+   committed-rev="1"
+   name="shBrushSql.js"
+   text-time="2006-10-11T18:51:19.625000Z"
+   committed-date="2006-10-11T18:27:20.998356Z"
+   checksum="d1a7debe4a17644d328f273ef17fe710"
+   last-author="T30"
+   kind="file"
+   prop-time="2006-10-11T18:51:19.546875Z"/>
+<entry
+   committed-rev="1"
+   name="shBrushCSharp.js"
+   text-time="2006-10-11T18:51:19.625000Z"
+   committed-date="2006-10-11T18:27:20.998356Z"
+   checksum="8fa04860b48ddace9bb56e7ddb49197c"
+   last-author="T30"
+   kind="file"
+   prop-time="2006-10-11T18:51:19.546875Z"/>
+<entry
+   committed-rev="1"
+   name="shBrushXml.js"
+   text-time="2006-10-11T18:51:19.625000Z"
+   committed-date="2006-10-11T18:27:20.998356Z"
+   checksum="63d06a863948ec233e12efd7dbe62c92"
+   last-author="T30"
+   kind="file"
+   prop-time="2006-10-11T18:51:19.562500Z"/>
+<entry
+   committed-rev="1"
+   name="shBrushPython.js"
+   text-time="2006-10-11T18:51:19.640625Z"
+   committed-date="2006-10-11T18:27:20.998356Z"
+   checksum="99c2e10f4c6021a9e768d9c462b5b915"
+   last-author="T30"
+   kind="file"
+   prop-time="2006-10-11T18:51:19.562500Z"/>
+<entry
+   committed-rev="1"
+   name="SyntaxHighlighter.css"
+   text-time="2006-10-11T18:51:19.640625Z"
+   committed-date="2006-10-11T18:27:20.998356Z"
+   checksum="1186fbcac91462cea61fddce9a88e729"
+   last-author="T30"
+   kind="file"
+   prop-time="2006-10-11T18:51:19.578125Z"/>
+<entry
+   committed-rev="1"
+   name="shCore.js"
+   text-time="2006-10-11T18:51:19.640625Z"
+   committed-date="2006-10-11T18:27:20.998356Z"
+   checksum="4e310699a4aebba634c745182720b75e"
+   last-author="T30"
+   kind="file"
+   prop-time="2006-10-11T18:51:19.578125Z"/>
+</wc-entries>
