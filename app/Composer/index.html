@@ -774,6 +774,7 @@
             //$('#input-table-map-' + name).append(
             ixmaps.embed('input-table-map-' + name, mapConfig, map => {
                 ixmaps.embeddedApiA[map.szMap].embeddedSVG.window[name] = data;
+                dataA[name].map = map;
                 //map.data(data, {
                 //    type: "jsonDB",
                 //    name: name
