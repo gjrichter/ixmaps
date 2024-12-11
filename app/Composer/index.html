@@ -997,6 +997,12 @@
 
             dataA[dataName].map = ixmaps.map(dataName);
             
+            console.log("++++++++++++++++++++++++")
+            console.log(dataName);
+            console.log(ixmaps.map);
+            console.log(ixmaps.map(dataName));
+            console.log("++++++++++++++++++++++++")
+            
             $("#" + "input-table-table-" + dataName).css("height", "150px");
             $("#input-table-table-" + dataName).html(makeDataTable(dataA[dataName].data, dataName, 150));
  
