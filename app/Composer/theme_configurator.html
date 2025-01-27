@@ -18,7 +18,7 @@
 
     <style type="text/css" media="screen">
         .map-config {
-            background-color: #888;
+            background-color: #2AA2DE;
         }
 
         hr.separator {
@@ -342,6 +342,12 @@
             float: left;
         }
 
+        
+        #color-select-div {
+            border: solid black 1px;
+            border-radius: 0.5em;
+            padding: 0.3em 0em;
+        }
     </style>
 </head>
 
@@ -364,7 +370,7 @@
             <!--  top				    -->
             <!--  --------------------	-->
 
-            <p class="form-control" style="border:none;background:none;margin-top:0.5em;margin-bottom:-0.3em;margin-left:-0.7em">Theme:</p>
+            <p class="form-control" style="border:none;background:none;margin-top:0em;margin-bottom:1em;margin-left:-0.7em;color:white;font-size:22px">Theme Configurator</p>
 
             <div id="data-alert" style="margin-top:0.5em"></div>
 
@@ -511,7 +517,11 @@
 
                 <div id="lookup-alert"></div>
             </div>
-
+            <br>
+        </div>
+        
+        <div class="container">
+            
             <!-- --------------------	-->
             <!-- data fields            -->
             <!-- --------------------	-->
@@ -521,16 +531,32 @@
                 <h3 id="chartDefinitionFieldsHeader" class="disabled">
                     <span id="chartDefinitionFields">theme</span>
                     <span>fields</span>
+                     <span class="pull-right">
+                        <a href='javascript:ixmaps.editor.applyChanges();'>
+                            <button type="button" class="btn btn-link btn-md">
+                                apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i>
+                            </button>
+                        </a>
+                    </span>
                 </h3>
                 <h5 class="subtitle">defines the data column(s) to visualize</h5>
-
+ 
                 <div id="data-field-alert"></div>
 
                 <div class="row">
                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                         <div class="form-group">
                             <label id="define-datafields-title" for="theme-data-fields-select">data field(s)</label>
-                            <select class="form-control" id="theme-data-fields-select" multiple="multiple" size='6' onchange="ixmaps.editor.getSampleValues()">
+                             <!-- help -->
+                            <a onclick="$(this).siblings('.help').toggle('fast');">
+                                <span style="font-size:14px;float:right;margin-right:0.2em;padding-top:0.2em"><span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></span></a>
+                            <div class="help">
+                                <p>The main visualization data field; may be numeric or categorical.</p>
+                                <p>numeric &rarr; defines color class in CHOROPLETH themes, or size in CHART themes.</p>
+                                <p>categorical &rarr; defines color in CHOROPLETH and CHART themes.</p>
+                                <p>Note: the size of a CHART theme can be defined by anoyher field below.</p>
+                            </div>
+                           <select class="form-control" id="theme-data-fields-select" multiple="multiple" size='6' onchange="ixmaps.editor.getSampleValues()">
                                 <option>-</option>
                             </select>
                         </div>
@@ -554,9 +580,9 @@
                             <label for="theme-data-field2-select">2. data field</label>
                             <!-- help -->
                             <a onclick="$(this).siblings('.help').toggle('fast');">
-                                <span style="font-size:14px;float:right;margin-right:0.2em;padding-top:0.2em">*)</span></a>
+                                <span style="font-size:14px;float:right;margin-right:0.2em;padding-top:0.2em"><span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></span></a>
                             <div class="help">
-                                <p>The second data field defines a data source to calculate the final value from two values, the data field(s) and this value.</p>
+                                <p>The second data field defines in general a 100% value source.</p>
                                 <p>If not specified differently, iXMaps will perform a 'percent' calculation.</p>
                                 <p>Other calculations can be defined by 'theme type' modificators like PERMILLE, FACTOR, DIFFERENCE ...</p>
                             </div>
@@ -715,7 +741,7 @@
                         <div class="form-group">
                             <label for="theme-type-select">or modify the chart type</label>
                             <div id="theme-type-menu-text"></div>
-                            <div class="btn btn-outline-dark" style="float:left;margin-top:0.4em;padding:1.8em 1em"  onclick="ixmaps.makeChartMenueHTML(null,'myMenuTarget');">
+                            <div class="btn btn-outline-dark" style="float:left;margin-top:0.4em;padding:1.8em 1em"  onclick="ixmaps.editor.makeChartMenueHTML(null,'myMenuTarget');">
                                 <span>
                                     <i class="icon shareIcon blackHover share_bitly icon-pie-chart" title="chart type menu" tabindex="-1" style="padding-top:0.2em"></i>
                                     chart type menu </span>
@@ -743,7 +769,7 @@
                             <label id="actual-themetype-title" for="theme-type-select">the actual theme type is</label>
                             <!-- help -->
                             <a onclick="$(this).siblings('.help').toggle('fast');">
-                                <span style="font-size:14px;margin-right:0.2em;padding-top:0.2em">*)</span></a>
+                                <span style="font-size:14px;margin-right:0.2em;padding-top:0.2em"><span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></span></a>
                             <div class="help">
                                 <p>The theme 'type' is a string with one or more key words to define the theme type</p>
                                 <p>There are two basic theme types:
@@ -799,18 +825,23 @@
                                     <span id="xcolor-label" style="font-size:11px;line-height:15px;background-color:white;"></span>
                                 </a>
                             </div>
-                            <div id="color-select-div" style="margin-top:1em;max-height:300px;overflow:auto;display:none"></div>
+                            <div id="color-select-div" style="width:58%;margin-top:1em;display:none">
+                                <div style="float:left;margin:0 0 0.3em 0.5em;color:#aaaaaa;"><b>colorschemes</b></div>
+                                <div style="float:right;margin:-0.1em 0.3em 0.3em 0.5em">
+                                    <a href="javascript:$('#color-select-div').hide()">close</a></div>
+                                <div id="color-select-div-workspace" style="clear:both;max-height:300px;overflow:auto;"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                         <div class="form-group">
-                            <label for="theme-distribution-select">distribution</label>
+                            <label for="theme-distribution-select">classification</label>
                             <!-- help -->
                             <a onclick="$(this).siblings('.help').toggle('fast');">
-                                <span style="font-size:14px;float:right;margin-right:0.2em;padding-top:0.2em">*)</span></a>
+                                <span style="font-size:14px;float:right;margin-right:0.2em;padding-top:0.2em"><span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></span></a>
                             <div class="help">
-                                <ul>
-                                    <li>for single fields it is either a class distributon mode like EQUIDISTANT, QUANTILE or LOGARITHMIC or CATEGORICAL for discrete value like 'type' or 'year'</li>
+                                <ul style="color:#444444">
+                                    <li>for single fields it is either a classification method like EQUIDISTANT, QUANTILE or LOGARITHMIC or CATEGORICAL for discrete value like 'type' or 'year'</li>
                                     <li>for multiple field charts it can be 'by field' (for bar or pie charts) or 'dominant' or 'significant', if we have single value charts or shapes for the visualisation</li>
                                     <p>('significant' is a value that is most above its own mean value; measured in standard deviation)</p>
                                 </ul>
@@ -821,6 +852,7 @@
                                     <option value="EQUIDISTANT">Equidistant</option>
                                     <option value="LOGARITHMICAL">Logarithmical</option>
                                     <option value="QUANTILE">Quantile</option>
+                                    <option value="HaedTail">Head/Tail</option>
                                     <option value="RANGES">Ranges</option>
                                 </optgroup>
                                 <optgroup label="discret values (text values allowed)">
@@ -1119,7 +1151,7 @@
                             <label for="chartRangeScaleValue">range scale</label>
                             <!-- help -->
                             <a onclick="$(this).siblings('.help').toggle('fast');">
-                                <span style="font-size:14px;float:right;margin-right:0.2em;padding-top:0.2em">*)</span></a>
+                                <span style="font-size:14px;float:right;margin-right:0.2em;padding-top:0.2em"><span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></span></a>
                             <div class="help">
                                 <p>The range scale defines a factor to apply on yaxis compression or complex symbol radius.</p>
                                 <ul>
@@ -1419,8 +1451,8 @@
                         <a onclick="$(this).siblings('.help').toggle();">
                             <span class="fa fa-info fa-fw" style="font-size:14px;color:#dddddd;float:right;padding-top:0.3em"></span></a>
                         <div class="help">
-                            <p>Actualize display every n charts generated</p>
-                            <p>Changes user experience</p>
+                            <p>Actualize display every n charts generated;
+                               affects user experience</p>
                         </div>
                         <!------ -->
                         <div class="form-group">
@@ -1600,7 +1632,7 @@
 
             ixmaps.popupSelectColorScheme = function() {
                 var szColors = ixmaps.getColors();
-                $("#color-select-div").html(szColors);
+                $("#color-select-div-workspace").html(szColors);
                 $("#color-select-div").toggle();
            };
 
@@ -1609,7 +1641,7 @@
                 ixmaps.editorColorschemeType = "colorscheme";
 
                 ixmaps.editorColorscheme = szColorscheme;
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, "colorscheme:" + szColorscheme, "set");
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, "colorscheme:" + szColorscheme, "set");
                 ixmaps.setColors(szColorscheme);
                 //$("#color-select-div").hide();
             };
@@ -1665,72 +1697,72 @@
             };
 
             function toggle_dopacity() {
-                var szThemeStyle = ixmaps.getThemeStyleString();
+                var szThemeStyle = ixmaps.getThemeStyleString(ixmaps.editor.mapId, ixmaps.editor.themeId);
                 if (szThemeStyle && szThemeStyle.match(/DOPACITYLOG/)) {
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOPACITYLOG;', 'remove');
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOPACITYMAX;dopacityscale:5;', 'toggle');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:DOPACITYLOG;', 'remove');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:DOPACITYMAX;dopacityscale:5;', 'toggle');
                 } else
                 if (szThemeStyle && szThemeStyle.match(/DOPACITYMAX/)) {
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOPACITYMAX;', 'remove');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:DOPACITYMAX;', 'remove');
                 } else
                 if (szThemeStyle && szThemeStyle.match(/DOPACITY/)) {
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOPACITY;', 'remove');
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOPACITYLOG;dopacityscale:5;', 'toggle');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:DOPACITY;', 'remove');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:DOPACITYLOG;dopacityscale:5;', 'toggle');
                 } else {
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOPACITY;dopacityscale:5;', 'toggle');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:DOPACITY;dopacityscale:5;', 'toggle');
                 }
                 setTimeout("init_theme_line()", 100);
             }
 
             function toggle_values() {
-                var szThemeStyle = ixmaps.getThemeStyleString();
+                var szThemeStyle = ixmaps.getThemeStyleString(ixmaps.editor.mapId, ixmaps.editor.themeId);
                 if (szThemeStyle && szThemeStyle.match(/VALUES/)) {
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:VALUES;', 'remove');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:VALUES;', 'remove');
                 } else {
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:VALUES;', 'add');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:VALUES;', 'add');
                 }
             }
 
             function toggle_glow() {
-                var szThemeStyle = ixmaps.getThemeStyleString();
+                var szThemeStyle = ixmaps.getThemeStyleString(ixmaps.editor.mapId, ixmaps.editor.themeId);
                 if (szThemeStyle && szThemeStyle.match(/GLOW/)) {
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:GLOW;', 'remove');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:GLOW;', 'remove');
                 } else {
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:GLOW;', 'add');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:GLOW;', 'add');
                 }
             }
 
             function toggle_aura() {
-                var szThemeStyle = ixmaps.getThemeStyleString();
+                var szThemeStyle = ixmaps.getThemeStyleString(ixmaps.editor.mapId, ixmaps.editor.themeId);
                 if (szThemeStyle && szThemeStyle.match(/AURA/)) {
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:AURA;', 'remove');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:AURA;', 'remove');
                 } else {
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:AURA;', 'add');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:AURA;', 'add');
                 }
             }
 
             function toggle_relocate() {
-                var szThemeStyle = ixmaps.getThemeStyleString();
+                var szThemeStyle = ixmaps.getThemeStyleString(ixmaps.editor.mapId, ixmaps.editor.themeId);
                 if (szThemeStyle && szThemeStyle.match(/RELOCATE/)) {
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:RELOCATE;', 'remove');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:RELOCATE;', 'remove');
                 } else {
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:RELOCATE;', 'add');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:RELOCATE;', 'add');
                 }
             }
 
             function toggle_shadow() {
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'shadow:toggle');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'shadow:toggle');
             }
 
             function toggle_data() {
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'showdata:toggle');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'showdata:toggle');
             }
 
             function setChartScale(nDelta) {
                 if (event.keyCode == 13) {
                     var newScale = Number($("#chartScaleValue").val());
                     if (!isNaN(newScale)) {
-                        ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'scale:' + String(newScale), 'set');
+                        ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'scale:' + String(newScale), 'set');
                     } else {
                         alert("Input type error: only numbers allowed!");
                     }
@@ -1745,13 +1777,13 @@
                     nScale = (nScale * 1.5).toPrecision(2);
                 }
                 $("#chartScaleValue").val(nScale)
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'scale:' + String(nScale), 'set');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'scale:' + String(nScale), 'set');
             }
 
             function setLineColor() {
                 if (event.keyCode == 13) {
                     var newColor = String($("#chartLineColor").val());
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'linecolor:' + newColor, 'set');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'linecolor:' + newColor, 'set');
                 }
             }
 
@@ -1759,7 +1791,7 @@
                 if (event.keyCode == 13) {
                     var newScale = Number($("#chartLineWidth").val());
                     if (!isNaN(newScale)) {
-                        ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'linewidth:' + String(newScale), 'set');
+                        ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'linewidth:' + String(newScale), 'set');
                     } else {
                         alert("Input type error: only numbers allowed!");
                     }
@@ -1774,14 +1806,14 @@
                     nScale = (nScale + 0.5).toPrecision(2);
                 }
                 $("#chartLineWidth").val(nScale)
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'linewidth:' + String(nScale), 'set');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'linewidth:' + String(nScale), 'set');
             }
 
             function setValueScale(nDelta) {
                 if (event.keyCode == 13) {
                     var newScale = Number($("#chartValueScale").val());
                     if (!isNaN(newScale)) {
-                        ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'valuescale:' + String(newScale), 'set');
+                        ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'valuescale:' + String(newScale), 'set');
                     } else {
                         alert("Input type error: only numbers allowed!");
                     }
@@ -1796,7 +1828,7 @@
                     nScale = (nScale * 1.5).toPrecision(2);
                 }
                 $("#chartValueScale").val(nScale)
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'valuescale:' + String(nScale), 'set');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'valuescale:' + String(nScale), 'set');
             }
 
             function setChartOpacity() {
@@ -1818,13 +1850,13 @@
                     nOpacity = (nOpacity * 1.5).toPrecision(2);
                 }
                 $("#chartOpacityValue").val(nOpacity)
-                ixmaps.changeThemeStyle(null,ixmaps.editor.themeId, 'fillopacity:' + String(nOpacity), 'set');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId,ixmaps.editor.themeId, 'fillopacity:' + String(nOpacity), 'set');
             }
 
             function setNormalSizeValue() {
                 if (event.keyCode == 13) {
                     var newValue = String($("#chartNormalSizeValue").val());
-                    ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'normalsizevalue:' + newValue, 'set');
+                    ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'normalsizevalue:' + newValue, 'set');
                 }
             }
 
@@ -1885,7 +1917,7 @@
             ixmaps.editorColorscheme = "#ffeeee,#dd0000,dynamic,cold";
 
             ixmaps.editor.setSelectColorScheme = function() {
-                var objTheme = ixmaps.getThemeObj();
+                var objTheme = ixmaps.map(ixmaps.editor.mapId).getThemeObj();
                 if (objTheme) {
                     var colorArgA = objTheme.origColorScheme.slice(0);
 
@@ -2114,8 +2146,6 @@
                 switch (szValue) {
                     case "CHOROPLETH":
                         ixmaps.editor.themeObj.style.type = szValue + szCategorical;
-                        ixmaps.embeddedSVG.window.map.Api.clearAll();
-                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
                         break;
                     case "CHART|DOT|RAW|FAST":
                         ixmaps.editor.themeObj.style.type = szValue + szCategorical;
@@ -2124,8 +2154,6 @@
                         ixmaps.editor.themeObj.style.gridwidth = null;
                         ixmaps.editor.themeObj.style.gridwidthpx = null;
                         ixmaps.editor.themeObj.style.sizefield = null;
-                        ixmaps.embeddedSVG.window.map.Api.clearAll();
-                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
                         break;
                     case "CHART|BUBBLE|SIZE":
                         ixmaps.editor.themeObj.style.type = szValue + szCategorical;
@@ -2134,8 +2162,6 @@
                         ixmaps.editor.themeObj.style.gridwidth = null;
                         ixmaps.editor.themeObj.style.gridwidthpx = null;
                         ixmaps.editor.themeObj.style.sizefield = null;
-                        ixmaps.embeddedSVG.window.map.Api.clearAll();
-                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
                         break
                     case "CHART|SYMBOL|GRIDSIZE|FAST|AGGREGATE|SUM|DOPACITY":
                         ixmaps.editor.themeObj.style.type = szValue + szCategorical;
@@ -2150,8 +2176,6 @@
                         } else {
                             ixmaps.editor.themeObj.style.type += "CENTER|DOMINANT";
                         }
-                        ixmaps.embeddedSVG.window.map.Api.clearAll();
-                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
                         break;
                     case "CHART|SYMBOL|AUTOSIZE|FAST|AGGREGATE|SUM":
                         ixmaps.editor.themeObj.style.type = szValue + szCategorical;
@@ -2164,8 +2188,6 @@
                         } else {
                             ixmaps.editor.themeObj.style.type += "CENTER|DOMINANT";
                         }
-                        ixmaps.embeddedSVG.window.map.Api.clearAll();
-                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
                         break;
                     case "CHART|BUBBLE|SIZE|FAST|AGGREGATE|RELOCATE|SUM":
                         ixmaps.editor.themeObj.style.type = szValue + szCategorical;
@@ -2179,8 +2201,6 @@
                         } else {
                             ixmaps.editor.themeObj.style.type += "";
                         }
-                        ixmaps.embeddedSVG.window.map.Api.clearAll();
-                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
                         break;
                     case "CHART|BUBBLE|SIZE|FAST|AGGREGATE|HEX|AUTOSIZE|SUM":
                         ixmaps.editor.themeObj.style.type = szValue + szCategorical;
@@ -2193,8 +2213,6 @@
                         } else {
                             ixmaps.editor.themeObj.style.type += "";
                         }
-                        ixmaps.embeddedSVG.window.map.Api.clearAll();
-                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
                         break;
                     case "CHART|WAFFLE|GRIDSIZE|AGGREGATE|FAST|RECT|SUM":
                         ixmaps.editor.themeObj.style.type = szValue + szCategorical;
@@ -2211,13 +2229,16 @@
                         } else {
                             ixmaps.editor.themeObj.style.type += "";
                         }
-                        ixmaps.embeddedSVG.window.map.Api.clearAll();
-                        ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
                         break;
 
                     default:
                         break;
                 }
+                
+                // apply changes
+                ixmaps.embeddedApiA[ixmaps.editor.themeId].embeddedSVG.window.map.Api.clearAll();
+                ixmaps.embeddedApiA[ixmaps.editor.themeId].embeddedSVG.window.map.Api.newMapThemeByObj(ixmaps.editor.themeObj);
+                
                 if (ixmaps.editor.themeObj.style.type.match(/CHART/)) {
                     $("#chartSize").show();
                 } else {
@@ -2227,22 +2248,22 @@
 
             ixmaps.editor.setDistribution = function() {
                 var szDistribution = $("#theme-distribution-select").val();
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:EQUIDISTANT;', 'remove');
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:QUANTILE;', 'remove');
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:RANGE;', 'remove');
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:LOG;', 'remove');
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:LOGARITHMICAL;', 'remove');
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DOMINANT;', 'remove');
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:DEVIATION;', 'remove');
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'type:' + szDistribution + ';', 'add');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:EQUIDISTANT;', 'remove');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:QUANTILE;', 'remove');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:RANGE;', 'remove');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:LOG;', 'remove');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:LOGARITHMICAL;', 'remove');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:DOMINANT;', 'remove');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:DEVIATION;', 'remove');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:' + szDistribution + ';', 'add');
             };
 
             ixmaps.editor.setClasses = function() {
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'classes:"' + $("#theme-classes-select").val() + '"', 'set');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'classes:"' + $("#theme-classes-select").val() + '"', 'set');
             };
 
             ixmaps.editor.setPosition = function() {
-                ixmaps.changeThemeStyle(null, ixmaps.editor.themeId, 'align:' + $("#chartPositionList").val() + '', 'set');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'align:' + $("#chartPositionList").val() + '', 'set');
             };
 
             ixmaps.editor.setNewLabel = function(i) {
@@ -2253,8 +2274,8 @@
                 var szScaling = $("#mapObjectScaling").val();
                 var szScale = ixmaps.getMapScale();
                 $("#mapNormalsizeScale").val("1:" + szScale);
-                ixmaps.setOptions(null,JSON.parse('{"objectscaling":"' + szScaling + '"}'));
-                ixmaps.setOptions(null,JSON.parse('{"normalsizescale":"' + szScale + '"}'));
+                ixmaps.setOptions(ixmaps.editor.mapId,JSON.parse('{"objectscaling":"' + szScaling + '"}'));
+                ixmaps.setOptions(ixmaps.editor.mapId,JSON.parse('{"normalsizescale":"' + szScale + '"}'));
             };
 
             ixmaps.editor.setAggregationMode = function() {
@@ -2266,12 +2287,12 @@
                 if (szScale.match(/\:/)) {
                     szScale = szScale.split(/\:/)[1];
                 }
-                ixmaps.setOptions(null,JSON.parse('{"normalsizescale":"' + szScale + '"}'));
+                ixmaps.setOptions(ixmaps.editor.mapId,JSON.parse('{"normalsizescale":"' + szScale + '"}'));
             };
 
             ixmaps.editor.setMapRenderRate = function() {
                 var szRate = $("#mapRenderRate").val();
-                ixmaps.setOptions(null,JSON.parse('{"flushChartDraw":"' + szRate + '"}'));
+                ixmaps.setOptions(ixmaps.editor.mapId,JSON.parse('{"flushChartDraw":"' + szRate + '"}'));
             };
 
             ixmaps.editor.alert = function(szAlert, szDestination, szFlag) {
@@ -2455,7 +2476,7 @@
                     changeCss(".container", "background-color:#666");
                 }
                 
-                ixmaps.editor.themeId = ixmaps.editor.themeId || szId || ixmaps.getThemes()[0].szId;
+                ixmaps.editor.themeId = ixmaps.editor.themeId || szId || ixmaps.getThemes(ixmaps.editor.mapId)[0].szId;
 
                 //var color_selected = "#48A542";
                 var color_selected = "#83bf80";
@@ -2506,55 +2527,16 @@
                 // get actual theme
                 // if no theme given, preset with default theme values
                 // -----------------------------------------------------
-
-                var objTheme = ixmaps.editor.themeObj = ixmaps.getThemeDefinitionObj(szId);
-                var objThemeObj = ixmaps.getThemeObj(szId);
-
-                if (!objTheme || !objThemeObj) {
-
-                    // ------------------------------
-                    // no theme yet, lets preset one	
-                    // ------------------------------
-
-                    objTheme = ixmaps.editor.makeDefaultTheme(color_selected);
-
-                    if (!objTheme.fields) {
-                        var szHtml = "<p style='padding:1em'>no data defined or data not valid</p>";
-                        $("#editor-footer").html(szHtml);
-                    }
-
-                    objThemeObj = {
-                        szFieldsA: [objTheme.fields]
-                    };
-
-                    if (ixmaps.editor.dbtableType) {
-                        ixmaps.editor.applyChangesTimeout = setTimeout("ixmaps.editor.applyChanges()", 100);
-                        $("#data-defined").css("color", color_selected);
-                    }
-
-                    // ------------------------------
-                    // make user message	
-                    // ------------------------------
-
-                    if (ixmaps.isBookmark()) {
-                        ixmaps.editor.alert(
-                            '<h3 style="margin:0">iXMaps Theme Configurator</h3><h5>loading project ... <img src="../../../ui/resources/images/loading_blue.gif" id="load-file-spinner" style="height:72px;margin:-0.4em 0 0 -2em;"></h3>',
-                            'data-alert', 'success');
-                    } else {
-                        ixmaps.editor.alert(
-                            '<h3>Welcome to iXMaps!</h3><h4>please define a <strong><a onclick="ixmaps.loadStoryTool(\'../../../app/Editor/dialog_data_load.html\')"><button type="button" class="btn btn-info btn-md" style="border-radius:1.5em;padding:0.1em 0.7em 0.4em 0.7em">data source</button></a></strong>  or <strong><a onclick="ixmaps.loadStoryTool(\'../../../app/Editor/dialog_project_load.html\')""><button type="button" class="btn btn-info btn-md" style="border-radius:1.5em;padding:0.1em 0.8em 0.4em 0.8em">load a project</button></a></strong></h4>',
-                            'data-alert', 'success');
-                    }
-                } else {
-                    $("#no-data-alert").hide();
-                    $("#apply-on-bottom").show();
-                    $("#data-defined").css("color", color_selected);
-
-                    ixmaps.editor.alert(
-                        '<h3>theme properties</h3>',
-                        'theme-alert', 'success');
-                }
-
+                
+                var objTheme = ixmaps.editor.themeObj = ixmaps.map(szId).getThemeDefinitionObj(szId);
+                var objThemeObj = ixmaps.map(szId).getThemeObj(szId);
+                
+                console.log("********************")
+                console.log(objThemeObj);
+                console.log("********************")
+                
+                console.log(ixmaps);
+                
                 if (!objTheme || !objTheme.style) {
                     return;
                 }
@@ -2576,7 +2558,10 @@
                 }
 
                 var szData = objTheme.style.dbtable;
-                ixmaps.editor.dataObj = eval("ixmaps.embeddedSVG.window." + (szData || "themeDataObj"));
+                console.log(szData);
+                console.log(ixmaps.embeddedSVG);
+                ixmaps.editor.dataObj = eval("ixmaps.embeddedApiA[szId].embeddedSVG.window." + (szData || "themeDataObj"));
+                
 
                 // ------------------------------
                 // get data fields
@@ -2598,7 +2583,7 @@
                         }
                     }
                 }
-
+                console.log(ixmaps.editor.dataObj);
                 // ------------------------------------------------------
                 // make data field html: <options> for <select> elements
                 // ------------------------------------------------------
@@ -3171,7 +3156,7 @@
 
                 // theme
                 // ------------------------------------
-                var objTheme = ixmaps.getThemeDefinitionObj() || ixmaps.editor.themeObj;
+                var objTheme = __map.getThemeDefinitionObj() || ixmaps.editor.themeObj;
 
                 objTheme.style.dbtableUrl = $("#define-data").val();
                 objTheme.layer = $("#map-layer-select").val();
@@ -3325,53 +3310,11 @@
 
                 // make the new theme
                 // -----------------------------
-                var oldTheme = ixmaps.getThemeDefinitionObj();
-                ixmaps.embeddedSVG.window.map.Api.clearAll();
-                ixmaps.embeddedSVG.window.map.Api.newMapThemeByObj(objTheme);
-
-                if (!oldTheme) {
-                    setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()", 100);
-                    setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()", 200);
-                    setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()", 500);
-                    setTimeout("ixmaps.embeddedSVG.window.map.Api.zoomToTheme()", 1000);
-                }
+                __map.replace(objTheme.style.name,objTheme);
 
                 ixmaps.editor.alert('<b>generating theme ...</b><img src="../../../ui/resources/images/loading_blue.gif" id="load-file-spinner" style="height:48px;margin:-0.4em 0 0 0;">', "generating-on-bottom", "default");
             };
 
-
-            ixmaps.xxmakeChartMenueHTML = function(szId, szTarget) {
-
-                if ($("#" + szTarget).html().length) {
-                    $("#" + szTarget).html("");
-                    return;
-                };
-
-                ixmaps.themeObj = ixmaps.themeObj || ixmaps.getThemeObj(szId);
-
-                // make <div> + <svg> to receive the chart menu (in svg)
-                var szHtml = "";
-                szHtml += "<div style='font-size:0.6em;margin-bottom:0.5em'>select chart type:</div>";
-                szHtml += "<div id='menuDiv' style='height:300px;width:260px;overflow:auto'><div><svg width='240' height='2000' viewBox='0 0 4800 40000'><g id='getchartmenutarget'></g></svg></div></div>";
-
-                // create dialog
-                $("#" + szTarget).html(szHtml);
-
-                // call theme method to draw the charts
-                var szTypelistA = ixmaps.themeObj.getChartTypeMenu($("#getchartmenutarget")[0], null, 140);
-
-                // create click map to select the chart for the theme
-                szHtml = "<div style='position:relative;top:-2010px;'>";
-                for (i in szTypelistA) {
-                    if (i % 4 == 0) {
-                        szHtml += "<div style='clear:both'>";
-                    }
-                    szHtml += "<a href=\"javascript:ixmaps.changeThemeStyle(null,'" + ixmaps.themeObj.szId + "','type:" + szTypelistA[i] + "','set');\"><div style='float:left;height:60px;width:60px;'></div></a>";
-                }
-                szHtml += "</div>";
-
-                $("#menuDiv").append(szHtml);
-            };
 
             szChartTypeList = [
                 "CHART|BAR", "CHART|BAR|3D", "CHART|BAR|3D|TRENDLINE", "CHART|BAR|3D|SORT", "CHART|BAR|HORZ|LEFT|UP", "CHART|BAR|HORZ|RIGHT|UP", "CHART|BAR|HORZ|LEFT|UP|COMPRESS", "CHART|BAR|HORZ|RIGHT|UP|COMPRESS", "CHART|BAR|HORZ|LEFT|UP|3D", "CHART|BAR|HORZ|RIGHT|UP|3D", "CHART|BAR|HORZ|RIGHT|3D", "CHART|BAR|HORZ|RIGHT|COMPRESS|3D", "CHART|BAR|HORZ|RIGHT|SORT|3D", "CHART|BAR|HORZ|RIGHT|SORT|COMPRESS|3D", "CHART|BAR|HORZ|RIGHT|SORT|UP|3D", "CHART|BAR|HORZ|LEFT|UP|COMPRESS|3D", "CHART|BAR|HORZ|RIGHT|UP|COMPRESS|3D", "CHART|BAR|HORZ|CENTER|UP", "CHART|BAR|STACKED", "CHART|BAR|STACKED|3D", "CHART|BAR|STACKED|3D", "CHART|BAR|COLUMNS|STACKED|3D", "CHART|BAR|COLUMNS|STACKED|3D|SIZE", "CHART|BAR|COLUMNS|STACKED|3D|SORT|SIZE", "CHART|BAR|HORZ|STACKED|SIZE", "CHART|BAR|HORZ|3D|STACKED|SIZE", "CHART|BAR|HORZ|COLUMNS|STACKED|SIZE", "CHART|PIE", "CHART|PIE|SIZE", "CHART|PIE|3D", "CHART|PIE|3D|SIZE", "CHART|PIE|3D|HEIGHT", "CHART|PIE|3D|VOLUME|SORT|SYMMETRIC", "CHART|PIE|3D|VOLUME|SORT|SYMMETRIC|SIZE", "CHART|PIE|3D|VOLUME|SORT|SYMMETRIC|SIZE|HEIGHT", "CHART|PIE|DONUT", "CHART|PIE|DONUT|SIZE", "CHART|PIE|DONUT|3D", "CHART|PIE|DONUT|3D|SIZE", "CHART|PIE|DONUT|3D|HEIGHT", "CHART|PIE|DONUT|3D|SIZE|HEIGHT", "CHART|PIE|DONUT|3D|VOLUME|SORT|SYMMETRIC", "CHART|PIE|STARBURST", "CHART|PIE|STARBURST|RAYS", "CHART|PIE|STARBURST|SRAYS", "CHART|PIE|STARBURST|SIZE", "CHART|PIE|STARBURST|RAYS|SIZE", "CHART|PIE|STARBURST|SRAYS|SIZE", "CHART|PIE|STARBURST|3D", "CHART|PIE|STARBURST|3D|SIZE", "CHART|PIE|STARBURST|3D|HEIGHT", "CHART|PIE|DONUT|STARBURST", "CHART|PIE|DONUT|STARBURST|SIZE", "CHART|PIE|DONUT|STARBURST|3D", "CHART|PIE|DONUT|STARBURST|3D|SIZE", "CHART|PIE|DONUT|STARBURST|3D|HEIGHT", "CHART|PIE|DONUT|STARBURST|3D|VOLUME", "CHART|PIE|DONUT|STARBURST|3D|VOLUME|SORT|SYMMETRIC", "CHART|PIE|CENTER|SIZE", "CHART|PIE|CENTERVALUE|SIZE", "CHART|PIE|CENTER|STARBURST|SIZE", "CHART|PIE|CENTERVALUE|STARBURST|SIZE", "CHART|PIE|CENTER|STARBURST|RAYS|SIZE", "CHART|PIE|CENTERVALUE|STARBURST|RAYS|SIZE", "CHART|PIE|HALF|CENTER|STARBURST|RAYS|SIZE", "CHART|PIE|HALF|CENTERVALUE|STARBURST|RAYS|SIZE", "CHART|PIE|DONUT|HALF|SIZE", "CHART|PIE|DONUT|HALF|STARBURST|SIZE", "CHART|PIE|DONUT|HALF|3D|SIZE", "CHART|PIE|DONUT|HALF|3D|HEIGHT|SIZE", "CHART|PIE|DONUT|HALF|3D|HEIGHT|VOLUME|SIZE", "CHART|WAFFLE|", "CHART|SYMBOL|SEQUENCE|CENTER", "CHART|SYMBOL|SEQUENCE|CENTER|SORT|UP", "CHART|SYMBOL|SEQUENCE|CENTER|SORT|DOWN", "CHART|SYMBOL|SEQUENCE|CENTER|RINGS", "CHART|SYMBOL|SEQUENCE|CENTER|SORT|UP|RINGS", "CHART|SYMBOL|SEQUENCE|CENTER|SORT|DOWN|RINGS", "CHART|SYMBOL|SEQUENCE|BOTTOM|SORT|DOWN", "CHART|SYMBOL|SEQUENCE|BOTTOM|SORT|UP|RINGS", "CHART|SYMBOL|SEQUENCE|TOP|SORT|UP|RINGS", "CHART|SYMBOL|SEQUENCE|BASE", "CHART|SYMBOL|SEQUENCE|BASE|SORT|DOWN", "CHART|SYMBOL|SEQUENCE|BASE|SORT|UP", "CHART|SYMBOL|SEQUENCE|STAR", "CHART|SYMBOL|SEQUENCE|STAR|SORT|UP|EXPAND", "CHART|SYMBOL|SEQUENCE|STAR|SORT|DOWN", "CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM", "CHART|SYMBOL|SEQUENCE|STAR|SORT|RANDOM|DOPACITY"
@@ -3380,7 +3323,7 @@
                 "CHART|BAR", "CHART|BAR|VALUES", "CHART|BAR|3D", "CHART|BAR|3D|VALUES", "CHART|BAR|3D|VOLUME", "CHART|BAR|3D|VOLUME|VALUES", "CHART|BAR|HORZ|RIGHT|UP", "CHART|BAR|HORZ|RIGHT|UP|VALUES", "CHART|BAR|HORZ|RIGHT|UP|3D", "CHART|BAR|HORZ|RIGHT|UP|VALUES|3D", "CHART|BAR|POINTER", "CHART|BAR|POINTER|VALUES", "CHART|BUBBLE|SURFACE", "CHART|BUBBLE|SURFACE|VALUES", "CHART|SQUARE|SURFACE", "CHART|SQUARE|SURFACE|VALUES"
             ];
             szChartTypeListSingleValue = [
-                "CHOROPLETH", "CHART|BUBBLE", "CHART|SQUARE", "CHART|PIE|3D|SIZE", "CHART|PIE|3D|HEIGHT", "CHART|PIE|3D|SIZE|HEIGHT", "CHART|BAR|3D|VOLUME", "CHART|BAR", "CHART|BAR|3D", "CHART|BAR|3D|SIZE", "CHART|BAR|HORZ|RIGHT|UP", "CHART|BAR|HORZ|RIGHT|UP|3D", "CHART|BAR|POINTER", "CHART|BAR|POINTER|SIZE", "CHART|BAR|HORZ|RIGHT|UP|POINTER", "CHART|LABEL"
+                "CHART|BUBBLE", "CHART|SQUARE", "CHART|LABEL", "CHART|PIE|3D|SIZE", "CHART|PIE|3D|HEIGHT", "CHART|PIE|3D|SIZE|HEIGHT", "CHART|BAR|3D|VOLUME", "CHART|BAR", "CHART|BAR|3D", "CHART|BAR|3D|SIZE", "CHART|BAR|HORZ|RIGHT|UP", "CHART|BAR|HORZ|RIGHT|UP|3D", "CHART|BAR|POINTER", "CHART|BAR|POINTER|SIZE", "CHART|BAR|HORZ|RIGHT|UP|POINTER", "CHART|LABEL"
             ];
             szChartTypeListPLOT = [
                 "CHART|SYMBOL|FIXSIZE|PLOT", "CHART|SYMBOL|FIXSIZE|PLOT|LOLLIPOP", "CHART|SYMBOL|FIXSIZE|PLOT|LINES", "CHART|SYMBOL|FIXSIZE|PLOT|LINES|AREA", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT|LOLLIPOP", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT|LINES", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT|LINES|AREA", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOT|LINES|AREA|STACKED", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOTVAR|LINES", "CHART|SYMBOL|SEQUENCE|FIXSIZE|PLOTVAR|LINES|AREA"
@@ -3439,12 +3382,12 @@
                 console.log("out");
             };
             ixmaps.chartClick = function(szFlag) {
-                ixmaps.changeThemeStyle(null, null, 'type:' + szFlag, 'set');
+                ixmaps.changeThemeStyle(ixmaps.editor.mapId, ixmaps.editor.themeId, 'type:' + szFlag, 'set');
             };
 
 
 
-            ixmaps.makeChartMenueHTML = function(szId, szTarget) {
+            ixmaps.editor.makeChartMenueHTML = function(szId, szTarget) {
 
                 if ($("#" + szTarget).html().length) {
                     $("#" + szTarget).html("");
@@ -3459,7 +3402,7 @@
                 // create dialog
                 $("#" + szTarget).html(szHtml);
 
-                var __themeObj = ixmaps.themeObj || ixmaps.getThemeObj(szId);
+                var __themeObj = ixmaps.getThemeObj(ixmaps.editor.mapId, ixmaps.editor.themeId);
 
                 var szTypeList = szChartTypeListSingleValue;
                 if ((__themeObj.szFieldsA.length > 1) ||
@@ -3471,19 +3414,19 @@
                 }
 
                 for (i = 0; i < szTypeList.length; i++) {
-                    ixmaps.makeOneChartHTML(szId, szTypeList, i);
+                    ixmaps.editor.makeOneChartHTML(szId, szTypeList, i);
                 }
 
 
             }
 
-            ixmaps.makeOneChartHTML = function(szId, szTypeList, index) {
+            ixmaps.editor.makeOneChartHTML = function(szId, szTypeList, index) {
 
                 console.log(i);
 
                 var szTargetDiv = "chartmenu-div";
 
-                var __themeObj = ixmaps.themeObj || ixmaps.getThemeObj(szId);
+                var __themeObj = ixmaps.getThemeObj(ixmaps.editor.mapId, ixmaps.editor.themeId);
 
                 if (!__themeObj) {
                     return;
@@ -3890,31 +3833,20 @@
                 // do this on every new theme  
                 // ===========================
 
-                __lastThemeId = null;
-                ixmaps.htmlgui_onDrawTheme = function(szId) {
-                    if (szId == __lastThemeId) {
-                        //return;
-                    }
-                    __lastThemeId = szId;
-                    setTimeout("ixmaps.editor.loadTheme(\"" + szId + "\")", 10);
-
-                    ixmaps.setLayout("right");
-                    resize();
-
-                };
-
-                /**
-               ixmaps.onMapReady = function() {
-                    setTimeout("ixmaps.editor.loadTheme()", 10);
+                 ixmaps.htmlgui_onDrawTheme = function() {
+                    setTimeout(() => {ixmaps.editor.loadTheme(ixmaps.editor.themeId)}, 10);
                 };
 
                 // ===========================
                 // first time   
                 // ===========================
                 
-                **/
-
-                ixmaps.editor.loadTheme();
+                console.log("init theme configurator: "+ixmaps.editor.themeId);
+                
+                ixmaps.editor.mapId = ixmaps.editor.themeId 
+                __map = ixmaps.map(ixmaps.editor.mapId);
+                
+                ixmaps.editor.loadTheme(ixmaps.editor.themeId);
 
             });
 

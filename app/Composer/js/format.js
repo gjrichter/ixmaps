@@ -65,7 +65,7 @@ ixmaps.data = ixmaps.data || {};
 					szDecimals += '0';
 				}
 			} else {
-				szDecimals = "";
+				szDecimals = String("000000000000").substr(0,nPrecision);
 			}
 			var szReturn = nValue < 0 ? "-" : "";
 			var szLeading = "";
@@ -108,7 +108,7 @@ ixmaps.data = ixmaps.data || {};
 				szReturn += "0";
 			}
 
-			if (szDecimals.length && szDecimals != "00") {
+			if (szDecimals.length) {
 				szReturn += ((szFlag && szFlag.match(/BLANK/)) ? "." : ",") + szDecimals;
 			}
 		}

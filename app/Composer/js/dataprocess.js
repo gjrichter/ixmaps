@@ -117,7 +117,8 @@
  		    if (dataA[name].fShowFilter) {
  		        table += "<tr>";
  		        for (i in dbtable.fields) {
- 		            table += "<th style='min-width:50px'><input id='input-table-table-" + name + "-filter-" + dbtable.fields[i].id + "' style='color:black;text-decoration:red;margin-right:1em;font-size:1.1em' onkeyup='javascript:__dataKeyupSelect(\"" + name + "\",\"" + dbtable.fields[i].id + "\",$(this).val())' value='" + (dataA[name].filterA ? dataA[name].filterA[dbtable.fields[i].id] || "" : "") + "'></input></th>";
+                    var szSafeId = ("input-table-table-" + name + "-filter-" + dbtable.fields[i].id).replace(/ |\W/g, "_");
+ 		            table += "<th style='min-width:50px'><input id='" + szSafeId + "' style='color:black;text-decoration:red;margin-right:1em;font-size:1.1em;width:100px' onkeyup='javascript:__dataKeyupSelect(\"" + name + "\",\"" + dbtable.fields[i].id + "\",$(this).val(),event)' value='" + (dataA[name].filterA ? dataA[name].filterA[dbtable.fields[i].id] || "" : "") + "'></input></th>";
  		        }
  		        table += "</tr>";
  		    }
@@ -147,7 +148,7 @@
  		            if (text.length > 40) {
  		                tooltip = "onmouseover=\"__showTooltip(event,'" + text + "')\" onmouseout=\"hideTooltip()\"";
  		            }
- 		            table += "<td nowrap style='padding-right:0.5em;overflow:hidden;text-overflow:ellipsis;max-width:500px' " + tooltip + "'>" + dbtable.records[r][i] + "&nbsp;</td>";
+ 		            table += "<td nowrap class='"+name+"_column_"+i+"' style='padding-right:0.5em;overflow:hidden;text-overflow:ellipsis;max-width:500px;' " + tooltip + "'>" + dbtable.records[r][i] + "&nbsp;</td>";
  		        }
  		        table += "</tr>";
  		    }
@@ -177,12 +178,62 @@
  		                value = type + "<small style='white-space:nowrap'>" +
  		                    "<br>min: " + ixmaps.formatValue(facetsA[i].min, 2, "BLANK") +
  		                    "<br>max: " + ixmaps.formatValue(facetsA[i].max, 2, "BLANK") +
- 		                    //"<br>sum: "+ixmaps.formatValue(facetsA[i].sum,2,"BLANK")+
+ 		                    "<br>sum: " + ixmaps.formatValue(facetsA[i].sum, 2, "BLANK")+
+ 		                    "</small>";
+ 		            }
+ 		            if (facetsA[i].undef) {
+ 		                value += "<small style='white-space:nowrap'>" +
+ 		                    "<br>" + facetsA[i].undef + " missing values" +
  		                    "</small>";
  		            }
  		        }
  		        $("#analytics-" + name + "-" + i).html(value);
- 		    }
+                
+                $("."+name+"_column_"+i).addClass(facetsA[i].undef?"td_red":facetsA[i].type=='numeric'?"td_blue":(facetsA[i].uniqueValues?"td_yellow":""));
+                
+                if (facetsA[i].type=='numeric'){
+                    $("."+name+"_column_"+i).addClass("td_right");
+                    $("."+name+"_column_"+i).each(function( index ) {
+                        $( this ).html(ixmaps.formatValue($( this ).text(), 2, "BLANK"));
+                    });                
+                }
+            }
+ 		};
+ 		makeDataCards = function (data, name, height) {
+            
+ 		    dbtable = data;
+            
+            var leftWidth = 0;
+
+            
+ 		    var table = "<div style='border-top:black solid 1px;'>";
+
+ 		    table += "<div class='card-body' >";
+ 		    table += "<div>";
+
+ 		    table += "<table class='display dataTable' width='100%'>";
+
+ 		    let max = Math.min(101, dbtable.records.length)
+ 		    for (var r = 0; r < max; r++) {
+
+				table += "<tr style='border-bottom:solid black 1px;'><td>"+(r+1)+"</td></tr>";
+				table += "<tr><td>"+"&nbsp;"+"</td></tr>";
+
+                for (var d = 0; d<dbtable.records[r].length; d++ ){
+						
+						var szValue = dbtable.records[r][d];
+						if (szValue.length && !isNaN(szValue)){
+                            var nValue = (dbtable.records[r][d]);
+							szValue = ixmaps.formatValue(nValue,2,"BLANK");
+						}
+						table += "<tr><td style='text-align:right;vertical-align:top;width:"+leftWidth+"px;color:#aaa;font-size:0.8em;'>"+dbtable.fields[d].id+"</td><td style='padding-left:0.5em;'>"+szValue+"</td></tr>";
+					}
+				}
+
+ 		    table += "</table>";
+ 		    table += "</div>";
+            
+ 		    return table;
  		};
 
  		showInputTable = function (data, name) {

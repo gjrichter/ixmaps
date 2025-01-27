@@ -244,7 +244,7 @@
         // !! get ixmaps api from story parent/opener
         //
         // ===========================================
-
+        
         ixmaps.initialized = true;
 
         ixmaps.data = ixmaps.data || {};
@@ -271,7 +271,7 @@
             $("#facetDiv").attr("id", "facetDiv-" + ixmaps.data.facetsDataName);
 
             var facetsA = ixmaps.data.getFacets(ixmaps.data.facetsObj, ixmaps.data.facetsFilter);
-            ixmaps.data.showFacets(ixmaps.data.facetsfilter, "facetDiv-" + ixmaps.data.facetsDataName, facetsA, ixmaps.data.facetsObj, ixmaps.data.facetsDataName);
+            ixmaps.data.showFacets(ixmaps.data.facetsFilter, "facetDiv-" + ixmaps.data.facetsDataName, facetsA, ixmaps.data.facetsObj, ixmaps.data.facetsDataName);
 
         });
 

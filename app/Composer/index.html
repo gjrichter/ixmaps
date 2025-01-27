@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>VIS-X Composer</title>
+    <title>Composer</title>
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="https://gjrichter.github.io/ixmaps/ui/resources/images/ixmaps_logo.png" />
 
@@ -25,38 +25,56 @@
             top: 0;
             padding: 0.2em 0;
         }
+        tr {
+            xxborder: solid #dddddd 1px;
+        }
+        .td_yellow {
+            background:rgba(255,255,0,0.1);
+        }
+        .td_red {
+            background:rgba(255,0,0,0.1);
+        }
+        .td_blue {
+            background:rgba(0,0,255,0.05);
+        }
+        .td_right {
+            text-align:end;
+        }
+        .even {
+            background:rgba(255,255,255);
+        }
+    </style>
+
+    <style>
+        #tooltip {
+            font-family: arial, system;
+            font-size: 14px;
+            background: white;
+            border: 0.5px solid black;
+            border-radius: 5px;
+            padding: 0.5em 1em 0.5em 1em;
+            max-width: 300px;
+            box-shadow: 1px 1px 9px rgba(0, 0, 0, .275);
+        }
+
+        #tooltip p {
+            font-size: 14px;
+        }
+
+        #tooltip table {
+            font-size: 14px;
+        }
 
     </style>
-    
-	<style>
-		#tooltip {
-			font-family: arial, system;
-			font-size: 14px;
-			background: white;
-			border: 0.5px solid black;
-			border-radius: 5px;
-			padding: 0.5em 1em 0.5em 1em;
-			max-width: 300px;
-			box-shadow: 1px 1px 9px rgba(0, 0, 0, .275);
-		}
 
-		#tooltip p {
-			font-size: 14px;
-		}
 
-		#tooltip table {
-			font-size: 14px;
-		}
-	</style>
-    
-    
 </head>
 
 <body>
     <!-- Navigation-->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container px-4 px-lg-5">
-            <a class="navbar-brand" href="#!"><img src="img/cabbage.png" style="height:36px;vertical-align:-32%;margin-right:1.5em">DATA CRAUTI </a>
+            <a class="navbar-brand" href="#!"><img src="img/cabbage.png" style="height:36px;vertical-align:-32%;margin-right:1.5em">DATA-KRAUTI </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
@@ -76,14 +94,13 @@
                     </li>
                     -->
                 </ul>
-                    <button class="btn btn-outline-dark" onclick="__dataLoadDialog()">
-                        add data
-                        <span id="nData" class="badge bg-dark text-white ms-1 rounded-pill">0</span>
-                    </button>
+                 <button class="btn btn-outline-dark" onclick="__dataLoadDialog()">
+                    add data
+                    <span id="nData" class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                </button>
             </div>
         </div>
     </nav>
-
 
     <!-- Related items section-->
     <section>
@@ -109,11 +126,11 @@
     </section>
 
     <!-- div to host dialog overlays -->
-    <div id="dialog-pos" style="position:absolute;top:100px;left:300px;display:none;z-index:9999">
-        <div id="dialog" style="display:none;">
+    <div id="composer-dialog-pos" style="position:absolute;top:100px;left:300px;display:none;z-index:9999">
+        <div id="composer-dialog" style="display:none;">
         </div>
     </div>
-    
+
     <!-- div to host dialog overlays -->
     <div id="tooltip" style="position: absolute; display: none;z-index:9999"></div>
     <div id="tooltips" style="display: none;"></div>
@@ -132,9 +149,9 @@
 
     <script src="libs/messagebox.js"></script>
 
-    <script src="../../ui/js/htmlgui_api.js"></script>
-    <script src="../../../data.js/data.js"></script>
-    
+    <script src="https://gjrichter.github.io/ixmaps_test/ui/js/htmlgui_api.js"></script>
+    <script src="https://gjrichter.github.io/data.js/data.js"></script>
+
     <script type="text/javascript" charset="utf-8">
     </script>
 
@@ -142,6 +159,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <script src="./js/json_config.js"></script>
+    <script src="./js/json_config_html.js"></script>
 
     <script type="text/javascript" charset="utf-8">
         
@@ -152,13 +170,13 @@
         //
         // ----------------------------------------------------------
         // ----------------------------------------------------------
-        
+
         // this is the one and only composer data base
         // --------------------------------------------
-        
+
         var nData = 0;
         const dataA = {};
-        
+
         // it will hold 1 object per every loaded data 
         // with the data object, all generated composer elements related to tyhe data 
         // 
@@ -175,11 +193,11 @@
         //          map:            null or the map created with the data
         //      }
         //  
-        
-        
+
+
         // and here we add data to the composer 
         // -------------------------------------
-        
+
         const __addData = (data) => {
 
             data = Data.import({
@@ -191,13 +209,14 @@
             let dataName = "data" + String(Math.random()).slice(2);
 
             // and add data 
-            dataA[dataName] = { data: data,
-                                 url: ixmaps.editor.dbtableUrl,
-                                type: ixmaps.editor.dbtableType
-                              };
-            
-             $("#nData").html(++nData);
-            
+            dataA[dataName] = {
+                data: data,
+                url: ixmaps.editor.dbtableUrl,
+                type: ixmaps.editor.dbtableType
+            };
+
+            $("#nData").html(++nData);
+
             // ------------------------------------------------
             // html to show and manipolate one data object
             // ------------------------------------------------
@@ -214,17 +233,19 @@
                 'href="javascript:__dataAnalytics(\'' + dataName + '\')">analyze</a> ';
             szHeader += '<a id="input-table-header-' + dataName + '-filter" class="btn btn-outline-dark mt-auto" ' +
                 'href="javascript:__dataFilter(\'' + dataName + '\')">filter</a> ';
-            
-            szHeader += '<a class="dropdown-toggle btn btn-outline-dark" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">process</a>' +
-                        '   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">' +
-                        '       <li><a class="dropdown-item" href="javascript:__dataProcessPivot(\'' + dataName + '\')">pivot</a></li>' +
-                        '       <li><a class="dropdown-item" href="#!">condense</a></li>' +
-                        '       <li><a class="dropdown-item" href="#!">join</a></li>' +
-                        '   </ul>' +    
-                        '</a>';
-            
-            
-            
+
+            szHeader += '<a id="input-table-header-' + dataName + '-process" class="btn btn-outline-dark mt-auto" ' +
+                'href="javascript:__dataProcessPivot(\'' + dataName + '\')">process</a> ';
+            /**
+            szHeader += '<a class="dropdown-toggle btn btn-outline-dark" id="input-table-header-' + dataName + '-process" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">process</a>' +
+                '   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">' +
+                '       <li><a class="dropdown-item" href="javascript:__dataProcessPivot(\'' + dataName + '\')">pivot</a></li>' +
+                '       <li><a class="dropdown-item" href="#!">condense</a></li>' +
+                '       <li><a class="dropdown-item" href="#!">join</a></li>' +
+                '   </ul>' +
+                '</a>';
+            **/
+
             szHeader += '<a id="input-table-header-' + dataName + '-map" class="btn btn-outline-dark mt-auto" ' +
                 'href="javascript:__dataToMap(\'' + dataName + '\')"><i class="bi-map  me-1"></i> map</a> ';
             szHeader += '<a id="input-table-header-' + dataName + '-theme" class="btn btn-outline-dark mt-auto" ' +
@@ -235,14 +256,14 @@
             szHeader += '<a id="input-table-header-' + dataName + '-remove" class="btn btn-outline-dark " ' +
                 'href="javascript:__removeData(\'' + dataName + '\')" style="float:right;margin-left:0.3em"><i class="bi-x-circle me-1"></i>remove</a>';
 
-            szHeader += '<a id="input-table-header-' + dataName + '-toggle-data" class="btn btn-outline-dark " ' +
-                'href="javascript:__hideMap(\'' + dataName + '\')" style="display:none;float:right;margin-left:0.3em"><i class="bi-eye  me-1"></i>toggle map</a>';
-
             szHeader += '<a id="input-table-header-' + dataName + '-toggle-map" class="btn btn-outline-dark " ' +
-                'href="javascript:__hideData(\'' + dataName + '\')" style="display:none;float:right"><i class="bi-eye  me-1"></i>toggle data</a>';
-            
+                'href="javascript:__hideMap(\'' + dataName + '\')" style="display:none;float:right;margin-left:0.3em"><i class="bi-eye  me-1"></i> map</a>';
+
+            szHeader += '<a id="input-table-header-' + dataName + '-toggle-data" class="btn btn-outline-dark " ' +
+                'href="javascript:__hideData(\'' + dataName + '\')" style="display:none;float:right"><i class="bi-eye  me-1"></i> data</a>';
+
             szHeader += '</div>';
-            
+
             szData += szHeader;
 
             // the data space: frame with sidebar and data workspace, workspace contains table view and map
@@ -256,15 +277,15 @@
             szTable += '<div id="input-table-table-' + dataName + '" style="resize:vertical;min-height:0px;height:400px;overflow:auto">';
             szTable += makeDataTable(data, dataName, 450);
             szTable += '</div>';
-            
-            szTable += '<p id="input-table-info-' + dataName + '">records: '+dataA[dataName].data.table.records+'</p>';
-            
+
+            szTable += '<p id="input-table-info-' + dataName + '">records: ' + dataA[dataName].data.table.records + '</p>';
+
             szTable += "<div id='input-table-map-" + dataName + "' style='width:100%'></div>";
 
             szTable += '</div>';
             szTable += '</div>';
             szData += szTable;
-            
+
             szData += "</div>";
 
             // ------------------------------------------------
@@ -278,35 +299,52 @@
         __removeData = function(dataName) {
 
             __confirm("do you really want to remove this data?", () => {
+
+                if ($("#input-table-header-" + dataName + "-theme").hasClass("active")) {
+                    $(".colpick").remove();
+                }
+
+                if (dataA[dataName].map) {
+                    delete ixmaps.embeddedApiA[dataName];
+                }
+
                 $("#" + "input-table-" + dataName).remove();
                 $("#" + "input-table-footer-" + dataName).remove();
                 $("#" + "input-table-header-" + dataName).remove();
 
                 delete dataA[dataName].data;
                 dataA[dataName] = null;
-                
+
                 $("#nData").html(--nData);
+
+                return;
             });
         };
 
         __hideData = function(dataName) {
 
             $("#" + "input-table-table-" + dataName).toggle();
+            let visible = ($("#input-table-table-" + dataName).css("display") != "none");
+            $("#input-table-header-" + dataName + "-toggle-data").children().first().removeClass("bi-eye bi-eye-slash")
+                                                                                    .addClass(visible?"bi-eye":"bi-eye-slash"); 
 
-            let height = ($("#" + "input-table-table-" + dataName).css("display") == "none") ? "600px" : "450px";
+            let height = !visible ? "600" : "450";
             $("#" + "input-table-map-" + dataName).height(height);
         };
 
-         __hideMap = function(dataName) {
+        __hideMap = function(dataName) {
 
             $("#" + "input-table-map-" + dataName).toggle();
+            let visible = ($("#input-table-map-" + dataName).css("display") != "none");
+            $("#input-table-header-" + dataName + "-toggle-map").children().first().removeClass("bi-eye bi-eye-slash")
+                                                                           .addClass(visible?"bi-eye":"bi-eye-slash"); 
 
-            let height = ($("#" + "input-table-map-" + dataName).css("display") == "none") ? "600" : "150";
+            let height = !visible ? "600" : "150";
             $("#" + "input-table-table-" + dataName).height(height);
             $("#input-table-table-" + dataName).html(makeDataTable(dataA[dataName].data, dataName, height));
         };
-        
-        
+
+
         // ----------------------------------------------------------
         // ----------------------------------------------------------
         // f a c e t s   
@@ -330,7 +368,7 @@
             $("#input-table-sidebar-" + dataName).css("width", "30%");
             $("#input-table-workspace-" + dataName).css("width", "70%");
 
-            $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height()-20);
+            $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height() - 20);
 
             ixmaps.data = ixmaps.data || {};
             ixmaps.data.fShowFacetValues = true;
@@ -352,8 +390,12 @@
             let height = $("#input-table-table-" + ixmaps.data.facetsDataName).height();
             let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
             $("#input-table-table-" + dataName).html(makeDataTable(ixmaps.data.facetsObj, dataName, height));
-            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
-            $("#input-table-info-" + dataName).html("records: "+ixmaps.data.facetsObj.table.records+" ("+dataA[dataName].data.table.records+")");
+            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset);
+            if (sFilter && sFilter.length){ 
+                $("#input-table-info-" + dataName).html("records: <b>" + ixmaps.data.facetsObj.table.records + "</b> (" + dataA[dataName].data.table.records + ")");
+            }else{
+                 $("#input-table-info-" + dataName).html("records: " + ixmaps.data.facetsObj.table.records);
+            }
 
             dataA[dataName].facetsFilter = sFilter;
             ixmaps.data.facetsFilter = sFilter;
@@ -371,6 +413,7 @@
         }
 
         __dataSort = function(dataName, szColumn, szDir) {
+            
             let data = dataA[dataName].data;
             if (dataA[dataName].facetsFilter) {
                 data = data.select(dataA[dataName].facetsFilter);
@@ -385,37 +428,37 @@
             $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
         };
 
-         __dataFilter = function(dataName) {
+        __dataFilter = function(dataName) {
 
             if ($("#input-table-header-" + dataName + "-filter").hasClass("active")) {
                 $("#input-table-header-" + dataName + "-filter").removeClass("active");
                 dataA[dataName].fShowFilter = false;
-            }else{
+            } else {
                 $("#input-table-header-" + dataName + "-filter").addClass("active");
                 dataA[dataName].fShowFilter = true;
-                
+
                 let data = dataA[dataName].data;
-                
-                if ( dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length ){
-                    
+
+                if (dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length) {
+
                     // get filter parts
                     // ----------------
                     let szPartsA = dataA[dataName].facetsFilter.split('WHERE ')[1].split('AND');
                     // test if BETWEEN x AND y and join two parts around AND
-                    for ( i=0; i<szPartsA.length; i++ ){
-                        if ( szPartsA[i].match(/BETWEEN/) ){
-                            szPartsA[i] = szPartsA[i] + "AND" + szPartsA[i+1];
-                            szPartsA.splice(i+1,1);
+                    for (i = 0; i < szPartsA.length; i++) {
+                        if (szPartsA[i].match(/BETWEEN/)) {
+                            szPartsA[i] = szPartsA[i] + "AND" + szPartsA[i + 1];
+                            szPartsA.splice(i + 1, 1);
                         }
                     }
                     // set filter parts
                     // ----------------
                     dataA[dataName].filterA = {};
-                    szPartsA.forEach(function(x){
+                    szPartsA.forEach(function(x) {
                         let xA = x.split(" ");
-                        dataA[dataName].filterA[xA[0].replace(/\"/g,"")] = xA[2].replace(/\"/g,"");
+                        dataA[dataName].filterA[xA[0].replace(/\"/g, "")] = xA[2].replace(/\"/g, "");
                     });
-                    
+
                     data = data.select(dataA[dataName].facetsFilter);
                 }
             }
@@ -425,30 +468,43 @@
             $("#input-table-table-" + dataName).html(makeDataTable(data, dataName, height));
             $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
         };
-        
-       __dataKeyupSelect = function(dataName, szColumn, szSelect) {
-           
+
+        __dataKeyupSelect = function(dataName, szColumn, szSelect, event) {
+
+            if ((event.key == 'ArrowLeft') ||
+                (event.key == 'ArrowRight')) {
+                return;
+            }
+
             let data = dataA[dataName].data;
             if (!dataA[dataName].filterA) {
                 dataA[dataName].filterA = {};
             }
             delete dataA[dataName].filterA[szColumn];
-            if (szSelect && szSelect.length){
-                 dataA[dataName].filterA[szColumn] = szSelect;
+            if (szSelect && szSelect.length) {
+                dataA[dataName].filterA[szColumn] = szSelect;
             }
             let szFilter = "";
-            for ( c in dataA[dataName].filterA ){
-                if ( dataA[dataName].filterA[c][0].match(/\<|\>/) && dataA[dataName].filterA[c].length < 3 ){
+            for (c in dataA[dataName].filterA) {
+                if (dataA[dataName].filterA[c][0].match(/\<|\>/) && dataA[dataName].filterA[c].length < 2) {
                     continue;
                 }
-                szFilter += szFilter.length?" AND ":" WHERE ";
-                if ( dataA[dataName].filterA[c][0].match(/\<|\>/) ){
-                    szFilter += "\"" + c + "\" " + dataA[dataName].filterA[c];
-                }else{                    
-                    szFilter += "\"" + c + "\" like \"" + dataA[dataName].filterA[c] +"\"";
+                szFilter += szFilter.length ? " AND " : " WHERE ";
+                if (dataA[dataName].filterA[c][0].match(/\<|\>/)) {
+                    if (dataA[dataName].filterA[c][1] != " ") {
+                        szFilter += "\"" + c + "\" " + dataA[dataName].filterA[c][0] + " " + dataA[dataName].filterA[c].slice(1);
+                    } else {
+                        szFilter += "\"" + c + "\" " + dataA[dataName].filterA[c];
+                    }
+                } else {
+                    if (dataA[dataName].filterA[c].match(/BETWEEN/)) {
+                        szFilter += "\"" + c + "\" " + dataA[dataName].filterA[c];
+                    } else {
+                        szFilter += "\"" + c + "\" like \"" + dataA[dataName].filterA[c] + "\"";
+                    }
                 }
             }
-            if ( szFilter && szFilter.length ){
+            if (szFilter && szFilter.length) {
                 data = data.select(szFilter);
             }
             if (dataA[dataName].map) {
@@ -459,31 +515,43 @@
                 }
             }
             dataA[dataName].facetsFilter = szFilter;
-            
+
             let height = $("#input-table-table-" + dataName).height();
             let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
             $("#input-table-table-" + dataName).html(makeDataTable(data, dataName, height));
             $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
-            $("#input-table-info-" + dataName).html("records: "+data.table.records+" ("+dataA[dataName].data.table.records+")");
-           
-            let __input = $("#input-table-table-" + dataName+ "-filter-" + szColumn);
-            __input.focus().val(__input.val()+"?").val(__input.val().slice(0,-1));
-          }
+            $("#input-table-info-" + dataName).html("records: " + data.table.records + " (" + dataA[dataName].data.table.records + ")");
 
-       __dataTheme = function(dataName) {
+            let szSafeId = ("input-table-table-" + dataName + "-filter-" + szColumn).replace(/ |\W/g, "_");
+            let __input = $("#" + szSafeId);
+            let len = __input.val().length;
+            __input.focus();
+            __input[0].setSelectionRange(len, len);
+        }
 
-            if ($("#input-table-header-" + dataName + "-theme").hasClass("active")) {
-                $("#input-table-sidebar-" + dataName).html("");
-                $("#input-table-sidebar-" + dataName).css("width", "0%");
-                $("#input-table-workspace-" + dataName).css("width", "100%");
-                $("#input-table-header-" + dataName + "-theme").removeClass("active");
-                
+        var act_dataName = null;
+        __dataTheme = function(dataName) {
+            
+            if (act_dataName){
+                $("#input-table-sidebar-" + act_dataName).html("");
+                $("#input-table-sidebar-" + act_dataName).css("width", "0%");
+                $("#input-table-workspace-" + act_dataName).css("width", "100%");
+                $("#input-table-header-" + act_dataName + "-theme").removeClass("active");
+
                 // remove colpicker elements; 
                 // these have been created by 'theme_configurator.html -> colpick.js' the in the 'body' element
                 $(".colpick").remove();
+
+                ixmaps.editor = {};
                 
-                return;
+                if (dataName == act_dataName){
+                    act_dataName = null;
+                    return;
+                }
             }
+            
+            act_dataName = dataName;
+            
             $("#input-table-header-" + dataName + "-facets").removeClass("active");
             $("#input-table-header-" + dataName + "-theme-edit").removeClass("active");
             $("#input-table-header-" + dataName + "-theme").addClass("active");
@@ -494,6 +562,8 @@
             $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height());
 
             $("#input-table-sidebar-" + dataName).css("overflow", "auto");
+
+            ixmaps.editor.themeId = dataName;
             __openSidebar(dataName, '../../app/Composer/theme_configurator.html');
 
         };
@@ -522,18 +592,19 @@
 
         };
 
-         __dataAnalytics = function(dataName) {
+        __dataAnalytics = function(dataName) {
 
+            let data = dataA[dataName].data;
+            
             if ($("#input-table-header-" + dataName + "-analytics").hasClass("active")) {
                 $("#input-table-header-" + dataName + "-analytics").removeClass("active");
                 dataA[dataName].fShowAnalytics = false;
-            }else{
+            } else {
                 $("#input-table-header-" + dataName + "-analytics").addClass("active");
                 dataA[dataName].fShowAnalytics = true;
-                
-                let data = dataA[dataName].data;
-                
-                if ( dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length ){
+
+
+                if (dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length) {
                     data = data.select(dataA[dataName].facetsFilter);
                 }
             }
@@ -544,18 +615,18 @@
             $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
         };
 
-         __dataProcess = function(dataName) {
+        __dataProcess = function(dataName) {
 
             if ($("#input-table-header-" + dataName + "-process").hasClass("active")) {
                 $("#input-table-header-" + dataName + "-process").removeClass("active");
                 dataA[dataName].fShowAnalytics = false;
-            }else{
+            } else {
                 $("#input-table-header-" + dataName + "-process").addClass("active");
                 dataA[dataName].fShowAnalytics = true;
-                
+
                 let data = dataA[dataName].data;
-                
-                if ( dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length ){
+
+                if (dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length) {
                     data = data.select(dataA[dataName].facetsFilter);
                 }
             }
@@ -566,28 +637,113 @@
             $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
         };
 
-         __dataProcessPivot = function(dataName) {
+        xx__dataProcessPivot = function(dataName,pivotJson) {
+            
+           dataA[dataName].data = dataA[dataName].origdata || dataA[dataName].data;       
+
+           let data = dataA[dataName].data;
+            
+           if ($("#input-table-header-" + dataName + "-pivot").hasClass("active")) {
+
+                dataA[dataName].origdata = dataA[dataName].data;
+
+                data = data.pivot(pivotJson);
+
+                //__addData(data);
+                dataA[dataName].data = data;
+                 
+                if (dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length) {
+                    data = data.select(dataA[dataName].facetsFilter);
+                }
+            }
+
+            let height = $("#input-table-table-" + dataName).height();
+            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
+            $("#input-table-table-" + dataName).html(makeDataTable(data, dataName, height));
+            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+        };
+
+        xx__dataProcessCondense = function(dataName,pivotJson) {
+            
+           dataA[dataName].data = dataA[dataName].origdata || dataA[dataName].data;       
+
+           let data = dataA[dataName].data;
+            
+           if ($("#input-table-header-" + dataName + "-condense").hasClass("active")) {
+
+                dataA[dataName].origdata = dataA[dataName].data;
+               
+                data = data.condense(pivotJson);
+
+                //__addData(data);
+                dataA[dataName].data = data;
+                 
+                if (dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length) {
+                    data = data.select(dataA[dataName].facetsFilter);
+                }
+            }
+
+            let height = $("#input-table-table-" + dataName).height();
+            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
+            $("#input-table-table-" + dataName).html(makeDataTable(data, dataName, height));
+            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+        };
+
+        x__dataProcessPivot = function(dataName) {
+
+            if ($("#input-table-header-" + dataName + "-pivot").hasClass("active")) {
+                $("#input-table-header-" + dataName + "-pivot").removeClass("active");
+                $("#input-table-sidebar-" + dataName).html("");
+                $("#input-table-sidebar-" + dataName).css("width", "0%");
+                $("#input-table-workspace-" + dataName).css("width", "100%");
+                 return;
+            }
+            $("#input-table-header-" + dataName + "-facets").removeClass("active");
+            $("#input-table-header-" + dataName + "-theme").removeClass("active");
+            $("#input-table-header-" + dataName + "-pivot").addClass("active");
+
+            $("#input-table-sidebar-" + dataName).css("width", "25%");
+            $("#input-table-workspace-" + dataName).css("width", "75%");
+
+            $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height());
+
+            ixmaps.data.processObj = dataA[dataName].data;
+            ixmaps.data.processDataName = dataName;
+            
+            $("#input-table-sidebar-" + dataName).css("overflow", "auto");
+            __openSidebar(dataName, '../../app/Composer/data_process.html');
+
+        };
+
+        __dataProcessPivot = function(dataName) {
 
             if ($("#input-table-header-" + dataName + "-process").hasClass("active")) {
+                $("#input-table-sidebar-" + dataName).html("");
+                $("#input-table-sidebar-" + dataName).css("width", "0%");
+                $("#input-table-workspace-" + dataName).css("width", "100%");
                 $("#input-table-header-" + dataName + "-process").removeClass("active");
-                dataA[dataName].fShowPivot = false;
-            }else{
-                $("#input-table-header-" + dataName + "-process").addClass("active");
-                dataA[dataName].fShowPivot = true;
-                
-                let data = dataA[dataName].data;
-                
-                if ( dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length ){
-                    data = data.select(dataA[dataName].facetsFilter);
-                }
+                return;
             }
 
-            let height = $("#input-table-table-" + dataName).height();
-            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
-            $("#input-table-table-" + dataName).html(makeDataTable(data, dataName, height));
-            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
-        };
+            $("#input-table-header-" + dataName + "-theme").removeClass("active");
+            $("#input-table-header-" + dataName + "-theme-edit").removeClass("active");
+            $("#input-table-header-" + dataName + "-process").addClass("active");
 
+            $("#input-table-sidebar-" + dataName).css("width", "30%");
+            $("#input-table-workspace-" + dataName).css("width", "70%");
+
+            $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height() - 20);
+
+            ixmaps.data = ixmaps.data || {};
+            ixmaps.data.processObj = dataA[dataName].data;
+            ixmaps.data.processDataName = dataName;
+
+            $("#input-table-sidebar-" + dataName).css("overflow", "hidden");
+            __openSidebar(dataName, '../../app/Composer/data_process.html');
+
+        };
+        
+        
         // ---------------------------------------------------
         // ---------------------------------------------------
         //
@@ -608,7 +764,6 @@
             }
         };
 
-        
     </script>
 
     <script type="text/javascript" charset="utf-8">
@@ -624,8 +779,8 @@
          */
         const __openDialog = (url) => {
 
-            const $dialog = $("#dialog");
-            const $dialogPos = $("#dialog-pos");
+            const $dialog = $("#composer-dialog");
+            const $dialogPos = $("#composer-dialog-pos");
 
             if ($dialog.is(":visible")) {
                 $dialog.empty().hide();
@@ -661,8 +816,8 @@
          * @type void
          */
         __killDialog = function() {
-            $("#dialog").hide();
-            $("#dialog-pos").hide();
+            $("#composer-dialog").hide();
+            $("#composer-dialog-pos").hide();
         };
 
         // ----------------------------------------------------------
@@ -702,15 +857,8 @@
          * @param flag 'show' or 'hide'
          * @type void
          */
-        xx__dataLoadDialog = function(flag) {
-            $("#dialog-pos").css("top", ($(document).scrollTop() + 100) + "px");
-            $("#dialog-pos").css("left", "-50px");
-            $("#dialog-pos").css("margin", "auto");
-            __openDialog('../../app/Composer/dialog_data_load.html');
-        };
-
         const __dataLoadDialog = () => {
-            const dialog = $("#dialog-pos");
+            const dialog = $("#composer-dialog-pos");
 
             // Set the top position 100 pixels below the current scroll position
             dialog.css("top", ($(document).scrollTop() + 100) + "px");
@@ -733,7 +881,7 @@
 
         // make shure that multiple maps are no synchronized
         ixmaps.fSyncMaps = false;
-        
+
         /**
          ** strings used by the map 	
          **/
@@ -774,7 +922,7 @@
             //$('#input-table-map-' + name).append(
             ixmaps.embed('input-table-map-' + name, mapConfig, map => {
                 ixmaps.embeddedApiA[map.szMap].embeddedSVG.window[name] = data;
-                
+
                 dataA[name].map = map;
                 $("#input-table-header-" + name + "-theme").show();
                 $("#input-table-header-" + name + "-theme-edit").show();
@@ -783,13 +931,13 @@
                 //    type: "jsonDB",
                 //    name: name
                 //});
-                 map.options(mapOptions)
+                map.options(mapOptions)
                     .local("aggregated", "")
                     .local("loading data ...", "...")
                     .local("working ...", "")
                     .require("../../ui/js/tools/tooltip_mustache.js")
                     .attribution(attribution);
-                 map.layer(theme);
+                map.layer(theme);
             })
             //);
 
@@ -914,16 +1062,13 @@
 
         }
 
-        
-        
+
+
         ixmaps.editor = ixmaps.editor || {};
 
         __dataToMap = function(dataName) {
 
-            ixmaps.editor.dbtable = dataA[dataName].data;
-            ixmaps.editor.dataObj = dataA[dataName].data;
-
-            let themeObj = ixmaps.editor.makeDefaultTheme(dataName);
+            let themeObj = __makeDefaultTheme(dataName);
             themeObj.style.filter = dataA[dataName].facetsFilter;
 
             if (themeObj.style.lookupfield) {
@@ -935,10 +1080,10 @@
                 alert("no geometry reference found in data");
 
                 for (var name2 in dataA) {
-                    if (ixmaps.editor.getDefaultLookup(themeObj, dataA[name2].data)) {
+                    if (__getDefaultLookup(themeObj, dataA[name2].data)) {
                         alert("but geometry reference found in data: " + name2);
 
-                        const dialog = $("#dialog-pos");
+                        const dialog = $("#composer-dialog-pos");
 
                         // Set the top position 100 pixels below the current scroll position
                         dialog.css("top", ($(document).scrollTop() + 100) + "px");
@@ -951,7 +1096,7 @@
                         ixmaps.data.connectA.push(name2);
 
                         //__openDialog('../../app/Composer/dialog_connect_data_to_map.html');
-                        
+
                         matchesA = ixmaps.editor.matchTwoDataByFields(dataA[dataName].data, dataA[name2].data);
                         alert(matchesA);
                         console.log(matchesA);
@@ -970,7 +1115,7 @@
                             ixmaps.editor.dbtable = dataA[dataName].data;
                             ixmaps.editor.dataObj = dataA[dataName].data;
 
-                            let themeObjMap = ixmaps.editor.makeDefaultTheme(name2);
+                            let themeObjMap = __makeDefaultTheme(name2);
                             themeObjMap.style.itemfield = bestMatch.field2;
                             themeObjMap.layer = "layer_1";
 
@@ -979,33 +1124,33 @@
 
                             $("#" + "input-table-map-" + dataName).css("height", "450px");
                             $("#" + "input-table-map-" + dataName).css("width", "100%");
-                            
+
                             __createMap2([themeObjMap, themeObj], [dataA[name2].data, dataA[dataName].data], [dataName, dataName]);
                         }
-                     }
-                /**    
-                } else {
-                    const dialog = $("#dialog-pos");
+                    }
+                    /**    
+                    } else {
+                        const dialog = $("#composer-dialog-pos");
 
-                    // Set the top position 100 pixels below the current scroll position
-                    dialog.css("top", ($(document).scrollTop() + 100) + "px");
+                        // Set the top position 100 pixels below the current scroll position
+                        dialog.css("top", ($(document).scrollTop() + 100) + "px");
 
-                    // Align the dialog to the left
-                    dialog.css("left", "-50px");
+                        // Align the dialog to the left
+                        dialog.css("left", "-50px");
 
-                    __openDialog('../../app/Composer/dialog_data_load.html');
-                    return;
-                }
-                **/
+                        __openDialog('../../app/Composer/dialog_data_load.html');
+                        return;
+                    }
+                    **/
                 }
             }
 
-             $("#" + "input-table-table-" + dataName).css("height", "150px");
+            $("#" + "input-table-table-" + dataName).css("height", "150px");
             $("#input-table-table-" + dataName).html(makeDataTable(dataA[dataName].data, dataName, 150));
 
             $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height());
             $("#facetDiv-" + dataName).height($("#input-table-workspace-" + dataName).height());
-            
+
             $("#input-table-header-" + dataName + "-map").hide();
             $("#input-table-header-" + dataName + "-toggle-data").show();
             $("#input-table-header-" + dataName + "-toggle-map").show();
@@ -1013,15 +1158,15 @@
         };
 
         ixmaps.htmlgui_onZoomAndPan = function() {
-            
+
             console.log("=======================");
             console.log("=== on zoom and pan ===");
             console.log("=======================");
-            
+
             for (var dataName in dataA) {
-                
-                if ( dataA[dataName].map ){
-                    
+
+                if (dataA[dataName].map) {
+
                     let themesA = dataA[dataName].map.getThemes();
                     let objTheme = themesA[0];
                     let dataObj = new Data.Table(dataA[dataName].data);
@@ -1046,9 +1191,9 @@
                     dataObj.table.records = records.length;
                     let height = $("#input-table-table-" + dataName).height();
                     $("#input-table-table-" + dataName).html(makeDataTable(dataObj, dataName, height));
-                    
-                    $("#input-table-info-" + dataName).html("records: "+dataObj.table.records+" ("+dataA[dataName].data.table.records+") filtered by map view");
- 
+
+                    $("#input-table-info-" + dataName).html("records: " + dataObj.table.records + " (" + dataA[dataName].data.table.records + ") filtered by map view");
+
                     /**
                     ixmaps.data.facetsObj = dataObj;
                     var facetsA = ixmaps.data.getFacets(ixmaps.data.facetsObj, ixmaps.data.facetsFilter);
@@ -1063,14 +1208,7 @@
         // d a t a   - - >  t h e m e        
         // ----------------------------------------------------------
 
-        ixmaps.editor.makeDefaultTheme = function(dataName) {
-
-            if (!ixmaps.editor.dbtable ||
-                !ixmaps.editor.dbtable.table ||
-                !ixmaps.editor.dbtable.table.records
-            ) {
-                return {};
-            }
+        __makeDefaultTheme = function(dataName) {
 
             objTheme = {
                 layer: "generic",
@@ -1088,7 +1226,9 @@
             objTheme.style.editor = true;
             objTheme.style.name = dataName;
 
-            var x = String(ixmaps.editor.dbtable.records[0][ixmaps.editor.dbtable.table.fields - 1]);
+            dataTable = dataA[dataName].data;
+
+            var x = String(dataTable.records[0][dataTable.table.fields - 1]);
             if (x.match(/Polygon/)) {
                 objTheme.layer = "FEATURE";
                 $('#map-layer-select').append($('<option>', {
@@ -1115,7 +1255,7 @@
                 objTheme.style.linecolor = "#0088dd";
                 objTheme.style.linewidth = "1";
             } else
-            if (ixmaps.editor.dbtable && ixmaps.editor.dbtable.table && (ixmaps.editor.dbtable.table.records > 250000)) {
+            if (dataTable && dataTable.table && (dataTable.table.records > 250000)) {
                 objTheme.style.type = "CHART|SYMBOL|GRIDSIZE|DOPACITY|AGGREGATE|SUM|SHOW";
                 //objTheme.style.type = "CHART|SYMBOL|AUTOSIZE|AGGREGATE|SUM|SHOW";
                 objTheme.style.gridwidth = "10px";
@@ -1123,7 +1263,7 @@
                 objTheme.style.dopacitypow = 2;
                 objTheme.style.dopacityscale = 2;
             } else
-            if (ixmaps.editor.dbtable && ixmaps.editor.dbtable.table && (ixmaps.editor.dbtable.table.records > 100000)) {
+            if (dataTable && dataTable.table && (dataTable.table.records > 100000)) {
                 objTheme.style.type = "CHART|BUBBLE|AGGREGATE|SUM|SHOW";
                 objTheme.style.gridwidth = "2px";
                 objTheme.style.fillopacity = "0.3";
@@ -1133,15 +1273,13 @@
                 objTheme.style.fillopacity = "0.2";
             }
 
-            objTheme.style.lookupfield = ixmaps.editor.getDefaultLookup(objTheme, dataA[dataName].data);
-
-            ixmaps.editor.themeObj = objTheme;
+            objTheme.style.lookupfield = __getDefaultLookup(objTheme, dataA[dataName].data);
 
             return objTheme;
 
         };
 
-        ixmaps.editor.getDefaultLookup = function(objTheme, data) {
+        __getDefaultLookup = function(objTheme, data) {
 
             let szLookup = "";
 
@@ -1161,7 +1299,7 @@
                         szLookup = fields[i].id;
                     } else {
                         // identify by value (like 13.3568,45.34567)
-                        valuesA = ixmaps.editor.getFieldValues(fields[i].id, 10);
+                        valuesA = __getFieldValues(data, fields[i].id, 10);
                         for (x in valuesA) {
                             if (!String(valuesA[x]).match(/\'/)) {
                                 var matchA = String(valuesA[x]).match(/(-?[0-9\.]+) ?, ?(-?[0-9\.]+)/)
@@ -1195,11 +1333,24 @@
             let szLat = "";
             let szLon = "";
             for (var i in fields) {
-                if (fields[i].id.match(/latitud/i) || (fields[i].id == "lat") || (fields[i].id == "LAT") || (fields[i].id == "Y")) {
+                if (fields[i].id.match(/latitud/i) ||
+                    (fields[i].id == "lat") ||
+                    (fields[i].id == "Lat") ||
+                    (fields[i].id == "LAT") ||
+                    (fields[i].id == "Y")) {
                     szLat = fields[i].id;
                 }
-                if (fields[i].id.match(/longitud/i) || (fields[i].id == "lon") || (fields[i].id == "long") || (fields[i].id == "lng") || (fields[i].id ==
-                        "LON") || (fields[i].id == "LNG") || (fields[i].id == "X")) {
+                if (fields[i].id.match(/longitud/i) ||
+                    (fields[i].id == "lon") ||
+                    (fields[i].id == "Lon") ||
+                    (fields[i].id == "LON") ||
+                    (fields[i].id == "long") ||
+                    (fields[i].id == "Long") ||
+                    (fields[i].id == "LONG") ||
+                    (fields[i].id == "lng") ||
+                    (fields[i].id == "Lng") ||
+                    (fields[i].id == "LNG") ||
+                    (fields[i].id == "X")) {
                     szLon = fields[i].id;
                 }
             }
@@ -1210,15 +1361,13 @@
             return szLookup;
         };
 
-        ixmaps.editor.getFieldValues = function(szField, nMax) {
+        __getFieldValues = function(data, szField, nMax) {
 
             // szField may be string or array of strings
             // if array, take first string !
             if ($.isArray(szField)) {
                 szField = szField[0];
             }
-
-            var data = ixmaps.editor.dataObj;
 
             var valuesA = null;
             if (data) {
@@ -1276,8 +1425,8 @@
             return result;
         };
 
-        
-        
+
+
         showCode = function(dataName) {
             $("#map_code_div-" + dataName).html("");
             $("#map_code_div-" + dataName + "_save").hide();
@@ -1306,201 +1455,79 @@
 
         __showProjectString = function(szProject, n, all, dataName) {
 
-            // make object to handle project definition and get string or json from it
-            // 
-            var project = new Config(szProject);
+            $.when(
+                $.getScript("../../ui/js/tools/json_config.js"),
+                $.Deferred(function (deferred) {
+                    $(deferred.resolve);
+                })
+            ).done(function () {
+                
+                // make object to handle project definition and get string or json from it
+                // 
+                var project = new Config(szProject);
 
-            // get JSON and formatted string
-            //
-            szProject = project.getPrettyString();
-            project = project.obj;
+                // get JSON and formatted string
+                //
+                szProject = project.getPrettyString();
+                project = project.obj;
 
-            // make the HTML
+                // make the HTML
 
-            var list = "";
-            var id = "source-" + dataName;
+                var list = "";
+                var id = "source-" + dataName;
 
-            list += '<div class="source" >';
-            list += '<pre id="' + id + '" class="prettyprint language-JSON">';
-            list += '</pre>';
-            list += '</div>';
+                list += '<div class="source" >';
+                list += '<pre id="' + id + '" class="prettyprint language-JSON">';
+                list += '</pre>';
+                list += '</div>';
 
-            $("#map_code_div-" + dataName).append(list);
+                $("#map_code_div-" + dataName).append(list);
 
-            $("#" + id + "").text(String(szProject));
-            hljs.highlightBlock($("#" + id)[0]);
+                $("#" + id + "").text(String(szProject));
+                hljs.highlightBlock($("#" + id)[0]);
 
-            $(".hljs-attr").attr("onMouseOver", "showTooltip(event,$(this).text())");
-            $(".hljs-attr").attr("onMouseOut", "hideTooltip()");
+                $(".hljs-attr").attr("onMouseOver", "showTooltip(event,$(this).text())");
+                $(".hljs-attr").attr("onMouseOut", "hideTooltip()");
 
-            $("#map_code_div-" + dataName + "_save").show();
+                $("#map_code_div-" + dataName + "_save").show();
+            });
 
         };
 
-        __showProjectHTML = function(szProject, n, all, dataName) {
-
-            // make object to handle project definition and get string or json from it
-            // 
-            var project = new Config(szProject);
-
-            // get JSON and formatted string
-            //
-            szProject = project.getPrettyString();
-            project = project.obj;
-
-            let view = new Config({
-                center: project.map.center,
-                zoom: project.map.zoom
-            });
-            let szView = view.getPrettyString().replace(/\n/g, "\n\t\t");
-
-            //szView = "["+project.map.center.lat+","+project.map.center.lng+"],"+project.map.zoom;
+        __showProjectHTML = function(sProject, n, all, dataName) {
             
-            szProject = "";
+            $.when(
+                $.getScript("./js/json_config.js"),
+                $.getScript("./js/json_config_html.js"),
+                $.Deferred(function (deferred) {
+                    $(deferred.resolve);
+                })
+            ).done(function () {
 
-            //szProject += "data = "+JSON.stringify(dataA[project.themes[0].style.dbtable]) + "\n\n";
+                // make object to handle project definition and get embedding HTML code
+                // 
+                let sHtml = new Config(sProject).getProjectHTML();
 
-            szProject +=
-                '<!DOCTYPE html>\n' +
-                '<html>\n' +
-                '  \n' +
-                '<head>\n' +
-                '\t<meta charset="UTF-8">\n' +
-                '\t<meta http-equiv="X-UA-Compatible" content="IE=edge">\n' +
-                '\t<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
-                '\t<meta name="description" content="ixmaps embed example">\n' +
-                '\t<meta name="author" content="guenter richter">\n' +
-                '\t<link rel="shortcut icon" href="https://gjrichter.github.io/ixmaps/ui/resources/images/ixmaps_logo.png">\n' +
-                ' \n' +
-                '\t<title>iXMaps Composer</title>\n' +
-                '</head>\n' +
-                ' \n' +
-                '<body>\n' +
-                ' \n' +
-                '\t<!-- here goes the map -->\n' +
-                '\t<div id="map-div"></div>\n' +
-                ' \n' +
-                '\t<!-- include the ixmaps API -->\n' +
-                '\t<script src="https://gjrichter.github.io/ixmaps/ui/js/htmlgui_api.js"><\/script>\n' +
-                ' \n' +
-                '\t<script type="text/javascript" charset="utf-8">\n' +
-                ' \n';
+                // show the HTML
 
-            szProject +=
-                '\t\t// create and embed the map\n' +
-                '\t\t// ! reference to "map-div", the hosting html div\n' +
-                '\n' +
-                '\t\tixmaps.embed("map-div", {\n' +
-                '\t\t\tmapService: "leaflet_vt",\n' +
-                '\t\t\tmapType: "'+ (project.map.basemap || "VT_OPENSTREETMAP") +'",\n' +
-                '\t\t\tmap: "../../maps/svg/maps/generic/mercator.svg",\n' +
-                '\t\t\tname: "map_1",\n' +
-                '\t\t\tmode: "pan",\n' +
-                '\t\t\tlegend: "true",\n' +
-                '\t\t\ttools: "true",\n' +
-                '\t\t\tsearch: "Europe",\n' +
-                '\t\t\tabout: "test"\n' +
-                '\t\t},\n';
+                let sPretty = "";
+                let sId = "source-" + dataName;
 
-            szProject +=
-                '\t\tmap => map\n' +
-                '\t\t.options({\n' +
-                '\t\t\tfeaturescaling: "'+(project.map.options.featurescaling||"true")+'",\n' +
-                '\t\t\tobjectscaling: "'+(project.map.options.objectscaling||"true")+'",\n' +
-                '\t\t\tnormalSizeScale: "'+(project.map.scaleParam.normalSizeScale||10000000)+'",\n' +
-                '\t\t\tflushChartDraw: "'+(project.map.scaleParam.flushChartDraw||1000000)+'",\n' +
-                '\t\t\tbasemapopacity: "'+(project.map.scaleParam.basemapopacity||0.5)+'",\n' +
-                '\t\t\tworksilent: "'+((typeof(project.map.scaleParam.worksilent) !='undefined')?project.map.scaleParam.worksilent: false)+'",\n' +
-                '\t\t\tloadsilent: "'+((typeof(project.map.scaleParam.loadsilent) !='undefined')?project.map.scaleParam.loadsilent: false)+'",\n' +
-                '\t\t\thideOnPan:  "'+((typeof(project.map.scaleParam.hideOnPan)  !='undefined')?project.map.scaleParam.hideOnPan:  false)+'",\n' +
-                '\t\t\tfreezeOnPan:"'+((typeof(project.map.scaleParam.freezeOnPan)!='undefined')?project.map.scaleParam.freezeOnPan:false)+'",\n' +
-                '\t\t})\n' +
-                '\t\t.local("working ...", "")\n' +
-                '\t\t.require("../../ui/js/tools/tooltip_basic.js")\n' +
-                '\t\t.attribution("' + (project.map.attribution||"").replace(/\"/g, '\\\"') + '")\n' +
-                '\t\t.view(' + szView + ')\n';
+                sPretty += '<div class="source" style="padding:0.2em 0 0.2em 1em;background:#f3f3f3">';
+                sPretty += '<pre id="' + sId + '" class="prettyprint language-HTML">';
+                sPretty += '</pre>';
+                sPretty += '</div>';
 
-            let szThemes = "";
-            for (var i in project.themes) {
-                let themeObj = project.themes[i];
-                let newObj = {};
+                $("#map_code_div-" + dataName).append(sPretty);
 
-                szThemes +=
-                    '\t\t.layer(ixmaps.layer("generic", layer => layer\n';
+                $("#" + sId + "").text(String(sHtml));
+                hljs.highlightBlock($("#" + sId)[0]);
 
-                let data = {
-                    url: String(themeObj.style.dbtableUrl),
-                    type: String(themeObj.style.dbtableType),
-                    name: String(themeObj.style.dbtable)
-                };
-                let dataObj = new Config(data);
-                let szData = dataObj.getPrettyString().replace(/\n/g, "\n\t\t\t");;
-                szThemes +=
-                    '\t\t\t.data(' + szData + ')\n';
+                $(".hljs-attr").attr("onMouseOver", "showTooltip(event,$(this).text())");
+                $(".hljs-attr").attr("onMouseOut", "hideTooltip()");
 
-                delete themeObj.style.dbtableUrl;
-                delete themeObj.style.dbtableType;
-                delete themeObj.style.dbtable;
-
-                let binding = {
-                    geo: String(themeObj.style.lookupfield)
-                };
-                if (themeObj.field){
-                    binding.value = String(themeObj.field);
-                }
-                if (themeObj.style.itemfield){
-                    binding.id = String(themeObj.style.itemfield);
-                }
-                let bindingObj = new Config(binding);
-                let szBinding = bindingObj.getPrettyString().replace(/\n/g, "\n\t\t\t");;
-                szThemes +=
-                    '\t\t\t.binding(' + szBinding + ')\n';
-
-                delete themeObj.style.lookupfield;
-                delete themeObj.field;
-
-                szThemes +=
-                    '\t\t\t.type("' + themeObj.style.type + '")\n';
-                delete themeObj.style.type;
-
-                let style = themeObj.style;
-                let styleObj = new Config(style);
-                let szStyle = styleObj.getPrettyString().replace(/\n/g, "\n\t\t\t");;
-                szThemes +=
-                    '\t\t\t.style(' + szStyle + ')\n';
-
-            }
-            szProject += szThemes;
-
-            szProject +=
-                '\t\t))\n' +
-                '\t);\n';
-
-            szProject +=
-                '\t<\/script>\n' +
-                '<\/body>\n' +
-                '<\/html>\n';
-
-
-            // make the HTML
-
-            var list = "";
-            var id = "source-" + dataName;
-
-            list += '<div class="source" style="padding:0.2em 0 0.2em 1em;background:#f3f3f3">';
-            list += '<pre id="' + id + '" class="prettyprint language-HTML">';
-            list += '</pre>';
-            list += '</div>';
-
-            $("#map_code_div-" + dataName).append(list);
-
-            $("#" + id + "").text(String(szProject));
-            hljs.highlightBlock($("#" + id)[0]);
-
-            $(".hljs-attr").attr("onMouseOver", "showTooltip(event,$(this).text())");
-            $(".hljs-attr").attr("onMouseOut", "hideTooltip()");
-
-            $("#map_code_div-" + dataName + "_save").show();
+                $("#map_code_div-" + dataName + "_save").show();
+            });
         };
 
         __saveProjectFile = function(dataName) {
@@ -1559,9 +1586,6 @@
             downloadLink.click();
         }
 
-
-       
-        
         // ----------------------------------------------------------
         // ----------------------------------------------------------
         // i n i t   a l l 

@@ -642,6 +642,11 @@ ixmaps.data = ixmaps.data || {};
         
 		$("#" + (szDiv || "facets")).html(szHtml);
         
+        // if active facet(s) - scroll first into view
+         if ($(".facet-active")[0]){
+            $(".facet-active")[0].scrollIntoView();
+        }
+        
         console.log("make histograms");
         sliderA.forEach(function (x) {
             $("#" + x.id + "histogram").css("margin-left", ($("#" + x.id).offset().left - $("#" + x.id + "histogram").offset().left) + "px");
@@ -652,11 +657,20 @@ ixmaps.data = ixmaps.data || {};
         try {
             ixmaps.data.initSliders(sliderA);
         } catch (e) {
-            setTimeout(() => {ixmaps.data.initSliders(sliderA)},500);
+            setTimeout(() => {ixmaps.data.initSliders(sliderA)},600);
         }
         
         $('[data-toggle="tooltip"]').tooltip();
  
+    };
+    
+    ixmaps.data.toFirstActiveFacet = (szDiv) => {
+        if ($(".facet-active")[0]){
+            $(".facet-active")[0].scrollIntoView();
+            //let top = ($(".facet-active").offset().top);
+            //alert(top);
+            //$("#" + (szDiv || "facets")).scrollTop(600);
+        }
     };
 
      ixmaps.data.initSliders = function (sliderA) {

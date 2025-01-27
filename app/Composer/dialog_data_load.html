@@ -144,21 +144,24 @@
             </div>
 
             <!-- some public data URL's -->
-            <div style="margin:0.5em 0 0.5em 0"><a href="#" onclick="$('#dataSamples').show()">try some public data ...</a></div>
+            <div style="margin:0.5em 0 0.5em 0">
+                <a href="javascript:void(0)" onclick="$('#dataSamples').toggle()">try some public data ...</a>&nbsp; / 
+                <a href="javascript:void(0)" onclick="$('#geoSamples').toggle()">geo reference data ... </a>
+             </div>
             <div id="dataSamples" style="display:none;margin-top:1em;margin-left:0em">
                 <ul>
                     <li>
-                        <a href="#" onclick="$('#dataURL').val('https://raw.githubusercontent.com/ondata/alberimonumentaliitalia/master/alberiMonumentali.csv');doDataUrl();">
+                        <a href="javascript:void(0)" onclick="$('#dataURL').val('https://raw.githubusercontent.com/ondata/alberimonumentaliitalia/master/alberiMonumentali.csv');doDataUrl();">
                             alberi monumentali d'italia</a><br>
                         <span style="color:#888">(onData, Andrea Borruso, cc-by-4.0</span> -><a href="https://github.com/ondata/alberimonumentaliitalia" target="_blank"> GitHub</a>)
                     </li>
                     <li>
-                        <a href="#" onclick="$('#dataURL').val('https://raw.githubusercontent.com/washingtonpost/data-school-shootings/master/school-shootings-data.csv');doDataUrl();">
+                        <a href="javascript:void(0)" onclick="$('#dataURL').val('https://raw.githubusercontent.com/washingtonpost/data-school-shootings/master/school-shootings-data.csv');doDataUrl();">
                             school shootings USA</a><br>
                         <span style="color:#888">(Washington Post, cc-by-sa-4.0 </span> -><a href="https://github.com/washingtonpost/data-school-shootings" target="_blank"> GitHub</a>)
                     </li>
                     <li>
-                        <a href="#" onclick="$('#dataURL').val('https://raw.githubusercontent.com/wri/global-power-plant-database/master/output_database/global_power_plant_database.csv');doDataUrl();">
+                        <a href="javascript:void(0)" onclick="$('#dataURL').val('https://raw.githubusercontent.com/wri/global-power-plant-database/master/output_database/global_power_plant_database.csv');doDataUrl();">
                             global power plant database</a><br>
                         <span style="color:#888">(World Resource Institute, cc-by-4.0</span> -><a href="https://github.com/wri/global-power-plant-database" target="_blank"> GitHub</a>)
                     </li>
@@ -179,29 +182,41 @@
 
                                 var szStartdate = year + "-" + String("0" + month).slice(-2) + "-" + String("0" + day).slice(-2);
 
-                                $('#dataURL').val('http://webservices.ingv.it/fdsnws/event/1/query?starttime=' + szStartdate + 'T00%3A00%3A00&minmag=1&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000');
+                                $('#dataURL').val('https://webservices.ingv.it/fdsnws/event/1/query?starttime=' + szStartdate + 'T00%3A00%3A00&minmag=1&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000');
                                 doDataUrl();
                             }
 
                         </script>
-                        <a href="#" onclick="__INGV_ultima_settimana()">
+                        <a href="javascript:void(0)" onclick="__INGV_ultima_settimana()">
                             INGV terremoti ultima settimana - magnitudine > 1</a><br>
                         <span style="color:#888">INGV Centro Nazionale Terremoti, cc-by-4.0</span> -><a href="http://cnt.rm.ingv.it/" target="_blank"> sito web</a>)
                     </li>
                     <li>
-                        <a href="#" onclick="$('#dataURL').val('http://webservices.ingv.it/fdsnws/event/1/query?starttime=2000-01-01T00%3A00%3A00&endtime=2018-11-22T23%3A59%3A59&minmag=3&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000');doDataUrl();">
+                        <a href="javascript:void(0)" onclick="$('#dataURL').val('https://webservices.ingv.it/fdsnws/event/1/query?starttime=2000-01-01T00%3A00%3A00&endtime=2018-11-22T23%3A59%3A59&minmag=3&maxmag=10&mindepth=-10&maxdepth=1000&minlat=-90&maxlat=90&minlon=-180&maxlon=180&minversion=100&orderby=time-asc&format=text&limit=10000');doDataUrl();">
                             INGV terremoti da 2000 in poi - magnitudine > 3</a><br>
                         <span style="color:#888">INGV Centro Nazionale Terremoti, cc-by-4.0</span> -><a href="http://cnt.rm.ingv.it/" target="_blank"> sito web</a>)
                     </li>
                     <li>
-                        <a href="#" onclick="$('#dataURL').val('https://docs.google.com/spreadsheets/d/e/2PACX-1vRNXJQI8bZQYG3DzeI5QOPnc7l89gCO-gtHVZQmb7oiLfeUGYSE1bNBobBeSyL3iEdVt6TEkynarfrF/pub?gid=1425152245&single=true&output=csv');doDataUrl();">
+                        <a href="javascript:void(0)" onclick="$('#dataURL').val('https://docs.google.com/spreadsheets/d/e/2PACX-1vRNXJQI8bZQYG3DzeI5QOPnc7l89gCO-gtHVZQmb7oiLfeUGYSE1bNBobBeSyL3iEdVt6TEkynarfrF/pub?gid=1425152245&single=true&output=csv');doDataUrl();">
                             Google Sheet sample - isaia</a><br>
                         <span style="color:#888">Interventi di difesa idraulica, cc-by-4.0</span> -><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRNXJQI8bZQYG3DzeI5QOPnc7l89gCO-gtHVZQmb7oiLfeUGYSE1bNBobBeSyL3iEdVt6TEkynarfrF/pub?gid=1425152245" target="_blank"> goole sheet</a>)
                     </li>
 
                 </ul>
             </div>
+            
+            <!-- some public data URL's -->
+            <div id="geoSamples" style="display:none;margin-top:1em;margin-left:0em">
+                <ul>
+                    <li>
+                        <a href="javascript:void(0)" onclick="$('#dataURL').val('https://confini-amministrativi.it/api/v2/it/20200101/comuni.topo.json');doDataUrl();">
+                            confini amministrativi 2020</a><br>
+                        <span style="color:#888">(onData, Andrea Borruso, cc-by-4.0</span> -><a href="https://github.com/ondata/alberimonumentaliitalia" target="_blank"> GitHub</a>)
+                    </li>
 
+                </ul>
+            </div>
+            
          </section>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>

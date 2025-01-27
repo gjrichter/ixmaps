@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <title>Composer Part</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta name="copyright" content="Guenter Richter" />
+    <meta name="author" content="service@medienobjekte.de" />
+    <meta name="description" content="Interactive &amp; estensible maps in SVG" />
+    <meta name="revisit-after" content="30 days" />
+    <meta name="distribution" content="Global" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.9.0/css/bootstrap-slider.min.css" />
+
+    <!-- Custom styles for this template -->
+    <link href="./assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="./assets/css/icomoon.css" rel="stylesheet">
+    <link href="./assets/font/IcoMoon-Free.css" rel="stylesheet">
+
+
+</head>
+
+<body style="margin:0px;padding:0px;" onload="">
+
+    <!-- Container -->
+    <div id="container" style="padding:0em 0.2em 0em 0em;vertical-align:middle;background-color:rgba(255,255,255,1);">
+
+        <div id="facetDiv" style="margin-bottom:1em;width:100%;height:400px;overflow:auto">
+            <p style="padding:0.2em 0.5em;border:solid black 0.1px;border-radius:5px;color:black">generating facets ...<img src='./resources/images/loading_blue.gif' style='display:block;margin:0.2em auto;height:64px'></p>
+        </div>
+
+    </div>
+
+
+    <script type="text/javascript">
+        
+        // ===========================================
+        //
+        // !! get ixmaps api from story parent/opener
+        //
+        // ===========================================
+
+        window.ixmaps = window.ixmaps || {};
+        window.ixmaps.data = window.ixmaps.data || {};
+
+        (function() {
+
+            dataName = ixmaps.data.processDataName;
+
+            let szHeader = '';
+            szHeader += '<div id="input-table-header-' + dataName + '" style="margin-top:0em;">'
+            szHeader += '<a id="input-table-header-' + dataName + '-pivot" class="btn btn-outline-dark mt-auto" '
+                        +'href="javascript:__togglePivot(\'' + dataName + '\')"> ' 
+                        +'<img src="./img/Iconsmind-Outline-Orientation-2-2.48.png" height="18px"> pivot</a> ';
+            szHeader += '<a id="input-table-header-' + dataName + '-condense" class="btn btn-outline-dark mt-auto" '
+                        +'href="javascript:__toggleCondense(\'' + dataName + '\')"><i class="bi-arrows-collapse  me-1"></i>condense</a> ';
+            szHeader += '<a id="input-table-header-' + dataName + '-condense" class="btn btn-outline-dark mt-auto" '
+                        +'href="javascript:__copyData(\'' + dataName + '\')"><i class="bi-view-stacked  me-1"></i>copy</a> ';
+            szHeader += '</div>';
+
+            let dbTable = dataA[dataName].origdata || dataA[dataName].data;
+            console.log(dbTable);
+            console.log(dbTable.table);
+
+            let sTable = "<div style='height:350px;overflow:auto'>";
+
+            sTable += "<div class='card-body' >";
+            sTable += "<div>";
+
+            sTable += "<table class='display dataTable' width='100%'>";
+
+            // show input table
+            // -----------------
+
+            for (i in dbTable.fields) {
+                sTable += "<tr>";
+
+                sTable += "<td style='overflow:hidden;text-overflow:ellipsis;max-width:150px;'><a style='color:black;text-decoration:red;margin-right:1em;font-size:1.1em;' href='javascript:__togglePivot(\"" + dataName + "\")' title='click to sort table by this column'>" + dbTable.fields[i].id + "</a></td>";
+
+                sTable += "<td style='min-width:50px;padding-right:0.5em;'>"
+                +"<select id='pivot-" + dataName + "-" + i + "' value='no role' style='border:solid #888888 0.1px' onchange='__makePivot(\"" + dataName + "\")'>"
+                    +"<option value='no role'>---</option>"
+                    +"<option>row</option>"
+                    +"<option>columns</option>"
+                    +"<option>values</option>"
+                    +"<option>keep</option>"
+                +"</select></td>";
+
+                sTable += "</tr>";
+
+            }
+            sTable += "</table>";
+
+            $("#facetDiv").html(szHeader + sTable);
+
+            __makePivot = function(dataName) {
+                
+                var dbTable = dataA[dataName].origdata || dataA[dataName].data; 
+                let pivot = {};
+                console.log(dbTable);
+                console.log(dbTable.table.fields);
+                
+                for (var i in dbTable.fields) {
+                    let id = "#pivot-" + dataName + "-" + i;
+                    console.log(id);
+                    if ($(id).val() == 'row') {
+                        pivot.lead = pivot.lead||[];
+                        pivot.lead.push(String(dbTable.fields[i].id));
+                    } else
+                    if ($(id).val() == 'columns') {
+                        pivot.columns = dbTable.fields[i].id;
+                    } else
+                    if ($(id).val() == 'values') {
+                        pivot.value = dbTable.fields[i].id;
+                    } else
+                    if ($(id).val() == 'keep') {
+                        pivot.keep = pivot.keep||[];
+                        pivot.keep.push(String(dbTable.fields[i].id));
+                    }
+                }
+                console.log(pivot);
+                xx__dataProcessPivot(dataName, pivot);
+
+            };
+
+
+            __togglePivot = function(dataName) {
+
+                if ($("#input-table-header-" + dataName + "-pivot").hasClass("active")) {
+                    $("#input-table-header-" + dataName + "-pivot").removeClass("active");
+                } else {
+                    $("#input-table-header-" + dataName + "-condense").removeClass("active");
+                    $("#input-table-header-" + dataName + "-pivot").addClass("active");
+                }
+                
+                __makePivot(dataName);
+            };
+            
+             __makeCondense = function(dataName) {
+                 
+                var dbTable = dataA[dataName].origdata || dataA[dataName].data; 
+                let condense = {};
+                console.log(dbTable);
+                console.log(dbTable.table.fields);
+                
+                for (var i in dbTable.fields) {
+                    let id = "#pivot-" + dataName + "-" + i;
+                    console.log(id);
+                    if ($(id).val() == 'row') {
+                        condense.lead = condense.lead||[];
+                        condense.lead.push(String(dbTable.fields[i].id));
+                    } else
+                    if ($(id).val() == 'columns') {
+                        condense.columns = dbTable.fields[i].id;
+                    } else
+                    if ($(id).val() == 'values') {
+                        condense.value = dbTable.fields[i].id;
+                    } else
+                    if ($(id).val() == 'keep') {
+                        condense.keep = condense.keep||[];
+                        condense.keep.push(String(dbTable.fields[i].id));
+                    }
+                }
+                console.log(condense);
+                xx__dataProcessCondense(dataName, condense);
+
+            };
+
+          __toggleCondense = function(dataName) {
+
+                if ($("#input-table-header-" + dataName + "-condense").hasClass("active")) {
+                    $("#input-table-header-" + dataName + "-condense").removeClass("active");
+                } else {
+                    $("#input-table-header-" + dataName + "-pivot").removeClass("active");
+                    $("#input-table-header-" + dataName + "-condense").addClass("active");
+                }
+                
+                __makeCondense(dataName);
+            };
+
+          __copyData = function(dataName) {
+
+              __addData(dataA[dataName].data);
+            };
+
+
+            /**
+             * end of namespace
+             */
+
+        })();
+
+    </script>
+</body>
+
+</html>
