@@ -1519,14 +1519,16 @@
             /* get ixmaps api from parent window/frame */
 
             ixmaps = ixmaps || null;
-            if (window.opener) {
-                parent = window.opener;
-                ixmaps = window.opener.ixmaps;
-            } else
-            if (parent) {
-                ixmaps = parent.window.ixmaps;
-            } else {
-                alert("error: missing parent window for themes !");
+            if (!ixmaps){
+                if (window.opener) {
+                    parent = window.opener;
+                    ixmaps = window.opener.ixmaps;
+                } else
+                if (parent) {
+                    ixmaps = parent.window.ixmaps;
+                } else {
+                    alert("error: missing parent window for themes !");
+                }
             }
 
         </script>
