@@ -109,23 +109,19 @@
     </section>
 
     <!-- Related items section-->
-    <section>
-        <div class="container px-4 px-lg-5 mt-5">
+    <section style="position:relative;bottom:10px;display:block">
+         <div class="container px-4 px-lg-5 mt-5">
             <div id="load-data-button" class="text-left" style="margin-top:3em">
                 <a class="btn btn-outline-dark mt-auto" href="javascript:__dataLoadDialog()">add data</a>
             </div>
         </div>
-    </section>
-
-    <!-- footer section-->
-    <section>
-        <div class="container px-4 px-lg-5 mt-5">
+       <div class="container px-4 px-lg-5 mt-5">
             <p>View data tables and config a visualization on a map</p>
         </div>
     </section>
 
     <!-- div to host dialog overlays -->
-    <div id="composer-dialog-pos" style="position:absolute;top:100px;left:300px;display:none;z-index:9999">
+    <div id="composer-dialog-pos" class="container" style="position:absolute;top:100px;display:none;z-index:9999">
         <div id="composer-dialog" style="display:none;">
         </div>
     </div>
@@ -794,10 +790,11 @@
                     }
 
                     $dialog.css({
-                        width: "50%",
-                        height: "150%",
-                        position: "relative",
-                        left: "15%"
+                        "width": "100%",
+                        "height": "150%",
+                        "position": "relative",
+                        "left": "13%",
+                        "max-width": "500px"
                     });
 
                     $dialog.append(`
@@ -1070,7 +1067,7 @@
             let themeObj = __makeDefaultTheme(dataName);
             themeObj.style.filter = dataA[dataName].facetsFilter;
 
-            if (themeObj.style.lookupfield) {
+            if (1 || themeObj.style.lookupfield) {
                 $("#" + "input-table-map-" + dataName).css("height", "450px");
                 $("#" + "input-table-map-" + dataName).css("width", "100%");
                 __createMap(themeObj, dataA[dataName].data, dataName);
@@ -1285,6 +1282,8 @@
             // 1. look for fields that contain both, latitude and longitude
 
             let fields = data.fields;
+            
+            szLookup = fields[0].id+"|"+fields[0].id;
 
             for (var i in fields) {
 

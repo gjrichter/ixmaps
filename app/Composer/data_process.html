@@ -75,9 +75,9 @@
             // -----------------
 
             for (i in dbTable.fields) {
-                sTable += "<tr>";
+                sTable += "<tr style='background:#f4f4f4'>";
 
-                sTable += "<td style='overflow:hidden;text-overflow:ellipsis;max-width:150px;'><a style='color:black;text-decoration:red;margin-right:1em;font-size:1.1em;' href='javascript:__togglePivot(\"" + dataName + "\")' title='click to sort table by this column'>" + dbTable.fields[i].id + "</a></td>";
+                sTable += "<td style='overflow:hidden;text-overflow:ellipsis;max-width:150px;padding-left:0.5em;'><a style='color:black;text-decoration:red;margin-right:1em;font-size:1.1em;' href='javascript:__togglePivot(\"" + dataName + "\")' title='click to sort table by this column'>" + dbTable.fields[i].id + "</a></td>";
 
                 sTable += "<td style='min-width:50px;padding-right:0.5em;'>"
                 +"<select id='pivot-" + dataName + "-" + i + "' value='no role' style='border:solid #888888 0.1px' onchange='__makePivot(\"" + dataName + "\")'>"

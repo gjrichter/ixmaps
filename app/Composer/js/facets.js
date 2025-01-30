@@ -320,7 +320,7 @@ ixmaps.data = ixmaps.data || {};
             // if less than 50 unique values, make text or number facet
             // --------------------------------------------------------
 
-            if (u.length < 50 && !__rangesA[szField] && (!fNumeric || u.length < 10)) {
+            if (u.length < 50 && !__rangesA[szField] && (!fNumeric || ((u.length < 10) && (a.length/u.length > 10) ))) {
 
                 // count values
                 var valuesCount = {};
