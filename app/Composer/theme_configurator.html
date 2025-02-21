@@ -353,15 +353,6 @@
 
 <body id="theme-editor">
 
-    <div id="editor-apply" style="position:absolute;top:50px;left:10px;background-color:white;border:solid #dddddd 1px;z-index:9999">
-        <a href='javascript:ixmaps.editor.applyChanges();'>
-            <button type="button" class="btn btn-link btn-md">
-                apply changes <i class="icon icon-loop2" title="refresh" tabindex="-1" style="padding:0.25em"></i>
-            </button>
-        </a>
-    </div>
-
-
     <div id="workspace" style="overflow-x:hidden;height:100%;margin-right:5px;">
 
         <div class="container map-config">
@@ -1519,6 +1510,7 @@
             /* get ixmaps api from parent window/frame */
 
             ixmaps = ixmaps || null;
+            
             if (!ixmaps){
                 if (window.opener) {
                     parent = window.opener;

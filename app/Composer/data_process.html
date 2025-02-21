@@ -64,7 +64,7 @@
             console.log(dbTable);
             console.log(dbTable.table);
 
-            let sTable = "<div style='height:350px;overflow:auto'>";
+            let sTable = "<div style='margin:0.3em 0.5em 0 0;height:350px;overflow:auto'>";
 
             sTable += "<div class='card-body' >";
             sTable += "<div>";
@@ -73,19 +73,42 @@
 
             // show input table
             // -----------------
+            
+            console.log(dataA[dataName].pivot);
 
             for (i in dbTable.fields) {
-                sTable += "<tr style='background:#f4f4f4'>";
+                sTable += "<tr style='background:#f4f4f4;line-height:1em;font-size:0.9em'>";
 
-                sTable += "<td style='overflow:hidden;text-overflow:ellipsis;max-width:150px;padding-left:0.5em;'><a style='color:black;text-decoration:red;margin-right:1em;font-size:1.1em;' href='javascript:__togglePivot(\"" + dataName + "\")' title='click to sort table by this column'>" + dbTable.fields[i].id + "</a></td>";
-
+                sTable += "<td style='overflow:hidden;text-overflow:ellipsis;max-width:150px;padding-top:0.8em;padding-left:0.5em;'><a style='color:black;text-decoration:red;margin-right:1em;font-size:1.1em;' href='javascript:__togglePivot(\"" + dataName + "\")' title='click to sort table by this column'>" + dbTable.fields[i].id + "</a></td>";
+                
+                let sValue = "no role";
+                if (dataA[dataName].pivot){
+                    for (c in dataA[dataName].pivot.lead){
+                        if (dataA[dataName].pivot.lead[c] == dbTable.fields[i].id){
+                            sValue = 'row';
+                        }
+                    }
+                    for (c in dataA[dataName].pivot.keep){
+                        if (dataA[dataName].pivot.keep[c] == dbTable.fields[i].id){
+                            sValue = 'keep';
+                        }
+                    }
+                    if (dataA[dataName].pivot.columns == dbTable.fields[i].id){
+                          sValue = 'columns';
+                    }
+                    for (c in dataA[dataName].pivot.value){
+                        if (dataA[dataName].pivot.value[c] == dbTable.fields[i].id){
+                            sValue = 'values';
+                        }
+                    }
+                }
                 sTable += "<td style='min-width:50px;padding-right:0.5em;'>"
                 +"<select id='pivot-" + dataName + "-" + i + "' value='no role' style='border:solid #888888 0.1px' onchange='__makePivot(\"" + dataName + "\")'>"
-                    +"<option value='no role'>---</option>"
-                    +"<option>row</option>"
-                    +"<option>columns</option>"
-                    +"<option>values</option>"
-                    +"<option>keep</option>"
+                    +"<option value='no role' "+((sValue=='no role')?"selected":"")+">---</option>"
+                    +"<option "+((sValue=='row')?"selected":"")+">row</option>"
+                    +"<option "+((sValue=='columns')?"selected":"")+">columns</option>"
+                    +"<option "+((sValue=='values')?"selected":"")+">values</option>"
+                    +"<option "+((sValue=='keep')?"selected":"")+">keep</option>"
                 +"</select></td>";
 
                 sTable += "</tr>";
@@ -94,7 +117,7 @@
             sTable += "</table>";
 
             $("#facetDiv").html(szHeader + sTable);
-
+            
             __makePivot = function(dataName) {
                 
                 var dbTable = dataA[dataName].origdata || dataA[dataName].data; 
@@ -104,7 +127,6 @@
                 
                 for (var i in dbTable.fields) {
                     let id = "#pivot-" + dataName + "-" + i;
-                    console.log(id);
                     if ($(id).val() == 'row') {
                         pivot.lead = pivot.lead||[];
                         pivot.lead.push(String(dbTable.fields[i].id));
@@ -121,7 +143,7 @@
                     }
                 }
                 console.log(pivot);
-                xx__dataProcessPivot(dataName, pivot);
+                __dataProcessMakePivot(dataName, pivot);
 
             };
 
@@ -164,7 +186,7 @@
                     }
                 }
                 console.log(condense);
-                xx__dataProcessCondense(dataName, condense);
+                __dataProcessMakeCondense(dataName, condense);
 
             };
 

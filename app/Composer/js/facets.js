@@ -1,257 +1,157 @@
-/** 
+/**
  * @fileoverview This file provides functions for facet filtering
  *
  * @author Guenter Richter guenter.richter@medienobjekte.de
- * @version 1.0 
- * @copyright CC BY SA
- * @license MIT
+ * @version 1.0.0
+ * @date 2025-01.01
+ * @description this code analyses tabular data and creates facets
+ * @license
+ * This software is licensed under the MIT License.
+ *
+ * Copyright (c) 2025 Guenter Richter
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
-ixmaps = ixmaps || {};
-ixmaps.data = ixmaps.data || {};
+window.ixmaps = window.ixmaps || {};
+window.ixmaps.data = window.ixmaps.data || {};
 
-(function () {
+(() => {
 
     // ===========================================
-    //
-    // h e l p e r
-    //
+    // Helper functions
     // ===========================================
 
-    // get unique values array via filter
-    var __onlyUnique = function (value, index, self) {
-        return self.indexOf(value) === index;
-    };
+    const __onlyUnique = (value, index, self) => self.indexOf(value) === index;
 
-    // get unique values array via named array
-    var __getUniqueValues = function (a) {
-        var u = [];
-        for (var i in a) {
-            u[String(a[i])] = 1;
-        }
-        var retA = [];
-        for (var v in u) {
-            retA.push(v);
-        }
-        return retA;
-    };
+    const __getUniqueValues = (arr) => [...new Set(arr.map(String))];
 
-    // get numbers from formatted values like 235 678.98 or 235.678,98
-    var __scanValue = function (nValue) {
-        if (String(nValue).match(/:/)) {
-            return "date";
-        } else
-            // strips blanks inside numbers (e.g. 1 234 456 --> 1234456)
-            if (String(nValue).match(/,/)) {
-                return parseFloat(String(nValue).replace(/\./gi, "").replace(/,/gi, "."));
-            } else {
-                return parseFloat(String(nValue).replace(/ /gi, ""));
-            }
+    const __scanValue = (nValue) => {
+        let strVal = String(nValue);
+        if (strVal.includes(":")) return "date";
+        return parseFloat(strVal.replace(/[\s,.]/g, (match) => (match === "," ? "." : ".")));
     };
 
     // ===========================================
-    //
-    // facet filter handling 
-    //
+    // Facet filter handling
     // ===========================================
 
     __facetFilterA = [];
     __rangesA = [];
 
     // ===========================================
-    //
-    // create filter facets from theme data
-    //
+    // Create filter facets from theme data
     // ===========================================
 
-    ixmaps.data.getFacets = function (mydata, szFilter, szFieldsA, szId, szMap, fFlag) {
+    ixmaps.data.getFacets = (mydata, szFilter, szFieldsA, szId, szMap, fFlag) => {
+        let facetsA = [];
+        let sizefield = null;
 
-        facetsA = [];
-
-        var fTest = true;
-        var sliderA = [];
-        var sizefield = null;
-
-        console.log("=== make statistic facets === " + szId);
-
-        /**
-		
-		var szThemeId = ixmaps.filterThemeId = szId;
-	
-		// theme object
-		// ------------------------------------
-		var objTheme = ixmaps.data.objTheme = ixmaps.map(szMap||"map").theme(szThemeId).obj;
-		var objThemeDefinition = ixmaps.data.objThemeDefinition = ixmaps.getThemeDefinitionObj(null,szThemeId);
-
-		// create data object from theme data
-		// ------------------------------------
-		var mydata = new Data.Table(null);
-		mydata.table = objTheme.objTheme.dbTable;
-		mydata.fields = objTheme.objTheme.dbFields;
-		mydata.records = objTheme.objTheme.dbRecords;
-
-		// GR 23.02.2018 take only rows which are on the map
-		// -------------------------------------------------
-		records = [];
-		try	{
-			for ( i in objTheme.indexA ){
-				if ( objTheme.itemA[objTheme.indexA[i]].dbIndex ){
-					records.push(mydata.records[objTheme.itemA[objTheme.indexA[i]].dbIndex]);
-				}
-				if ( objTheme.itemA[objTheme.indexA[i]].dbIndexA ){
-					for ( a in objTheme.itemA[objTheme.indexA[i]].dbIndexA ) {
-						records.push(mydata.records[objTheme.itemA[objTheme.indexA[i]].dbIndexA[a]]);
-					}
-				}
-			}
-		}
-		// maybe the data is not ready, then we repeat
-		catch (e){
-			setTimeout("ixmaps.data.makeFacets('"+szFilter+"','"+szDiv+"')",1000);
-			console.log("error data not ready !!!");
-			return;
-		}
-
-		mydata.records = records;
-        
-        **/
-
-        console.log("**********************");
-        console.log(mydata);
-        console.log("**********************");
+        console.log("=== Creating facet statistics ===", szId);
 
         __facetFilterA = [];
 
-        // if we have already a filter on the map,
-        // filter data before creating facets
-        // ------------------------------------
-        if (szFilter && szFilter.match(/WHERE/)) {
-
-            console.log("!!!!!filter!!!!!!");
-            console.log(szFilter);
-            console.log("!!!!!!!!!!!!!!!!!");
-
+        // Apply filter if present
+        if (szFilter && szFilter.includes("WHERE")) {
+            console.log("Applying filter:", szFilter);
             mydata = mydata.select(szFilter);
 
-            // get filter parts
-            // ----------------
-            var szPartsA = szFilter.split('WHERE ')[1].split('AND');
-            // test if BETWEEN x AND y and join two parts around AND
-            for (i = 0; i < szPartsA.length; i++) {
-                if (szPartsA[i].match(/BETWEEN/)) {
-                    szPartsA[i] = szPartsA[i] + "AND" + szPartsA[i + 1];
+            let szPartsA = szFilter.split("WHERE ")[1].split("AND");
+            for (let i = 0; i < szPartsA.length; i++) {
+                if (szPartsA[i].includes("BETWEEN")) {
+                    szPartsA[i] += "AND" + szPartsA[i + 1];
                     szPartsA.splice(i + 1, 1);
                 }
             }
-            // set filter parts
-            // ----------------
-            szPartsA.forEach(function (x) {
-                __facetFilterA.push(x);
-            });
+
+            __facetFilterA = szPartsA.map((x) => x.trim());
         }
 
-        console.log("********---***********");
-        console.log(mydata);
-        console.log("********---***********");
-
-        // make facets from data fields
-        // ----------------------------
-
-        var a, u;
-
+        // Define fields to analyze
         szFieldsA = szFieldsA || mydata.columnNames();
+        szFieldsA = szFieldsA.filter((field) => field !== "geometry");
 
-        for (i in szFieldsA) {
-            if (szFieldsA[i] == "geometry") {
-                szFieldsA.splice(i, 1);
-            }
-        }
-        var v = null;
-        if (sizefield) {
-            if (ixmaps.data.fShowFacetValues) {
-                v = mydata.column(sizefield).values();
-                v = v.map(function (value) {
-                    var x = __scanValue(value);
-                    return (isNaN(x) ? 0 : x);
-                })
-            }
-            $("#facets-counts-values").show();
-        }
-        for (var i = 0; i < szFieldsA.length; i++) {
+        let v = sizefield ? mydata.column(sizefield).values().map(__scanValue) : null;
 
-            var facet = {};
-            var szField = szFieldsA[i];
+        for (const szField of szFieldsA) {
+            if (!mydata.column(szField)) continue;
 
-            if (!mydata.column(szField)) {
-                continue;
-            }
-
-            a = mydata.column(szField).values();
+            let facet = {
+                id: szField
+            };
+            let values = mydata.column(szField).values();
 
             // test for undefined and only numeric values
             // ------------------------------------------ 
             facet.undef = 0;
-            fNumeric = true;
-            a.every(function (x) {
-                if ( (typeof(x) != "undefined") && 
+            let isNumeric = true;
+            let isDateTime = false;
+            values.every(function (x) {
+                if ((typeof (x) != "undefined") &&
                     (x != "undefined") &&
-                    (x != '') && 
-                    (x != ' ') && 
-                    (x != '-') && 
-                    (x != '""') && 
-                    (x != "''") && 
-                    (x != "NaN") && 
-                    (x != "NULL") ) {
-                     if (isNaN(__scanValue(x))) {
-                        fNumeric = false;
-                    } 
+                    (x != '') &&
+                    (x != ' ') &&
+                    (x != '-') &&
+                    (x != '""') &&
+                    (x != "''") &&
+                    (x != "NaN") &&
+                    (x != "NULL")) {
+                    if (!String(x).match(/^-?\d*(\.|,)*\d+$/)) {
+                        isNumeric = false;
+                    }
+                    if (String(x).match(/^(\d{4})-(0[1-9]|1[0-2]|[1-9])-([1-9]|0[1-9]|[1-2]\d|3[0-1]).*$/)) {
+                        isDateTime = true;
+                        isNumeric = false;
+                    }
+                    if (String(x).match(/^(\d{4})\/(0[1-9]|1[0-2]|[1-9])\/([1-9]|0[1-9]|[1-2]\d|3[0-1]).*$/)) {
+                        isDateTime = true;
+                        isNumeric = false;
+                    }
+                    if (String(x).match(/^([1-9]|0[1-9]|[1-2]\d|3[0-1])\/(0[1-9]|1[0-2]|[1-9])\/(\d{4})$/)) {
+                        isDateTime = true;
+                        isNumeric = false;
+                    }
                 } else {
                     facet.undef++;
                 }
-                return fNumeric;
+                return isNumeric;
             });
+            
             if (fFlag && fFlag.match(/NONUMERIC/)) {
-                fNumeric = false;
+                isNumeric = false;
             }
-            // test if field already part of the active query 
-            // ------------------------------------------
-            var fActiveFacet = false;
-            __facetFilterA.forEach(function (szFilter, index) {
-                if ((szFilter.split("\"")[1] == szField) && ((szFilter.split("\"")[2] == " is ") || (szFilter.split("\"")[2] == " = "))) {
-                    fActiveFacet = true;
-                }
-            });
 
-            // test for unique values 
-            // -----------------------
+            let fActiveFacet = __facetFilterA.some(
+                (filter) => filter.includes(`"${szField}" is `) || filter.includes(`"${szField}" = `)
+            );
 
-            // first test maximal 250 values at the beginning 
+            let uniqueValues = __getUniqueValues(values);
 
-            console.log("!!! test unique !!!")
-            console.log(szField);
-
-            a.length = Math.min(a.length, 250);
-            u = a.filter(__onlyUnique);
-
-            console.log(u.length + "/" + a.length + " unique values");
-
-            // if we have many unique values and they are numbers,
-            // make a numerique facet, if they are texts, skip field
-            // -----------------------------------------------------
-            if ((a.length >= 250) && (u.length >= (a.length / 2))) {
-
-                console.log("many unique values");
-
-                if (fNumeric) {
-
-                    console.log("-> numeric facet");
-
-                    a = mydata.column(szField).values();
+            if (isNumeric || (uniqueValues.length > values.length / 2)) {
+                if (isNumeric) {
+                    let numericValues = values.map(__scanValue).filter((x) => !isNaN(x));
+                    facet.type = "numeric";
                     var sum = 0;
                     var min = Number.MAX_VALUE;
                     var max = (-Number.MAX_VALUE);
                     var sum = 0;
-                    a = a.map(function (x) {
+                    values.map(function (x) {
                         x = __scanValue(x);
                         if (!isNaN(x)) {
                             min = Math.min(min, x || min);
@@ -260,210 +160,40 @@ ixmaps.data = ixmaps.data || {};
                         }
                         return (x);
                     });
-                    facet.id = szField;
-                    facet.type = "numeric";
                     facet.min = min;
                     facet.max = max;
                     facet.sum = sum;
-                    facet.values = a;
-                    facet.data = a;
-                    facetsA.push(facet);
-
+                    //facet.min = Math.min(...numericValues);
+                    //facet.max = Math.max(...numericValues);
+                    //facet.sum = numericValues.reduce((a, b) => a + b, 0);
+                    facet.values = numericValues;
+                    facet.data = numericValues;
                 } else {
-                    // make input field to define filter 
-                    // ------------------------------------------
-
-                    console.log("-> textual facet");
-
-                    facet.id = szField;
-                    facet.type = "textual";
-                    facet.example = a[0];
-
-                    if (fActiveFacet) {
-
-                        // add value list in any case 
-                        // ---------------------------
-                        facet.values = a;
-                        // count values
-                        var valuesCount = {};
-                        var nCount = {};
-                        a.forEach(function (x) {
-                            valuesCount[x] = (valuesCount[x] || 0) + 1;
-                            nCount++;
-                        });
-                        facet.nCount = nCount;
-                        facet.valuesCount = valuesCount;
-                        facet.uniqueValues = a.length;
-                    }
-
-                    facetsA.push(facet);
+                    facet.type = isDateTime?"time":"textual";
+                    facet.values = uniqueValues; //.slice(0, 200);
                 }
-
-                console.log(" ");
-
-                continue;
-            };
-
-            // ok, data with many different values done
-            // lets get all! unique values
-            // -----------------------------------------
-
-            console.log("-> get all unique values");
-
-            a = mydata.column(szField).values();
-
-            // get unique values array
-            u = __getUniqueValues(a);
-
-            console.log(u.length + " unique values found");
-
-            // if less than 50 unique values, make text or number facet
-            // --------------------------------------------------------
-
-            if (u.length < 50 && !__rangesA[szField] && (!fNumeric || ((u.length < 10) && (a.length/u.length > 10) ))) {
-
-                // count values
-                var valuesCount = {};
-                var nCount = 0;
-                var nValuesSum = 0;
-                a.forEach(function (x) {
-                    valuesCount[x] = (valuesCount[x] || 0) + (v ? Number(v[nCount]) : 1);
-                    nValuesSum += (v ? Number(v[nCount]) : 1);
-                    nCount++;
-                });
-
-                if (fNumeric) {
-                    u = u.map(function (x) {
-                        return Number(x);
-                    });
-                    u.sort(function (a, b) {
-                        return ((a > b) ? 1 : -1);
-                    });
-                } else {
-                    u.sort();
-                    u.sort(function (a, b) {
-                        return ((valuesCount[a] < valuesCount[b]) ? 1 : -1);
-                    });
-                }
-
-                facet.id = szField;
-                facet.values = u;
-                facet.nCount = nCount;
-                facet.nValuesSum = nValuesSum;
-                facet.valuesCount = valuesCount;
-                facet.uniqueValues = u.length;
-
-                if ((u.length >= 1) || fActiveFacet) {
-                    facet.type = "textual";
-                }
-
-                facetsA.push(facet);
-
             } else {
+                let valueCounts = values.reduce((acc, val) => {
+                    acc[val] = (acc[val] || 0) + 1;
+                    return acc;
+                }, {});
 
-                // more than 50 unique values
-
-                if (fNumeric) {
-                    if (u.length > 0) {
-
-                        // if more than 3 values, make min/max range filter
-                        // ------------------------------------------
-                        a = mydata.column(szField).values();
-                        var min = Number.MAX_VALUE;
-                        var max = (-Number.MAX_VALUE);
-                        var fNaN = false;
-                        var sum = 0;
-                        a = a.map(function (x) {
-                            x = __scanValue(x);
-                            if (!isNaN(x)) {
-                                min = Math.min(min, x || min);
-                                max = Math.max(max, x || max);
-                                sum += x || 0;
-                            }
-                            return (x);
-                        });
-                        facet.id = szField;
-                        facet.type = "numeric";
-                        facet.min = min; //a[0];
-                        facet.max = max; //a[a.length-1];
-                        facet.sum = sum;
-                        facet.data = a;
-                        facet.uniqueValues = u.length;
-                        facet.type = "numeric";
-                        facetsA.push(facet);
-
-                    } else {
-
-                        // make input field to define filter 
-                        // ------------------------------------------
-                        facet.id = szField;
-                        facet.type = "categorical";
-                        if (u.length < 200) {
-                            // add value list
-                            // ---------------
-                            facet.values = u;
-                            var valuesCount = {};
-                            var nCount = 0;
-                            a.forEach(function (x) {
-                                valuesCount[x] = (valuesCount[x] || 0) + 1;
-                                nCount++;
-                            });
-                            u.sort(function (a, b) {
-                                return ((valuesCount[a] < valuesCount[b]) ? 1 : -1);
-                            });
-                            facet.nCount = nCount;
-                            facet.valuesCount = valuesCount;
-                            facet.uniqueValues = u.length;
-                        }
-                        facetsA.push(facet);
-
-                    }
-
+                if (isNumeric) {
+                    uniqueValues.sort((a, b) => a - b);
                 } else {
-
-                    // if not numeric, make input field to define filter 
-                    // ------------------------------------------
-                    facet.id = szField;
-                    facet.type = "textual";
-                    if (u.length < 200) {
-                        // add value list
-                        // ---------------
-                        facet.values = u;
-                        var valuesCount = {};
-                        var nCount = 0;
-                        var nValuesSum = 0;
-                        a.forEach(function (x) {
-                            valuesCount[x] = (valuesCount[x] || 0) + (v ? Number(v[nCount]) : 1);
-                            nValuesSum += (v ? Number(v[nCount]) : 1);
-                            nCount++;
-                        });
-                        u.sort(function (a, b) {
-                            return ((valuesCount[a] < valuesCount[b]) ? 1 : -1);
-                        });
-                        facet.nCount = nCount;
-                        facet.nValuesSum = nValuesSum;
-                        facet.valuesCount = valuesCount;
-                        facet.uniqueValues = u.length;
-                    }
-                    facetsA.push(facet);
+                    uniqueValues.sort((a, b) => valueCounts[b] - valueCounts[a]);
                 }
+
+                facet.type = isDateTime?"time":"textual";
+                facet.values = uniqueValues;
+                facet.valuesCount = valueCounts;
+                facet.uniqueValues = uniqueValues.length;
             }
-            console.log(" ");
+
+            facetsA.push(facet);
         }
 
-        console.log("=== make statistic facets - end ===");
-        console.log("===================================")
-        console.log(facetsA);
-        console.log("===================================")
+        console.log("=== Facet statistics completed ===", facetsA);
         return facetsA;
     };
-
-    /**
-     * end of namespace
-     */
-
 })();
-
-// -----------------------------
-// EOF
-// -----------------------------

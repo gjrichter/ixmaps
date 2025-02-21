@@ -1,10 +1,32 @@
-/** 
+/**
  * @fileoverview This file provides functions to list filter facets
  *
  * @author Guenter Richter guenter.richter@medienobjekte.de
- * @version 1.0 
- * @copyright CC BY SA
- * @license MIT
+ * @version 1.0.0
+ * @date 2025-01.01
+ * @description 
+ * @license
+ * This software is licensed under the MIT License.
+ *
+ * Copyright (c) 2025 Guenter Richter
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 ixmaps = ixmaps || {};
@@ -163,7 +185,7 @@ ixmaps.data = ixmaps.data || {};
 		// make final filter from actual parts stored in __facetFilterA
 		szFilter = __facetFilterA.length ? ("WHERE " + __facetFilterA.join(" AND ")) : null;
 
-        __dataFacetsSetFilter(dataName, szFilter);
+        ixmaps.data.facetsCallback(dataName, szFilter);
 	};
 
 	// -------------------------------------------------------------------------
@@ -198,7 +220,7 @@ ixmaps.data = ixmaps.data || {};
 		// make final filter from actual parts stored in __facetFilterA
 		szFilter = __facetFilterA.length ? ("WHERE " + __facetFilterA.join(" AND ")) : null;
 
-        __dataFacetsSetFilter(dataName, szFilter);
+        ixmaps.data.facetsCallback(dataName, szFilter);
 	};
 
 	// -----------------------------------------------
@@ -222,6 +244,8 @@ ixmaps.data = ixmaps.data || {};
 	};
 	
 	var __makeHistogram = function (id, szRange) {
+        
+        let facetsA = __facetsA;
 
 		var rangeA = szRange.split(",");
 
@@ -376,10 +400,8 @@ ixmaps.data = ixmaps.data || {};
             });
         }
        
-        console.log("--- show facets ---");
-		
 		for (var i = 0; i < facetsA.length; i++) {
-
+            
 			var fActiveFacet = false;
 			var szActiveFilter = null;
 
@@ -387,8 +409,6 @@ ixmaps.data = ixmaps.data || {};
 			var szSafeId = facetsA[i].id.replace(/ |\W/g, "_");
             facetsA[i].safeId = szSafeId;
             
-            console.log(szSafeId)
-
 			__facetFilterA.forEach(function (szFilter, index) {
 				if (szFilter.split("\"")[1] == facetsA[i].id) {
 					fActiveFacet = true;
@@ -431,13 +451,13 @@ ixmaps.data = ixmaps.data || {};
 			szHtml += "</div>";
 			szHtml += fActiveFacet ? "</a>" : "";
 
-			if (facetsA[i].type == "textual") {
+			if (facetsA[i].type == "textual" || facetsA[i].type == "categorical") {
 				var placeholder = "Cerca ..." + ((!facetsA[i].values) ? (" (e.g. " + (facetsA[i].example || " ") + ")") : "");
 				var value = "";
 				if (fActiveFacet) {
 					value = placeholder = szActiveFilter.split("\"")[3];
 				}
-				if ( !facetsA[i] || !facetsA[i].values || facetsA[i].values.length > 10){
+				if ( 1 || !facetsA[i] || !facetsA[i].values || facetsA[i].values.length > 10){
 					szHtml += '<div class="input-group">';
 					szHtml += '<input id="' + (szSafeId + "query") + '" type="text" class="form-control" style="background:transparent;border:none" value="' + value + '" placeholder="' + placeholder + '"';
 					szHtml += 'onKeyUp="if(event.which == 13){var value = $(\'#' + (szSafeId + "query") + '\').val();__setFilter(\'' + facetsA[i].id + '\',value,\'' +dataName+'\');}">';
@@ -513,7 +533,7 @@ ixmaps.data = ixmaps.data || {};
 						nTicks = max - min;
 					}
 
-					var szScale = ((max - min) < 40) ? "" : "LOG";
+					var szScale = ((max - min) < 100000) ? "" : "LOG";
 
 					szHtml += '<div style="background:#ffffff;margin-top:0.4em;border-radius:5px;">'
 					szHtml += '<div id="' + sliderId + 'histogram" style="padding-top:2em;min-height:120px">';
@@ -636,8 +656,6 @@ ixmaps.data = ixmaps.data || {};
 			}
 			szHtml += "</div>";
             
-            console.log("done");
-
 		}
 		szHtml += "</div>";
         
@@ -648,12 +666,10 @@ ixmaps.data = ixmaps.data || {};
             $(".facet-active")[0].scrollIntoView();
         }
         
-        console.log("make histograms");
         sliderA.forEach(function (x) {
             $("#" + x.id + "histogram").css("margin-left", ($("#" + x.id).offset().left - $("#" + x.id + "histogram").offset().left) + "px");
             __makeHistogram(x.id, $("#" + x.id).attr("data-slider-value").split('[')[1].split(']')[0]);
-         });
-        console.log("done");
+        });
         
         try {
             ixmaps.data.initSliders(sliderA);

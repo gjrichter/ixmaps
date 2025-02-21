@@ -1,0 +1,131 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>iXmps - Editor - Dataimport</title>
+    <!-- Styles ------------------------ -->
+
+    <style>
+        body #importdiv {
+            overflow: auto;
+            padding: 1em;
+        }
+
+        textarea {
+            width: 100%;
+        }
+
+        legend {
+            xxborder: 0;
+        }
+
+	  .midlink {
+		font-family:arial;
+		font-size:12;
+		font-weight:normal;
+		color: #ddd;
+		vertical-align:50%;
+		margin-left:-5px;
+		margin-right:-2px;
+		}
+	   .testlink a{
+		font-family:arial;
+		font-size:12;
+		font-weight:normal;
+		color: #fff;
+		vertical-align:30%;
+		padding:0em 0.5em;
+		margin-left:0.2em;;
+		background:#ddd;
+		border-radius:2em;
+		text-decoration: none;
+		}
+	 select.ifield {
+		width:150px;
+	  }
+	  p {
+		margin-top:10px;
+		margin-bottom:2px;
+	  }
+
+	.wrapword{
+		white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+		white-space: -pre-wrap;      /* Opera 4-6 */
+		white-space: -o-pre-wrap;    /* Opera 7 */
+		white-space: pre-wrap;       /* css-3 */
+		word-wrap: break-word;       /* Internet Explorer 5.5+ */
+		white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
+		word-break: break-all;
+		white-space: normal;
+	}
+    </style>
+</head>
+
+<!-- End of Header ------------------------ -->
+
+<body>
+    <div id="importdiv" style="margin-bottom:5em;margin-top:-1em;background-color: #ffffff;border-radius:1em;border:solid #888888 1px">
+
+        <h3 style="margin-top:0em">share ...</h3>
+
+        <hr>
+        <button type="button" class="btn btn-outline-dark" id="longUrl-test">
+            test URL
+        </button>
+        <hr>
+        <div class="row">
+
+            <!-- quick share -------------------------------------------------- -->
+            <p>long URL to share: </p>
+            <div>
+                <textarea id="longUrl" rows="5" cols="50" class="area wrapword" style="font-size:0.85em">
+				...
+				</textarea>
+            </div>
+            <div style="height:10px"></div>
+            <p>short URL to share:</p>
+            <div id="shortUrl" style="margin-top:-0.8em;">---
+            </div>
+
+
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            
+            const root = "http://localhost/ixmaps/deploy/rc-exp/ixmaps/app/Composer_corr/index.html";
+            
+            let query = "?";
+            for (i in dataA){
+                var project = new Config(dataA[i]);
+                delete project.obj.pivot?.cols;
+                query += "data="+encodeURIComponent(project.obj.url);
+                query += "&filter="+encodeURIComponent(project.obj.facetsFilter||"");
+                query += "&pivot="+encodeURIComponent(project.obj.pivot?JSON.stringify(project.obj.pivot):"");
+                query += "&sort="+encodeURIComponent(project.obj.sortDir?(project.obj.sortDir):"");
+                query += "&analyze="+encodeURIComponent(project.obj.fShowAnalytics?"true":"");
+            }
+             
+            $("#longUrl-test").attr("onclick","window.open(\""+(root+query)+"\")");
+            
+            $("#longUrl").html(root+query);
+            
+            var shortUrlService ="http://tinyurl.com/api-create.php?url=";
+			$("#shortUrl")[0].innerHTML = "<iframe src=\""+shortUrlService+root+query+"\" width=\"300px\" height=\"50px\" frameborder=\"0\" marginwidth=\"1px\" />";
+
+
+         });
+
+
+        // ------------------------
+        // end of code 
+        // ------------------------
+
+    </script>
+
+</body>
+
+</html>

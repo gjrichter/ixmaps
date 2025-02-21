@@ -16,8 +16,10 @@
     <!-- Custom styles for this template -->
     <link href="./assets/css/font-awesome.min.css" rel="stylesheet">
     <link href="./assets/css/icomoon.css" rel="stylesheet">
+    <!--
     <link href="./assets/font/IcoMoon-Free.css" rel="stylesheet">
-
+    -->
+    
     <style>
         table.facet {
             xxbackground: #F7F6EF;
@@ -228,10 +230,12 @@
         </div>
 
     </div>
-
+    
+    <!--
     <script type="text/javascript" src="../assets/js/jquery-3.5.1.min.js"></script>
     <script type="text/javascript" src="../assets/js/bootstrap.min.js"></script>
-
+    -->
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.9.0/bootstrap-slider.min.js"></script>
     <script type="text/javascript" src="./js/show_word_cloud.js"></script>
     <script src="./d3/d3.js" charset="utf-8"></script>
@@ -239,6 +243,7 @@
     <script src="./d3/d3.wordcloud.js"></script>
 
     <script type="text/javascript">
+        
         // ===========================================
         //
         // !! get ixmaps api from story parent/opener
@@ -249,15 +254,6 @@
 
         ixmaps.data = ixmaps.data || {};
         ixmaps.data.fShowFacetValues = true;
-
-        // -----------------------------------------------
-        // refresh theme on zoom and pan ! 
-        // defined here to be exportable with map sharing
-        // -----------------------------------------------
-
-        //ixmaps.htmlgui_onZoomAndPan = function(nZoom){
-        //setTimeout("ixmaps.data.makeFacets(null,'facetDiv')",10);
-        //};
 
         $.when(
             $.getScript("./js/facets.js"),
