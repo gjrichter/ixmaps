@@ -581,7 +581,7 @@ ixmaps.data = ixmaps.data || {};
 						var href = "javascript:__setFacetFilter(__queryA[" + (__queryA.length - 1) + "],\'"+ dataName +"\');";
 
 						// how often is the value in the column
-						var nCount = facetsA[i].valuesCount ? facetsA[i].valuesCount[facetsA[i].values[ii]] : null;
+						var nCount = facetsA[i].valuesCount ? facetsA[i].valuesCount[facetsA[i].values[ii]] : 1;
 						var nMaxCount = facetsA[i].nValuesSum || facetsA[i].nCount;
 
 						var bgColor = "";
@@ -662,7 +662,7 @@ ixmaps.data = ixmaps.data || {};
 		$("#" + (szDiv || "facets")).html(szHtml);
         
         // if active facet(s) - scroll first into view
-         if ($(".facet-active")[0]){
+        if ($(".facet-active")[0]){
             $(".facet-active")[0].scrollIntoView();
         }
         

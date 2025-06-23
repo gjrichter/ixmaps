@@ -91,7 +91,7 @@
 <!-- End of Header ------------------------ -->
 
 <body>
-    <div id="importdiv" style="margin-bottom:5em;margin-top:-1em;background-color: #ffffff;border-radius:1em;border:solid #888888 1px">
+    <div id="importdiv" style="margin-bottom:5em;margin-top:-1em;background-color: #ffffff;border-radius:1em;border:solid #dddddd 1px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.03), 0 6px 20px 0 rgba(0, 0, 0, 0.03);">
 
         <h3 style="margin-top:0em">add data ...</h3>
         <div>
@@ -131,14 +131,14 @@
         </section>
 
 
-        <section id="section-special-files" style="background-color:#dddddd;padding:0.5em;margin:0.2em 0em">
+        <section id="section-special-files" style="background-color:#ffffff;padding:0.5em;margin:0.2em 0em">
             <div>
                 <p>enter a data source URL
                     <br>
                     <span style="font-size:0.8em;">
                         <span>
                 </p>
-                <input type="text" id="dataURL" class="filenameOrUrl" style="border:none;border-radius:0.5em"></input>&nbsp;
+                <input type="text" id="dataURL" class="filenameOrUrl" style="border:solid black 0.1px;border-radius:0.7em"></input>&nbsp;
                 <a class="btn btn-outline-dark mt-auto" href="javascript:doDataUrl()">load</a>
                 <img src="./resources/images/loading_blue.gif" id="load-url-spinner" style="height:64px;vertical-align:top;display:none">
             </div>
@@ -301,9 +301,11 @@
             };
             //google.load('visualization', '1', options);
 
-            _LOG = function(text) {
-                console.log(text);
-            };
+            if ( _LOG === "undefined" ){
+                _LOG = function(text) {
+                    console.log(text);
+                };
+            }
 
         });
 

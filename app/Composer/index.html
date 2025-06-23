@@ -41,6 +41,7 @@
         .td_blue {
             background: rgba(0, 0, 255, 0.05);
         }
+
         .td_green {
             background: rgba(0, 255, 0, 0.05);
         }
@@ -54,22 +55,27 @@
             background: #ffffff;
             background: #F4F5F6;
         }
-        
+
         a {
             text-decoration: none;
         }
-        
-        .wrapword{
-            white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
-            white-space: -pre-wrap;      /* Opera 4-6 */
-            white-space: -o-pre-wrap;    /* Opera 7 */
-            white-space: pre-wrap;       /* css-3 */
-            word-wrap: break-word;       /* Internet Explorer 5.5+ */
-            white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
+
+        .wrapword {
+            white-space: -moz-pre-wrap !important;
+            /* Mozilla, since 1999 */
+            white-space: -pre-wrap;
+            /* Opera 4-6 */
+            white-space: -o-pre-wrap;
+            /* Opera 7 */
+            white-space: pre-wrap;
+            /* css-3 */
+            word-wrap: break-word;
+            /* Internet Explorer 5.5+ */
+            white-space: -webkit-pre-wrap;
+            /* Newer versions of Chrome/Safari*/
             word-break: break-all;
             white-space: normal;
         }
-
 
     </style>
 
@@ -95,6 +101,68 @@
 
     </style>
 
+    <style>
+        /* Table styles */
+.data-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+.data-table th {
+    background-color: #f2f2f2;
+}
+
+.data-table tr.even {
+    background-color: #f9f9f9;
+}
+
+/* Card styles */
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1em;
+    flex-basis: calc(33.33% - 1em); /* Adjust as needed */
+    background-color: white;
+}
+.card-item{
+  display: flex;
+  align-items: center;
+  margin:0.5em 0;
+}
+.card-header{
+   font-weight: bold;
+   margin-right: 1em;
+}
+.card-value {
+  
+}
+
+/* sort styles */
+.sort-icon {
+    font-size: 0.8em;
+    margin: 0 0.2em;
+    display:inline-block;
+}
+.sort-icon:hover{
+    color: #0d6efd;
+}
+
+    </style>
+ 
 
 </head>
 
@@ -102,10 +170,10 @@
     <!-- Navigation-->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container px-4 px-lg-5">
-            <a class="navbar-brand" href="#!"><img src="img/cabbage.png" style="height:36px;vertical-align:-32%;margin-right:1.5em">DATA-KRAUTI </a>
+            <a class="navbar-brand" href="#!"><img src="img/cabbage.png" style="height:36px;vertical-align:-32%;margin-right:1.2em"><span style="font-size:0.9em;vertical-align:2px">DATA-KRAUTI</span> </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
                     <li class="nav-item"><a class="nav-link" href="https://gjrichter.github.io/docs/Data-Krauti/docs/" target="blank">About <i class='bi-info-circle me-1'></i></a></li>
                 </ul>
                 <ul class="navbar-nav right" style="margin-right:1.2em">
@@ -118,10 +186,10 @@
             </div>
         </div>
     </nav>
-    
+
     <div id="load-param-spinner" style="display:none">
         <center>
-            <img src="./resources/images/loading_blue.gif"  style="height:64px;margin:-0.4em 0 0 -2em;"> loading data ...  
+            <img src="./resources/images/loading_blue.gif" style="height:64px;margin:-0.4em 0 0 -2em;"> loading data ...
         </center>
     </div>
 
@@ -134,19 +202,19 @@
     </section>
 
     <!-- footer section-->
-    <section style="position:relative;bottom:10px;display:block;wifth=100%">
+    <section style="position:relative;bottom:10px;display:block;width:100%">
         <div class="container px-4 px-lg-5 mt-5">
             <div id="load-data-button" class="text-left" style="margin:3em 0;display:none;">
                 <a class="btn btn-outline-dark mt-auto" href="javascript:__dataLoadDialog()">add data</a>
             </div>
         </div>
-        <div class="container px-4 px-lg-5 mt-5" style="font-size:14px;color:#888888;text-align:center" >
-            <p>View and explorev data with tables and on a map - Version: <span style="font-size:0.8em">0.91</span></p>
+        <div class="container px-4 px-lg-5 mt-5" style="font-size:14px;color:#888888;text-align:center">
+            <p>View and explorev data with tables and on a map - Version: <span style="font-size:0.8em">0.92</span></p>
         </div>
     </section>
 
     <!-- div to host dialog overlays -->
-    <div id="composer-dialog-pos" class="container" style="position:absolute;top:100px;display:none;z-index:9999">
+    <div id="composer-dialog-pos" class="container" style="position:absolute;top:100px;left:0px;width:100%;display:none;z-index:9999;background-color:rgba(255,255,255,0.7)">
         <div id="composer-dialog" style="display:none;">
         </div>
     </div>
@@ -170,7 +238,7 @@
 
     <script src="../../ui/js/htmlgui_api.js"></script>
     <script src="../../../data.js/data.js"></script>
-    
+
     <!-- must load papaparse here, elsewise .import non funziona -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
     <script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
@@ -183,13 +251,12 @@
 
     <script src="./js/json_config.js"></script>
     <script src="./js/json_config_html.js"></script>
-    
+
     <script src="./js/dataprocess.js"></script>
     <script src="./js/format.js"></script>
     <script src="./js/facets.js"></script>
-    
+
     <script type="text/javascript" charset="utf-8">
-        
         // ----------------------------------------------------------
         // ----------------------------------------------------------
         //
@@ -197,17 +264,17 @@
         //
         // ----------------------------------------------------------
         // ----------------------------------------------------------
-        
+
         /**
          * Namespace for the ixmaps application.
          * @namespace ixmaps
-         */        
+         */
         ixmaps = ixmaps || {};
-        
+
         /**
          * Namespace for data handling within the ixmaps application.
          * @namespace ixmaps.data
-         */        
+         */
         ixmaps.data = ixmaps.data || {};
 
         /**
@@ -227,15 +294,15 @@
          * @type {Object}
          */
         const dataA = {};
-        
-        
+
+
 
         // -------------------------------------
         //
         // handle the data (add, remove, ...) 
         //
         // -------------------------------------
-        
+
         /**
          * Adds data to the composer.
          *
@@ -244,7 +311,7 @@
          * @private
          */
         const __addData = (data) => {
-            
+
             // Constants for reusability and maintainability
             const BUTTON_CLASSES = 'btn btn-outline-dark mt-auto';
             const DEFAULT_TABLE_HEIGHT = '400px';
@@ -263,14 +330,14 @@
 
             // Generate unique ID using a more reliable method
             const dataName = `data_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-            
+
             // Store data with proper type checking
-            
+
             let sink = new DataSink(importedData);
-                sink.url = ixmaps.editor.dbtableUrl || '';
-                sink.type = ixmaps.editor.dbtableType || 'default';
+            sink.url = ixmaps.editor.dbtableUrl || '';
+            sink.type = ixmaps.editor.dbtableType || 'default';
             dataA[dataName] = sink;
-            
+
             // Update data counter with safety check
             const dataCounter = document.getElementById('nData');
             if (dataCounter) {
@@ -290,17 +357,85 @@
             };
 
             // Create header with buttons
-            const headerButtons = [
-                { id: 'facets', onClick: '__dataFacets', icon: 'funnel', text: 'facets' },
-                { id: 'analytics', onClick: '__dataAnalytics', icon: '', text: 'analyze' },
-                { id: 'filter', onClick: '__dataFilter', icon: '', text: 'filter' },
-                { id: 'process', onClick: '__dataProcess', icon: '', text: 'process' },
-                { id: 'map', onClick: '__dataToMap', icon: 'map', text: 'map' },
-                { id: 'theme', onClick: '__mapTheme', icon: 'layout-text-sidebar', text: 'config. map', style: 'display:none' },
-                { id: 'theme-edit', onClick: '__mapThemeEdit', icon: 'pencil', text: 'edit theme', style: 'display:none' },
-                { id: 'remove', onClick: '__removeData', icon: 'x-circle', text: 'remove', style: 'float:right;margin-left:0.3em' },
-                { id: 'toggle-map', onClick: '__hideMap', icon: 'eye', text: 'map', style: 'display:none;float:right;margin-left:0.3em' },
-                { id: 'toggle-data', onClick: '__hideData', icon: 'eye', text: 'data', style: 'display:none;float:right' }
+            const headerButtons = [{
+                    id: 'facets',
+                    onClick: '__dataFacets',
+                    icon: 'funnel',
+                    text: 'facets'
+                },
+                {
+                    id: 'analytics',
+                    onClick: '__dataAnalytics',
+                    icon: '',
+                    text: 'analyze'
+                },
+                {
+                    id: 'filter',
+                    onClick: '__dataFilter',
+                    icon: '',
+                    text: 'filter'
+                },
+                {
+                    id: 'process',
+                    onClick: '__dataProcess',
+                    icon: '',
+                    text: 'process'
+                },
+                {
+                    id: 'map',
+                    onClick: '__dataToMap',
+                    icon: 'map',
+                    text: 'map'
+                },
+                {
+                    id: 'theme',
+                    onClick: '__mapTheme',
+                    icon: 'layout-text-sidebar',
+                    text: 'config. map',
+                    style: 'display:none'
+                },
+                {
+                    id: 'theme-edit',
+                    onClick: '__mapThemeEdit',
+                    icon: 'pencil',
+                    text: 'edit theme',
+                    style: 'display:none'
+                },
+                {
+                    id: 'remove-map',
+                    onClick: '__removeMap',
+                    icon: 'x-circle',
+                    text: 'remove map',
+                    style: 'display:none'
+                },
+                {
+                    id: 'map-inline',
+                    onClick: 'fullscreen',
+                    icon: 'arrows-angle-contract',
+                    text: 'inline map',
+                    style: 'display:none'
+                },
+                {
+                    id: 'remove',
+                    onClick: '__removeData',
+                    icon: 'x-circle',
+                    text: 'remove',
+                    style: 'float:right;margin-left:0.3em'
+                },
+                {
+                    id: 'toggle-map',
+                    onClick: '__hideMap',
+                    icon: 'eye',
+                    text: 'map',
+                    style: 'display:none;float:right;margin-left:0.3em'
+                },
+                {
+                    id: 'toggle-data',
+                    onClick: '__hideData',
+                    icon: 'eye',
+                    text: 'data',
+                    style: 'display:none;float:right'
+                }
             ];
 
             const header = `
@@ -319,7 +454,7 @@
                             ${__makeDataTable(importedData, dataName, 450)}
                         </div>
                         <p id="input-table-info-${dataName}">
-                            records: ${dataA[dataName].data.table.records} <a href="javascript:export(${dataA[dataName].data.table.records})">export</a> <a class="${BUTTON_CLASSES}" style="float:right;padding:0.2em 0.5em;border:none" href="javascript:__toggleCards('${dataName}')">table <i class="bi-arrow-left-right me-1"></i> cards</a>
+                            records: ${dataA[dataName].data.table.records} <a href="javascript:saveAsCSV('${dataName}')">export</a> <a class="${BUTTON_CLASSES}" style="float:right;padding:0.2em 0.5em;border:none" href="javascript:__toggleCards('${dataName}')">table <i class="bi-arrow-left-right me-1"></i> cards</a>
                         </p>
                         <div id="input-table-map-${dataName}" style="width:100%"></div>
                     </div>
@@ -335,19 +470,19 @@
             `;
 
             // Append to DOM safely
-                   $('#Input-table').append(container);
-            
+            $('#Input-table').append(container);
+
             $("#load-data-button").show();
 
             // Return the dataName for potential future reference
             return dataName;
-        };        
- 
+        };
+
         /**
          * Removes data from the composer.
          * @param {string} dataName - The unique data name.
          * @private
-         */        
+         */
         __removeData = function(dataName) {
 
             __confirm("do you really want to remove this data?", () => {
@@ -372,7 +507,7 @@
                 return;
             });
         };
-        
+
 
         // ----------------------------------------------------------
         // ----------------------------------------------------------
@@ -427,61 +562,125 @@
          */
         __dataFacetsSetFilter = function(dataName, sFilter) {
 
-            ixmaps.data.facetsObj = dataA[dataName].data;
-            if (sFilter && sFilter.length) {
-                ixmaps.data.facetsObj = dataA[dataName].data.select(sFilter);
-            }
-            
-            dataA[dataName].facetsFilter = sFilter;
-            ixmaps.data.facetsFilter = sFilter;
-            
-            let height = $("#input-table-table-" + ixmaps.data.facetsDataName).height();
-            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
-            $("#input-table-table-" + dataName).html(__makeDataTable(ixmaps.data.facetsObj, dataName, height));
-            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset);
-            if (dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length) {
-                $("#input-table-info-" + dataName).html("records: <b>" + ixmaps.data.facetsObj.table.records + "</b> (" + dataA[dataName].data.table.records + ")");
-            } else {
-                $("#input-table-info-" + dataName).html("records: " + ixmaps.data.facetsObj.table.records);
+            const dataObj = dataA[dataName];
+            const $table = $("#input-table-table-" + dataName);
+            const $tableInfo = $("#input-table-info-" + dataName);
+
+            if (!dataObj || !dataObj.data) {
+                console.warn(`No data found for dataName: ${dataName}`);
+                return;
             }
 
-            var facetsA = ixmaps.data.getFacets(ixmaps.data.facetsObj, sFilter);
+            let selectedData = dataObj.data;
+
+            if (sFilter && sFilter.length) {
+                selectedData = dataObj.data.select(sFilter);
+                dataObj.facetsFilter = sFilter;
+            } else {
+                dataObj.facetsFilter = "";
+            }
+
+            ixmaps.data.facetsObj = selectedData;
+            ixmaps.data.facetsFilter = dataObj.facetsFilter;
+
+            const height = $table.height();
+            const offset = $table.children(":first").scrollLeft();
+
+            // redraw table with filtered data
+            $table.html(__makeDataTable(selectedData, dataName, height));
+            $table.children(":first").scrollLeft(offset);
+
+            // update table info below table
+            const totalRecords = dataObj.data.table.records;
+            const selectedRecords = selectedData.table.records;
+            if (dataObj.facetsFilter && dataObj.facetsFilter.length) {
+                $tableInfo.html(`records: <b>${selectedRecords}</b> (${totalRecords}) <a href='javascript:saveAsCSV("${dataName}")'>export</a>`);
+            } else {
+                $tableInfo.html(`records: ${selectedRecords} <a href='javascript:saveAsCSV("${dataName}")'>export</a>`);
+            }
+            // redraw facets in sidebar
+            var facetsA = ixmaps.data.getFacets(selectedData, sFilter);
             try {
-                ixmaps.data.showFacets(sFilter, "facetDiv-" + dataName, facetsA, ixmaps.data.facetsObj, dataName);
-            } catch (e) {}
- 
-            if (dataA[dataName].map) {
+                ixmaps.data.showFacets(sFilter, "facetDiv-" + dataName, facetsA, selectedData, dataName);
+            } catch (e) {
+                console.error("Error in showFacets:", e);
+            }
+            // update map if present
+            if (dataObj.map) {
                 if (sFilter && sFilter.length) {
-                    dataA[dataName].map.changeThemeStyle(dataName, "filter:" + sFilter, "set");
+                    dataObj.map.changeThemeStyle(dataName, "filter:" + sFilter, "set");
                 } else {
-                    dataA[dataName].map.changeThemeStyle(dataName, "filter", "remove");
+                    dataObj.map.changeThemeStyle(dataName, "filter", "remove");
                 }
             }
         };
 
         /**
-        * Sorts the data in the table based on the given column and direction.
-        *
-        * @param {string} dataName - The name of the data to sort.
-        * @param {string} szColumn - The column to sort by.
-        * @param {string} [szDir] - The sort direction ("UP" or "DOWN"). If not provided, toggles the current direction.
-        * @function __dataSort
+        * helper function to update the table view
+        * @param {string} dataName - The name of the data to filter.
+        * @param {object} data - The data to display.
         * @private
         */
-        __dataSort = function(dataName, szColumn, szDir) {
+        function __setActiveHeaderButton(dataName, buttonName) {
+            // Deactivate other buttons
+            $(`#input-table-header-${dataName}-facets`).removeClass("active");
+            $(`#input-table-header-${dataName}-process`).removeClass("active");
+            $(`#input-table-header-${dataName}-theme`).removeClass("active");
+            $(`#input-table-header-${dataName}-theme-edit`).removeClass("active");
 
-            let data = dataA[dataName].data;
-            if (dataA[dataName]?.facetsFilter & !dataA[dataName]?.fPivot) {
-                data = data.select(dataA[dataName].facetsFilter);
+            // Activate theme sidebar
+            $(`#input-table-header-${dataName}-${buttonName}`).addClass("active");
+        };
+        
+        /**
+        * helper function to update the table view
+        * @param {string} dataName - The name of the data to filter.
+        * @param {object} data - The data to display.
+        * @private
+        */
+        function __updateDataTable(dataName, data) {
+            const $table = $(`#input-table-table-${dataName}`);
+            const height = $table.height();
+            const offset = $table.children(":first").scrollLeft();
+            $table.html(__makeDataTable(data, dataName, height));
+            $table.children(":first").scrollLeft(offset);
+        };
+
+       /**
+         * Sorts the data in the table based on the given column and direction.
+         *
+         * @param {string} dataName - The name of the data to sort.
+         * @param {string} szColumn - The column to sort by.
+         * @param {string} [szDir] - The sort direction ("UP" or "DOWN"). If not provided, toggles the current direction.
+         * @function __dataSort
+         * @private
+         */
+         __dataSort = function (dataName, szColumn, szDir) {
+            const dataObj = dataA[dataName];
+            if (!dataObj || !dataObj.data) {
+                console.warn(`No data found for dataName: ${dataName}`);
+                return;
             }
-            szDir = szDir || (dataA[dataName].sortDir ? ((dataA[dataName].sortDir.match(/DOWN/)) ? "UP" : "DOWN") : "UP");
-            data.sort(szColumn, szDir);
-            dataA[dataName].sortDir = szColumn + "-" + szDir;
 
-            let height = $("#input-table-table-" + dataName).height();
-            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
-            $("#input-table-table-" + dataName).html(__makeDataTable(data, dataName, height));
-            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+            let data = dataObj.data;
+
+            // Apply Facet Filter if exists and not a pivot table
+            if (dataObj.facetsFilter && !dataObj.fPivot) {
+                data = data.select(dataObj.facetsFilter);
+            }
+
+            // Determine Sort Direction
+            const currentSortDir = dataObj.sortDir;
+            szDir = szDir || (currentSortDir ? (currentSortDir.includes("DOWN") ? "UP" : "DOWN") : "UP");
+
+            // Sort Data
+            data.sort(szColumn, szDir);
+
+            // Update Sort Direction in Data Object
+            dataObj.sortDir = `${szColumn}-${szDir}`;
+
+            // Update Table
+            __updateDataTable(dataName, data);
         };
 
         /**
@@ -491,49 +690,46 @@
          * @function __dataFilter
          * @private
          */
-        __dataFilter = function(dataName) {
+        __dataFilter = function (dataName) {
+            const dataObj = dataA[dataName];
+            if (!dataObj || !dataObj.data) {
+                console.warn(`No data found for dataName: ${dataName}`);
+                return;
+            }
+            
+            const headerButton = $(`#input-table-header-${dataName}-filter`);
+            dataObj.fShowFilter = !headerButton.hasClass("active");
+            headerButton.toggleClass("active", dataObj.fShowFilter);
 
-            if ($("#input-table-header-" + dataName + "-filter").hasClass("active")) {
-                $("#input-table-header-" + dataName + "-filter").removeClass("active");
-                dataA[dataName].fShowFilter = false;
-            } else {
-                $("#input-table-header-" + dataName + "-filter").addClass("active");
-                dataA[dataName].fShowFilter = true;
+            if (dataObj.fShowFilter) {
+                dataObj.filterA = dataObj.filterA || {};
 
-                let data = dataA[dataName].data;
-
-                ixmaps.data.facetsObj = dataA[dataName].data;
-                
-               if (dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length) {
-
+                if (dataObj.facetsFilter) {
                     // get filter parts
                     // ----------------
-                    let szPartsA = dataA[dataName].facetsFilter.split('WHERE ')[1].split('AND');
-                    // test if BETWEEN x AND y and join two parts around AND
-                    for (i = 0; i < szPartsA.length; i++) {
-                        if (szPartsA[i].match(/BETWEEN/)) {
-                            szPartsA[i] = szPartsA[i] + "AND" + szPartsA[i + 1];
-                            szPartsA.splice(i + 1, 1);
+                    const filterParts = dataObj.facetsFilter.split('WHERE ')[1]?.split('AND') || [];
+                    const refinedFilterParts = [];
+                    for (let i = 0; i < filterParts.length; i++) {
+                        if (filterParts[i].match(/BETWEEN/)) {
+                            refinedFilterParts.push(filterParts[i] + "AND" + filterParts[i + 1]);
+                            i++; // Skip the next element since it's already included.
+                        } else {
+                            refinedFilterParts.push(filterParts[i]);
                         }
                     }
-                    // set filter parts
-                    // ----------------
-                    dataA[dataName].filterA = {};
-                    szPartsA.forEach(function(x) {
-                        let xA = x.split(" ");
-                        dataA[dataName].filterA[xA[0].replace(/\"/g, "")] = xA[2].replace(/\"/g, "");
+
+                    dataObj.filterA = {};
+                    refinedFilterParts.forEach(part => {
+                        const [key, , value] = part.trim().split(/\s+/);
+                        dataObj.filterA[key.replace(/"/g, "")] = value.replace(/"/g, "");
                     });
-
-                    ixmaps.data.facetsObj = dataA[dataName].data.select(dataA[dataName].facetsFilter);
+                    
+                    ixmaps.data.facetsObj = dataObj.data.select(dataObj.facetsFilter);
                 }
-            }
-
-            let height = $("#input-table-table-" + dataName).height();
-            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
-            $("#input-table-table-" + dataName).html(__makeDataTable(ixmaps.data.facetsObj, dataName, height));
-            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+             }
+             __updateDataTable(dataName, ixmaps.data.facetsObj||dataObj.data);
         };
-
+        
         /**
          * Applies a filter to the data based on keyup events in the filter input fields.
          *
@@ -544,72 +740,69 @@
          * @function __dataKeyupSelect
          * @private
          */
-        __dataKeyupSelect = function(dataName, szColumn, szSelect, event) {
+        __dataKeyupSelect = function (dataName, szColumn, szSelect, event) {
+            if (!["ArrowLeft", "ArrowRight", "Enter"].includes(event.key)) return;
+            if (event.key !== "Enter") return;
 
-            if ((event.key == 'ArrowLeft') ||
-                (event.key == 'ArrowRight')) {
+            const dataObj = dataA[dataName];
+            if (!dataObj || !dataObj.data) {
+                console.warn("No data found for dataName: "+dataName);
                 return;
             }
-            if ((event.key != 'Enter')) {
-                return;
-            }
 
-            let data = dataA[dataName].data;
-            if (!dataA[dataName].filterA) {
-                dataA[dataName].filterA = {};
-            }
-            delete dataA[dataName].filterA[szColumn];
+            let data = dataObj.data;
+            dataObj.filterA = dataObj.filterA || {};
+            delete dataObj.filterA[szColumn];
+
             if (szSelect && szSelect.length) {
-                dataA[dataName].filterA[szColumn] = szSelect;
+                dataObj.filterA[szColumn] = szSelect;
             }
-            let szFilter = "";
-            for (c in dataA[dataName].filterA) {
-                if (dataA[dataName].filterA[c][0].match(/\<|\>/) && dataA[dataName].filterA[c].length < 2) {
+
+            let filterParts = [];
+            for (const column in dataObj.filterA) {
+                let filterValue = dataObj.filterA[column];
+                 if (!filterValue || (filterValue[0].match(/[<>]/) && filterValue.length < 2)) {
                     continue;
                 }
-                szFilter += szFilter.length ? " AND " : " WHERE ";
-                if (dataA[dataName].filterA[c][0].match(/\<|\>/)) {
-                    if (dataA[dataName].filterA[c][1] != " ") {
-                        szFilter += "\"" + c + "\" " + dataA[dataName].filterA[c][0] + " " + dataA[dataName].filterA[c].slice(1);
-                    } else {
-                        szFilter += "\"" + c + "\" " + dataA[dataName].filterA[c];
-                    }
-                } else {
-                    if (dataA[dataName].filterA[c].match(/BETWEEN/)) {
-                        szFilter += "\"" + c + "\" " + dataA[dataName].filterA[c];
-                    } else {
-                        szFilter += "\"" + c + "\" like \"" + dataA[dataName].filterA[c] + "\"";
-                    }
-                }
-            }
-            if (szFilter && szFilter.length) {
-                data = data.select(szFilter);
-            }
-            if (dataA[dataName].map) {
-                if (szFilter && szFilter.length) {
-                    dataA[dataName].map.changeThemeStyle(null, "filter:" + szFilter, "set");
-                } else {
-                    dataA[dataName].map.changeThemeStyle(null, "filter", "remove");
-                }
-            }
-            dataA[dataName].facetsFilter = szFilter;
+                const operator = filterValue[0].match(/[<>]/) ? filterValue[0] : "like";
+                const value = filterValue.startsWith("<") || filterValue.startsWith(">")
+                 ? (filterValue.startsWith("< ") || filterValue.startsWith("> ") ? filterValue.slice(1).trim() : filterValue.slice(1)) 
+                : (filterValue.match(/BETWEEN/) ? filterValue : `"${filterValue}"`);
 
-            let height = $("#input-table-table-" + dataName).height();
-            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
-            $("#input-table-table-" + dataName).html(__makeDataTable(data, dataName, height));
-            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
-            if (dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length) {
-                $("#input-table-info-" + dataName).html("records: <b>" + data.table.records + "</b> / " + dataA[dataName].data.table.records + " +<small><i class='bi-funnel me-1'></i>"+szFilter+"</small>");
-            } else {
-                $("#input-table-info-" + dataName).html("records: " + ixmaps.data.facetsObj.table.records);
+                let filterPart;
+                if (operator === "like") {
+                    filterPart = `"${column}" ${operator} ${value}`;
+                } else {
+                    filterPart = `"${column}" ${operator} ${value}`;
+                }
+                filterParts.push(filterPart);
             }
- 
-            let szSafeId = ("input-table-table-" + dataName + "-filter-" + szColumn).replace(/ |\W/g, "_");
-            let __input = $("#" + szSafeId);
-            let len = __input.val().length;
-            __input.focus();
-            __input[0].setSelectionRange(len, len);
-        }
+
+            const newFilter = filterParts.length ? `WHERE ${filterParts.join(" AND ")}` : "";
+            if (newFilter) {
+              data = data.select(newFilter);
+            }
+            if (dataObj.map) {
+                dataObj.map.changeThemeStyle(null, newFilter ? `filter:${newFilter}` : "filter", newFilter ? "set" : "remove");
+            }
+
+            dataObj.facetsFilter = newFilter;
+
+            __updateDataTable(dataName, data);
+           
+            const $info = $(`#input-table-info-${dataName}`);
+            const totalRecords = dataObj.data.table.records;
+            if(newFilter){
+                $info.html(`records: <b>${data.table.records}</b> / ${totalRecords} +<small><i class='bi-funnel me-1'></i>${newFilter}</small>  <a href='javascript:saveAsCSV("${dataName}")'>export</a>`);
+            } else{
+                 $info.html(`records: ${data.table.records} <a href='javascript:saveAsCSV("${dataName}")'>export</a>`);
+            }
+
+            const szSafeId = (`input-table-table-${dataName}-filter-${szColumn}`).replace(/ |\W/g, "_");
+            const $input = $(`#${szSafeId}`);
+            const len = $input.val().length;
+            $input.focus().prop('selectionStart', len).prop('selectionEnd', len);
+        };
 
         /**
          * Toggles analytics display for the data.
@@ -617,27 +810,22 @@
          * @param {string} dataName - The name of the data.
          * @private
          */
-        __dataAnalytics = function(dataName) {
+        __dataAnalytics = function (dataName) {
+           const dataObj = dataA[dataName];
+            if (!dataObj || !dataObj.data) {
+                console.warn(`No data found for dataName: ${dataName}`);
+                return;
+            }
+            const headerButton = $(`#input-table-header-${dataName}-analytics`);
+            dataObj.fShowAnalytics = !headerButton.hasClass("active");
+            headerButton.toggleClass("active", dataObj.fShowAnalytics);
 
-            let data = dataA[dataName].data;
-
-            if ($("#input-table-header-" + dataName + "-analytics").hasClass("active")) {
-                $("#input-table-header-" + dataName + "-analytics").removeClass("active");
-                dataA[dataName].fShowAnalytics = false;
-            } else {
-                $("#input-table-header-" + dataName + "-analytics").addClass("active");
-                dataA[dataName].fShowAnalytics = true;
-
-
-                if (dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length) {
-                    //data = data.select(dataA[dataName].facetsFilter);
-                }
+            let data = dataObj.data;
+            if (dataObj.facetsFilter) {
+              //data = data.select(dataObj.facetsFilter);
             }
 
-            let height = $("#input-table-table-" + dataName).height();
-            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
-            $("#input-table-table-" + dataName).html(__makeDataTable(data, dataName, height));
-            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+            __updateDataTable(dataName, data);
         };
 
         /**
@@ -647,34 +835,33 @@
          * @param {object} pivotJson - The pivot configuration in JSON format.
          * @private
          */
-        __dataProcessMakePivot = function(dataName, pivotJson) {
+        __dataProcessMakePivot = function (dataName, pivotJson) {
+            const dataObj = dataA[dataName];
+            if (!dataObj || !dataObj.data) {
+                console.warn(`No data found for dataName: ${dataName}`);
+                return;
+            }
+            dataObj.data = dataObj.origdata || dataObj.data;
+            let data = dataObj.data;
+            dataObj.fPivot = null;
 
-            dataA[dataName].data = dataA[dataName].origdata || dataA[dataName].data;
+            const pivotButton = $(`#input-table-header-${dataName}-pivot`);
 
-            let data = dataA[dataName].data;
-            
-            dataA[dataName].fPivot = null;
+            if (pivotButton.hasClass("active")) {
+                 dataObj.origdata = dataObj.data;
+                if (dataObj.facetsFilter) {
+                    data = data.select(dataObj.facetsFilter);
+                 }
 
-            if ($("#input-table-header-" + dataName + "-pivot").hasClass("active")) {
-
-                dataA[dataName].origdata = dataA[dataName].data;
-                
-                if (dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length) {
-                    data = data.select(dataA[dataName].facetsFilter);
-                }
-                
                 data = data.pivot(pivotJson);
 
-                //__addData(data);
-                dataA[dataName].data = data;
-                dataA[dataName].fPivot = true;
-                dataA[dataName].pivot = pivotJson;
-             }
+                dataObj.data = data;
+                dataObj.fPivot = true;
+                dataObj.pivot = pivotJson;
+            }
+            __updateDataTable(dataName, data);
 
-            let height = $("#input-table-table-" + dataName).height();
-            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
-            $("#input-table-table-" + dataName).html(__makeDataTable(data, dataName, height));
-            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+            $(`#input-table-info-${dataName}`).html(`records: ${data.table.records} (${dataObj.data.table.records}) <a href='javascript:saveAsCSV("${dataName}")'>export</a>`);
         };
 
         /**
@@ -684,30 +871,28 @@
          * @param {object} pivotJson - The pivot configuration in JSON format.  Seems misnamed, should likely be condenseJson.
          * @private
          */
-        __dataProcessMakeCondense = function(dataName, pivotJson) {
+        __dataProcessMakeCondense = function (dataName, condenseJson) {
+            const dataObj = dataA[dataName];
+            if (!dataObj || !dataObj.data) {
+                console.warn(`No data found for dataName: ${dataName}`);
+                return;
+            }
+            dataObj.data = dataObj.origdata || dataObj.data;
+            let data = dataObj.data;
 
-            dataA[dataName].data = dataA[dataName].origdata || dataA[dataName].data;
+            const condenseButton = $(`#input-table-header-${dataName}-condense`);
 
-            let data = dataA[dataName].data;
+            if (condenseButton.hasClass("active")) {
+                dataObj.origdata = dataObj.data;
 
-            if ($("#input-table-header-" + dataName + "-condense").hasClass("active")) {
+                data = data.condense(condenseJson);
+                dataObj.data = data;
 
-                dataA[dataName].origdata = dataA[dataName].data;
-
-                data = data.condense(pivotJson);
-
-                //__addData(data);
-                dataA[dataName].data = data;
-
-                if (dataA[dataName].facetsFilter && dataA[dataName].facetsFilter.length) {
-                    data = data.select(dataA[dataName].facetsFilter);
+                if (dataObj.facetsFilter) {
+                    data = data.select(dataObj.facetsFilter);
                 }
             }
-
-            let height = $("#input-table-table-" + dataName).height();
-            let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
-            $("#input-table-table-" + dataName).html(__makeDataTable(data, dataName, height));
-            $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
+          __updateDataTable(dataName, data);
         };
 
         /**
@@ -716,33 +901,39 @@
          * @param {string} dataName - The name of the data.
          * @private
          */
-        __dataProcess = function(dataName) {
+         __dataProcess = function (dataName) {
+            const $headerButton = $(`#input-table-header-${dataName}-process`);
+            const $sidebar = $(`#input-table-sidebar-${dataName}`);
+            const $workspace = $(`#input-table-workspace-${dataName}`);
 
-            if ($("#input-table-header-" + dataName + "-process").hasClass("active")) {
-                $("#input-table-sidebar-" + dataName).html("");
-                $("#input-table-sidebar-" + dataName).css("width", "0%");
-                $("#input-table-workspace-" + dataName).css("width", "100%");
-                $("#input-table-header-" + dataName + "-process").removeClass("active");
+            const isActive = $headerButton.hasClass("active");
+
+            // Toggle Sidebar and Workspace Visibility
+            if (isActive) {
+                $sidebar.html("").css("width", "0%");
+                $workspace.css("width", "100%");
+                $headerButton.removeClass("active");
                 return;
             }
 
-            $("#input-table-header-" + dataName + "-facets").removeClass("active");
-            $("#input-table-header-" + dataName + "-theme").removeClass("active");
-            $("#input-table-header-" + dataName + "-theme-edit").removeClass("active");
-            $("#input-table-header-" + dataName + "-process").addClass("active");
+            // Activate current sidebar
+            __setActiveHeaderButton(dataName,"process");
 
-            $("#input-table-sidebar-" + dataName).css("width", "30%");
-            $("#input-table-workspace-" + dataName).css("width", "70%");
+            // Set Sidebar and Workspace Width
+            $sidebar.css("width", "30%");
+            $workspace.css("width", "70%");
 
-            $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height() - 20);
+            // Set Sidebar Height
+            $sidebar.height($workspace.height() - 20);
 
+            // Setup Data for Sidebar
             ixmaps.data = ixmaps.data || {};
             ixmaps.data.processObj = dataA[dataName].data;
             ixmaps.data.processDataName = dataName;
 
-            $("#input-table-sidebar-" + dataName).css("overflow", "hidden");
+            // Open the Sidebar
+            $sidebar.css("overflow", "hidden");
             __openSidebar(dataName, './data_process.html');
-
         };
 
         /**
@@ -751,44 +942,48 @@
          * @param {string} dataName - The name of the data.
          * @private
          */
-        var act_dataName = null;
-        __mapTheme = function(dataName) {
+         let act_dataName = null;
+        __mapTheme = function (dataName) {
+            const $activeSidebar = act_dataName ? $(`#input-table-sidebar-${act_dataName}`) : null;
+            const $activeWorkspace = act_dataName ? $(`#input-table-workspace-${act_dataName}`) : null;
+            const $activeHeader = act_dataName ? $(`#input-table-header-${act_dataName}-theme`) : null;
 
+            // If another theme is active, close it
             if (act_dataName) {
-                $("#input-table-sidebar-" + act_dataName).html("");
-                $("#input-table-sidebar-" + act_dataName).css("width", "0%");
-                $("#input-table-workspace-" + act_dataName).css("width", "100%");
-                $("#input-table-header-" + act_dataName + "-theme").removeClass("active");
+                $activeSidebar.html("").css("width", "0%");
+                $activeWorkspace.css("width", "100%");
+                $activeHeader.removeClass("active");
 
-                // remove colpicker elements; 
-                // these have been created by 'theme_configurator.html -> colpick.js' the in the 'body' element
+                // Remove color picker elements
                 $(".colpick").remove();
 
                 ixmaps.editor = {};
 
-                if (dataName == act_dataName) {
+                // If the same theme is clicked again, close and reset
+                if (dataName === act_dataName) {
                     act_dataName = null;
                     return;
                 }
             }
 
+            // Set current theme as active
             act_dataName = dataName;
 
-            $("#input-table-header-" + dataName + "-facets").removeClass("active");
-            $("#input-table-header-" + dataName + "-process").removeClass("active");
-            $("#input-table-header-" + dataName + "-theme-edit").removeClass("active");
-            $("#input-table-header-" + dataName + "-theme").addClass("active");
+            // Activate current sidebar
+            __setActiveHeaderButton(dataName,"theme");
 
-            $("#input-table-sidebar-" + dataName).css("width", "35%");
-            $("#input-table-workspace-" + dataName).css("width", "65%");
+            // Set sidebar and workspace dimensions
+            const $sidebar = $(`#input-table-sidebar-${dataName}`);
+            const $workspace = $(`#input-table-workspace-${dataName}`);
+            $sidebar.css({
+                "width": "35%",
+                "overflow": "auto"
+            }).height($workspace.height());
+            $workspace.css("width", "65%");
 
-            $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height());
-
-            $("#input-table-sidebar-" + dataName).css("overflow", "auto");
-
+            // Set editor theme ID and open the sidebar
             ixmaps.editor.themeId = dataName;
             __openSidebar(dataName, './theme_configurator.html');
-
         };
 
         /**
@@ -797,27 +992,33 @@
          * @param {string} dataName - The name of the data.
          * @private
          */
-        __mapThemeEdit = function(dataName) {
+         __mapThemeEdit = function (dataName) {
+            const $headerButton = $(`#input-table-header-${dataName}-theme-edit`);
+            const $sidebar = $(`#input-table-sidebar-${dataName}`);
+            const $workspace = $(`#input-table-workspace-${dataName}`);
 
-            if ($("#input-table-header-" + dataName + "-theme-edit").hasClass("active")) {
-                $("#input-table-sidebar-" + dataName).html("");
-                $("#input-table-sidebar-" + dataName).css("width", "0%");
-                $("#input-table-workspace-" + dataName).css("width", "100%");
-                $("#input-table-header-" + dataName + "-theme-edit").removeClass("active");
+            const isActive = $headerButton.hasClass("active");
+
+            // Toggle Sidebar and Workspace Visibility
+            if (isActive) {
+                $sidebar.html("").css("width", "0%");
+                $workspace.css("width", "100%");
+                $headerButton.removeClass("active");
                 return;
             }
-            $("#input-table-header-" + dataName + "-facets").removeClass("active");
-            $("#input-table-header-" + dataName + "-theme").removeClass("active");
-            $("#input-table-header-" + dataName + "-theme-edit").addClass("active");
 
-            $("#input-table-sidebar-" + dataName).css("width", "35%");
-            $("#input-table-workspace-" + dataName).css("width", "65%");
+            // Activate current sidebar
+            __setActiveHeaderButton(dataName,"theme-edit");
 
-            $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height());
+            // Set Sidebar and Workspace Dimensions
+            $sidebar.css({
+                "width": "35%",
+                "overflow": "auto"
+            }).height($workspace.height());
+            $workspace.css("width", "65%");
 
-            $("#input-table-sidebar-" + dataName).css("overflow", "auto");
+            // Open the sidebar
             __openSidebar(dataName, './theme_editor.html');
-
         };
 
         /**
@@ -829,11 +1030,11 @@
          * @returns {string} - html with the data table
          * @private
          */
-        __makeDataTable = function(data, dataName, height){
+        __makeDataTable = function(data, dataName, height) {
             return dataA[dataName].makeDataTable(data, dataName, height);
-        };    
-         
-         /**
+        };
+
+        /**
          * check scroll and add data rows if scroll at end 
          * @function __onScroll
          * @param {object} a - The scroll event.
@@ -841,7 +1042,7 @@
          * @returns {void}
          * @private
          */
-       __onScroll = function (event, dataName) {
+        __onScroll = function(event, dataName) {
             let rest = 1000;
             for (var i in event.target.childNodes) {
                 if (event.target.childNodes.item(i).tagName == "DIV") {
@@ -852,8 +1053,8 @@
                 dataA[dataName].addToDataTable(dataName);
             }
         };
-        
-        
+
+
         // ---------------------------------------------------
         // ---------------------------------------------------
         //
@@ -882,7 +1083,7 @@
                 }
             }
         };
-        
+
         /**
          * Displays an informational message box with a given text.
          * If `MessageBox.show` fails, it falls back to using the browser's built-in `alert`.
@@ -897,7 +1098,7 @@
                 alert(szText);
             }
         };
-        
+
         /**
          * Displays an error message box with a given text.
          * If `MessageBox.show` fails, it falls back to using the browser's built-in `alert`.
@@ -912,14 +1113,14 @@
                 alert(szText);
             }
         };
-        
+
         /**
          * Toggles visibility of data table for a specific data set and adjusts map height accordingly.
          * Updates icons on toggle buttons based on visibility state.
          * @function __hideData
          * @param {string} dataName - Name of the dataset whose table is being toggled
          * @private
-        */
+         */
         __hideData = function(dataName) {
 
             $("#" + "input-table-table-" + dataName).toggle();
@@ -932,12 +1133,12 @@
         };
 
         /**
-        * Toggles visibility of map for a specific dataset and adjusts table height accordingly.
-        * Updates icons on toggle buttons based on visibility state.
-        * @function __hideMap
-        * @param {string} dataName Name of the dataset whose map is being toggled
-        * @private
-        */
+         * Toggles visibility of map for a specific dataset and adjusts table height accordingly.
+         * Updates icons on toggle buttons based on visibility state.
+         * @function __hideMap
+         * @param {string} dataName Name of the dataset whose map is being toggled
+         * @private
+         */
         __hideMap = function(dataName) {
 
             $("#" + "input-table-map-" + dataName).toggle();
@@ -949,27 +1150,27 @@
             $("#" + "input-table-table-" + dataName).height(height);
             $("#input-table-table-" + dataName).html(__makeDataTable(dataA[dataName].data, dataName, height));
         };
-        
+
         /**
          * Toggles visibility of data table for a specific data set and adjusts map height accordingly.
          * Updates icons on toggle buttons based on visibility state.
          * @function __hideData
          * @param {string} dataName - Name of the dataset whose table is being toggled
          * @private
-        */
+         */
         __toggleCards = function(dataName) {
-            
+
             dataA[dataName].fShowCards = !dataA[dataName].fShowCards;
-            
+
             let height = $("#input-table-table-" + dataName).height();
             let offset = $("#input-table-table-" + dataName).children(":first").scrollLeft();
             $("#input-table-table-" + dataName).html(__makeDataTable(data, dataName, height));
             $("#input-table-table-" + dataName).children(":first").scrollLeft(offset)
         };
+
     </script>
 
     <script type="text/javascript" charset="utf-8">
-        
         // ----------------------------------------------------------
         // d i a l o g     
         // ----------------------------------------------------------
@@ -1000,8 +1201,8 @@
                         "width": "100%",
                         "height": "150%",
                         "position": "relative",
-                        "left": "13%",
-                        "max-width": "500px"
+                        "margin-left": "auto",
+                        "max-width": "1024px"
                     });
 
                     $dialog.append(`
@@ -1096,7 +1297,7 @@
         //
         // ---------------------------------------------------
         // ---------------------------------------------------
-        
+
 
         // make shure that multiple maps are no synchronized
         ixmaps.fSyncMaps = false;
@@ -1171,13 +1372,13 @@
             szCodeDiv += '<div class="text-left" style="margin:0.3em 0 0.5em 0">';
             szCodeDiv += '<a id="map_code_div-' + name + '-showcode" class="btn btn-outline-dark mt-auto" href="javascript:__showCode(\'' + name + '\')">show map project (JSON)</a> ';
             szCodeDiv += '<a id="map_code_div-' + name + '-showhtml" class="btn btn-outline-dark mt-auto" href="javascript:__showHTML(\'' + name + '\')">show embeding code (HTML)</a>';
-            szCodeDiv += '<a class="btn btn-outline-dark mt-auto" style="float:right" href="javascript:fullscreen(\'' + name + '\')">fullscreen</a> ';
+            szCodeDiv += '<a class="btn btn-outline-dark mt-auto" style="float:right" href="javascript:fullscreen(\'' + name + '\')"><i class="bi-arrows-angle-expand me-1"></i> fullscreen</a> ';
             szCodeDiv += '</div>';
             szCodeDiv += '<div id="map_code_div-' + name + '"></div>';
             szCodeDiv += '<div id="map_code_div-' + name + '_save" class="text-left" style="margin-top:0em;display:none">';
             szCodeDiv += '<a class="btn btn-outline-dark mt-auto" href="javascript:__saveProjectFile(\'' + name + '\')">save code</a> ';
             szCodeDiv += '</div>';
-            $('#input-table-' + name).append(szCodeDiv);
+            $('#input-table-map-' + name).append(szCodeDiv);
 
         };
 
@@ -1192,7 +1393,7 @@
          * @param {Array<object>} data - An array containing the two data objects for the map.
          * @param {Array<string>} name - An array containing the names of the two maps.
          * @returns {void}
-         */        
+         */
         const __createMap2 = (theme, data, name) => {
 
             const mapConfig = {
@@ -1250,7 +1451,7 @@
             szCodeDiv += '<div id="map_code_div-' + name + '"_save" class="text-left" style="margin-top:0em;display:none">';
             szCodeDiv += '<a class="btn btn-outline-dark mt-auto" href="javascript:__saveProjectFile(\'' + name + '\')">save code</a> ';
             szCodeDiv += '</div>';
-            $('#input-table-' + name).append(szCodeDiv);
+            $('#input-table-map' + name).append(szCodeDiv);
 
         };
 
@@ -1293,38 +1494,45 @@
 
             if (fullscreenMapId) {
                 $("#input-table-map-" + szFrameId).attr("style", fullscreenMapIdStyle);
+                $("#input-table-header-" + fullscreenMapId + "-map-inline").hide();
+
+                $("#input-table-map-contract-" + fullscreenMapId).remove();
 
                 window.scrollTo({
                     top: -pageY
                 });
                 fullscreenMapId = null;
                 fullscreenMapIdStyle = null;
+
                 return;
             }
 
             fullscreenMapId = szFrameId;
             pageY = document.body.getBoundingClientRect().top;
 
-            scroll = $("#input-table-map-" + szFrameId).offsetTop;
+            scroll = $("#input-table-map-" + szFrameId).offset().top;
 
             fullscreenMapIdStyle = $("#input-table-map-" + szFrameId).attr("style");
-            $("#input-table-map-" + szFrameId).attr("style", "position:absolute;width:100% !important;left:0 !important;height:" + (window.innerHeight - 5) + "px;border:0");
+            $("#input-table-map-" + szFrameId).attr("style", "position:absolute;width:100% !important;left:0 !important;height:" + (window.innerHeight - 5) + "px;border:0;z-index:999999;background:white");
 
             window.scrollTo({
                 top: scroll
             });
+
+            $("#input-table-header-" + szFrameId + "-map-inline").show();
+
+            $("#input-table-map-" + szFrameId).append('<div id="input-table-map-contract-' + szFrameId + '" style="position:absolute;bottom:2em;right:2em;"><a class="btn btn-outline-dark mt-auto" style="float:right" href="javascript:fullscreen(\'' + szFrameId + '\')"><i class="bi-arrows-angle-contract me-1"></i></a></div>');
         };
-        
+
         /**
          * Exits fullscreen mode for a map.
          *
          * @function inline
          * @param {string} szFrameId - The ID of the map container.
          */
-        inline = function(szFrameId) {
-        };
+        inline = function(szFrameId) {};
 
-        
+
         /**
          * Creates a map from a given data source.
          * @function __dataToMap
@@ -1335,13 +1543,13 @@
 
             let themeObj = __makeDefaultTheme(dataName);
             themeObj.style.filter = dataA[dataName].facetsFilter;
-            
+
             console.log("^^^^^^^^^^^^^^^^^^^^^^^^");
             console.log("^^^^^^^^^^^^^^^^^^^^^^^^");
             console.log(themeObj);
             console.log("^^^^^^^^^^^^^^^^^^^^^^^^");
             console.log("^^^^^^^^^^^^^^^^^^^^^^^^");
-            
+
             if (1 || themeObj.style.lookupfield) {
                 $("#" + "input-table-map-" + dataName).css("height", "450px");
                 $("#" + "input-table-map-" + dataName).css("width", "100%");
@@ -1409,6 +1617,7 @@
             $("#facetDiv-" + dataName).height($("#input-table-workspace-" + dataName).height());
 
             $("#input-table-header-" + dataName + "-map").hide();
+            $("#input-table-header-" + dataName + "-remove-map").show();
             $("#input-table-header-" + dataName + "-toggle-data").show();
             $("#input-table-header-" + dataName + "-toggle-map").show();
 
@@ -1454,9 +1663,60 @@
                     let height = $("#input-table-table-" + dataName).height();
                     $("#input-table-table-" + dataName).html(__makeDataTable(dataObj, dataName, height));
 
-                    $("#input-table-info-" + dataName).html("records: " + dataObj.table.records + " (" + dataA[dataName].data.table.records + ") filtered by map view <a href='javascript:export(\"" + dataName+ "\")'>export</a>");
+                    $("#input-table-info-" + dataName).html("records: " + dataObj.table.records + " (" + dataA[dataName].data.table.records + ") filtered by map view <a href='javascript:saveAsCSV(\"" + dataName + "\")'>export</a>");
                 }
             }
+        };
+
+        /**
+         * Removes the map from a data workspace
+         * @param {string} dataName - The unique data name.
+         * @private
+         */
+        __removeMap = function(dataName) {
+
+            __confirm("do you really want to remove the map?", () => {
+                
+                $("#" + "input-table-table-" + dataName).css("height", "450px");
+                $("#input-table-table-" + dataName).html(__makeDataTable(dataA[dataName].data, dataName, 450));
+
+                $("#input-table-sidebar-" + dataName).height($("#input-table-workspace-" + dataName).height());
+                $("#facetDiv-" + dataName).height($("#input-table-workspace-" + dataName).height());
+
+                $("#input-table-header-" + dataName + "-map").show();
+                $("#input-table-header-" + dataName + "-remove-map").hide();
+                $("#input-table-header-" + dataName + "-theme").hide();
+                $("#input-table-header-" + dataName + "-theme-edit").hide();
+                $("#input-table-header-" + dataName + "-toggle-data").hide();
+                $("#input-table-header-" + dataName + "-toggle-map").hide();
+                
+                if ($("#input-table-header-" + dataName + "-theme").hasClass("active")) {
+                    $(".colpick").remove();
+                }
+
+                $("#input-table-map-" + dataName).html("");
+                
+                if (dataA[dataName].map) {
+                    delete ixmaps.embeddedApiA[dataName];
+                    dataA[dataName].map = null;
+                }
+                
+                const $activeSidebar = dataName ? $(`#input-table-sidebar-${dataName}`) : null;
+                const $activeWorkspace = dataName ? $(`#input-table-workspace-${dataName}`) : null;
+                const $activeHeader = dataName ? $(`#input-table-header-${dataName}-theme`) : null;
+
+                // If another theme is active, close it
+                if (dataName) {
+                    $activeSidebar.html("").css("width", "0%");
+                    $activeWorkspace.css("width", "100%");
+                    $activeHeader.removeClass("active");
+
+                    // Remove color picker elements
+                    $(".colpick").remove();
+                }
+ 
+                return;
+            });
         };
 
 
@@ -1629,12 +1889,12 @@
             if (szLat.length && szLon.length) {
                 szLookup = szLat + "|" + szLon;
             }
-            
-            if (szLookup == ""){
-                szLookup = fields[0].id+"|"+fields[0].id;
+
+            if (szLookup == "") {
+                szLookup = fields[0].id + "|" + fields[0].id;
                 __error("No column with coordinate values found!\nPlease select coordinates manually !");
             }
-            
+
             return szLookup;
         };
 
@@ -1852,11 +2112,11 @@
                 $("#map_code_div-" + dataName + "_save").show();
             });
         };
-        
+
         // -------------------------------------       
         // s a v e    t o    d o w n l o a d
         // -------------------------------------
-        
+
         /**
          * isAPIAvailable  
          *
@@ -1932,7 +2192,7 @@
         // l o a d   a n d   p r o c e s s   d a t a 
         // ----------------------------------------------------------
         // ----------------------------------------------------------
-        
+
         /**
          * Process loaded data (text string) and create data table object.
          * Apply query parameter to filter or process the data.
@@ -1943,7 +2203,7 @@
          * @type void
          */
         function processTextData(text, szSource) {
-            
+
             let sType = "";
 
             if (text.match(/\<xml/) && text.match(/feed/)) {
@@ -1963,46 +2223,46 @@
             } else
             if ((text[0] == "{") || (text[0] == "[")) {
                 sType = "json";
-             } else {
+            } else {
                 sType = "csv";
             }
 
             $("#load-param-spinner").hide();
-            
+
             data = Data.import({
                 source: text,
                 type: sType
             });
-            
+
             const dataName = __addData(data);
-            
-            if (params.analyze){
+
+            if (params.analyze) {
                 dataA[dataName].fShowAnalytics = true;
                 $("#input-table-header-" + dataName + "-analytics").addClass("active");
             }
-            
-            if (params.filter){
-                if (!params.pivot){
+
+            if (params.filter) {
+                if (!params.pivot) {
                     __dataFacets(dataName);
                 }
-                __dataFacetsSetFilter(dataName,params.filter);
+                __dataFacetsSetFilter(dataName, params.filter);
             }
-            if (params.pivot){
-                 dataA[dataName].pivot = JSON.parse(params.pivot);
+            if (params.pivot) {
+                dataA[dataName].pivot = JSON.parse(params.pivot);
                 __dataProcess(dataName);
                 setTimeout(() => {
                     $("#input-table-header-" + dataName + "-pivot").addClass("active");
-                    __dataProcessMakePivot(dataName,dataA[dataName].pivot);
-                },100);
+                    __dataProcessMakePivot(dataName, dataA[dataName].pivot);
+                }, 100);
             }
-            if (params.sort){
-                 setTimeout(() => {
-                    __dataSort(dataName,params.sort.split("-")[0],params.sort.split("-")[1]);
-                },1000);
-             }
+            if (params.sort) {
+                setTimeout(() => {
+                    __dataSort(dataName, params.sort.split("-")[0], params.sort.split("-")[1]);
+                }, 1000);
+            }
 
-         };
-        
+        };
+
         /**
          * Load data from given URL as text and calls a processing function on success.
          *
@@ -2022,7 +2282,7 @@
                     processTextData(data, szUrl);
                 },
                 error: function() {
-                     alert("\"" + szUrl + "\" could not be loaded!");
+                    alert("\"" + szUrl + "\" could not be loaded!");
                 }
             });
         }
@@ -2032,29 +2292,29 @@
         // i n i t   a l l 
         // ----------------------------------------------------------
         // ----------------------------------------------------------
-        
-        $("#Input-table").css("min-height",(window.innerHeight-200)+"px");
-        
+
+        $("#Input-table").css("min-height", (window.innerHeight - 200) + "px");
+
         // get query as parameter object
         // ------------------------------
-		const params = new Proxy(new URLSearchParams(window.location.search), {
-			get: (searchParams, prop) => searchParams.get(prop),
-		});
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        });
 
         // ----------------------------------------------------------------------------
         // a) if we have data or project defined in query parameter, load and process data
         // ----------------------------------------------------------------------------
-        
-		if (params.project) {
-			alert(params.project);
-		} else
+
+        if (params.project) {
+            alert(params.project);
+        } else
         if (params.data) {
             doDataUrl(params.data);
         }
         // ---------------------------------
         // b) if not, show data loading dialog
         // ---------------------------------
-        else{
+        else {
             __dataLoadDialog();
         }
 
